@@ -64,9 +64,9 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 					//depth = imp.getNSlices();
 					//type = imp.getType();
 					//fi = imp.getOriginalFileInfo();
-					//if (!showDialog(info, list))
-					//	return;
-					//break;
+					if (!showDialog(info, list))
+						return;
+					break;
 				}
 			}
 			if (width==0) {
@@ -474,10 +474,12 @@ class OpenerExtensions extends Opener {
 		IJ.log("  filename:"+filename);
 		IJ.log("  slice:"+n);
 		if (info==null) return null;
-		FileInfo fi= (FileInfo) info[0].clone();
-		fi.fileName = filename;
-		fi.directory = directory;
-		if (info.length==1 && fi.nImages>1) {
+		FileInfo fi = null;
+		if (info.length==1 && info[0].nImages>1) {
+			/** in this case getTiffFileInfo will only open the first IDF; as this is rather fast we do it
+			for every file to see different fi.offset, which does happen */
+			FileInfo[] infoThisFile = new Opener().getTiffFileInfo(directory+filename);
+			fi = (FileInfo) infoThisFile[0];
 			if (n<1 || n>fi.nImages)
 				throw new IllegalArgumentException("N out of 1-"+fi.nImages+" range");
 			long size = fi.width*fi.height*fi.getBytesPerPixel();
@@ -485,6 +487,11 @@ class OpenerExtensions extends Opener {
 			fi.offset = 0;
 			fi.nImages = 1;
 		} else {
+			/** it would take to long to open all IFDs again; so we hope that the ones from the
+			first file work */
+			fi = (FileInfo) info[0].clone();
+			fi.fileName = filename;
+			fi.directory = directory;		
 			if (n<1 || n>info.length)
 				throw new IllegalArgumentException("N out of 1-"+info.length+" range");
 			fi.longOffset = info[n-1].getOffset();
