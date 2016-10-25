@@ -43,15 +43,20 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 		double max = -Double.MAX_VALUE;
 		
 		try {
+			
+			IJ.log("Obtaining info from first file...");
+			
 			for (int i=0; i<list.length; i++) {
-				IJ.log("Obtaining info from first file...");
+				
 				info = new Opener().getTiffFileInfo(directory+list[i]);
-				IJ.log("file info length: "+info.length);								
+				IJ.log("file info length: "+info.length);												
 				fi = info[0];
-				IJ.log("bit-depth: "+2*fi.getBytesPerPixel());
+				IJ.log("filename: "+fi.fileName);								
+				IJ.log("bit-depth: "+8*fi.getBytesPerPixel());
 				IJ.log("nx: "+fi.width);
 				IJ.log("ny: "+fi.height);
 				IJ.log("nImages: "+fi.nImages);
+				IJ.log("offset: "+fi.getOffset());
 				IJ.log(""+fi.toString());
 				if (fi!=null) {
 					width = fi.width;
@@ -61,10 +66,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 					//fi = imp.getOriginalFileInfo();
 					//if (!showDialog(info, list))
 					//	return;
-					start = 0; 
-					increment = 1;
-					n = 0;
-					break;
+					//break;
 				}
 			}
 			if (width==0) {
@@ -116,14 +118,15 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 						depth = info.length;
 					
 					// only opens first slice
-					IJ.log("Obtaining information by opening first slice of first stack...");
-					imp = new Opener().openImage(directory+list[i], 1);
+					IJ.log("Obtaining additional information by opening first slice of first stack...");
+					imp = new OpenerExtensions().openPlaneInTiffUsingGivenFileInfo(directory, list[i], 1, info);
+					//imp = new Opener().openImage(directory+list[i], 1);
 					ColorModel cm = imp.getProcessor().getColorModel();
 					width = imp.getWidth();
 					height = imp.getHeight();
 					type = imp.getType();
 					//depth = imp.getNSlices();
-					stack = new VirtualStackOfStacks(width, height, depth, cm, directory);
+					stack = new VirtualStackOfStacks(width, height, depth, cm, directory, info);
 				 }
 				count = stack.getNStacks()+1;
 				IJ.showStatus(count+"/"+n);
@@ -325,12 +328,14 @@ class VirtualStackOfStacks extends ImageStack{
 	int nSlices;
 	int nStacks;
 	String[] names;
+	FileInfo[] info;
 	
 	/** Creates a new, empty virtual stack. */
-	public VirtualStackOfStacks(int width, int height, int depth, ColorModel cm, String path) {
+	public VirtualStackOfStacks(int width, int height, int depth, ColorModel cm, String path, FileInfo[] info) {
 		super(width, height, cm);
 		this.path = path;
 		this.depth = depth;
+		this.info = info;
 		names = new String[INITIAL_SIZE];
 		//IJ.log("VirtualStackOfStacks: "+path);
 	}
@@ -405,7 +410,8 @@ class VirtualStackOfStacks extends ImageStack{
 		nSlice = n - nFile * depth;
 		// IJ.log("requested slice: "+n);
 		IJ.log("opening slice "+nSlice+" of "+path+names[nFile]);
-		ImagePlus imp = new Opener().openImage(path+names[nFile], nSlice);
+		//ImagePlus imp = new Opener().openImage(path+names[nFile], nSlice);
+                        ImagePlus imp = new OpenerExtensions().openPlaneInTiffUsingGivenFileInfo(path, names[nFile], nSlice, info);
 		if (imp!=null) {
 			int w = imp.getWidth();
 			int h = imp.getHeight();
@@ -454,3 +460,40 @@ class VirtualStackOfStacks extends ImageStack{
 	}
 		
 }
+
+
+/** Opens the nth image of the specified TIFF stack. */
+class OpenerExtensions extends Opener { 
+
+	public OpenerExtensions() {
+	}
+ 
+	public ImagePlus openPlaneInTiffUsingGivenFileInfo(String directory, String filename, int n, FileInfo[] info) {
+		IJ.log("openPlaneInTiffUsingGivenFileInfo");
+		IJ.log("  directory:"+directory);
+		IJ.log("  filename:"+filename);
+		IJ.log("  slice:"+n);
+		if (info==null) return null;
+		FileInfo fi= (FileInfo) info[0].clone();
+		fi.fileName = filename;
+		fi.directory = directory;
+		if (info.length==1 && fi.nImages>1) {
+			if (n<1 || n>fi.nImages)
+				throw new IllegalArgumentException("N out of 1-"+fi.nImages+" range");
+			long size = fi.width*fi.height*fi.getBytesPerPixel();
+			fi.longOffset = fi.getOffset() + (n-1)*(size+fi.gapBetweenImages);
+			fi.offset = 0;
+			fi.nImages = 1;
+		} else {
+			if (n<1 || n>info.length)
+				throw new IllegalArgumentException("N out of 1-"+info.length+" range");
+			fi.longOffset = info[n-1].getOffset();
+			fi.offset = 0;
+			fi.stripOffsets = info[n-1].stripOffsets; 
+			fi.stripLengths = info[n-1].stripLengths; 
+		}
+		FileOpener fo = new FileOpener(fi);
+		return fo.open(false);
+	}
+}
+
