@@ -9,6 +9,7 @@ import ij.io.*;
 import ij.gui.*;
 import ij.process.*;
 
+import loci.formats.tiff.*;
 
 /** Opens a folder of stacks as a virtual stack. */
 public class Open_Stacks_As_VirtualStack implements PlugIn {
@@ -38,6 +39,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 		int width=0,height=0,depth=0,type=0;
 		FileInfo[] info = null;
 		FileInfo fi = null;
+		TiffParser tp = null;
 		VirtualStackOfStacks stack = null;
 		double min = Double.MAX_VALUE;
 		double max = -Double.MAX_VALUE;
@@ -47,7 +49,9 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 			IJ.log("Obtaining info from first file...");
 			
 			for (int i=0; i<list.length; i++) {
-				
+				tp = new TiffParser(directory+list[i]);
+				IFDList ifds = tp.getIFDs();
+				byte[]	getSamples(IFD ifd, byte[] buf, int x, int y, long width, long height) 
 				info = new Opener().getTiffFileInfo(directory+list[i]);
 				IJ.log("file info length: "+info.length);												
 				fi = info[0];
@@ -138,6 +142,8 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 		} catch(OutOfMemoryError e) {
 			IJ.outOfMemory("FolderOpener");
 			if (stack!=null) stack.trim();
+		}catch(IOException e){
+			  e.printStackTrace();
 		}
 		if (stack!=null && stack.getSize()>0) {
 			ImagePlus imp2 = new ImagePlus("Stack", stack);
