@@ -107,7 +107,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 			int counter = 0;
 			ImagePlus imp = null;
 			for (int i=start-1; i<list.length; i++) {
-				IJ.log("Processing "+list[i]);
+				//IJ.log("Processing "+list[i]);
 				if (filter!=null && (list[i].indexOf(filter)<0))
 					continue;
 				if ((counter++%increment)!=0)
@@ -135,7 +135,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 					stack = new VirtualStackOfStacks(width, height, depth, cm, directory, info);
 				 }
 				count = stack.getNStacks()+1;
-				IJ.showStatus(count+"/"+n);
+				//IJ.showStatus(count+"/"+n);
 				IJ.showProgress((double)count/n);
 				stack.addStack(list[i]);
 				if (count>=n)
@@ -160,9 +160,9 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 			imp2.setDimensions(nC, nZ, nT);
 			imp2.setOpenAsHyperStack(true); 
 			imp2.show();
-			ImageProcessor ipc = stack.getCroppedProcessor(10, 690, 100, 430, 100);
-			ImagePlus impc = new ImagePlus("ipc",ipc);
-			impc.show();
+			//ImageProcessor ipc = stack.getCroppedProcessor(10, 690, 100, 430, 100);
+			//ImagePlus impc = new ImagePlus("ipc",ipc);
+			//impc.show();
 		}
 		IJ.showProgress(1.0);
 	}
