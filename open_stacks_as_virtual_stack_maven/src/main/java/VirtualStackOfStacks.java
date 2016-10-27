@@ -4,13 +4,15 @@
 
 import java.awt.image.*;
 import ij.*;
-import ij.io.*;
-
+import ij.io.FileInfo;
+import ij.process.ImageProcessor;
+import static ij.IJ.log;
 
 /**
  This class represents an array of disk-resident images.
  */
 public class VirtualStackOfStacks extends ImageStack {
+
     static final int INITIAL_SIZE = 100;
     String path;
     int depth;
