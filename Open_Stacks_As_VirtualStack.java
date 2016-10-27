@@ -49,10 +49,12 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 			IJ.log("Obtaining info from first file...");
 			
 			for (int i=0; i<list.length; i++) {
-				tp = new TiffParser(directory+list[i]);
-				IFDList ifds = tp.getIFDs();
-				byte[]	getSamples(IFD ifd, byte[] buf, int x, int y, long width, long height) 
+				//tp = new TiffParser(directory+list[i]);
+				//IFDList ifds = tp.getIFDs();
+				//byte[]	getSamples(IFD ifd, byte[] buf, int x, int y, long width, long height) 
+				IJ.log("  Reading IFDs...");				
 				info = new Opener().getTiffFileInfo(directory+list[i]);
+				IJ.log("  done.");				
 				IJ.log("file info length: "+info.length);												
 				fi = info[0];
 				IJ.log("filename: "+fi.fileName);								
@@ -142,8 +144,8 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 		} catch(OutOfMemoryError e) {
 			IJ.outOfMemory("FolderOpener");
 			if (stack!=null) stack.trim();
-		}catch(IOException e){
-			  e.printStackTrace();
+		//}catch(IOException e){
+		//	  e.printStackTrace();
 		}
 		if (stack!=null && stack.getSize()>0) {
 			ImagePlus imp2 = new ImagePlus("Stack", stack);
@@ -158,6 +160,9 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 			imp2.setDimensions(nC, nZ, nT);
 			imp2.setOpenAsHyperStack(true); 
 			imp2.show();
+			ImageProcessor ipc = stack.getCroppedProcessor(10, 690, 100, 430, 100);
+			ImagePlus impc = new ImagePlus("ipc",ipc);
+			impc.show();
 		}
 		IJ.showProgress(1.0);
 	}
@@ -429,6 +434,25 @@ class VirtualStackOfStacks extends ImageStack{
 		}		
 		return imp.getProcessor();
 	 }
+
+	public ImageProcessor getCroppedProcessor(int n, int x, int width, int y, int height) {
+		IJ.log("getCroppedProcessor");
+		int nFile = (int) (n-1)/depth;
+		int nSlice = n - nFile * depth;
+		// IJ.log("requested slice: "+n);
+		IJ.log("opening slice "+nSlice+" of "+path+names[nFile]);
+		ImagePlus imp = new OpenerExtensions().openCroppedTiffPlaneUsingGivenFileInfo(path, names[nFile], nSlice, x, width, y, height, info);
+		if (imp!=null) {
+			int w = imp.getWidth();
+			int h = imp.getHeight();
+			int type = imp.getType();
+			ColorModel cm = imp.getProcessor().getColorModel();
+		} else {
+			IJ.log("Error: loading failed!");	
+			return null;
+		}		
+		return imp.getProcessor();
+	}
  
 	 /** Returns the number of slices in this stack. */
 	public int getSize() {
@@ -508,5 +532,83 @@ class OpenerExtensions extends Opener {
 		FileOpener fo = new FileOpener(fi);
 		return fo.open(false);
 	}
+
+
+	public ImagePlus openCroppedTiffPlaneUsingGivenFileInfo(String directory, String filename, int n, int x, int width, int y, int height, FileInfo[] info) {
+		
+		IJ.log("openCroppedTiffPlaneUsingGivenFileInfo");
+		IJ.log("  directory:"+directory);
+		IJ.log("  filename:"+filename);
+		IJ.log("  slice:"+n);
+		IJ.log("  x:"+x);
+		IJ.log("  w:"+width);
+		IJ.log("  y:"+y);
+		IJ.log("  h:"+height);
+		
+		if (info==null) return null;
+		FileInfo fi = null;
+		if (info.length==1 && info[0].nImages>1) {
+			/** in this case getTiffFileInfo will only open the first IDF; as this is rather fast we do it
+			for every file to see different fi.offset, which does happen */
+			FileInfo[] infoThisFile = new Opener().getTiffFileInfo(directory+filename);
+			fi = (FileInfo) infoThisFile[0];
+			if (n<1 || n>fi.nImages)
+				throw new IllegalArgumentException("N out of 1-"+fi.nImages+" range");
+			long size = fi.width*fi.height*fi.getBytesPerPixel();
+			fi.longOffset = fi.getOffset() + (n-1)*(size+fi.gapBetweenImages);
+			fi.offset = 0;
+			fi.nImages = 1;
+		
+	} else {	
+
+			width = 100; //1918;
+			height = 100;
+			x = 680; y = 420;
+
+			/** it would take to long to open all IFDs again; so we hope that the ones from the
+			first file work */
+			IJ.log("  IFD array case");
+			fi = (FileInfo) info[0].clone();
+			fi.fileName = filename;
+			fi.directory = directory;		
+			if (n<1 || n>info.length)
+				throw new IllegalArgumentException("N out of 1-"+info.length+" range");
+			fi.longOffset = info[n-1].getOffset() + (y*fi.width+x)*fi.getBytesPerPixel();  // offset to upper left corner of ROI
+			fi.offset = 0;
+			fi.stripOffsets = info[n-1].stripOffsets; 
+			fi.stripLengths = info[n-1].stripLengths;
+
+			//IJ.log("fi.width: "+fi.width);
+			//IJ.log("fi.height: "+fi.height);
+			//IJ.log("fi.getBytesPerPixel: "+fi.getBytesPerPixel());
+			//IJ.log("stripLengths.length: "+fi.stripLengths.length);
+			//for (int i=0; i<1; i++) {  
+			//	IJ.log("  stripLengths "+fi.stripLengths[i]);
+			//	IJ.log("  stripOffsets  "+fi.stripLengths[i]);
+			//}
+			int[] newStripLengths = new int[height];
+			int[] newStripOffsets = new int[height];
+			for (int i=0; i<newStripLengths .length; i++) { 
+				newStripLengths[i] = width * fi.getBytesPerPixel();
+				newStripOffsets[i] = i * fi.width * fi.getBytesPerPixel();
+			}
+			fi.stripOffsets = newStripOffsets; 
+			fi.stripLengths = newStripLengths;
+			fi.height = height;
+			fi.width = width;
+			//IJ.log("stripLengths.length: "+fi.stripLengths.length);
+			//for (int i=0; i<1; i++) {  
+			//	IJ.log("  stripLengths "+fi.stripLengths[i]);
+			//	IJ.log("  stripOffsets  "+fi.stripLengths[i]);
+			//}
+
+		}
+		long startTime = System.currentTimeMillis();		
+		FileOpener fo = new FileOpener(fi);
+		ImagePlus imp =  fo.open(false);
+		long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; IJ.log("  elapsed time: "+elapsedTime);
+		return imp;
+	}
+
 }
 
