@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+		http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>net.imagej</groupId>
+		<artifactId>pom-imagej</artifactId>
+		<version>7.0.0</version>
+		<relativePath />
+	</parent>
+
+	<groupId>sc.fiji</groupId>
+	<artifactId>Open_Stacks_As_VirtualStack</artifactId>
+	<version>0.1.0-SNAPSHOT</version>
+
+	<name>plugins/Open_Stacks_As_VirtualStack.jar</name>
+	<description>A Maven project implementing an ImageJ 1.x plugin</description>
+
+	<developers>
+		<developer>
+			<id>tischi</id>
+			<name>Christian Tischer</name>
+			<email>tischitischer@gmail.com</email>
+			<url></url>
+			<organization>EMBL Heidelberg</organization>
+			<organizationUrl>http://www.embl.de</organizationUrl>
+			<roles>
+				<role>microscopy</role>
+				<role>image analysis</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+
+	<properties>
+		<main-class>Open_Stacks_As_VirtualStack</main-class>
+	</properties>
+
+	<repositories>
+		<!-- NB: for project parent -->
+		<repository>
+			<id>imagej.public</id>
+			<url>http://maven.imagej.net/content/groups/public</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>ij</artifactId>
+			<version>1.51f</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>${main-class}</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
