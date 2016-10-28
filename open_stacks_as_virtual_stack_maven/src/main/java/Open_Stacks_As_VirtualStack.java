@@ -4,9 +4,11 @@ import java.awt.image.*;
 import java.io.*;
 import java.awt.event.*;
 import ij.*;
+import ij.ImagePlus;
 import ij.io.Opener;
 import ij.io.FileInfo;
 import ij.gui.*;
+import ij.process.ImageProcessor;
 
 import static ij.IJ.log;
 
@@ -15,61 +17,75 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 
 	private static boolean grayscale;
 	private static double scale = 100.0;
-	private int n, start, increment;
+	private int n=0, start=0, increment=0;
 	private String filter;
 	private FileInfo fi;
 	private String info1;
 
 	public void run(String arg) {
 		String directory = IJ.getDirectory("Select a Directory");
-		if (directory==null)
+		if (directory == null)
 			return;
 		Macro.setOptions(null); // Prevents later use of OpenDialog from reopening the same file
-		
-		log("Obtaining file list...");
-		String[] list = new File(directory).list();
-		if (list==null || list.length==0)
-			return;
 		IJ.register(Open_Stacks_As_VirtualStack.class);
-		log("Sorting file list...");
-		list = sortFileList(list);
-		if (list==null) return;
-		if (IJ.debugMode) log("FolderOpener: " + directory + " (" + list.length + " files)");
-		int width=0,height=0,depth=0,type=0;
+		ImagePlus imp = openStacksAsVirtualStack(directory, 0);
+		imp.show();
+	}
+
+	public Open_Stacks_As_VirtualStack() {
+
+	}
+
+	public ImagePlus openStacksAsVirtualStack(String directory, int inc) {
+		this.increment = inc;
+        int width=0,height=0,depth=0,type=0;
 		FileInfo[] info = null;
 		FileInfo fi = null;
 		VirtualStackOfStacks stack = null;
 		double min = Double.MAX_VALUE;
 		double max = -Double.MAX_VALUE;
-		
+        ImagePlus imp2 = null;
+
+		log("Obtaining file list...");
+		String[] list = new File(directory).list();
+		if (list==null || list.length==0)
+			return null;
+		log("Sorting file list...");
+		list = this.sortFileList(list);
+		if (list==null) return null;
+		log("FolderOpener: " + directory + " (" + list.length + " files)");
+
 		try {
 			
 			log("Obtaining info from first file...");
 			
 			for (int i=0; i<list.length; i++) {
-				log("  Reading IFDs...");
+				log("Reading IFDs from: "+ directory + list[i]);
 				info = Opener.getTiffFileInfo(directory + list[i]);
-				log("  done.");
-				log("file info length: " + info.length);
-				fi = info[0];
-				log("filename: " + fi.fileName);
-				log("bit-depth: " + 8 * fi.getBytesPerPixel());
-				log("nx: " + fi.width);
-				log("ny: " + fi.height);
-				log("nImages: " + fi.nImages);
-				log("offset: " + fi.getOffset());
-				log("" + fi.toString());
-				if (fi!=null) {
-					width = fi.width;
-					if (!showDialog(info, list))
-						return;
-					break;
-				}
+				if(info == null) {
+                    log("Failed to open file!");
+                    return(null);
+                }
+                fi = info[0];
+                if (fi!=null) {
+                    log("fileInfo length: " + info.length);
+                    log("filename: " + fi.fileName);
+                    log("fileInfo: " + fi.toString());
+                    width = fi.width;
+					if(increment == 0) {  // only show user dialog if increment is not set
+						if (!showDialog(info, list))
+							return null;
+						break;
+					}
+				} else {
+                    log("Failed to read IFDs!");
+                    return(null);
+                }
 			}
 			if (width==0) {
 				IJ.showMessage("Import Sequence", "This folder does not appear to contain any TIFF,\n"
 				+ "JPEG, BMP, DICOM, GIF, FITS or PGM files.");
-				return;
+				return null;
 			}
 
 			if (n<1)
@@ -89,7 +105,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 				}
 				if (filteredImages==0) {
 					IJ.error("None of the "+n+" files contain\n the string '"+filter+"' in their name.");
-					return;
+					return null;
 				}
 			}
 			n = filteredImages;
@@ -139,7 +155,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 		//	  e.printStackTrace();
 		}
 		if (stack!=null && stack.getSize()>0) {
-			ImagePlus imp2 = new ImagePlus("Stack", stack);
+            imp2 = new ImagePlus("Stack", stack);
 			if (imp2.getType()==ImagePlus.GRAY16 || imp2.getType()==ImagePlus.GRAY32)
 				imp2.getProcessor().setMinAndMax(min, max);
 			imp2.setFileInfo(fi); // saves FileInfo of the first image
@@ -149,13 +165,14 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 			int nZ = imp2.getNSlices() / stack.getNStacks();
 			int nT = stack.getNStacks();
 			imp2.setDimensions(nC, nZ, nT);
-			imp2.setOpenAsHyperStack(true); 
-			imp2.show();
+			imp2.setOpenAsHyperStack(true);
+            imp2.resetDisplayRange();
 			//ImageProcessor ipc = stack.getCroppedProcessor(10, 690, 100, 430, 100);
 			//ImagePlus impc = new ImagePlus("ipc",ipc);
 			//impc.show();
 		}
 		IJ.showProgress(1.0);
+        return(imp2);
 	}
 	
 	boolean showDialog(FileInfo[] info, String[] list) {
@@ -252,16 +269,25 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 
 		// start ImageJ
 		new ImageJ();
-
+		Open_Stacks_As_VirtualStack ovs = new Open_Stacks_As_VirtualStack();
+		ImagePlus imp = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200/", 1);
+		imp.show();
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        ImageProcessor ip = vss.getCroppedProcessor(1,5,50,25,50);
+        ImagePlus imp2 = new ImagePlus("", ip);
+        imp2.resetDisplayRange();
+        imp2.show();
 		// open the Clown sample
-		ImagePlus image = IJ.openImage("http://imagej.net/images/clown.jpg");
-		image.show();
+		//ImagePlus image = IJ.openImage("http://imagej.net/images/clown.jpg");
+		//image.show();
 
 		// run the plugin
-		IJ.runPlugIn(clazz.getName(), "");
+		//IJ.runPlugIn(clazz.getName(), "");
 	}
 
 }
+
+
 
 class VirtualOpenerDialog extends GenericDialog {
 	FileInfo[] info;

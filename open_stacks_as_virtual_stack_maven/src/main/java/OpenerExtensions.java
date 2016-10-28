@@ -59,7 +59,9 @@ class OpenerExtensions extends Opener {
         log("  h:" + height);
 
         if (info==null) return null;
+
         FileInfo fi = null;
+
         if (info.length==1 && info[0].nImages>1) {
             /** in this case getTiffFileInfo will only open the first IDF; as this is rather fast we do it
              for every file to see different fi.offset, which does happen */
@@ -69,15 +71,21 @@ class OpenerExtensions extends Opener {
                 throw new IllegalArgumentException("N out of 1-"+fi.nImages+" range");
             long size = fi.width*fi.height*fi.getBytesPerPixel();
             fi.longOffset = fi.getOffset() + (n-1)*(size+fi.gapBetweenImages);
+            fi.longOffset = fi.longOffset + (y*fi.width+x)*fi.getBytesPerPixel();
             fi.offset = 0;
-            fi.nImages = 1;
+            fi.nImages = 0;
+            int[] newStripLengths = new int[height];
+            int[] newStripOffsets = new int[height];
+            for (int i=0; i<newStripLengths .length; i++) {
+                newStripLengths[i] = width * fi.getBytesPerPixel();
+                newStripOffsets[i] = i * fi.width * fi.getBytesPerPixel();
+            }
+            fi.stripOffsets = newStripOffsets;
+            fi.stripLengths = newStripLengths;
+            fi.height = height;
+            fi.width = width;
 
         } else {
-
-            width = 100; //1918;
-            height = 100;
-            x = 680; y = 420;
-
             /** it would take to long to open all IFDs again; so we hope that the ones from the
              first file work */
             log("  IFD array case");
