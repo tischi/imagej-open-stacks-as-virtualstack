@@ -58,9 +58,9 @@
   </path>
   
   
-  <target name="compile.module.open_stacks_as_virtualstack" depends="compile.module.open_stacks_as_virtualstack.production,compile.module.open_stacks_as_virtualstack.tests" description="Compile module Open_Stacks_As_VirtualStack"/>
+  <target name="compile.module.open_stacks_as_virtualstack" depends="compile.module.open_stacks_as_virtualstack.production,compile.module.open_stacks_as_virtualstack.tests" description="Compile module ct.vss.Open_Stacks_As_VirtualStack"/>
   
-  <target name="compile.module.open_stacks_as_virtualstack.production" depends="register.custom.compilers" description="Compile module Open_Stacks_As_VirtualStack; production classes">
+  <target name="compile.module.open_stacks_as_virtualstack.production" depends="register.custom.compilers" description="Compile module ct.vs.Open_Stacks_As_VirtualStack; production classes">
     <mkdir dir="${open_stacks_as_virtualstack.output.dir}"/>
     <javac2 destdir="${open_stacks_as_virtualstack.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.open_stacks_as_virtualstack}/javac">
       <compilerarg line="${compiler.args.open_stacks_as_virtualstack}"/>
@@ -82,7 +82,7 @@
     </copy>
   </target>
   
-  <target name="compile.module.open_stacks_as_virtualstack.tests" depends="register.custom.compilers,compile.module.open_stacks_as_virtualstack.production" description="compile module Open_Stacks_As_VirtualStack; test classes" unless="skip.tests"/>
+  <target name="compile.module.open_stacks_as_virtualstack.tests" depends="register.custom.compilers,compile.module.open_stacks_as_virtualstack.production" description="compile module ct.vs.Open_Stacks_As_VirtualStack; test classes" unless="skip.tests"/>
   
   <target name="clean.module.open_stacks_as_virtualstack" description="cleanup module">
     <delete dir="${open_stacks_as_virtualstack.output.dir}"/>
