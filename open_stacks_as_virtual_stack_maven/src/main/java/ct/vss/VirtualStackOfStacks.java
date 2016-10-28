@@ -133,9 +133,10 @@ public class VirtualStackOfStacks extends ImageStack {
         return imp.getProcessor();
     }
 
-    public ImagePlus getCroppedStackAsImagePlus(int t, int c, int z, int nz, int x, int nz, int y, int ny) {
+    public ImagePlus getCroppedFrameAsImagePlus(int t, int c, int z, int nz, int x, int nx, int y, int ny) {
         log("opening slices " + z + " to " + (z+nz) + " of " + path + names[t-1]);
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingGivenFileInfo(path, names[t-1], z, nz, x, nx, y, ny, info);
+
+        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingGivenFileInfo(path, names[t - 1], info, z, nz, x, nx, y, ny);
 
         if (imp==null) {
             log("Error: loading failed!");

@@ -275,10 +275,13 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 		ImagePlus imp = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200/", 1);
 		imp.show();
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-        ImageProcessor ip = vss.getCroppedProcessor(1,5,50,25,50);
-        ImagePlus imp2 = new ImagePlus("", ip);
-        imp2.resetDisplayRange();
-        imp2.show();
+        //ImageProcessor ip = vss.getCroppedProcessor(1,5,50,25,50);
+        //ImagePlus imp2 = new ImagePlus("", ip);
+        //imp2.resetDisplayRange();
+        //imp2.show();
+		ImagePlus imp3 = vss.getCroppedFrameAsImagePlus(1,1,20,40,30,70,30,70);
+		imp3.show();
+		imp3.resetDisplayRange();
 		// open the Clown sample
 		//ImagePlus image = IJ.openImage("http://imagej.net/images/clown.jpg");
 		//image.show();
