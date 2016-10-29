@@ -13,215 +13,52 @@ class OpenerExtensions extends Opener {
     public OpenerExtensions() {
     }
 
-    public ImagePlus openPlaneInTiffUsingGivenFileInfo(String directory, String filename, int n, FileInfo[] info) {
-        //log("openPlaneInTiffUsingGivenFileInfo");
-        //log("  directory:" + directory);
-        //log("  filename:" + filename);
-        //log("  slice:" + n);
-        if (info==null) return null;
-        FileInfo fi = null;
-        if (info.length==1 && info[0].nImages>1) {
-            /** in this case getTiffFileInfo will only open the first IDF; as this is rather fast we do it
-             for every file to see different fi.offset, which does happen */
-            FileInfo[] infoThisFile = new Opener().getTiffFileInfo(directory+filename);
-            fi = infoThisFile[0];
-            if (n<1 || n>fi.nImages)
-                throw new IllegalArgumentException("N out of 1-"+fi.nImages+" range");
-            long size = fi.width*fi.height*fi.getBytesPerPixel();
-            fi.longOffset = fi.getOffset() + (n-1)*(size+fi.gapBetweenImages);
-            fi.offset = 0;
-            fi.nImages = 1;
-        } else {
-            /** it would take to long to open all IFDs again; so we hope that the ones from the
-             first file work */
-            fi = (FileInfo) info[0].clone();
-            fi.fileName = filename;
-            fi.directory = directory;
-            if (n<1 || n>info.length)
-                throw new IllegalArgumentException("N out of 1-"+info.length+" range");
-            fi.longOffset = info[n-1].getOffset();
-            fi.offset = 0;
-            fi.stripOffsets = info[n-1].stripOffsets;
-            fi.stripLengths = info[n-1].stripLengths;
-        }
-        FileOpener fo = new FileOpener(fi);
-        return fo.open(false);
-    }
+    public ImagePlus openCroppedTiffStackUsingOneIFD(FileInfo fi0, int z, int nz, int x, int nx, int y, int ny) {
 
+        log("openCroppedTiffStackUsingFirstIFD");
 
-    public ImagePlus openCroppedTiffPlaneUsingGivenFileInfo(String directory, String filename, int n, int x, int width, int y, int height, FileInfo[] info) {
+        if (fi==null) return null;
 
-        log("openCroppedTiffPlaneUsingGivenFileInfo");
-        log("  directory:" + directory);
-        log("  filename:" + filename);
-        log("  slice:" + n);
+        log("  directory:" + fi.directory);
+        log("  filename:" + fi.fileName);
+        log("  z:" + z);
+        log("  nz:" + nz);
         log("  x:" + x);
-        log("  w:" + width);
+        log("  nx:" + nx);
         log("  y:" + y);
-        log("  h:" + height);
+        log("  ny:" + ny);
 
-        if (info==null) return null;
+        if (nz<1 || nz>fi.nImages)
+            throw new IllegalArgumentException("N out of 1-"+fi.nImages+" range");
+        // do the same for nx and ny and so on
 
-        FileInfo fi = null;
-
-        if (info.length==1 && info[0].nImages>1) {
-            /** in this case getTiffFileInfo will only open the first IDF; as this is rather fast we do it
-             for every file to see different fi.offset, which does happen */
-            FileInfo[] infoThisFile = new Opener().getTiffFileInfo(directory+filename);
-            fi = infoThisFile[0];
-            if (n<1 || n>fi.nImages)
-                throw new IllegalArgumentException("N out of 1-"+fi.nImages+" range");
-            long size = fi.width*fi.height*fi.getBytesPerPixel();
-            fi.longOffset = fi.getOffset() + (n-1)*(size+fi.gapBetweenImages);
-            fi.longOffset = fi.longOffset + (y*fi.width+x)*fi.getBytesPerPixel();
-            fi.offset = 0;
-            fi.nImages = 0;
-            int[] newStripLengths = new int[height];
-            int[] newStripOffsets = new int[height];
-            for (int i=0; i<newStripLengths .length; i++) {
-                newStripLengths[i] = width * fi.getBytesPerPixel();
-                newStripOffsets[i] = i * fi.width * fi.getBytesPerPixel();
-            }
-            fi.stripOffsets = newStripOffsets;
-            fi.stripLengths = newStripLengths;
-            fi.height = height;
-            fi.width = width;
-
-        } else {
-            /** it would take to long to open all IFDs again; so we hope that the ones from the
-             first file work */
-            log("  IFD array case");
-            fi = (FileInfo) info[0].clone();
-            fi.fileName = filename;
-            fi.directory = directory;
-            if (n<1 || n>info.length)
-                throw new IllegalArgumentException("N out of 1-"+info.length+" range");
-            fi.longOffset = info[n-1].getOffset() + (y*fi.width+x)*fi.getBytesPerPixel();  // offset to upper left corner of ROI
-            fi.offset = 0;
-            fi.stripOffsets = info[n-1].stripOffsets;
-            fi.stripLengths = info[n-1].stripLengths;
-
-            //IJ.log("fi.width: "+fi.width);
-            //IJ.log("fi.height: "+fi.height);
-            //IJ.log("fi.getBytesPerPixel: "+fi.getBytesPerPixel());
-            //IJ.log("stripLengths.length: "+fi.stripLengths.length);
-            //for (int i=0; i<1; i++) {
-            //	IJ.log("  stripLengths "+fi.stripLengths[i]);
-            //	IJ.log("  stripOffsets  "+fi.stripLengths[i]);
-            //}
-            int[] newStripLengths = new int[height];
-            int[] newStripOffsets = new int[height];
-            for (int i=0; i<newStripLengths .length; i++) {
-                newStripLengths[i] = width * fi.getBytesPerPixel();
-                newStripOffsets[i] = i * fi.width * fi.getBytesPerPixel();
-            }
-            fi.stripOffsets = newStripOffsets;
-            fi.stripLengths = newStripLengths;
-            fi.height = height;
-            fi.width = width;
-            //IJ.log("stripLengths.length: "+fi.stripLengths.length);
-            //for (int i=0; i<1; i++) {
-            //	IJ.log("  stripLengths "+fi.stripLengths[i]);
-            //	IJ.log("  stripOffsets  "+fi.stripLengths[i]);
-            //}
-
-        }
         long startTime = System.currentTimeMillis();
-        FileOpener fo = new FileOpener(fi);
-        ImagePlus imp =  fo.open(false);
-        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("  elapsed time: " + elapsedTime);
-        return imp;
-    }
 
-    public ImagePlus openCroppedTiffStackUsingGivenFileInfo(String directory, String filename, FileInfo[] info, int z, int nz, int x, int nx, int y, int ny) {
+        fi = (FileInfo) fi0.clone(); // make a deep copy so we can savely modify it to load what we want
+        long size = fi.width*fi.height*fi.getBytesPerPixel();
+        fi.longOffset = fi.getOffset() + (z*(size+fi.gapBetweenImages));
+        fi.longOffset = fi.longOffset + (y*fi.width+x)*fi.getBytesPerPixel();
+        fi.offset = 0;
+        fi.nImages = nz;
+        fi.gapBetweenImages += (int) (fi.width-(x+nx-1));
+        fi.gapBetweenImages += (int) (fi.height-(y+ny))*fi.width;
+        fi.gapBetweenImages += (int) (y*fi.width);
+        fi.gapBetweenImages += (int) (x-1);
+        fi.gapBetweenImages *= fi.getBytesPerPixel();
+        log(" fi.gapBetweenImages: "+fi.gapBetweenImages);
 
-        log("openCroppedTiffStackUsingGivenFileInfo");
-        log("  directory:" + directory);
-        log("  filename:" + filename);
-        log("  x:" + x);
-        log("  w:" + nx);
-        log("  y:" + y);
-        log("  h:" + ny);
-        log("  z:" + y);
-        log("  d:" + nz);
-
-        if (info==null) return null;
-
-        FileInfo fi = null;
-
-        if (info.length==1 && info[0].nImages>1) {
-            /** in this case getTiffFileInfo will only open the first IDF; as this is rather fast we do it
-             for every file to see different fi.offset, which does happen */
-            log("--ImageJ Tiff");
-            FileInfo[] infoThisFile = new Opener().getTiffFileInfo(directory+filename);
-            fi = infoThisFile[0];
-            log(" fi.gapBetweenImages: "+fi.gapBetweenImages);
-            if (nz<1 || nz>fi.nImages)
-                throw new IllegalArgumentException("N out of 1-"+fi.nImages+" range");
-            long size = fi.width*fi.height*fi.getBytesPerPixel();
-            fi.longOffset = fi.getOffset() + (nz-1)*(size+fi.gapBetweenImages);
-            fi.longOffset = fi.longOffset + (y*fi.width+x)*fi.getBytesPerPixel();
-            fi.offset = 0;
-            fi.nImages = nz;
-            log(" size: "+size);
-            fi.gapBetweenImages = (int) (fi.width-(x+nx-1));
-            fi.gapBetweenImages += (int) (fi.height-(y+ny))*fi.width;
-            fi.gapBetweenImages += (int) (y*fi.width);
-            fi.gapBetweenImages += (int) (x-1);
-            fi.gapBetweenImages *= fi.getBytesPerPixel();
-            log(" fi.gapBetweenImages: "+fi.gapBetweenImages);
-            int[] newStripLengths = new int[ny];
-            int[] newStripOffsets = new int[ny];
-            for (int i=0; i<newStripLengths .length; i++) {
-                newStripLengths[i] = nx * fi.getBytesPerPixel();
-                newStripOffsets[i] = i * fi.width * fi.getBytesPerPixel();
-            }
-            fi.stripOffsets = newStripOffsets;
-            fi.stripLengths = newStripLengths;
-            fi.height = ny;
-            fi.width = nx;
-
-        } else {
-            /** it would take to long to open all IFDs again; so we hope that the ones from the
-             first file work */
-            log("--IFD array");
-            fi = (FileInfo) info[0].clone();
-            fi.fileName = filename;
-            fi.directory = directory;
-            if (nz<1 || nz>info.length)
-                throw new IllegalArgumentException("N out of 1-"+info.length+" range");
-            fi.longOffset = info[nz-1].getOffset() + (y*fi.width+x)*fi.getBytesPerPixel();  // offset to upper left corner of ROI
-            fi.offset = 0;
-            fi.stripOffsets = info[nz-1].stripOffsets;
-            fi.stripLengths = info[nz-1].stripLengths;
-            fi.nImages = nz;
-
-            //IJ.log("fi.width: "+fi.width);
-            //IJ.log("fi.height: "+fi.height);
-            //IJ.log("fi.getBytesPerPixel: "+fi.getBytesPerPixel());
-            //IJ.log("stripLengths.length: "+fi.stripLengths.length);
-            //for (int i=0; i<1; i++) {
-            //	IJ.log("  stripLengths "+fi.stripLengths[i]);
-            //	IJ.log("  stripOffsets  "+fi.stripLengths[i]);
-            //}
-            int[] newStripLengths = new int[ny];
-            int[] newStripOffsets = new int[ny];
-            for (int i=0; i<newStripLengths .length; i++) {
-                newStripLengths[i] = nx * fi.getBytesPerPixel();
-                newStripOffsets[i] = i * fi.width * fi.getBytesPerPixel();
-            }
-            fi.stripOffsets = newStripOffsets;
-            fi.stripLengths = newStripLengths;
-            fi.height = ny;
-            fi.width = nx;
-            //IJ.log("stripLengths.length: "+fi.stripLengths.length);
-            //for (int i=0; i<1; i++) {
-            //	IJ.log("  stripLengths "+fi.stripLengths[i]);
-            //	IJ.log("  stripOffsets  "+fi.stripLengths[i]);
-            //}
-
+        int[] newStripLengths = new int[ny];
+        int[] newStripOffsets = new int[ny];
+        for (int i=0; i<newStripLengths .length; i++) {
+            newStripLengths[i] = nx * fi.getBytesPerPixel();
+            newStripOffsets[i] = i * fi.width * fi.getBytesPerPixel();
         }
-        long startTime = System.currentTimeMillis();
+
+        fi.stripOffsets = newStripOffsets;
+        fi.stripLengths = newStripLengths;
+        fi.height = ny;
+        fi.width = nx;
+
         FileOpener fo = new FileOpener(fi);
         ImagePlus imp =  fo.open(false);
         long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("time to open data [ms]: " + elapsedTime);
