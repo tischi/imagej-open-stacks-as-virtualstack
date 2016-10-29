@@ -19,7 +19,7 @@ public class VirtualStackOfStacks extends ImageStack {
     int nSlices;
     int nStacks;
     String[] names;
-    FileInfo fi;
+    FileInfo fiRef;
     FileInfo[] info;
 
     /** Creates a new, empty virtual stack. */
@@ -28,8 +28,9 @@ public class VirtualStackOfStacks extends ImageStack {
         this.path = path;
         this.depth = depth;
         this.info = info;
+        this.fiRef = fi;
+        this.info = info;
         names = new String[INITIAL_SIZE];
-        //IJ.log("VirtualStackOfStacks: "+path);
     }
 
     /** Adds an stack to the end of the stack. */
@@ -104,25 +105,11 @@ public class VirtualStackOfStacks extends ImageStack {
         log("opening slice " + nSlice + " of " + path + names[nFile]);
         // potentially check and adapt first offset again by loading the first IFD of this file
         // ...
-        ImagePlus imp = new OpenerExtensions().openPlaneInTiffUsingGivenFileInfo(path, names[nFile], nSlice, info);
-        if (imp!=null) {
-            int w = imp.getWidth();
-            int h = imp.getHeight();
-            int type = imp.getType();
-            ColorModel cm = imp.getProcessor().getColorModel();
-        } else {
-            log("Error: loading failed!");
-            return null;
-        }
-        return imp.getProcessor();
-    }
-
-    public ImageProcessor getCroppedProcessor(int n, int x, int width, int y, int height) {
-        //log("getCroppedProcessor");
-        int nFile = (n-1) /depth;
-        int nSlice = n - nFile * depth;
-        //log("opening slice " + nSlice + " of " + path + names[nFile]);
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffPlaneUsingGivenFileInfo(path, names[nFile], nSlice, x, width, y, height, info);
+        //log("opening slices " + z + " to " + (z+nz-1) + " of " + path + names[t]);
+        FileInfo fi = (FileInfo) fiRef.clone(); // make a deep copy so we can savely modify it to load what we want
+        fi.directory = path;
+        fi.fileName = names[nFile];
+        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingFirstIFD(fi, nSlice);
         if (imp!=null) {
             int w = imp.getWidth();
             int h = imp.getHeight();
@@ -136,9 +123,12 @@ public class VirtualStackOfStacks extends ImageStack {
     }
 
     public ImagePlus getCroppedFrameAsImagePlus(int t, int c, int z, int nz, int x, int nx, int y, int ny) {
-        log("opening slices " + z + " to " + (z+nz-1) + " of " + path + names[t]);
 
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingGivenFileInfo(path, names[t], info, z, nz, x, nx, y, ny);
+        //log("opening slices " + z + " to " + (z+nz-1) + " of " + path + names[t]);
+        FileInfo fi = (FileInfo) fiRef.clone(); // make a deep copy so we can savely modify it to load what we want
+        fi.directory = path;
+        fi.fileName = names[t];
+        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingFirstIFD(fi, z, nz, x, nx, y, ny);
 
         if (imp==null) {
             log("Error: loading failed!");

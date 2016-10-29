@@ -11,16 +11,28 @@ import static ij.IJ.log;
 class OpenerExtensions extends Opener {
 
     public OpenerExtensions() {
+
     }
 
-    public ImagePlus openCroppedTiffStackUsingOneIFD(FileInfo fi0, int z, int nz, int x, int nx, int y, int ny) {
+    // todo: make special version when whole image is opened
+    public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, int z) {
+        int nz = fi0.nImages;
+        int x = 0;
+        int nx = fi0.width;
+        int y = 0;
+        int ny = fi0.height;
+        ImagePlus imp = openCroppedTiffStackUsingFirstIFD(fi0, z, nz, x, nx,  y,  ny);
+        return imp;
+    }
+        // todo: make special version when whole image is opened
+    public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, int z, int nz, int x, int nx, int y, int ny) {
 
         log("openCroppedTiffStackUsingFirstIFD");
 
-        if (fi==null) return null;
+        if (fi0==null) return null;
 
-        log("  directory:" + fi.directory);
-        log("  filename:" + fi.fileName);
+        log("  directory:" + fi0.directory);
+        log("  filename:" + fi0.fileName);
         log("  z:" + z);
         log("  nz:" + nz);
         log("  x:" + x);
@@ -28,13 +40,13 @@ class OpenerExtensions extends Opener {
         log("  y:" + y);
         log("  ny:" + ny);
 
-        if (nz<1 || nz>fi.nImages)
-            throw new IllegalArgumentException("N out of 1-"+fi.nImages+" range");
+        if (nz<1 || nz>fi0.nImages)
+            throw new IllegalArgumentException("N out of 1-"+fi0.nImages+" range");
         // do the same for nx and ny and so on
 
         long startTime = System.currentTimeMillis();
 
-        fi = (FileInfo) fi0.clone(); // make a deep copy so we can savely modify it to load what we want
+        FileInfo fi = (FileInfo) fi0.clone(); // make a deep copy so we can savely modify it to load what we want
         long size = fi.width*fi.height*fi.getBytesPerPixel();
         fi.longOffset = fi.getOffset() + (z*(size+fi.gapBetweenImages));
         fi.longOffset = fi.longOffset + (y*fi.width+x)*fi.getBytesPerPixel();
@@ -60,8 +72,8 @@ class OpenerExtensions extends Opener {
         fi.width = nx;
 
         FileOpener fo = new FileOpener(fi);
-        ImagePlus imp =  fo.open(false);
-        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("time to open data [ms]: " + elapsedTime);
+        ImagePlus imp = fo.open(false);
+        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("image data opened in [ms]: " + elapsedTime);
         return imp;
     }
 

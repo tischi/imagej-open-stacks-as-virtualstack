@@ -10,7 +10,6 @@ import ij.io.Opener;
 import ij.io.FileInfo;
 import ij.gui.*;
 import ij.plugin.PlugIn;
-import ij.process.ImageProcessor;
 
 import static ij.IJ.log;
 
@@ -46,27 +45,33 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 		double max = -Double.MAX_VALUE;
         ImagePlus imp2 = null;
 
-		log("Obtaining file list...");
+		log("");
+        log("");
+        log("# Opening: "+directory);
+        log("Obtaining file list...");
 		String[] list = new File(directory).list();
 		if (list==null || list.length==0)
 			return null;
-		log("Sorting file list...");
-		list = this.sortFileList(list);
+        log("Number of files: " + list.length);
+        list = this.sortFileList(list);
 		if (list==null) return null;
-		log("FolderOpener: " + directory + " (" + list.length + " files)");
 
 		try {
 
-
-			log("-- Checking offsets of all files");
+			log("# Checking offsets to first image in all files: ");
 			for(int i=0; i<list.length; i++) {
-				log("Reading TiffInfo from: " + directory + list[0]);
-				info = Opener.getTiffFileInfo(directory + list[0]);
-				log("Offset: "+info[0].getOffset()):
+				log("File: " + list[i]);
+                try {
+                    TiffDecoderExtension tde = new TiffDecoderExtension(directory, list[i]);
+                    fi = tde.getFirstIFD();
+                } catch(IOException ex) {
+                    IJ.showMessage("File Checking", ex.toString());
+                    return null;
+                }
+                log("Offset: " + fi.getOffset());
 			}
 
-
-            log("-- Reading IFDs from: " + directory + list[0]);
+            log("# IFDs from first file: " + directory + list[0]);
             info = Opener.getTiffFileInfo(directory + list[0]);
 
             if (info == null) {
@@ -75,44 +80,53 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
             }
 
             if (info[0].width==0) {
-                IJ.showMessage("Import Sequence", "This folder does not appear to contain only TIFF Stacks");
+                IJ.showMessage("File Checking", "This folder does not appear to contain only TIFF Stacks");
                 return null;
             }
 
             fi = info[0]; // Set first IFD as reference
 
             if(info.length > 1) {
-                log("-- IFD array --");
-                log("IFD array length: " + info.length);
+                log("Number of IFDs: " + info.length);
                 log("nImages: " + info[0].nImages);
-                int size = 0, gapBetweenImages = 0, gapBetweenFirstImages = 0;
+                int size = 0, sizeOfFirstImage = 0, gapBetweenImages = 0, gapBetweenFirstImages = 0;
                 for (int j = 0; j < info.length-1; j++) {
                     size = info[j].width*info[j].height*info[j].getBytesPerPixel();
                     gapBetweenImages = (int) (info[j+1].getOffset() - info[j].getOffset() - size);
+
                     if (j==0) {
                         gapBetweenFirstImages = gapBetweenImages;
-                        log("Image size: "+info[j].width*info[j].height*info[j].getBytesPerPixel());
-                        log("Gap between images: " + gapBetweenImages);
+                        sizeOfFirstImage = size;
                     }
                     if (gapBetweenImages != gapBetweenFirstImages) {
-                        log("Checking image: " + j);
+                        log("gapBetweenImages 1: " + gapBetweenFirstImages);
+                        log("gapBetweenImages "+j+": " + gapBetweenImages);
+                        IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
+                        return null;
+                    }
+                    if (size != sizeOfFirstImage) {
+                        log("Size of image 1: " + sizeOfFirstImage);
+                        log("Size of image "+j+": " + size);
                         log("Gap between images: " + gapBetweenImages);
                         IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
                         return null;
                     }
-                    log("Image size: "+info[j].width*info[j].height*info[j].getBytesPerPixel());
-                    log("Gap between images: " + gapBetweenImages);
+                    //log("Size image: "+info[j].width*info[j].height*info[j].getBytesPerPixel());
+                    //log("Gap between images: " + gapBetweenImages);
                 }
+                log("Size of all images: "+info[0].width*info[0].height*info[0].getBytesPerPixel());
+                log("Gap between all images: " + gapBetweenImages);
                 fi.gapBetweenImages = gapBetweenImages;
             } else {
-                log("-- nImages --");
+                log("Number of IFDs: " + info.length);
                 log("nImages: " + fi.nImages);
                 log("Image size: " + fi.width * fi.height * fi.getBytesPerPixel());
                 log("gapBetweenImages: " + fi.gapBetweenImages);
             }
+            log("File checking done.");
+            log("-------------------");
 
-
-			if (increment == 0) {  // only show user dialog if increment is not set
+            if (increment == 0) {  // only show user dialog if increment is not set
                 if (!showDialog(info, list))
                     return null;
             }
@@ -166,7 +180,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
                         depth = info.length;
                     }
 
-                    stack = new VirtualStackOfStacks(fi.width, fi.height, depth, cm, directory, info);
+                    stack = new VirtualStackOfStacks(fi.width, fi.height, depth, cm, directory, fi, info);
 				 }
 				count = stack.getNStacks()+1;
 				//IJ.showStatus(count+"/"+n);
