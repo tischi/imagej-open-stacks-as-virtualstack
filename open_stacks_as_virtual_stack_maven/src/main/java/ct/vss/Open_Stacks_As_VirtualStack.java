@@ -47,9 +47,8 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 
 		log("");
         log("");
-        log("# Opening: "+directory);
-        log("Obtaining file list...");
-		String[] list = new File(directory).list();
+        log("# Analyzing folder: "+directory);
+        String[] list = new File(directory).list();
 		if (list==null || list.length==0)
 			return null;
         log("Number of files: " + list.length);
@@ -58,20 +57,34 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 
 		try {
 
-			log("# Checking offsets to first image in all files: ");
+			log("# Checking offsets to first image in all files");
+			long offset0 = 0;
+			boolean differentOffsets = false;
 			for(int i=0; i<list.length; i++) {
-				log("File: " + list[i]);
-                try {
-                    TiffDecoderExtension tde = new TiffDecoderExtension(directory, list[i]);
-                    fi = tde.getFirstIFD();
-                } catch(IOException ex) {
-                    IJ.showMessage("File Checking", ex.toString());
-                    return null;
-                }
-                log("Offset: " + fi.getOffset());
+				try {
+					TiffDecoderExtension tde = new TiffDecoderExtension(directory, list[i]);
+					fi = tde.getFirstIFD();
+				} catch (IOException ex) {
+					IJ.showMessage("File Checking", ex.toString());
+					return null;
+				}
+				if (i == 0) {
+					offset0 = fi.getOffset();
+					log("File: " + list[i]);
+					log("Offset: " + fi.getOffset());
+				} else if (fi.getOffset() != offset0) {
+					log("File: " + list[i]);
+					log("Offset:" + i + ": " + fi.getOffset());
+					differentOffsets = true;
+				}
+			}
+			if(differentOffsets) {
+				log("");log("There have been different offsets!");log("");
+			} else {
+				log("All offsets are the same.");
 			}
 
-            log("# IFDs from first file: " + directory + list[0]);
+            log("# Analyzing IFDs from first file:" + list[0]);
             info = Opener.getTiffFileInfo(directory + list[0]);
 
             if (info == null) {
@@ -120,11 +133,10 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
             } else {
                 log("Number of IFDs: " + info.length);
                 log("nImages: " + fi.nImages);
-                log("Image size: " + fi.width * fi.height * fi.getBytesPerPixel());
+                log("Image size [B]: " + fi.width * fi.height * fi.getBytesPerPixel());
                 log("gapBetweenImages: " + fi.gapBetweenImages);
             }
-            log("File checking done.");
-            log("-------------------");
+            log("File checking done.\n");
 
             if (increment == 0) {  // only show user dialog if increment is not set
                 if (!showDialog(info, list))
@@ -173,7 +185,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 
                     int depth;
                     ColorModel cm = null;
-                    if( fi.nImages > 0) {
+                    if( fi.nImages > 1) {
                         depth = fi.nImages;
                     }
                     else {
@@ -181,7 +193,8 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
                     }
 
                     stack = new VirtualStackOfStacks(fi.width, fi.height, depth, cm, directory, fi, info);
-				 }
+
+				}
 				count = stack.getNStacks()+1;
 				//IJ.showStatus(count+"/"+n);
 				IJ.showProgress((double)count/n);
@@ -314,8 +327,8 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 		ImagePlus imp = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200-IJtiff/", 1);
 		imp.show();
 
-        ImagePlus imp2 = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", 1);
-        imp2.show();
+        //ImagePlus imp2 = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", 1);
+        //imp2.show();
 
         //VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         //ImageProcessor ip = vss.getCroppedProcessor(1,5,50,25,50);

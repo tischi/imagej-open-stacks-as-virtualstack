@@ -27,18 +27,12 @@ class OpenerExtensions extends Opener {
         // todo: make special version when whole image is opened
     public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, int z, int nz, int x, int nx, int y, int ny) {
 
-        log("openCroppedTiffStackUsingFirstIFD");
+        log("# openCroppedTiffStackUsingFirstIFD");
 
         if (fi0==null) return null;
 
-        log("  directory:" + fi0.directory);
-        log("  filename:" + fi0.fileName);
-        log("  z:" + z);
-        log("  nz:" + nz);
-        log("  x:" + x);
-        log("  nx:" + nx);
-        log("  y:" + y);
-        log("  ny:" + ny);
+        log("filename: " + fi0.fileName);
+        log("z,nz,x,nx,y,ny: " + z +","+ nz +","+ x +","+ nx +","+ y +","+ ny);
 
         if (nz<1 || nz>fi0.nImages)
             throw new IllegalArgumentException("N out of 1-"+fi0.nImages+" range");
@@ -57,7 +51,7 @@ class OpenerExtensions extends Opener {
         fi.gapBetweenImages += (int) (y*fi.width);
         fi.gapBetweenImages += (int) (x-1);
         fi.gapBetweenImages *= fi.getBytesPerPixel();
-        log(" fi.gapBetweenImages: "+fi.gapBetweenImages);
+        //log("  fi.gapBetweenImages: "+fi.gapBetweenImages);
 
         int[] newStripLengths = new int[ny];
         int[] newStripOffsets = new int[ny];
@@ -73,7 +67,7 @@ class OpenerExtensions extends Opener {
 
         FileOpener fo = new FileOpener(fi);
         ImagePlus imp = fo.open(false);
-        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("image data opened in [ms]: " + elapsedTime);
+        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
         return imp;
     }
 

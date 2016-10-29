@@ -102,7 +102,7 @@ public class VirtualStackOfStacks extends ImageStack {
         nFile = (n-1) /depth;
         nSlice = n - nFile * depth;
         // IJ.log("requested slice: "+n);
-        log("opening slice " + nSlice + " of " + path + names[nFile]);
+        //log("opening slice " + nSlice + " of " + path + names[nFile]);
         // potentially check and adapt first offset again by loading the first IFD of this file
         // ...
         //log("opening slices " + z + " to " + (z+nz-1) + " of " + path + names[t]);
