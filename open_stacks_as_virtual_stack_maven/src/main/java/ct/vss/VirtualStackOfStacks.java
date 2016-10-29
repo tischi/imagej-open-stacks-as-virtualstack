@@ -107,7 +107,6 @@ public class VirtualStackOfStacks extends ImageStack {
         // ...
         //log("opening slices " + z + " to " + (z+nz-1) + " of " + path + names[t]);
         FileInfo fi = (FileInfo) fiRef.clone(); // make a deep copy so we can savely modify it to load what we want
-        fi.directory = path;
         fi.fileName = names[nFile];
         ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingFirstIFD(fi, nSlice);
         if (imp!=null) {

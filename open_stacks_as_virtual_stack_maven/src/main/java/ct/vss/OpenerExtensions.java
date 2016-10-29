@@ -16,7 +16,7 @@ class OpenerExtensions extends Opener {
 
     // todo: make special version when whole image is opened
     public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, int z) {
-        int nz = fi0.nImages;
+        int nz = 1;
         int x = 0;
         int nx = fi0.width;
         int y = 0;
@@ -24,7 +24,7 @@ class OpenerExtensions extends Opener {
         ImagePlus imp = openCroppedTiffStackUsingFirstIFD(fi0, z, nz, x, nx,  y,  ny);
         return imp;
     }
-        // todo: make special version when whole image is opened
+
     public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, int z, int nz, int x, int nx, int y, int ny) {
 
         log("# openCroppedTiffStackUsingFirstIFD");
@@ -32,10 +32,11 @@ class OpenerExtensions extends Opener {
         if (fi0==null) return null;
 
         log("filename: " + fi0.fileName);
+        log("fi0.nImages: " + fi0.nImages);
         log("z,nz,x,nx,y,ny: " + z +","+ nz +","+ x +","+ nx +","+ y +","+ ny);
 
-        if (nz<1 || nz>fi0.nImages)
-            throw new IllegalArgumentException("N out of 1-"+fi0.nImages+" range");
+        if (z<0 || z>fi0.nImages)
+            throw new IllegalArgumentException("z="+z+" is out of range");
         // do the same for nx and ny and so on
 
         long startTime = System.currentTimeMillis();

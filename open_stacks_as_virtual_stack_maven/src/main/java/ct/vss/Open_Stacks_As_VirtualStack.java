@@ -84,8 +84,8 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 				log("All offsets are the same.");
 			}
 
-            log("# Analyzing IFDs from first file:" + list[0]);
-            info = Opener.getTiffFileInfo(directory + list[0]);
+            log("# Analyzing IFDs from: " + list[0]);
+            info = Opener.getTiffFileInfo(directory + list[1]);
 
             if (info == null) {
                 log("Failed to open file!");
@@ -102,6 +102,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
             if(info.length > 1) {
                 log("Number of IFDs: " + info.length);
                 log("nImages: " + info[0].nImages);
+
                 int size = 0, sizeOfFirstImage = 0, gapBetweenImages = 0, gapBetweenFirstImages = 0;
                 for (int j = 0; j < info.length-1; j++) {
                     size = info[j].width*info[j].height*info[j].getBytesPerPixel();
@@ -110,19 +111,20 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
                     if (j==0) {
                         gapBetweenFirstImages = gapBetweenImages;
                         sizeOfFirstImage = size;
-                    }
-                    if (gapBetweenImages != gapBetweenFirstImages) {
-                        log("gapBetweenImages 1: " + gapBetweenFirstImages);
-                        log("gapBetweenImages "+j+": " + gapBetweenImages);
-                        IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
-                        return null;
+                        log("gapBetweenImages "+ j + ": " + gapBetweenFirstImages);
+                        log("image size "+ j + ": " + sizeOfFirstImage);
+                    } else if (gapBetweenImages != gapBetweenFirstImages) {
+                        log("gapBetweenImages " + j + ": " + gapBetweenImages);
+                        log("image size "+ j + ": " + size);
+                        //IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
+                        //return null;
                     }
                     if (size != sizeOfFirstImage) {
                         log("Size of image 1: " + sizeOfFirstImage);
                         log("Size of image "+j+": " + size);
                         log("Gap between images: " + gapBetweenImages);
-                        IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
-                        return null;
+                        //IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
+                        //return null;
                     }
                     //log("Size image: "+info[j].width*info[j].height*info[j].getBytesPerPixel());
                     //log("Gap between images: " + gapBetweenImages);
@@ -190,9 +192,10 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
                     }
                     else {
                         depth = info.length;
+                        fi.nImages = info.length;
                     }
 
-                    stack = new VirtualStackOfStacks(fi.width, fi.height, depth, cm, directory, fi, info);
+                    stack = new VirtualStackOfStacks(fi.width, fi.height, fi.nImages, cm, directory, fi, info);
 
 				}
 				count = stack.getNStacks()+1;
@@ -324,8 +327,12 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 		// start ImageJ
 		new ImageJ();
 		Open_Stacks_As_VirtualStack ovs = new Open_Stacks_As_VirtualStack();
-		ImagePlus imp = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200-IJtiff/", 1);
-		imp.show();
+
+        //ImagePlus imp = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200-IJtiff/", 1);
+		//imp.show();
+
+        ImagePlus imp = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/MATLABtiff/", 1);
+        imp.show();
 
         //ImagePlus imp2 = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", 1);
         //imp2.show();
