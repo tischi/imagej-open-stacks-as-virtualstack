@@ -21,6 +21,8 @@ public class VirtualStackOfStacks extends ImageStack {
     String[] names;
     FileInfo fiRef;
     FileInfo[] info;
+    FileInfo[][] infos;
+
 
     /** Creates a new, empty virtual stack. */
     public VirtualStackOfStacks(int width, int height, int depth, ColorModel cm, String path, FileInfo fi, FileInfo[] info) {
@@ -31,10 +33,11 @@ public class VirtualStackOfStacks extends ImageStack {
         this.fiRef = fi;
         this.info = info;
         names = new String[INITIAL_SIZE];
+        infos = new FileInfo[INITIAL_SIZE][];
     }
 
     /** Adds an stack to the end of the stack. */
-    public void addStack(String name) {
+    public void addStack(String name, FileInfo[] info) {
         if (name==null)
             throw new IllegalArgumentException("'name' is null!");
         nSlices = nSlices + depth;
@@ -42,11 +45,16 @@ public class VirtualStackOfStacks extends ImageStack {
         //log("adding stack " + nStacks + ":" + name);
         //IJ.log("total number of slices:"+nSlices);
         if (nStacks==names.length) {
-            String[] tmp = new String[nStacks*2];
-            System.arraycopy(names, 0, tmp, 0, nStacks);
-            names = tmp;
+            String[] tmp_names = new String[nStacks*2];
+            System.arraycopy(names, 0, tmp_names, 0, nStacks);
+            names = tmp_names;
+            FileInfo[][] tmp_infos = new FileInfo[nStacks*2][];
+            System.arraycopy(infos, 0, tmp_infos, 0, nStacks);
+            infos = tmp_infos;
         }
         names[nStacks-1] = name;
+        infos[nStacks-1] = info;
+
     }
 
     /** Does nothing. */
@@ -97,18 +105,19 @@ public class VirtualStackOfStacks extends ImageStack {
      were 1<=n<=nslices. Returns null if the stack is empty.
      */
     public ImageProcessor getProcessor(int n) {
-        int nFile, nSlice;
+        int iFile, z;
         // get z-th slice of a tif stack
-        nFile = (n-1) /depth;
-        nSlice = n - nFile * depth;
+        iFile = (int) (n-1) / depth;
+        z = (n-1) - iFile * depth; // zero-based in my opener functions
         // IJ.log("requested slice: "+n);
         //log("opening slice " + nSlice + " of " + path + names[nFile]);
         // potentially check and adapt first offset again by loading the first IFD of this file
         // ...
         //log("opening slices " + z + " to " + (z+nz-1) + " of " + path + names[t]);
-        FileInfo fi = (FileInfo) fiRef.clone(); // make a deep copy so we can savely modify it to load what we want
-        fi.fileName = names[nFile];
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingFirstIFD(fi, nSlice);
+        //FileInfo fi = (FileInfo) fiRef.clone(); // make a deep copy so we can savely modify it to load what we want
+        //fi.fileName = names[nFile];
+        //ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingFirstIFD(fi, z);
+        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[iFile], z);
         if (imp!=null) {
             int w = imp.getWidth();
             int h = imp.getHeight();
@@ -124,10 +133,11 @@ public class VirtualStackOfStacks extends ImageStack {
     public ImagePlus getCroppedFrameAsImagePlus(int t, int c, int z, int nz, int x, int nx, int y, int ny) {
 
         //log("opening slices " + z + " to " + (z+nz-1) + " of " + path + names[t]);
-        FileInfo fi = (FileInfo) fiRef.clone(); // make a deep copy so we can savely modify it to load what we want
-        fi.directory = path;
-        fi.fileName = names[t];
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingFirstIFD(fi, z, nz, x, nx, y, ny);
+        //FileInfo fi = (FileInfo) fiRef.clone(); // make a deep copy so we can savely modify it to load what we want
+        //fi.directory = path;
+
+        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[t], z, nz, x, nx, y, ny);
+        //ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingFirstIFD(fi, z, nz, x, nx, y, ny);
 
         if (imp==null) {
             log("Error: loading failed!");

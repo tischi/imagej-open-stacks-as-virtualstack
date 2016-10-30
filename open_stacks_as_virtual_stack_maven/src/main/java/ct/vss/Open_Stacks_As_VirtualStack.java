@@ -39,6 +39,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 	public ImagePlus openStacksAsVirtualStack(String directory, int inc) {
 		this.increment = inc;
         FileInfo[] info = null;
+		FileInfo[][] infos = null;
 		FileInfo fi = null;
 		VirtualStackOfStacks stack = null;
 		double min = Double.MAX_VALUE;
@@ -85,7 +86,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 			}
 
             log("# Analyzing IFDs from: " + list[0]);
-            info = Opener.getTiffFileInfo(directory + list[1]);
+            info = Opener.getTiffFileInfo(directory + list[0]);
 
             if (info == null) {
                 log("Failed to open file!");
@@ -107,7 +108,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
                 for (int j = 0; j < info.length-1; j++) {
                     size = info[j].width*info[j].height*info[j].getBytesPerPixel();
                     gapBetweenImages = (int) (info[j+1].getOffset() - info[j].getOffset() - size);
-
+					log(""+info[j].getOffset());
                     if (j==0) {
                         gapBetweenFirstImages = gapBetweenImages;
                         sizeOfFirstImage = size;
@@ -131,7 +132,7 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
                 }
                 log("Size of all images: "+info[0].width*info[0].height*info[0].getBytesPerPixel());
                 log("Gap between all images: " + gapBetweenImages);
-                fi.gapBetweenImages = gapBetweenImages;
+                fi.gapBetweenImages = gapBetweenFirstImages;
             } else {
                 log("Number of IFDs: " + info.length);
                 log("nImages: " + fi.nImages);
@@ -200,8 +201,10 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 				}
 				count = stack.getNStacks()+1;
 				//IJ.showStatus(count+"/"+n);
-				IJ.showProgress((double)count/n);
-				stack.addStack(list[i]);
+				info = Opener.getTiffFileInfo(directory + list[i]);
+				// add stack to virtual stack
+				stack.addStack(list[i], info);
+				IJ.showProgress((double) count / n);
 				if (count>=n)
 					break;
 			}
@@ -326,25 +329,22 @@ public class Open_Stacks_As_VirtualStack implements PlugIn {
 
 		// start ImageJ
 		new ImageJ();
+		//IJ.debugMode = true;
+
 		Open_Stacks_As_VirtualStack ovs = new Open_Stacks_As_VirtualStack();
 
         //ImagePlus imp = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200-IJtiff/", 1);
-		//imp.show();
-
         ImagePlus imp = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/MATLABtiff/", 1);
-        imp.show();
+		//ImagePlus imp = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", 1);
+        //imp.show();
 
-        //ImagePlus imp2 = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", 1);
-        //imp2.show();
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        ImagePlus impC = vss.getCroppedFrameAsImagePlus(0,0,0,2,754,100,417,100);
+		//ImagePlus impC = vss.getCroppedFrameAsImagePlus(0,1,20,10,30,70,30,70); //T88200-OMEtiff
+		impC.show();
+		impC.setPosition(5);
+		impC.resetDisplayRange();
 
-        //VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-        //ImageProcessor ip = vss.getCroppedProcessor(1,5,50,25,50);
-        //ImagePlus imp2 = new ImagePlus("", ip);
-        //imp2.resetDisplayRange();
-        //imp2.show();
-		//ImagePlus imp3 = vss.getCroppedFrameAsImagePlus(1,1,20,40,30,70,30,70);
-		//imp3.show();
-		//imp3.resetDisplayRange();
 		// open the Clown sample
 		//ImagePlus image = IJ.openImage("http://imagej.net/images/clown.jpg");
 		//image.show();
