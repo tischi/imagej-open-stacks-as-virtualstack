@@ -20,20 +20,17 @@ public class VirtualStackOfStacks extends ImageStack {
     int nStacks;
     String[] names;
     FileInfo fiRef;
-    FileInfo[] info;
-    FileInfo[][] infos;
-
+    //FileInfo[] info;
+    protected FileInfo[][] infos;
 
     /** Creates a new, empty virtual stack. */
-    public VirtualStackOfStacks(int width, int height, int depth, ColorModel cm, String path, FileInfo fi, FileInfo[] info) {
+    public VirtualStackOfStacks(int width, int height, int depth, ColorModel cm, String path, FileInfo fi) {
         super(width, height, cm);
         this.path = path;
         this.depth = depth;
-        this.info = info;
         this.fiRef = fi;
-        this.info = info;
-        names = new String[INITIAL_SIZE];
-        infos = new FileInfo[INITIAL_SIZE][];
+        this.names = new String[INITIAL_SIZE];
+        this.infos = new FileInfo[INITIAL_SIZE][];
     }
 
     /** Adds an stack to the end of the stack. */
@@ -42,8 +39,6 @@ public class VirtualStackOfStacks extends ImageStack {
             throw new IllegalArgumentException("'name' is null!");
         nSlices = nSlices + depth;
         nStacks ++;
-        //log("adding stack " + nStacks + ":" + name);
-        //IJ.log("total number of slices:"+nSlices);
         if (nStacks==names.length) {
             String[] tmp_names = new String[nStacks*2];
             System.arraycopy(names, 0, tmp_names, 0, nStacks);
@@ -54,7 +49,7 @@ public class VirtualStackOfStacks extends ImageStack {
         }
         names[nStacks-1] = name;
         infos[nStacks-1] = info;
-
+        log("Added file: "+infos[nStacks-1][0].fileName);
     }
 
     /** Does nothing. */
@@ -108,6 +103,9 @@ public class VirtualStackOfStacks extends ImageStack {
         int iFile, z;
         // get z-th slice of a tif stack
         iFile = (int) (n-1) / depth;
+        log("iFile: "+iFile); log("filename: "+infos[iFile][0].fileName);
+        log(""+infos[0][0].fileName);
+        log(""+infos[1][0].fileName);
         z = (n-1) - iFile * depth; // zero-based in my opener functions
         // IJ.log("requested slice: "+n);
         //log("opening slice " + nSlice + " of " + path + names[nFile]);

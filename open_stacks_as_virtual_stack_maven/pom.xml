@@ -13,10 +13,10 @@
 	</parent>
 
 	<groupId>ct.vss</groupId>
-	<artifactId>Open_Stacks_As_VirtualStack</artifactId>
+	<artifactId>OpenStacksAsVirtualStack</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
 
-	<name>plugins/Open_Stacks_As_VirtualStack.jar</name>
+	<name>plugins/OpenStacksAsVirtualStack.jar</name>
 	<description>A Maven project implementing an ImageJ 1.x plugin</description>
 
 	<developers>
@@ -36,7 +36,7 @@
 	</developers>
 
 	<properties>
-		<main-class>ct.vss.Open_Stacks_As_VirtualStack</main-class>
+		<main-class>ct.vss.OpenStacksAsVirtualStack</main-class>
 	</properties>
 
 	<repositories>

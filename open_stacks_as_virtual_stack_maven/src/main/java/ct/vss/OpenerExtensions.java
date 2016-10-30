@@ -89,9 +89,9 @@ class OpenerExtensions extends Opener {
 
         if (info==null) return null;
 
-        for(int i=0; i<info.length; i++) {
-            log(""+info[i].getOffset());
-        }
+        //for(int i=0; i<info.length; i++) {
+        //    log(""+info[i].getOffset());
+        //}
 
         log("filename: " + info[0].fileName);
         log("z,nz,x,nx,y,ny: " + z +","+ nz +","+ x +","+ nx +","+ y +","+ ny);
@@ -126,6 +126,7 @@ class OpenerExtensions extends Opener {
             for (int i=0; i<ny; i++) {
                 infoModified[iz-z].stripLengths[i] = nx * fi.getBytesPerPixel();
                 infoModified[iz-z].stripOffsets[i] = (int) infoModified[iz-z].getOffset() + i * fi.width * fi.getBytesPerPixel();
+                //infoModified[iz-z].stripOffsets[i] = (int) i * fi.width * fi.getBytesPerPixel();
             }
             infoModified[iz-z].height = ny;
             infoModified[iz-z].width = nx;
