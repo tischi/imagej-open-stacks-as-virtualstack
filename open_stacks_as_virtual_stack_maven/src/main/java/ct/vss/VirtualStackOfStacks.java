@@ -33,6 +33,10 @@ public class VirtualStackOfStacks extends ImageStack {
         this.infos = new FileInfo[INITIAL_SIZE][];
     }
 
+    public FileInfo[][] getFileInfos() {
+        return infos;
+    }
+
     /** Adds an stack to the end of the stack. */
     public void addStack(String name, FileInfo[] info) {
         if (name==null)
@@ -143,7 +147,6 @@ public class VirtualStackOfStacks extends ImageStack {
         }
         return imp;
     }
-
 
     /** Returns the number of slices in this stack. */
     public int getSize() {

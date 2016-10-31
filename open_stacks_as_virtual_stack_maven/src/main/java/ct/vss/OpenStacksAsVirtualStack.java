@@ -39,7 +39,20 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         // constructor
     }
 
-	public  ImagePlus open(String directory, String fileAnalysisMethod, int increment) {
+    public ImagePlus openCropped(String directory, String fileAnalysisMethod, int increment) {
+
+    }
+
+    public ImagePlus openCropped(FileInfo[][] infos, int t, int nt, int nz, int nx, int ny, int[] z, int[] x, int[] y) {
+        OpenerExtensions oe = new OpenerExtensions();
+        FileInfo[][] infosCropped = new FileInfo[nt][];
+        for(int it=t; it<nt; it++) {
+            infosCropped[it-t] = oe.cropFileInfo(infos[it]);
+        }
+    }
+
+
+    public ImagePlus open(String directory, String fileAnalysisMethod, int increment) {
 		this.directory = directory;
 		this.fileAnalysisMethod = fileAnalysisMethod;
 		this.increment = increment;
@@ -216,6 +229,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     for (int j=0; j<info.length; j++) {
                         infoModified[j] =  (FileInfo) info[j].clone();
                         infoModified[j].fileName = list[i];
+
                     }
                     stack.addStack(list[i], infoModified);
                 }
@@ -356,19 +370,45 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		//IJ.debugMode = true;
 
 		OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
+        boolean MATLAB = false;
+        boolean OME = true;
 
-        //ImagePlus imp = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200-IJtiff/", 1);
-        ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/MATLABtiff/", "Tiff: Use IFDs of first file for all", 1);
-		//ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", "Tiff: Use IFDs of first file for all", 1);
-        //ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", "Tiff: Load IFDs of all files", 1);
-        imp.show();
 
-        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-        ImagePlus impC = vss.getCroppedFrameAsImagePlus(0,0,0,2,754,100,417,100);
-		//ImagePlus impC = vss.getCroppedFrameAsImagePlus(0,1,30,10,50,70,34,70); //T88200-OMEtiff
-		impC.show();
-		impC.setPosition(5);
-		impC.resetDisplayRange();
+        if (MATLAB) {
+            ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/MATLABtiff/", "Tiff: Use IFDs of first file for all", 1);
+            imp.show();
+
+            // read subset as ImagePlus
+            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+            ImagePlus impC = vss.getCroppedFrameAsImagePlus(0, 0, 0, 2, 754, 100, 417, 100);
+            impC.show();
+            impC.setPosition(0);
+            impC.resetDisplayRange();
+        }
+
+        if(OME) {
+            // intialise whole data set
+            ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", "Tiff: Use IFDs of first file for all", 1);
+            imp.show();
+
+            // read subset as ImagePlus
+            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+            ImagePlus impRealOneCroppedFrame = vss.getCroppedFrameAsImagePlus(0,1,30,10,50,70,34,70); //T88200-OMEtiff
+            impRealOneCroppedFrame.show();
+            impRealOneCroppedFrame.setPosition(5);
+            impRealOneCroppedFrame.resetDisplayRange();
+
+            // open virtual subset
+            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+            FileInfo[][] infos = vss.getFileInfos();
+            int t=0,nt=2,nz=10,ny=70,nx=70;
+            int[] z = {30,30};
+            int[] x = {50,50};
+            int[] y = {34,34};
+            ImagePlus impVirtualCropSeries = ovs.openCropped(infos, t, nt, nz, nx, ny, z, x, y, 1);
+            impVirtualCropSeries.show();
+        }
+
 
 		// open the Clown sample
 		//ImagePlus image = IJ.openImage("http://imagej.net/images/clown.jpg");
