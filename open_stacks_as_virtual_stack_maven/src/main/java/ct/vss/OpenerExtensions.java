@@ -39,7 +39,7 @@ class OpenerExtensions extends Opener {
             throw new IllegalArgumentException("z="+z+" is out of range");
         // do the same for nx and ny and so on
 
-        long startTime = System.currentTimeMillis();
+        //long startTime = System.currentTimeMillis();
 
         FileInfo fi = (FileInfo) fi0.clone(); // make a deep copy so we can savely modify it to load what we want
         long size = fi.width*fi.height*fi.getBytesPerPixel();
@@ -68,19 +68,19 @@ class OpenerExtensions extends Opener {
 
         FileOpener fo = new FileOpener(fi);
         ImagePlus imp = fo.open(false);
-        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
+        //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
         return imp;
     }
 
     public ImagePlus openTiffStackSliceUsingIFDs(FileInfo[] info, int z) {
 
-        long startTime = System.currentTimeMillis();
+        //long startTime = System.currentTimeMillis();
 
         FileInfo[] infoModified = new FileInfo[1];
         infoModified[0] = info[z];
         ImagePlus imp = openTiffStack(infoModified);
 
-        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
+        //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
 
         return imp;
     }
@@ -153,10 +153,10 @@ class OpenerExtensions extends Opener {
         //    log(""+info[i].getOffset());
         //}
 
-        long startTime = System.currentTimeMillis();
+        //long startTime = System.currentTimeMillis();
         FileInfo[] infoModified = cropFileInfo(info, z, nz, x, nx, y, ny);
         ImagePlus imp = openTiffStack(infoModified);
-        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
+        //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
         return imp;
     }
 

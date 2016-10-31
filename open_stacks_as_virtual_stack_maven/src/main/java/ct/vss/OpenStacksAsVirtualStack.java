@@ -421,12 +421,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             int nz = 69;
             int nx = 70;
             int ny = 70;
-            Positions3D positions = register.computeDrifts3D(0,3,0,69,45,80,27,80, "center_of_mass", 200);
+            Positions3D positions = register.computeDrifts3D(0,3,24,69-24,45,80,27,80, "center_of_mass", 200);
             positions.printPositions();
 
             // open drift corrected as virtual stack
             FileInfo[][] infos = vss.getFileInfos();
-            ImagePlus impVirtualCropSeries = ovs.openCropped(infos, 69, 70, 70, positions);
+            ImagePlus impVirtualCropSeries = ovs.openCropped(infos, 69-24, 70, 70, positions);
             impVirtualCropSeries.show();
 
         }
