@@ -39,24 +39,22 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         // constructor
     }
 
-    public ImagePlus openCropped(String directory, String fileAnalysisMethod, int increment) {
-
-    }
-
     public ImagePlus openCropped(FileInfo[][] infos, int t, int nt, int nz, int nx, int ny, int[] z, int[] x, int[] y) {
-        ImageStack stack = new VirtualStackOfStacks(nx, ny, nz);
+        VirtualStackOfStacks stack = new VirtualStackOfStacks(nx, ny, nz);
         OpenerExtensions oe = new OpenerExtensions();
-        FileInfo[][] infosCropped = new FileInfo[nt][];
+        FileInfo[] infoModified = new FileInfo[nt];
         for(int it=t; it<nt; it++) {
-            infosCropped[it-t] = oe.cropFileInfo(infos[it],z[it],nz,x[it],nx,y[it],ny);
-            stack.addTiffStack(infoModified);
+            infoModified = oe.cropFileInfo(infos[it],z[it],nz,x[it],nx,y[it],ny);
+            stack.addStack(infoModified);
         }
-        return(makeImagePlus(stack,infosCropped[0][0]));
+        return(makeImagePlus(stack,infoModified[0]));
     }
 
-    private ImagePlus makeImagePlus(ImageStack stack, FileInfo fi) {
+    private ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfo fi) {
+        double min = Double.MAX_VALUE;
+        double max = -Double.MAX_VALUE;
         ImagePlus imp = new ImagePlus(fi.directory, stack);
-        if (imp.getType()==ImagePlus.GRAY16 || imp2.getType()==ImagePlus.GRAY32)
+        if (imp.getType()==ImagePlus.GRAY16 || imp.getType()==ImagePlus.GRAY32)
             imp.getProcessor().setMinAndMax(min, max);
         imp.setFileInfo(fi); // saves FileInfo of the first image
         if (imp.getStackSize()==1 && info1!=null)
@@ -78,9 +76,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		FileInfo[][] infos = null;
 		FileInfo fi = null;
 		VirtualStackOfStacks stack = null;
-		double min = Double.MAX_VALUE;
-		double max = -Double.MAX_VALUE;
-        ImagePlus imp2 = null;
 
 		log("");
         log("");
@@ -230,6 +225,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     ColorModel cm = null;
                     if( fi.nImages > 1) {
                         depth = fi.nImages;
+                        fi.nImages = 1;
                     }
                     else {
                         depth = info.length;
@@ -248,12 +244,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         infoModified[j].fileName = list[i];
 
                     }
-                    stack.addTiffStack(infoModified);
+                    stack.addStack(infoModified);
                 }
 				if (fileAnalysisMethod == "Tiff: Load IFDs of all files") {
                     //log("Tiff: Load IFDs of all files");
 					info = Opener.getTiffFileInfo(directory + list[i]);
-                    stack.addStack(list[i], info);
+                    stack.addStack(info);
                 }
 
 				IJ.showProgress((double) count / n);
@@ -267,25 +263,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		//}catch(IOException e){
 		//	  e.printStackTrace();
 		}
+        ImagePlus impFinal = null;
 		if (stack!=null && stack.getSize()>0) {
-            imp2 = new ImagePlus("Stack", stack);
-			if (imp2.getType()==ImagePlus.GRAY16 || imp2.getType()==ImagePlus.GRAY32)
-				imp2.getProcessor().setMinAndMax(min, max);
-			imp2.setFileInfo(fi); // saves FileInfo of the first image
-			if (imp2.getStackSize()==1 && info1!=null)
-				imp2.setProperty("Info", info1);
-			int nC = 1;
-			int nZ = imp2.getNSlices() / stack.getNStacks();
-			int nT = stack.getNStacks();
-			imp2.setDimensions(nC, nZ, nT);
-			imp2.setOpenAsHyperStack(true);
-            imp2.resetDisplayRange();
-			//ImageProcessor ipc = stack.getCroppedProcessor(10, 690, 100, 430, 100);
-			//ImagePlus impc = new ImagePlus("ipc",ipc);
-			//impc.show();
+            impFinal = makeImagePlus(stack, fi);
 		}
 		IJ.showProgress(1.0);
-        return(imp2);
+        return(impFinal);
 	}
 	
 	boolean showDialog(FileInfo[] info, String[] list) {
@@ -386,10 +369,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 		//IJ.debugMode = true;
 
-		OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
+
         boolean MATLAB = false;
         boolean OME = true;
 
+        OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
 
         if (MATLAB) {
             ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/MATLABtiff/", "Tiff: Use IFDs of first file for all", 1);
@@ -408,21 +392,23 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", "Tiff: Use IFDs of first file for all", 1);
             imp.show();
 
-            // read subset as ImagePlus
             VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+
+            // read subset as ImagePlus
+            /**
             ImagePlus impRealOneCroppedFrame = vss.getCroppedFrameAsImagePlus(0,1,30,10,50,70,34,70); //T88200-OMEtiff
             impRealOneCroppedFrame.show();
             impRealOneCroppedFrame.setPosition(5);
             impRealOneCroppedFrame.resetDisplayRange();
+            */
 
             // open virtual subset
-            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
             FileInfo[][] infos = vss.getFileInfos();
             int t=0,nt=2,nz=10,ny=70,nx=70;
-            int[] z = {30,30};
-            int[] x = {50,50};
+            int[] z = {30,29};
+            int[] x = {50,55};
             int[] y = {34,34};
-            ImagePlus impVirtualCropSeries = ovs.openCropped(infos, t, nt, nz, nx, ny, z, x, y, 1);
+            ImagePlus impVirtualCropSeries = ovs.openCropped(infos, t, nt, nz, nx, ny, z, x, y);
             impVirtualCropSeries.show();
         }
 

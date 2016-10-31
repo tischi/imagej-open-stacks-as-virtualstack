@@ -31,7 +31,7 @@ public class VirtualStackOfStacks extends ImageStack {
     }
 
     /** Adds an stack to the end of the stack. */
-    public void addTiffStack(FileInfo[] info) {
+    public void addStack(FileInfo[] info) {
         if (info==null)
             throw new IllegalArgumentException("'info' is null!");
         nSlices = nSlices + depth;
@@ -108,13 +108,15 @@ public class VirtualStackOfStacks extends ImageStack {
         //FileInfo fi = (FileInfo) fiRef.clone(); // make a deep copy so we can savely modify it to load what we want
         //fi.fileName = names[nFile];
         //ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingFirstIFD(fi, z);
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[iFile], z);
-        if (imp!=null) {
-            int w = imp.getWidth();
-            int h = imp.getHeight();
-            int type = imp.getType();
-            ColorModel cm = imp.getProcessor().getColorModel();
-        } else {
+        //ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[iFile], z);
+        ImagePlus imp = new OpenerExtensions().openTiffStackSliceUsingIFDs(infos[iFile], z);
+
+        if (imp==null) {
+            //int w = imp.getWidth();
+            //int h = imp.getHeight();
+            //int type = imp.getType();
+            //ColorModel cm = imp.getProcessor().getColorModel();
+        //} else {
             log("Error: loading failed!");
             return null;
         }
