@@ -369,7 +369,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 		//IJ.debugMode = true;
 
-
         boolean MATLAB = false;
         boolean OME = true;
 
@@ -394,6 +393,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
 
+            // compute drift
+            Registration register = new Registration(vss);
+            Positions3D positions = register.computeDrifts3D(t, nt, z, nz, x, nx, y, ny, 'center_of_mass', 200);
+            computeDrifts3D(int t, int nt, int z, int nz, int x, int nx, int y, int ny, String method, int bg);
+
+
+
             // read subset as ImagePlus
             /**
             ImagePlus impRealOneCroppedFrame = vss.getCroppedFrameAsImagePlus(0,1,30,10,50,70,34,70); //T88200-OMEtiff
@@ -409,7 +415,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             int[] x = {50,55};
             int[] y = {34,34};
             ImagePlus impVirtualCropSeries = ovs.openCropped(infos, t, nt, nz, nx, ny, z, x, y);
+            //ImagePlus impVirtualCropSeries = ovs.openCropped(infos, nz, nx, ny, positions);
+
             impVirtualCropSeries.show();
+
         }
 
 
