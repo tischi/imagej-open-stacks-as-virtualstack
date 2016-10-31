@@ -83,16 +83,7 @@ class OpenerExtensions extends Opener {
         return imp;
     }
 
-    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, int z, int nz, int x, int nx, int y, int ny) {
-
-        log("# openCroppedTiffStackUsingIFDs");
-
-        if (info==null) return null;
-
-        //for(int i=0; i<info.length; i++) {
-        //    log(""+info[i].getOffset());
-        //}
-
+    public FileInfo[] cropFileInfo(FileInfo[] info, int z, int nz, int x, int nx, int y, int ny) {
         log("filename: " + info[0].fileName);
         log("z,nz,x,nx,y,ny: " + z +","+ nz +","+ x +","+ nx +","+ y +","+ ny);
         log("info.length: " + info.length);
@@ -101,10 +92,7 @@ class OpenerExtensions extends Opener {
             throw new IllegalArgumentException("z="+z+" is out of range");
         // do the same for nx and ny and so on
 
-        long startTime = System.currentTimeMillis();
-
         FileInfo[] infoModified = new FileInfo[nz];
-
         FileInfo fi = info[0];
 
         // adjusted gap
@@ -138,6 +126,22 @@ class OpenerExtensions extends Opener {
         //    log(""+infoModified[i].stripOffsets[0]);
         //}
 
+        return(infoModified);
+    }
+
+
+    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, int z, int nz, int x, int nx, int y, int ny) {
+
+        log("# openCroppedTiffStackUsingIFDs");
+
+        if (info==null) return null;
+
+        //for(int i=0; i<info.length; i++) {
+        //    log(""+info[i].getOffset());
+        //}
+
+        long startTime = System.currentTimeMillis();
+        FileInfo[] infoModified = cropFileInfo(info, int z, int nz, int x, int nx, int y, int ny)
         ImagePlus imp = openTiffStack(infoModified);
         long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
         return imp;

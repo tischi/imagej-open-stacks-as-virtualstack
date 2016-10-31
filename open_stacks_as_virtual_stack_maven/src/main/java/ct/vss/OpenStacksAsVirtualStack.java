@@ -48,7 +48,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         OpenerExtensions oe = new OpenerExtensions();
         FileInfo[][] infosCropped = new FileInfo[nt][];
         for(int it=t; it<nt; it++) {
-            infosCropped[it-t] = oe.cropFileInfo(infos[it]);
+            infosCropped[it-t] = oe.cropFileInfo(infos[it],z[it],nz,x[it],nx,y[it],ny);
             stack.addTiffStack(infoModified);
         }
         return(makeImagePlus(stack,infosCropped[0][0]));
