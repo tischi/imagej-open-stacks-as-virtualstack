@@ -118,15 +118,15 @@ class OpenerExtensions extends Opener {
         // todo check if this is slow and make faster
         for (int iz=z; iz<(z+nz); iz++){
             infoModified[iz-z] = (FileInfo) info[iz].clone();
+            infoModified[iz-z].nImages = 1;
             infoModified[iz-z].longOffset = infoModified[iz-z].getOffset();
-            infoModified[iz-z].longOffset += (y*fi.width+x)*fi.getBytesPerPixel();
+            //infoModified[iz-z].longOffset += (y*fi.width+x)*fi.getBytesPerPixel();
             infoModified[iz-z].offset = 0;
             infoModified[iz-z].stripLengths = new int[ny];
             infoModified[iz-z].stripOffsets = new int[ny];
             for (int i=0; i<ny; i++) {
                 infoModified[iz-z].stripLengths[i] = nx * fi.getBytesPerPixel();
-                infoModified[iz-z].stripOffsets[i] = (int) infoModified[iz-z].getOffset() + i * fi.width * fi.getBytesPerPixel();
-                //infoModified[iz-z].stripOffsets[i] = (int) i * fi.width * fi.getBytesPerPixel();
+                infoModified[iz-z].stripOffsets[i] = (int) infoModified[iz-z].getOffset() + ((((y+i)*fi.width) + x) * fi.getBytesPerPixel());
             }
             infoModified[iz-z].height = ny;
             infoModified[iz-z].width = nx;

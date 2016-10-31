@@ -70,6 +70,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 				try {
 					TiffDecoderExtension tde = new TiffDecoderExtension(directory, list[i]);
 					fi = tde.getFirstIFD();
+					if(fi == null) {
+						IJ.showMessage("Tiff file checking", "Could not open "+directory+list[i]);
+					}
 				} catch (IOException ex) {
 					IJ.showMessage("File Checking", ex.toString());
 					return null;
@@ -113,7 +116,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 for (int j = 0; j < info.length-1; j++) {
                     size = info[j].width*info[j].height*info[j].getBytesPerPixel();
                     gapBetweenImages = (int) (info[j+1].getOffset() - info[j].getOffset() - size);
-					log(""+info[j].getOffset());
+					//log(""+info[j].getOffset());
                     if (j==0) {
                         gapBetweenFirstImages = gapBetweenImages;
                         sizeOfFirstImage = size;
@@ -122,6 +125,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     } else if (gapBetweenImages != gapBetweenFirstImages) {
                         log("gapBetweenImages " + j + ": " + gapBetweenImages);
                         log("image size "+ j + ": " + size);
+                        gapBetweenFirstImages = gapBetweenImages;
                         //IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
                         //return null;
                     }
@@ -354,14 +358,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
 
         //ImagePlus imp = ovs.openStacksAsVirtualStack("/Users/tischi/Desktop/example-data/T88200-IJtiff/", 1);
-        //ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/MATLABtiff/", "Tiff: Use IDFs of first file for all", 1);
+        ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/MATLABtiff/", "Tiff: Use IFDs of first file for all", 1);
 		//ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", "Tiff: Use IFDs of first file for all", 1);
-        ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", "Tiff: Load IFDs of all files", 1);
+        //ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", "Tiff: Load IFDs of all files", 1);
         imp.show();
 
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-        //ImagePlus impC = vss.getCroppedFrameAsImagePlus(0,0,0,2,754,100,417,100);
-		ImagePlus impC = vss.getCroppedFrameAsImagePlus(0,1,30,10,50,70,34,70); //T88200-OMEtiff
+        ImagePlus impC = vss.getCroppedFrameAsImagePlus(0,0,0,2,754,100,417,100);
+		//ImagePlus impC = vss.getCroppedFrameAsImagePlus(0,1,30,10,50,70,34,70); //T88200-OMEtiff
 		impC.show();
 		impC.setPosition(5);
 		impC.resetDisplayRange();
