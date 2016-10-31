@@ -32,10 +32,9 @@ public class Registration {
 
         // set position of reference image
         positions.setPosition(t, posCurr);
-
         // compute reference center of mass
         comRef = centerOfMass16bit(getImageStack(positions.getPosition(t)), bg);
-        log("comRef "+t+": "+comRef.toString());
+        //log("comRef "+t+": "+comRef.toString());
 
         for (int it = t + 1; it < nt; it++) {
 
@@ -44,7 +43,7 @@ public class Registration {
 
             // compute reference center of mass at next predicted position
             comCurr = centerOfMass16bit(getImageStack(positions.getPosition(it)), bg);
-            log("comCurr "+it+": "+comCurr.toString());
+            //log("comCurr "+it+": "+comCurr.toString());
 
             // compute difference
             comDiff = comCurr.subtract(comRef);
@@ -66,9 +65,9 @@ public class Registration {
     }
 
     private ImageStack getImageStack(int[] p) {
-        log("Registration.getImageStack p[0]: "+p[0]);
+        //log("Registration.getImageStack p[0]: "+p[0]+" z:"+p[3]);
         ImagePlus imp = vss.getCroppedFrameAsImagePlus(p[0], 0, p[3], nz, p[1], nx, p[2], ny);
-        imp.show();
+        //imp.show();
         return(imp.getStack());
     }
 

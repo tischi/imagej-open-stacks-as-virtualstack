@@ -50,7 +50,7 @@ public class Positions3D {
         txyz[it-t][2] = y;
         txyz[it-t][3] = z;
 
-        log("Set Position: "+t+" "+x+" "+y+" "+z);
+        //log("Set Position: "+t+" "+x+" "+y+" "+z);
     }
 
     public int[] getPosition(int it) {
