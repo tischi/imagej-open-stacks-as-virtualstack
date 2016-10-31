@@ -10,21 +10,45 @@ import javafx.geometry.Point3D;
 public class Positions3D {
     public int nt, t;
     private int[][] txyz;
+    int zmax, xmax, ymax;
+    int nz, nx, ny;
 
-    public Positions3D(int nt, int t) {
+
+    public Positions3D(int nt, int t, int xmax, int ymax, int zmax, int nx, int ny, int nz) {
         this.t = t; //starting time-point
         this.nt = nt;
-        this.txyz = new int[nt][3];
+        this.xmax = xmax;
+        this.ymax = ymax;
+        this.zmax = zmax;
+        this.nx = nx;
+        this.ny = ny;
+        this.nz = nz;
+        this.txyz = new int[nt][4];
     }
 
-    public void setPosition(int it, int x, int y, int z) {
+    public void setPosition(int it, double xd, double yd, double zd) {
         if (it < t || it > t+nt-1) {
             throw new IllegalArgumentException("t="+it+" is out of range,"+(nt+t-1));
         }
-        txyz[it-t][0] = t;
+
+        // round the values
+        int x = (int) (xd+0.5);
+        int y = (int) (yd+0.5);
+        int z = (int) (zd+0.5);
+
+        // make sure that the ROI stays within the image bounds
+        if (x < 0) x = 0;
+        if (y < 0) y = 0;
+        if (z < 0) z = 0;
+
+        if (x+nx > xmax) x = xmax-nx;
+        if (y+ny > ymax) y = ymax-ny;
+        if (z+nz > zmax) z = zmax-nz;
+
+        txyz[it-t][0] = it;
         txyz[it-t][1] = x;
         txyz[it-t][2] = y;
-        txyz[it-t][2] = z;
+        txyz[it-t][3] = z;
 
         log("Set Position: "+t+" "+x+" "+y+" "+z);
     }
@@ -40,13 +64,11 @@ public class Positions3D {
         if (it < t || it > t+nt-1) {
             throw new IllegalArgumentException("t="+it+" is out of range,"+(nt+t-1));
         }
-        txyz[it-t][0] = t;
-        txyz[it-t][1] = (int) p.getX();
-        txyz[it-t][2] = (int) p.getY();
-        txyz[it-t][2] = (int) p.getZ();
-
-        log("Set Position: "+t+" "+x+" "+y+" "+z);
-    }
+        int x = (int) p.getX();
+        int y = (int) p.getY();
+        int z = (int) p.getZ();
+        setPosition(it,x,y,z);
+       }
 
 
     /**
@@ -63,8 +85,8 @@ public class Positions3D {
     }*/
 
     public void printPositions() {
-        for(int it=0; it<nt; it++) {
-            log("Position: "+xyz[0]+" "+xyz[1]+" "+xyz[2]+" "+xyz[3]);
+        for(int it=t; it<nt+t; it++) {
+            log("Position: "+txyz[it-t][0]+" "+txyz[it-t][1]+" "+txyz[it-t][2]+" "+txyz[it-t][3]);
         }
 
     }

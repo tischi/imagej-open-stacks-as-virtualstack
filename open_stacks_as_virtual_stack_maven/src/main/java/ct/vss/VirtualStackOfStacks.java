@@ -96,9 +96,7 @@ public class VirtualStackOfStacks extends ImageStack {
         int iFile, z;
         // get z-th slice of a tif stack
         iFile = (int) (n-1) / depth;
-        log("iFile: "+iFile); log("filename: "+infos[iFile][0].fileName);
-        log(""+infos[0][0].fileName);
-        log(""+infos[1][0].fileName);
+        //log("iFile: "+iFile); log("filename: "+infos[iFile][0].fileName);
         z = (n-1) - iFile * depth; // zero-based in my opener functions
         // IJ.log("requested slice: "+n);
         //log("opening slice " + nSlice + " of " + path + names[nFile]);

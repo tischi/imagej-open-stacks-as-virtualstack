@@ -97,6 +97,7 @@ class OpenerExtensions extends Opener {
     }
 
     public FileInfo[] cropFileInfo(FileInfo[] info, int z, int nz, int x, int nx, int y, int ny) {
+        log("OpenerExtensions.cropFileInfo:");
         log("filename: " + info[0].fileName);
         log("z,nz,x,nx,y,ny: " + z +","+ nz +","+ x +","+ nx +","+ y +","+ ny);
         log("info.length: " + info.length);

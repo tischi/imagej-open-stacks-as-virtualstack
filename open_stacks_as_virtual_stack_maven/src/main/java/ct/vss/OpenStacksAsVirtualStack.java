@@ -39,12 +39,15 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         // constructor
     }
 
-    public ImagePlus openCropped(FileInfo[][] infos, int t, int nt, int nz, int nx, int ny, int[] z, int[] x, int[] y) {
+
+
+    public ImagePlus openCropped(FileInfo[][] infos, int nz, int nx, int ny, Positions3D p) {
         VirtualStackOfStacks stack = new VirtualStackOfStacks(nx, ny, nz);
         OpenerExtensions oe = new OpenerExtensions();
-        FileInfo[] infoModified = new FileInfo[nt];
-        for(int it=t; it<nt; it++) {
-            infoModified = oe.cropFileInfo(infos[it],z[it],nz,x[it],nx,y[it],ny);
+        FileInfo[] infoModified = new FileInfo[p.nt];
+        for(int it=p.t; it<p.nt; it++) {
+            int[] pos = p.getPosition(it);
+            infoModified = oe.cropFileInfo(infos[it],pos[3],nz,pos[1],nx,pos[2],ny);
             stack.addStack(infoModified);
         }
         return(makeImagePlus(stack,infoModified[0]));
@@ -370,7 +373,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		//IJ.debugMode = true;
 
         boolean MATLAB = false;
-        boolean OME = true;
+        boolean OME = false;
+        boolean OME_drift = true;
 
         OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
 
@@ -393,30 +397,36 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
 
-            // compute drift
-            Registration register = new Registration(vss);
-            Positions3D positions = register.computeDrifts3D(t, nt, z, nz, x, nx, y, ny, 'center_of_mass', 200);
-            computeDrifts3D(int t, int nt, int z, int nz, int x, int nx, int y, int ny, String method, int bg);
-
-
-
-            // read subset as ImagePlus
-            /**
-            ImagePlus impRealOneCroppedFrame = vss.getCroppedFrameAsImagePlus(0,1,30,10,50,70,34,70); //T88200-OMEtiff
-            impRealOneCroppedFrame.show();
-            impRealOneCroppedFrame.setPosition(5);
-            impRealOneCroppedFrame.resetDisplayRange();
-            */
-
             // open virtual subset
             FileInfo[][] infos = vss.getFileInfos();
             int t=0,nt=2,nz=10,ny=70,nx=70;
             int[] z = {30,29};
             int[] x = {50,55};
             int[] y = {34,34};
-            ImagePlus impVirtualCropSeries = ovs.openCropped(infos, t, nt, nz, nx, ny, z, x, y);
+            //ImagePlus impVirtualCropSeries = ovs.openCropped(infos, t, nt, nz, nx, ny, z, x, y);
             //ImagePlus impVirtualCropSeries = ovs.openCropped(infos, nz, nx, ny, positions);
 
+            //impVirtualCropSeries.show();
+
+        }
+
+        if (OME_drift) {
+            ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/T88200-OMEtiff-registration-test/", "Tiff: Use IFDs of first file for all", 1);
+            imp.show();
+
+            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+
+            // compute drift
+            Registration register = new Registration(vss);
+            int nz = 69;
+            int nx = 70;
+            int ny = 70;
+            Positions3D positions = register.computeDrifts3D(0,3,0,69,50,70,34,70, "center_of_mass", 150);
+            positions.printPositions();
+
+            // open drift corrected as virtual stack
+            FileInfo[][] infos = vss.getFileInfos();
+            ImagePlus impVirtualCropSeries = ovs.openCropped(infos, 69, 70, 70, positions);
             impVirtualCropSeries.show();
 
         }
