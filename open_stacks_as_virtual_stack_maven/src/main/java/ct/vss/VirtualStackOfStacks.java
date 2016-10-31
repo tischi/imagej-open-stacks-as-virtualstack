@@ -14,44 +14,33 @@ import static ij.IJ.log;
 public class VirtualStackOfStacks extends ImageStack {
 
     static final int INITIAL_SIZE = 100;
-    String path;
     int depth;
     int nSlices;
     int nStacks;
-    String[] names;
-    FileInfo fiRef;
-    //FileInfo[] info;
     protected FileInfo[][] infos;
 
     /** Creates a new, empty virtual stack. */
-    public VirtualStackOfStacks(int width, int height, int depth, ColorModel cm, String path, FileInfo fi) {
-        super(width, height, cm);
-        this.path = path;
+    public VirtualStackOfStacks(int width, int height, int depth) {
+        super(width, height, null);
         this.depth = depth;
-        this.fiRef = fi;
-        this.names = new String[INITIAL_SIZE];
         this.infos = new FileInfo[INITIAL_SIZE][];
     }
 
     public FileInfo[][] getFileInfos() {
-        return infos;
+        return(infos);
     }
 
     /** Adds an stack to the end of the stack. */
-    public void addStack(String name, FileInfo[] info) {
-        if (name==null)
-            throw new IllegalArgumentException("'name' is null!");
+    public void addTiffStack(FileInfo[] info) {
+        if (info==null)
+            throw new IllegalArgumentException("'info' is null!");
         nSlices = nSlices + depth;
         nStacks ++;
-        if (nStacks==names.length) {
-            String[] tmp_names = new String[nStacks*2];
-            System.arraycopy(names, 0, tmp_names, 0, nStacks);
-            names = tmp_names;
+        if (nStacks==infos.length) {
             FileInfo[][] tmp_infos = new FileInfo[nStacks*2][];
             System.arraycopy(infos, 0, tmp_infos, 0, nStacks);
             infos = tmp_infos;
         }
-        names[nStacks-1] = name;
         infos[nStacks-1] = info;
         log("Added file: "+infos[nStacks-1][0].fileName);
     }
@@ -75,8 +64,8 @@ public class VirtualStackOfStacks extends ImageStack {
         if (nSlices<1)
             return;
         for (int i=n; i<nSlices; i++)
-            names[i-1] = names[i];
-        names[nSlices-1] = null;
+            infos[i-1] = infos[i];
+        infos[nSlices-1] = null;
         nSlices--;
     }
 
@@ -162,7 +151,7 @@ public class VirtualStackOfStacks extends ImageStack {
     public String getSliceLabel(int n) {
         int nFile;
         nFile = n / depth;
-        return names[nFile];
+        return infos[nFile][0].fileName;
     }
 
     /** Returns null. */

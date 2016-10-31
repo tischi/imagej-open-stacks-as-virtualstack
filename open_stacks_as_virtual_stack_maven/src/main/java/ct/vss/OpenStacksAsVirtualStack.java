@@ -44,13 +44,31 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     public ImagePlus openCropped(FileInfo[][] infos, int t, int nt, int nz, int nx, int ny, int[] z, int[] x, int[] y) {
+        ImageStack stack = new VirtualStackOfStacks(nx, ny, nz);
         OpenerExtensions oe = new OpenerExtensions();
         FileInfo[][] infosCropped = new FileInfo[nt][];
         for(int it=t; it<nt; it++) {
             infosCropped[it-t] = oe.cropFileInfo(infos[it]);
+            stack.addTiffStack(infoModified);
         }
+        return(makeImagePlus(stack,infosCropped[0][0]));
     }
 
+    private ImagePlus makeImagePlus(ImageStack stack, FileInfo fi) {
+        ImagePlus imp = new ImagePlus(fi.directory, stack);
+        if (imp.getType()==ImagePlus.GRAY16 || imp2.getType()==ImagePlus.GRAY32)
+            imp.getProcessor().setMinAndMax(min, max);
+        imp.setFileInfo(fi); // saves FileInfo of the first image
+        if (imp.getStackSize()==1 && info1!=null)
+            imp.setProperty("Info", info1);
+        int nC = 1;
+        int nZ = imp.getNSlices() / stack.getNStacks();
+        int nT = stack.getNStacks();
+        imp.setDimensions(nC, nZ, nT);
+        imp.setOpenAsHyperStack(true);
+        imp.resetDisplayRange();
+        return(imp);
+    }
 
     public ImagePlus open(String directory, String fileAnalysisMethod, int increment) {
 		this.directory = directory;
@@ -215,10 +233,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     }
                     else {
                         depth = info.length;
-                        fi.nImages = info.length;
                     }
 
-                    stack = new VirtualStackOfStacks(fi.width, fi.height, fi.nImages, cm, directory, fi);
+                    stack = new VirtualStackOfStacks(fi.width, fi.height, depth);
 
 				}
 				count = stack.getNStacks()+1;
@@ -231,7 +248,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         infoModified[j].fileName = list[i];
 
                     }
-                    stack.addStack(list[i], infoModified);
+                    stack.addTiffStack(infoModified);
                 }
 				if (fileAnalysisMethod == "Tiff: Load IFDs of all files") {
                     //log("Tiff: Load IFDs of all files");
