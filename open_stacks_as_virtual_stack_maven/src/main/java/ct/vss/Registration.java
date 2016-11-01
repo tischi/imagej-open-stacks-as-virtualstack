@@ -29,6 +29,7 @@ public class Registration implements PlugIn {
     ImagePlus imp;
     int nx, ny, nz;
     public final static int MEAN=10, MEDIAN=11, MIN=12, MAX=13, VAR=14, MAXLOCAL=15; // Filters3D
+    private static NonBlockingGenericDialog gd;
 
     public Registration(ImagePlus imp, boolean gui) {
         this.imp = imp;
@@ -45,32 +46,48 @@ public class Registration implements PlugIn {
     }
 
     public void showDialog() {
-        NonBlockingGenericDialog gd = new NonBlockingGenericDialog("Registration");
-        gd.addSlider("radius x:", 0, (int) imp.getWidth() / 2, 50);
+        gd = new NonBlockingGenericDialog("Registration");
+        gd.addSlider("Radius x:", 0, (int) imp.getWidth() / 2, 40);
+        gd.addSlider("Radius y:", 0, (int) imp.getHeight() / 2, 40);
+        gd.addSlider("Radius z:", 0, (int) imp.getNSlices() / 2, 20);
         //gd.addStringField("File Name Contains:", "");
-        // Create custom button
-        Button bt = new Button("A");
+        //((Label)theLabel).setText(""+imp.getTitle());
+        Button bt = new Button("Update position");
         bt.addActionListener(new ActionListener() {
+                                 public void actionPerformed(ActionEvent e) {
+                                     Roi roi = imp.getRoi();
+                                     Scrollbar s;
+                                     if ((roi != null) && (roi.getPolygon().npoints == 1)) {
+                                         int x = roi.getPolygon().xpoints[0];
+                                         int y = roi.getPolygon().ypoints[0];
+                                         int z = imp.getZ() - 1;
+                                         int t = imp.getT() - 1;
+                                         //int nx = (int) getNextNumber();
+                                         log("" + t + " " + z + " " + x + " " + y);
+                                         s = (Scrollbar)gd.getSliders().get(0);
+                                         log("" + s.getValue());
+                                         s = (Scrollbar)gd.getSliders().get(1);
+                                         log("" + s.getValue());
 
-            public void actionPerformed(ActionEvent e)
-            {
-                //Execute when button is pressed
-                IJ.log("You clicked the button A");
-                Roi roi = imp.getRoi();
-                if((roi.getPolygon()!=null) && (roi.getPolygon().npoints==1)) {
-                    Polygon p = roi.getPolygon();
-                    log("X:" + p.xpoints[0] + ",Y:" + p.ypoints[0]);
-                } else {
-                    log("No PointTool selection");
-                }
-            }
-        });
+                                         Roi p = new PointRoi(10, 10);
+                                         imp.deleteRoi();
+                                         imp.setRoi(p);
+                                     } else {
+                                         log("No PointTool selection");
+                                     }
+                                 }
+                             });
         gd.add(bt);
+        //gd.addDialogListener(this);
         gd.showDialog();
-        gd.addMessage("0,0,0");
-        gd.showDialog();
-
     }
+
+    //public boolean dialogItemChanged(GenericDialog gd, AWTEvent awtEvent) {
+    //    log("aaaa");
+        //});
+
+    //    return false;
+    //}
 
     public Positions3D computeDrifts3D(int t, int nt, int z, int nz, int x, int nx, int y, int ny, String method, int bg) {
         Positions3D positions = new Positions3D(nt, t, vss.getWidth(), vss.getHeight(), vss.nSlices, nx, ny, nz);
@@ -217,12 +234,13 @@ class RegistrationDialog extends NonBlockingGenericDialog {
     }
 
 
+
     protected void setup() {
-        setPositionInfo();
+        //setPositionInfo();
     }
 
     public void itemStateChanged(ItemEvent e) {
-        //setStackInfo();
+        log(""+e);
     }
 
     public void keyTyped(KeyEvent e) {
@@ -234,9 +252,13 @@ class RegistrationDialog extends NonBlockingGenericDialog {
         //setStackInfo();
     }
 
-    void setPositionInfo() {
-        ((Label)theLabel).setText(""+imp.getTitle());
-    }
+    //public void actionPerformed(java.awt.event.ActionEvent e){
+    //    log(""+e);
+    //}
+
+    //void setPositionInfo() {
+    //    ((Label)theLabel).setText(""+imp.getTitle());
+   // }
 
 
 }
