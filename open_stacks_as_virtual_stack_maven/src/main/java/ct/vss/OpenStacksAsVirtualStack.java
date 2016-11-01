@@ -285,6 +285,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		gd.showDialog();
 		if (gd.wasCanceled())
 			return false;
+
 		n = (int)gd.getNextNumber();
 		start = (int)gd.getNextNumber();
 		increment = (int)gd.getNextNumber();
@@ -373,7 +374,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		//IJ.debugMode = true;
 
         boolean MATLAB = false;
-        boolean OME = false;
+		boolean MATLAB_MIP = false;
+		boolean OME = false;
         boolean OME_drift = true;
 
         OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
@@ -412,26 +414,40 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         if (OME_drift) {
             ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/T88200-OMEtiff-registration-test/", "Tiff: Use IFDs of first file for all", 1);
+            imp.setTitle("AAAA");
             imp.show();
-
-            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+            //VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
 
             // compute drift
-            Registration register = new Registration(vss);
-            int nz = 69;
-            int nx = 70;
-            int ny = 70;
-            Positions3D positions = register.computeDrifts3D(0,3,24,69-24,45,80,27,80, "center_of_mass", 200);
-            positions.printPositions();
+            Registration register = new Registration(imp, true);
+
+            //Positions3D positions = register.computeDrifts3D(0,3,24,69-24,45,80,27,80, "center_of_mass", 200);
+            //positions.printPositions();
 
             // open drift corrected as virtual stack
-            FileInfo[][] infos = vss.getFileInfos();
-            ImagePlus impVirtualCropSeries = ovs.openCropped(infos, 69-24, 70, 70, positions);
-            impVirtualCropSeries.show();
+            //FileInfo[][] infos = vss.getFileInfos();
+            //ImagePlus impVirtualCropSeries = ovs.openCropped(infos, 69-24, 70, 70, positions);
+            //impVirtualCropSeries.show();
 
         }
 
+		if (MATLAB_MIP) {
+			ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/T88200-OMEtiff-registration-test/", "Tiff: Use IFDs of first file for all", 1);
+			imp.show();
 
+			VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+
+			// compute drift
+			Registration register = new Registration(imp, true);
+			Positions3D positions = register.computeDrifts3D(0,3,24,69,45,80,27,80, "center_of_mass", 200);
+			positions.printPositions();
+
+			// open drift corrected as virtual stack
+			FileInfo[][] infos = vss.getFileInfos();
+			ImagePlus impVirtualCropSeries = ovs.openCropped(infos, 69, 70, 70, positions);
+			impVirtualCropSeries.show();
+
+		}
 		// open the Clown sample
 		//ImagePlus image = IJ.openImage("http://imagej.net/images/clown.jpg");
 		//image.show();

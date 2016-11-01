@@ -2,22 +2,74 @@ package ct.vss;
 
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.io.FileInfo;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
 import ij.plugin.Filters3D;
 import static ij.IJ.log;
+import ij.plugin.frame.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.*;
+import ij.*;
+import ij.plugin.*;
+import ij.process.*;
+import ij.gui.*;
+import ij.measure.*;
 
 /**
  * Created by tischi on 31/10/16.
  */
 
-public class Registration {
+// https://imagej.nih.gov/ij/developer/source/ij/plugin/frame/ContrastAdjuster.java.html
+
+public class Registration implements PlugIn {
+
     VirtualStackOfStacks vss;
+    ImagePlus imp;
     int nx, ny, nz;
     public final static int MEAN=10, MEDIAN=11, MIN=12, MAX=13, VAR=14, MAXLOCAL=15; // Filters3D
 
-    public Registration(VirtualStackOfStacks vss) {
+    public Registration(ImagePlus imp, boolean gui) {
+        this.imp = imp;
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        if(vss==null) {
+            throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
+        }
         this.vss = vss;
+        if(gui) showDialog();
+    }
+
+    public void run(String arg) {
+
+    }
+
+    public void showDialog() {
+        NonBlockingGenericDialog gd = new NonBlockingGenericDialog("Registration");
+        gd.addSlider("radius x:", 0, (int) imp.getWidth() / 2, 50);
+        //gd.addStringField("File Name Contains:", "");
+        // Create custom button
+        Button bt = new Button("A");
+        bt.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e)
+            {
+                //Execute when button is pressed
+                IJ.log("You clicked the button A");
+                Roi roi = imp.getRoi();
+                if((roi.getPolygon()!=null) && (roi.getPolygon().npoints==1)) {
+                    Polygon p = roi.getPolygon();
+                    log("X:" + p.xpoints[0] + ",Y:" + p.ypoints[0]);
+                } else {
+                    log("No PointTool selection");
+                }
+            }
+        });
+        gd.add(bt);
+        gd.showDialog();
+        gd.addMessage("0,0,0");
+        gd.showDialog();
+
     }
 
     public Positions3D computeDrifts3D(int t, int nt, int z, int nz, int x, int nx, int y, int ny, String method, int bg) {
@@ -151,3 +203,41 @@ public class Registration {
     }
 
 }
+
+
+// http://imagej.1557.x6.nabble.com/Getting-x-y-coordinates-of-the-multi-point-tool-td4490440.html
+
+
+class RegistrationDialog extends NonBlockingGenericDialog {
+    ImagePlus imp;
+
+    public RegistrationDialog(ImagePlus imp) {
+        super("Registration");
+        this.imp = imp;
+    }
+
+
+    protected void setup() {
+        setPositionInfo();
+    }
+
+    public void itemStateChanged(ItemEvent e) {
+        //setStackInfo();
+    }
+
+    public void keyTyped(KeyEvent e) {
+        log(""+e.getKeyChar());
+    }
+
+
+    public void textValueChanged(TextEvent e) {
+        //setStackInfo();
+    }
+
+    void setPositionInfo() {
+        ((Label)theLabel).setText(""+imp.getTitle());
+    }
+
+
+}
+
