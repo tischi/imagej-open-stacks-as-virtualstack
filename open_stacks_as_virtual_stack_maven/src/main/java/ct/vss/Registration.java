@@ -27,7 +27,6 @@ public class Registration implements PlugIn {
 
     VirtualStackOfStacks vss;
     ImagePlus imp;
-    int nx, ny, nz;
     public final static int MEAN=10, MEDIAN=11, MIN=12, MAX=13, VAR=14, MAXLOCAL=15; // Filters3D
     private static NonBlockingGenericDialog gd;
 
@@ -82,11 +81,12 @@ public class Registration implements PlugIn {
                                          int bg = new Integer(tf.getText());
 
                                          ImageStack stack = getImageStack(t, new Point3D(x,y,z), nx, ny, nz);
+                                         // computes center of mass in cropped region
                                          Point3D p = centerOfMass16bit(stack, bg);
-
-                                         log(""+p.toString());
-                                         Roi r = new PointRoi(p.getX(), p.getY());
-                                         imp.setSlice((int)p.getZ()+1);
+                                         // show on image, computing back to global coordinates
+                                         Roi r = new PointRoi(p.getX()+x, p.getY()+y);
+                                         log(""+((int)(p.getZ())+z+1));
+                                         imp.setPosition(0,(int)p.getZ()+z+1,t+1);
                                          imp.deleteRoi();
                                          imp.setRoi(r);
                                      } else {
@@ -114,7 +114,7 @@ public class Registration implements PlugIn {
 
         int it = t;
         // set position of reference image
-        points = setPosition(points, it, posGlobalCurr);
+        points = setPosition(points, it, posGlobalCurr, nx, ny, nz);
         stack = getImageStack(it,points[it], nx, ny, nz);
         // compute internal position
         //long startTime = System.currentTimeMillis();
@@ -127,7 +127,7 @@ public class Registration implements PlugIn {
         for (it = t + 1; it < nt; it++) {
 
             // use current position to extract next image
-            points = setPosition(points, it, posGlobalCurr); // update position of this image
+            points = setPosition(points, it, posGlobalCurr, nx, ny, nz); // update position of this image
 
             // compute internal position
             stack = getImageStack(it,points[it],nx,ny,nz);
@@ -146,7 +146,7 @@ public class Registration implements PlugIn {
             // - also have a linear motion model
 
             // update position of this image; this will make sure that it is within the bounds
-            points = setPosition(points, it, posGlobalCurr);
+            points = setPosition(points, it, posGlobalCurr, nx, ny, nz);
 
         }
         log("Drift correction done.");
@@ -163,7 +163,7 @@ public class Registration implements PlugIn {
         return(imp.getStack());
     }
 
-    public Point3D[] setPosition(Point3D[] points, int it, Point3D p) {
+    public Point3D[] setPosition(Point3D[] points, int it, Point3D p, int nx, int ny, int nz) {
 
         if (it < 0 || it >= points.length) {
             throw new IllegalArgumentException("t="+it+" is out of range");
