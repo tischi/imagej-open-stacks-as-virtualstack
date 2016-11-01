@@ -438,14 +438,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 			VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
 
 			// compute drift
-			Registration register = new Registration(imp, true);
-			Positions3D positions = register.computeDrifts3D(0,3,24,69,45,80,27,80, "center_of_mass", 200);
-			positions.printPositions();
+			//Registration register = new Registration(imp, true);
+			//Positions3D positions = register.computeDrifts3D(0,3,24,69,45,80,27,80, "center_of_mass", 200);
+			//positions.printPositions();
 
 			// open drift corrected as virtual stack
-			FileInfo[][] infos = vss.getFileInfos();
-			ImagePlus impVirtualCropSeries = ovs.openCropped(infos, 69, 70, 70, positions);
-			impVirtualCropSeries.show();
+			//FileInfo[][] infos = vss.getFileInfos();
+			//ImagePlus impVirtualCropSeries = ovs.openCropped(infos, 69, 70, 70, positions);
+			//impVirtualCropSeries.show();
 
 		}
 		// open the Clown sample

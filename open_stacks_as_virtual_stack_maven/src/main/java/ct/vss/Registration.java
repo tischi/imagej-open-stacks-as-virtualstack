@@ -50,6 +50,7 @@ public class Registration implements PlugIn {
         gd.addSlider("Radius x:", 0, (int) imp.getWidth() / 2, 40);
         gd.addSlider("Radius y:", 0, (int) imp.getHeight() / 2, 40);
         gd.addSlider("Radius z:", 0, (int) imp.getNSlices() / 2, 20);
+        gd.addNumericField("Image background",100,0);
         //gd.addStringField("File Name Contains:", "");
         //((Label)theLabel).setText(""+imp.getTitle());
         Button bt = new Button("Update position");
@@ -65,13 +66,29 @@ public class Registration implements PlugIn {
                                          //int nx = (int) getNextNumber();
                                          log("" + t + " " + z + " " + x + " " + y);
                                          s = (Scrollbar)gd.getSliders().get(0);
-                                         log("" + s.getValue());
+                                         int nx = (int) s.getValue();
                                          s = (Scrollbar)gd.getSliders().get(1);
-                                         log("" + s.getValue());
+                                         int ny = (int) s.getValue();
+                                         s = (Scrollbar)gd.getSliders().get(2);
+                                         int nz = (int) s.getValue();
+                                         // recast to corner and size
+                                         x = x - nx;
+                                         y = y - ny;
+                                         z = z - nz;
+                                         nx = 2 * nx + 1;
+                                         ny = 2 * ny + 1;
+                                         nz = 2 * nz + 1;
+                                         TextField tf = (TextField) gd.getNumericFields().get(0);
+                                         int bg = new Integer(tf.getText());
 
-                                         Roi p = new PointRoi(10, 10);
+                                         ImageStack stack = getImageStack(t, new Point3D(x,y,z), nx, ny, nz);
+                                         Point3D p = centerOfMass16bit(stack, bg);
+
+                                         log(""+p.toString());
+                                         Roi r = new PointRoi(p.getX(), p.getY());
+                                         imp.setSlice((int)p.getZ()+1);
                                          imp.deleteRoi();
-                                         imp.setRoi(p);
+                                         imp.setRoi(r);
                                      } else {
                                          log("No PointTool selection");
                                      }
@@ -89,20 +106,16 @@ public class Registration implements PlugIn {
     //    return false;
     //}
 
-    public Positions3D computeDrifts3D(int t, int nt, int z, int nz, int x, int nx, int y, int ny, String method, int bg) {
-        Positions3D positions = new Positions3D(nt, t, vss.getWidth(), vss.getHeight(), vss.nSlices, nx, ny, nz);
+    public Point3D[] computeDrifts3D(int t, int nt, int z, int nz, int x, int nx, int y, int ny, String method, int bg) {
+        Point3D[] points = new Point3D[vss.nSlices];
         ImageStack stack;
         Point3D pRef, pCurr, pDiff;
         Point3D posGlobalCurr = new Point3D(x, y, z);
 
-        this.nx = nx;
-        this.ny = ny;
-        this.nz = nz;
-
         int it = t;
         // set position of reference image
-        positions.setPosition(it, posGlobalCurr);
-        stack = getImageStack(positions.getPosition(it));
+        points = setPosition(points, it, posGlobalCurr);
+        stack = getImageStack(it,points[it], nx, ny, nz);
         // compute internal position
         //long startTime = System.currentTimeMillis();
         //stack = Filters3D.filter(stack, MEAN, 4, 4, 2);
@@ -114,10 +127,10 @@ public class Registration implements PlugIn {
         for (it = t + 1; it < nt; it++) {
 
             // use current position to extract next image
-            positions.setPosition(it, posGlobalCurr); // update position of this image
+            points = setPosition(points, it, posGlobalCurr); // update position of this image
 
             // compute internal position
-            stack = getImageStack(positions.getPosition(it));
+            stack = getImageStack(it,points[it],nx,ny,nz);
             pCurr = centerOfMass16bit(stack, bg);
             //pCurr = maxLoc16bit(stack);
             log("pCurr "+it+": "+pCurr.toString());
@@ -133,23 +146,47 @@ public class Registration implements PlugIn {
             // - also have a linear motion model
 
             // update position of this image; this will make sure that it is within the bounds
-            positions.setPosition(it, posGlobalCurr);
+            points = setPosition(points, it, posGlobalCurr);
 
         }
         log("Drift correction done.");
         log("");
-        return (positions);
+        return(points);
     }
 
-    private ImageStack getImageStack(int[] p) {
+    private ImageStack getImageStack(int it, Point3D p, int nx, int ny, int nz) {
         //log("Registration.getImageStack p[0]: "+p[0]+" z:"+p[3]);
         long startTime = System.currentTimeMillis();
-        ImagePlus imp = vss.getCroppedFrameAsImagePlus(p[0], 0, p[3], nz, p[1], nx, p[2], ny);
+        ImagePlus imp = vss.getCroppedFrameAsImagePlus(it, 0, (int)p.getZ(), nz, (int)p.getX(), nx, (int)p.getY(), ny);
         long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("loaded stack in [ms]: " + elapsedTime);
         //imp.show();
         return(imp.getStack());
     }
 
+    public Point3D[] setPosition(Point3D[] points, int it, Point3D p) {
+
+        if (it < 0 || it >= points.length) {
+            throw new IllegalArgumentException("t="+it+" is out of range");
+        }
+
+        // round the values
+        int x = (int) (p.getX()+0.5);
+        int y = (int) (p.getY()+0.5);
+        int z = (int) (p.getZ()+0.5);
+
+        // make sure that the ROI stays within the image bounds
+        if (x < 0) x = 0;
+        if (y < 0) y = 0;
+        if (z < 0) z = 0;
+
+        if (x+nx >= imp.getWidth()) x = imp.getWidth()-nx;
+        if (y+ny >= imp.getHeight()) y = imp.getHeight()-ny;
+        if (z+nz >= imp.getNSlices()) z = imp.getNSlices()-nz;
+
+        points[it] = new Point3D(x,y,z);
+
+        return(points);
+    }
 
     public Point3D centerOfMass16bit(ImageStack stack, int bg) {
         long startTime = System.currentTimeMillis();
