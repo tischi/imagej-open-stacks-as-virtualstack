@@ -50,6 +50,7 @@ public class Registration implements PlugIn {
         gd.addSlider("Radius y:", 0, (int) imp.getHeight() / 2, 40);
         gd.addSlider("Radius z:", 0, (int) imp.getNSlices() / 2, 20);
         gd.addNumericField("Image background",100,0);
+        gd.addNumericField("Iterations",5,0);
         //gd.addStringField("File Name Contains:", "");
         //((Label)theLabel).setText(""+imp.getTitle());
         Button bt = new Button("Recompute position");
@@ -57,7 +58,11 @@ public class Registration implements PlugIn {
                                  public void actionPerformed(ActionEvent e) {
                                      Roi roi = imp.getRoi();
                                      Scrollbar s;
+                                     TextField tf;
+                                     Point3D p = new Point3D(0,0,0);
                                      if ((roi != null) && (roi.getPolygon().npoints == 1)) {
+
+                                         // get values
                                          int x = roi.getPolygon().xpoints[0];
                                          int y = roi.getPolygon().ypoints[0];
                                          int z = imp.getZ() - 1;
@@ -70,22 +75,24 @@ public class Registration implements PlugIn {
                                          int ry = (int) s.getValue();
                                          s = (Scrollbar)gd.getSliders().get(2);
                                          int rz = (int) s.getValue();
-                                         // recast to corner and size
-                                         x = x - rx;
-                                         y = y - ry;
-                                         z = z - rz;
-                                         int nx = 2 * rx + 1;
-                                         int ny = 2 * ry + 1;
-                                         int nz = 2 * rz + 1;
-                                         TextField tf = (TextField) gd.getNumericFields().get(0);
+                                         tf = (TextField) gd.getNumericFields().get(3);
                                          int bg = new Integer(tf.getText());
+                                         tf = (TextField) gd.getNumericFields().get(4);
+                                         int iterations = new Integer(tf.getText());
+                                         // compute new center
+                                         // todo
+                                         // make faster by loading a bit generous?
+                                         for(int i=0; i<iterations; i++) {
+                                             log("ITERATION "+i);
+                                             ImageStack stack = getImageStack(t, new Point3D(x-rx, y-ry, z-rz), 2*rx+1, 2*ry+1, 2*rz+1);
+                                             // computes center of mass in cropped region
+                                             p = centerOfMass16bit(stack, bg);
+                                             x = (int)(p.getX()+x-rx); y=(int)(p.getY()+y-ry); z=(int)(p.getZ()+z-rz);
+                                         }
 
-                                         ImageStack stack = getImageStack(t, new Point3D(x, y, z), nx, ny, nz);
-                                         // computes center of mass in cropped region
-                                         Point3D p = centerOfMass16bit(stack, bg);
                                          // show on image, computing back to global coordinates
-                                         Roi r = new PointRoi(p.getX()+x, p.getY()+y);
-                                         Roi bounds = new Roi((int)p.getX()-rx+x,(int)p.getY()-ry+y,nx,ny);
+                                         Roi r = new PointRoi(x, y);
+                                         Roi bounds = new Roi(x-rx,y-ry,2*rx+1,2*ry+1);
                                          imp.setPosition(0, (int) p.getZ() + z + 1, t + 1);
                                          imp.deleteRoi();
                                          imp.setRoi(r);
