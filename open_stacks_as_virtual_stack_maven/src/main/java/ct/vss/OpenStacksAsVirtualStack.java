@@ -374,23 +374,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		//IJ.debugMode = true;
 
         boolean MATLAB = false;
-		boolean MATLAB_MIP = false;
+		boolean OME_MIP = true;
 		boolean OME = false;
-        boolean OME_drift = true;
+        boolean OME_drift = false;
 
         OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
 
         if (MATLAB) {
             ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/MATLABtiff/", "Tiff: Use IFDs of first file for all", 1);
             imp.show();
-
-            // read subset as ImagePlus
-            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-            ImagePlus impC = vss.getCroppedFrameAsImagePlus(0, 0, 0, 2, 754, 100, 417, 100);
-            impC.show();
-            impC.setPosition(0);
-            impC.resetDisplayRange();
-        }
+            }
 
         if(OME) {
             // intialise whole data set
@@ -431,30 +424,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         }
 
-		if (MATLAB_MIP) {
-			ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/T88200-OMEtiff-registration-test/", "Tiff: Use IFDs of first file for all", 1);
-			imp.show();
+		if (OME_MIP) {
+			ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/OME_MIPs/", "Tiff: Use IFDs of first file for all", 1);
+            imp.show();
+            Registration register = new Registration(imp, true);
+        }
 
-			VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-
-			// compute drift
-			//Registration register = new Registration(imp, true);
-			//Positions3D positions = register.computeDrifts3D(0,3,24,69,45,80,27,80, "center_of_mass", 200);
-			//positions.printPositions();
-
-			// open drift corrected as virtual stack
-			//FileInfo[][] infos = vss.getFileInfos();
-			//ImagePlus impVirtualCropSeries = ovs.openCropped(infos, 69, 70, 70, positions);
-			//impVirtualCropSeries.show();
-
-		}
-		// open the Clown sample
-		//ImagePlus image = IJ.openImage("http://imagej.net/images/clown.jpg");
-		//image.show();
-
-		// run the plugin
-		//IJ.runPlugIn(clazz.getName(), "");
-	}
+    }
 
 }
 

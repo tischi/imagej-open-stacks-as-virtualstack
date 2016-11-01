@@ -43,7 +43,7 @@ public class Registration implements PlugIn {
     public void run(String arg) {
 
     }
-
+    // todo: button: Show ROI
     public void showDialog() {
         gd = new NonBlockingGenericDialog("Registration");
         gd.addSlider("Radius x:", 0, (int) imp.getWidth() / 2, 40);
@@ -52,7 +52,7 @@ public class Registration implements PlugIn {
         gd.addNumericField("Image background",100,0);
         //gd.addStringField("File Name Contains:", "");
         //((Label)theLabel).setText(""+imp.getTitle());
-        Button bt = new Button("Update position");
+        Button bt = new Button("Recompute position");
         bt.addActionListener(new ActionListener() {
                                  public void actionPerformed(ActionEvent e) {
                                      Roi roi = imp.getRoi();
@@ -65,30 +65,31 @@ public class Registration implements PlugIn {
                                          //int nx = (int) getNextNumber();
                                          log("" + t + " " + z + " " + x + " " + y);
                                          s = (Scrollbar)gd.getSliders().get(0);
-                                         int nx = (int) s.getValue();
+                                         int rx = (int) s.getValue();
                                          s = (Scrollbar)gd.getSliders().get(1);
-                                         int ny = (int) s.getValue();
+                                         int ry = (int) s.getValue();
                                          s = (Scrollbar)gd.getSliders().get(2);
-                                         int nz = (int) s.getValue();
+                                         int rz = (int) s.getValue();
                                          // recast to corner and size
-                                         x = x - nx;
-                                         y = y - ny;
-                                         z = z - nz;
-                                         nx = 2 * nx + 1;
-                                         ny = 2 * ny + 1;
-                                         nz = 2 * nz + 1;
+                                         x = x - rx;
+                                         y = y - ry;
+                                         z = z - rz;
+                                         int nx = 2 * rx + 1;
+                                         int ny = 2 * ry + 1;
+                                         int nz = 2 * rz + 1;
                                          TextField tf = (TextField) gd.getNumericFields().get(0);
                                          int bg = new Integer(tf.getText());
 
-                                         ImageStack stack = getImageStack(t, new Point3D(x,y,z), nx, ny, nz);
+                                         ImageStack stack = getImageStack(t, new Point3D(x, y, z), nx, ny, nz);
                                          // computes center of mass in cropped region
                                          Point3D p = centerOfMass16bit(stack, bg);
                                          // show on image, computing back to global coordinates
                                          Roi r = new PointRoi(p.getX()+x, p.getY()+y);
-                                         log(""+((int)(p.getZ())+z+1));
-                                         imp.setPosition(0,(int)p.getZ()+z+1,t+1);
+                                         Roi bounds = new Roi((int)p.getX()-rx+x,(int)p.getY()-ry+y,nx,ny);
+                                         imp.setPosition(0, (int) p.getZ() + z + 1, t + 1);
                                          imp.deleteRoi();
                                          imp.setRoi(r);
+                                         imp.setOverlay(bounds, Color.blue, 2, null);
                                      } else {
                                          log("No PointTool selection");
                                      }
