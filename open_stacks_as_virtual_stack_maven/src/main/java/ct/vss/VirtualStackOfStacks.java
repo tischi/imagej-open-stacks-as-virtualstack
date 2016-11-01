@@ -150,7 +150,7 @@ public class VirtualStackOfStacks extends ImageStack {
     /** Returns the file name of the Nth image. */
     public String getSliceLabel(int n) {
         int nFile;
-        nFile = n / depth;
+        nFile = (n-1) / depth;
         return infos[nFile][0].fileName;
     }
 
