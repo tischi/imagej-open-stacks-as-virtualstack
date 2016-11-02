@@ -29,8 +29,10 @@ public class Registration implements PlugIn {
     ImagePlus imp;
     public final static int MEAN=10, MEDIAN=11, MIN=12, MAX=13, VAR=14, MAXLOCAL=15; // Filters3D
     private static NonBlockingGenericDialog gd;
-
-
+    private final static Point3D pOnes = new Point3D(1,1,1);
+    // gui variables
+    int gui_t, gui_nt, gui_bg, gui_iterations;
+    Point3D gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii;
 
     public Registration(ImagePlus imp, boolean gui) {
         this.imp = imp;
@@ -48,43 +50,48 @@ public class Registration implements PlugIn {
     // todo: button: Show ROI
     public void showDialog() {
         gd = new NonBlockingGenericDialog("Registration");
-        gd.addSlider("Radius center of mass x:", 0, (int) imp.getWidth() / 2, 40);
-        gd.addSlider("Radius center of mass y:", 0, (int) imp.getHeight() / 2, 40);
+        gd.addSlider("Radius center of mass x:", 0, (int) imp.getWidth() / 2, 20);
+        gd.addSlider("Radius center of mass y:", 0, (int) imp.getHeight() / 2, 20);
         gd.addSlider("Radius center of mass z:", 0, (int) imp.getNSlices() / 2, 20);
         gd.addNumericField("Image loading margin factor", 2, 1);
         gd.addNumericField("Image background",100,0);
-        gd.addNumericField("Iterations",5,0);
+        gd.addNumericField("Iterations",6,0);
         //gd.addStringField("File Name Contains:", "");
         //((Label)theLabel).setText(""+imp.getTitle());
         Button bt = new Button("Correct current position");
         bt.addActionListener(new ActionListener() {
                                  public void actionPerformed(ActionEvent e) {
-                                     int nt = 0; // only 'track' current position
-                                     Point3D[] points = guiCallTo_track(nt);
-
-                                         pCenter = pStackCenter.add(pStackMin);
-
+                                     if (updateGuiVariables()) {
+                                         gui_nt = 0; // only 'track' current position
+                                         Point3D[] points = track3D(gui_t, gui_nt, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                                         Point3D pCenter = points[gui_t];
                                          // show on image, computing back to global coordinates
+                                         int rx = (int) gui_pStackRadii.getX();
+                                         int ry = (int) gui_pStackRadii.getY();
                                          Roi r = new PointRoi(pCenter.getX(), pCenter.getY());
-                                         Roi bounds = new Roi(pCenter.getX()-rx,pCenter.getY()-ry,2*rx+1,2*ry+1);
-                                         imp.setPosition(0, ((int) pCenter.getZ() + (int) pStackMin.getZ() + 1), t + 1);
+                                         Overlay o = new Overlay();
+                                         Roi cropBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
+                                         o.add(cropBounds);
+                                         rx = (int) gui_pCenterOfMassRadii.getX();
+                                         ry = (int) gui_pCenterOfMassRadii.getY();
+                                         Roi comBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
+                                         o.add(comBounds);
+                                         imp.setPosition(0, ((int) pCenter.getZ() + 1), gui_t + 1);
                                          imp.deleteRoi();
                                          imp.setRoi(r);
-                                         imp.setOverlay(bounds, Color.blue, 2, null);
+                                         o.setLabelColor(Color.blue);
+                                         imp.setOverlay(o);
 
+                                     }
                                  }
                              });
         gd.add(bt);
         gd.showDialog();
     }
 
-
-    public Point3D[] guiCallTo_track(int nt) {
+    public boolean updateGuiVariables() {
 
         Roi roi = imp.getRoi();
-        Scrollbar s;
-        TextField tf;
-        ImageStack stack;
 
         if ((roi != null) && (roi.getPolygon().npoints == 1)) {
 
@@ -92,31 +99,25 @@ public class Registration implements PlugIn {
             int x = roi.getPolygon().xpoints[0];
             int y = roi.getPolygon().ypoints[0];
             int z = imp.getZ() - 1;
-            int t = imp.getT() - 1;
+            gui_t = imp.getT() - 1;
 
             int rx = new Integer(getTextFieldTxt(gd, 0));
             int ry = new Integer(getTextFieldTxt(gd, 1));
             int rz = new Integer(getTextFieldTxt(gd, 2));
             double marginFactor = new Double(getTextFieldTxt(gd, 3));
-            int bg = new Integer(getTextFieldTxt(gd, 4));
-            int iterations = new Integer(getTextFieldTxt(gd, 5));
 
-            Point3D pCenterOfMassRadii = new Point3D(rx, ry, rz);
-            Point3D pStackRadii = pCenterOfMassRadii.multiply(marginFactor);
-            Point3D pStackCenter = new Point3D(x, y, z);
+            gui_bg = new Integer(getTextFieldTxt(gd, 4));
+            gui_iterations = new Integer(getTextFieldTxt(gd, 5));
+            gui_pCenterOfMassRadii = new Point3D(rx, ry, rz);
+            gui_pStackRadii = gui_pCenterOfMassRadii.multiply(marginFactor);
+            gui_pStackCenter = new Point3D(x, y, z);
 
-            //Point3D pStackMin = pCenter.subtract(pStackRadii);
-            // convert from radii to sizes
-            //Point3D pStackSize = pStackRadii.multiply(2);
-            //pStackSize = pStackSize.add(1, 1, 1);
-
-            // Track
-            Point3D[] points = track3D(t, nt, pStackCenter, pStackRadii, pCenterOfMassRadii, bg, iterations);
-            return(points);
+            return(true);
 
         } else {
+
             log("No PointTool selection on image");
-            return(null);
+            return(false);
         }
 
     }
@@ -131,54 +132,30 @@ public class Registration implements PlugIn {
     public Point3D[] track3D(int t, int nt, Point3D pStackCenter, Point3D pStackRadii, Point3D pCenterOfMassRadii, int bg, int iterations) {
         Point3D[] points = new Point3D[vss.nSlices];
         ImageStack stack;
-        Point3D pRef, pLocalCenter, pDiff, pMin, pMax;
-        Point3D posGlobalCurr = new Point3D(x, y, z);
+        Point3D pOffset, pLocalCenter;
 
-        //int it = t;
-        // set position of reference image
-        //points = curatePosition(points, t, posGlobalCurr, nx, ny, nz);
+        for (int it = t; it <= t+nt; it++) {
 
-        //pStackMin = getImageStack(t, pStackMin, pStackSize);
-
-        // compute internal position
-        //long startTime = System.currentTimeMillis();
-        //stack = Filters3D.filter(stack, MEAN, 4, 4, 2);
-        //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("filtered stack in [ms]: " + elapsedTime);
-        //pRef = centerOfMass16bit(stack, bg, pMin, pMax);
-        //pRef = maxLoc16bit(stack);
-        //log("pRef "+t+": "+pRef.toString());
-
-        for (it = t; it <= t+nt; it++) {
-
-            //  ensure that extracted stack is within bounds
+            // get stack, ensuring that extracted stack is within bounds
             pStackCenter = curatePosition(pStackCenter, pStackRadii);
+            stack = getImageStack(it, pStackCenter, pStackRadii);
 
-            // get stack
-            stack = getImageStack(it, pStackMin, pStackSize);
-
-            // compute center of mass (local stack coordinates)
+            // compute center of mass (in zero-based local stack coordinates)
             pLocalCenter = iterativeCenterOfMass16bit(stack, bg, pCenterOfMassRadii, iterations);
 
+            // compute offset to zero-based center of stack
+            pOffset = pLocalCenter.subtract(pStackRadii);
+            //pOffset = pOffset.subtract(pOnes);
+            log("track3D.pOffset: "+pOffset.toString());
 
-            pCurr = centerOfMass16bit(stack, bg, pMin, pMax);
-            //pCurr = maxLoc16bit(stack);
-            log("pCurr "+it+": "+pCurr.toString());
-
-            // compute difference
-            pDiff = pCurr.subtract(pRef);
-            log("pDiff "+it+": "+pDiff.toString());
-            posGlobalCurr = posGlobalCurr.add(pDiff);
-
-            // update
+            // shift the global position of this stack and store to return array
             // todo:
-            // - make this save for out-of-bouds
             // - also have a linear motion model
-
-            // update position of this image; this will make sure that it is within the bounds
-            points = setPosition(points, it, posGlobalCurr, nx, ny, nz);
-
+            pStackCenter = pStackCenter.add(pOffset);
+            points[it] =  pStackCenter;
         }
-        log("Drift correction done.");
+
+        log("Tracking done.");
         log("");
         return(points);
     }
@@ -218,8 +195,8 @@ public class Registration implements PlugIn {
         Point3D pMin, pMax;
 
         Point3D pCenter = new Point3D(stack.getWidth()/2+0.5,stack.getHeight()/2+0.5,stack.getSize()/2+0.5);
-        log(""+radii.toString());
-        log(""+pCenter.toString());
+        //log(""+radii.toString());
+        //log(""+pCenter.toString());
 
         for(int i=0; i<iterations; i++) {
             log("# Iteration "+i);
@@ -246,12 +223,15 @@ public class Registration implements PlugIn {
         int zmin = 0 > (int) pMin.getZ() ? 0 : (int) pMin.getZ();
         int zmax = (depth-1) < (int) pMax.getZ() ? (depth-1) : (int) pMax.getZ();
 
-        log("centerOfMass16bit: pMin: "+pMin.toString());
-        log("centerOfMass16bit: pMax: "+pMax.toString());
         Point3D pMinCorr = new Point3D(xmin,ymin,zmin);
         Point3D pMaxCorr = new Point3D(xmax,ymax,zmax);
+
+        /*
+        log("centerOfMass16bit: pMin: "+pMin.toString());
+        log("centerOfMass16bit: pMax: "+pMax.toString());
         log("centerOfMass16bit: pMinCorr: "+pMinCorr.toString());
         log("centerOfMass16bit: pMaxCorr: "+pMaxCorr.toString());
+        */
 
         // compute one-based, otherwise the numbers at x=0,y=0,z=0 are lost for the center of mass
         for(int z=zmin+1; z<=zmax+1; z++) {
@@ -259,7 +239,7 @@ public class Registration implements PlugIn {
             short[] pixels = (short[]) ip.getPixels();
             i = 0;
             for (int y = ymin+1; y<=ymax+1; y++) {
-                i = (y-1) * width + xmin-1;
+                i = (y-1) * width + xmin; // zero-based location in pixel array
                 for (int x = xmin+1; x<=xmax+1; x++) {
                     v = pixels[i] & 0xffff;
                     if (v >= bg) {

@@ -15,7 +15,7 @@ class OpenerExtensions extends Opener {
 
     }
 
-    // todo: make special version when whole image is opened
+    /*
     public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, int z) {
         int nz = 1;
         int x = 0;
@@ -80,6 +80,7 @@ class OpenerExtensions extends Opener {
         //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
         return imp;
     }
+    */
 
     public ImagePlus openTiffStackSliceUsingIFDs(FileInfo[] info, int z) {
 
@@ -96,17 +97,23 @@ class OpenerExtensions extends Opener {
 
     // todo: make special version when whole image is opened
     public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, int z) {
-        int nz = 1;
-        int x = 0;
-        int nx = info[0].width;
-        int y = 0;
-        int ny = info[0].height;
-        ImagePlus imp = openCroppedTiffStackUsingIFDs(info, z, nz, x, nx, y, ny);
+        Point3D p = new Point3D(0,0,z);
+        Point3D pr = new Point3D(info[0].width/2-0.5, info[0].height/2-0.5, 0); // to also open images with even widths correctly
+        ImagePlus imp = openCroppedTiffStackUsingIFDs(info, p, pr);
         return imp;
     }
 
-    public FileInfo[] cropFileInfo(FileInfo[] info, int z, int nz, int x, int nx, int y, int ny) {
+    public FileInfo[] cropFileInfo(FileInfo[] info, Point3D p, Point3D pr) {
         log("OpenerExtensions.cropFileInfo:");
+
+        // round the values
+        int x = (int) (p.getX() - pr.getX() + 0.5);
+        int y = (int) (p.getY() - pr.getY() + 0.5);
+        int z = (int) (p.getZ() - pr.getZ() + 0.5);
+        int nx = (int) (2 * pr.getX() + 1.0001);
+        int ny = (int) (2 * pr.getY() + 1.0001);
+        int nz = (int) (2 * pr.getZ() + 1.0001);
+
         log("filename: " + info[0].fileName);
         log("z,nz,x,nx,y,ny: " + z +","+ nz +","+ x +","+ nx +","+ y +","+ ny);
         log("info.length: " + info.length);
@@ -152,7 +159,7 @@ class OpenerExtensions extends Opener {
         return(infoModified);
     }
 
-    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, int z, int nz, int x, int nx, int y, int ny) {
+    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, Point3D p, Point3D pr) {
 
         log("# openCroppedTiffStackUsingIFDs");
 
@@ -163,7 +170,7 @@ class OpenerExtensions extends Opener {
         //}
 
         //long startTime = System.currentTimeMillis();
-        FileInfo[] infoModified = cropFileInfo(info, z, nz, x, nx, y, ny);
+        FileInfo[] infoModified = cropFileInfo(info, p, pr);
         ImagePlus imp = openTiffStack(infoModified);
         //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
         return imp;

@@ -43,7 +43,7 @@ public class VirtualStackOfStacks extends ImageStack {
             infos = tmp_infos;
         }
         infos[nStacks-1] = info;
-        log("Added file: "+infos[nStacks-1][0].fileName);
+        //log("Added file: "+infos[nStacks-1][0].fileName);
     }
 
     /** Does nothing. */

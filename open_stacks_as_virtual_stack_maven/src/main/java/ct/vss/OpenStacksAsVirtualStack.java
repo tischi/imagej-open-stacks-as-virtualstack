@@ -40,7 +40,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
 
-
+	/*
     public ImagePlus openCropped(FileInfo[][] infos, int nz, int nx, int ny, Positions3D p) {
         VirtualStackOfStacks stack = new VirtualStackOfStacks(nx, ny, nz);
         OpenerExtensions oe = new OpenerExtensions();
@@ -51,7 +51,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             stack.addStack(infoModified);
         }
         return(makeImagePlus(stack,infoModified[0]));
-    }
+    }*/
 
     private ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfo fi) {
         double min = Double.MAX_VALUE;
