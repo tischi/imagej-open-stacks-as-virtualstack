@@ -65,12 +65,12 @@ public class Registration implements PlugIn {
         btCorrectCurrent.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                Scrollbar sb = (Scrollbar) gd.getSliders().get(3);
+                sb.setValue(imp.getT());
+                TextField tf = (TextField) gd.getNumericFields().get(6);
+                tf.setText(""+imp.getT());
                 if (updateGuiVariables()) {
                     // only 'track' current position
-                    Scrollbar sb = (Scrollbar) gd.getSliders().get(3);
-                    sb.setValue(imp.getT());
-                    TextField tf = (TextField) gd.getNumericFields().get(6);
-                    tf.setText(""+imp.getT());
                     pTracked = track3D(gui_t, gui_tMax, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
                     showTrackOnFrame();
                 }
@@ -147,7 +147,7 @@ public class Registration implements PlugIn {
 
             gui_bg = new Integer(getTextFieldTxt(gd, 4));
             gui_iterations = new Integer(getTextFieldTxt(gd, 5));
-            gui_tMax = new Integer(getTextFieldTxt(gd, 6));
+            gui_tMax = (new Integer(getTextFieldTxt(gd, 6))) - 1;
             gui_pCenterOfMassRadii = new Point3D(rx, ry, rz);
             gui_pStackRadii = gui_pCenterOfMassRadii.multiply(marginFactor);
             gui_pStackCenter = new Point3D(x, y, z);

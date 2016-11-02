@@ -1,12 +1,14 @@
 package ct.vss;
 
 import ij.ImagePlus;
+import ij.ImageStack;
 import ij.io.FileInfo;
 import ij.io.FileOpener;
 import ij.io.Opener;
 import javafx.geometry.Point3D;
 
 import static ij.IJ.log;
+import static ij.IJ.save;
 
 /** Opens the nth image of the specified TIFF stack.*/
 class OpenerExtensions extends Opener {
@@ -83,37 +85,24 @@ class OpenerExtensions extends Opener {
 
 
     public ImagePlus openTiffStackSliceUsingIFDs(FileInfo[] info, int z) {
+        ImagePlus imp;
 
         long startTime = System.currentTimeMillis();
-        FileInfo[] infoModified = new FileInfo[1];
-
-        infoModified[0] = info[z];
-        //log("infoModified.length "+infoModified.length);
-        //ImagePlus imp = openTiffStack(infoModified);
-        //imp.show();
-
-
-        FileOpener fo = new FileOpener(infoModified[0]);
-        ImagePlus imp = fo.open(false);
-        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("Whole slice opened in [ms]: " + elapsedTime);
-
-        startTime = System.currentTimeMillis();
-        infoModified = cropFileInfo(infoModified, new Point3D(200,200,0), new Point3D(100,100,0));
-        fo = new FileOpener(infoModified[0]);
-        //log("info[z].nImages: "+infoModified[0].nImages);
+        FileOpener fo = new FileOpener(info[z]);
         imp = fo.open(false);
-        stopTime = System.currentTimeMillis(); elapsedTime = stopTime - startTime; log("Cropped slice opened in [ms]: " + elapsedTime);
+        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("Whole slice opened in [ms]: " + elapsedTime);
 
         return imp;
     }
 
     // todo: make special version when whole image is opened
+    /*
     public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, int z) {
         Point3D p = new Point3D(0,0,z);
         Point3D pr = new Point3D(info[0].width/2-0.5, info[0].height/2-0.5, 0); // to also open images with even widths correctly
         ImagePlus imp = openCroppedTiffStackUsingIFDs(info, p, pr);
         return imp;
-    }
+    }*/
 
     public FileInfo[] cropFileInfo(FileInfo[] info, Point3D p, Point3D pr) {
         //log("OpenerExtensions.cropFileInfo:");
@@ -172,7 +161,6 @@ class OpenerExtensions extends Opener {
     }
 
     public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, Point3D p, Point3D pr) {
-
         //log("# openCroppedTiffStackUsingIFDs");
 
         if (info==null) return null;
@@ -182,9 +170,23 @@ class OpenerExtensions extends Opener {
         //}
 
         FileInfo[] infoModified = cropFileInfo(info, p, pr);
-        long startTime = System.currentTimeMillis();
-        ImagePlus imp = openTiffStack(infoModified);
-        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("Cropped stack opened in [ms]: " + elapsedTime);
+
+        //ImagePlus imp = openTiffStack(infoModified);
+        ImagePlus imp;
+        ImageStack stack=null;
+        FileOpener fo;
+        for(int i=0; i<infoModified.length; i++) {
+            fo = new FileOpener(infoModified[i]);
+            long startTime = System.currentTimeMillis();
+            imp = fo.open(false);
+            long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("Cropped frame stack opened in [ms]: " + elapsedTime);
+            if(i==0){
+                stack = imp.getStack();
+            } else {
+                stack.addSlice(imp.getProcessor());
+            }
+        }
+        imp = new ImagePlus("",stack);
         return imp;
     }
 
