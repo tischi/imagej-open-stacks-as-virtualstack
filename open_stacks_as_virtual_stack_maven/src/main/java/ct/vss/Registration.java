@@ -31,7 +31,7 @@ public class Registration implements PlugIn {
     private static NonBlockingGenericDialog gd;
     private final static Point3D pOnes = new Point3D(1,1,1);
     // gui variables
-    int gui_t, gui_nt, gui_bg, gui_iterations;
+    int gui_t, gui_tMax, gui_bg, gui_iterations;
     Point3D gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii;
     Point3D[] pTracked;
 
@@ -58,6 +58,7 @@ public class Registration implements PlugIn {
         gd.addNumericField("Image loading margin factor", 2, 1);
         gd.addNumericField("Image background", 100, 0);
         gd.addNumericField("Iterations",6,0);
+        gd.addSlider("Analyze until time-point:", 1, (int) imp.getNFrames(), imp.getNFrames());
         //gd.addStringField("File Name Contains:", "");
         //((Label)theLabel).setText(""+imp.getTitle());
         Button btCorrectCurrent = new Button("Correct current position");
@@ -65,8 +66,12 @@ public class Registration implements PlugIn {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
-                    gui_nt = 0; // only 'track' current position
-                    pTracked = track3D(gui_t, gui_nt, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                    // only 'track' current position
+                    Scrollbar sb = (Scrollbar) gd.getSliders().get(3);
+                    sb.setValue(imp.getT());
+                    TextField tf = (TextField) gd.getNumericFields().get(6);
+                    tf.setText(""+imp.getT());
+                    pTracked = track3D(gui_t, gui_tMax, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
                     showTrackOnFrame();
                 }
             }
@@ -77,9 +82,8 @@ public class Registration implements PlugIn {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
-                    gui_nt = imp.getNFrames()-imp.getT(); // only 'track' current position
                     pTracked = null;
-                    pTracked = track3D(gui_t, gui_nt, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                    pTracked = track3D(gui_t, gui_tMax, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
                     showTrackOnFrame();
                 }
             }
@@ -87,7 +91,7 @@ public class Registration implements PlugIn {
         gd.add(btTrack);
 
         gd.addSlider("Show frame with track", 1, (int) imp.getNFrames(), 1);
-        final Scrollbar sbCurrentFrame = (Scrollbar) gd.getSliders().get(3);
+        final Scrollbar sbCurrentFrame = (Scrollbar) gd.getSliders().get(4);
         sbCurrentFrame.addAdjustmentListener(new AdjustmentListener() {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
@@ -123,6 +127,7 @@ public class Registration implements PlugIn {
             imp.setOverlay(o);
         }
     }
+
     public boolean updateGuiVariables() {
 
         Roi roi = imp.getRoi();
@@ -142,6 +147,7 @@ public class Registration implements PlugIn {
 
             gui_bg = new Integer(getTextFieldTxt(gd, 4));
             gui_iterations = new Integer(getTextFieldTxt(gd, 5));
+            gui_tMax = new Integer(getTextFieldTxt(gd, 6));
             gui_pCenterOfMassRadii = new Point3D(rx, ry, rz);
             gui_pStackRadii = gui_pCenterOfMassRadii.multiply(marginFactor);
             gui_pStackCenter = new Point3D(x, y, z);
@@ -163,13 +169,13 @@ public class Registration implements PlugIn {
     }
 
 
-    public Point3D[] track3D(int t, int nt, Point3D pStackCenter, Point3D pStackRadii, Point3D pCenterOfMassRadii, int bg, int iterations) {
+    public Point3D[] track3D(int t, int tMax, Point3D pStackCenter, Point3D pStackRadii, Point3D pCenterOfMassRadii, int bg, int iterations) {
         Point3D[] points = new Point3D[vss.nSlices];
         ImageStack stack;
         Point3D pOffset, pLocalCenter;
         long startTime, stopTime, elapsedTime;
 
-        for (int it = t; it <= t+nt; it++) {
+        for (int it = t; it <= tMax; it++) {
 
             log("track3D: Analzying time-point "+it);
 
@@ -196,6 +202,9 @@ public class Registration implements PlugIn {
             // - also have a linear motion model
             pStackCenter = pStackCenter.add(pOffset);
             points[it] =  pStackCenter;
+
+            IJ.showProgress((double) it / (tMax-t));
+
         }
 
         log("Tracking done.");
@@ -224,9 +233,9 @@ public class Registration implements PlugIn {
         int rz = (int) pr.getZ();
 
         // make sure that the ROI stays within the image bounds
-        if (x-rx < 0) x = 0;
-        if (y-ry < 0) y = 0;
-        if (z-rz < 0) z = 0;
+        if (x-rx < 0) x = rx;
+        if (y-ry < 0) y = ry;
+        if (z-rz < 0) z = rz;
 
         if (x+rx >= imp.getWidth()) x = imp.getWidth()-rx;
         if (y+ry >= imp.getHeight()) y = imp.getHeight()-ry;

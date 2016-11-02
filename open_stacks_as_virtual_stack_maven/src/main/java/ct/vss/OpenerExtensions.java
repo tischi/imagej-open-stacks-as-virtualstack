@@ -24,7 +24,7 @@ class OpenerExtensions extends Opener {
         int ny = fi0.height;
         ImagePlus imp = openCroppedTiffStackUsingFirstIFD(fi0, z, nz, x, nx,  y,  ny);
         return imp;
-    }
+    }*/
 
     public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, Point3D p, Point3D pr) {
 
@@ -80,17 +80,29 @@ class OpenerExtensions extends Opener {
         //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
         return imp;
     }
-    */
+
 
     public ImagePlus openTiffStackSliceUsingIFDs(FileInfo[] info, int z) {
 
-        //long startTime = System.currentTimeMillis();
-
+        long startTime = System.currentTimeMillis();
         FileInfo[] infoModified = new FileInfo[1];
-        infoModified[0] = info[z];
-        ImagePlus imp = openTiffStack(infoModified);
 
-        //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
+        infoModified[0] = info[z];
+        //log("infoModified.length "+infoModified.length);
+        //ImagePlus imp = openTiffStack(infoModified);
+        //imp.show();
+
+
+        FileOpener fo = new FileOpener(infoModified[0]);
+        ImagePlus imp = fo.open(false);
+        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("Whole slice opened in [ms]: " + elapsedTime);
+
+        startTime = System.currentTimeMillis();
+        infoModified = cropFileInfo(infoModified, new Point3D(200,200,0), new Point3D(100,100,0));
+        fo = new FileOpener(infoModified[0]);
+        //log("info[z].nImages: "+infoModified[0].nImages);
+        imp = fo.open(false);
+        stopTime = System.currentTimeMillis(); elapsedTime = stopTime - startTime; log("Cropped slice opened in [ms]: " + elapsedTime);
 
         return imp;
     }
@@ -169,10 +181,10 @@ class OpenerExtensions extends Opener {
         //    log(""+info[i].getOffset());
         //}
 
-        //long startTime = System.currentTimeMillis();
         FileInfo[] infoModified = cropFileInfo(info, p, pr);
+        long startTime = System.currentTimeMillis();
         ImagePlus imp = openTiffStack(infoModified);
-        //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
+        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("Cropped stack opened in [ms]: " + elapsedTime);
         return imp;
     }
 

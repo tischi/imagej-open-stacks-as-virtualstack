@@ -373,17 +373,27 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 		//IJ.debugMode = true;
 
-        boolean MATLAB = false;
-		boolean OME_MIP = true;
+        boolean MATLAB = true;
+		boolean MATLAB_EXTERNAL = false;
+		boolean OME_MIP = false;
 		boolean OME = false;
         boolean OME_drift = false;
 
         OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
 
+
+		if (MATLAB_EXTERNAL) {
+			ImagePlus imp = ovs.open("/Volumes/My Passport/Res_13/", "Tiff: Use IFDs of first file for all", 1);
+			imp.show();
+			Registration register = new Registration(imp, true);
+		}
+
         if (MATLAB) {
             ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/MATLABtiff/", "Tiff: Use IFDs of first file for all", 1);
             imp.show();
+			Registration register = new Registration(imp, true);
             }
+
 
         if(OME) {
             // intialise whole data set
