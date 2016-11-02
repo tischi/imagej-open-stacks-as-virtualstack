@@ -104,7 +104,7 @@ class OpenerExtensions extends Opener {
     }
 
     public FileInfo[] cropFileInfo(FileInfo[] info, Point3D p, Point3D pr) {
-        log("OpenerExtensions.cropFileInfo:");
+        //log("OpenerExtensions.cropFileInfo:");
 
         // round the values
         int x = (int) (p.getX() - pr.getX() + 0.5);
@@ -114,9 +114,9 @@ class OpenerExtensions extends Opener {
         int ny = (int) (2 * pr.getY() + 1.0001);
         int nz = (int) (2 * pr.getZ() + 1.0001);
 
-        log("filename: " + info[0].fileName);
-        log("z,nz,x,nx,y,ny: " + z +","+ nz +","+ x +","+ nx +","+ y +","+ ny);
-        log("info.length: " + info.length);
+        //log("filename: " + info[0].fileName);
+        //log("z,nz,x,nx,y,ny: " + z +","+ nz +","+ x +","+ nx +","+ y +","+ ny);
+        //log("info.length: " + info.length);
 
         if (z<0 || z>info.length)
             throw new IllegalArgumentException("z="+z+" is out of range");
@@ -161,7 +161,7 @@ class OpenerExtensions extends Opener {
 
     public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, Point3D p, Point3D pr) {
 
-        log("# openCroppedTiffStackUsingIFDs");
+        //log("# openCroppedTiffStackUsingIFDs");
 
         if (info==null) return null;
 

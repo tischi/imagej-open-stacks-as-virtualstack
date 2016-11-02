@@ -60,8 +60,8 @@ public class Registration implements PlugIn {
         gd.addNumericField("Iterations",6,0);
         //gd.addStringField("File Name Contains:", "");
         //((Label)theLabel).setText(""+imp.getTitle());
-        Button bt = new Button("Correct current position");
-        bt.addActionListener(new ActionListener() {
+        Button btCorrectCurrent = new Button("Correct current position");
+        btCorrectCurrent.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
@@ -71,8 +71,22 @@ public class Registration implements PlugIn {
                 }
             }
         });
-        gd.add(bt);
-        gd.addSlider("Current frame", 1, (int) imp.getNFrames(), 1);
+        gd.add(btCorrectCurrent);
+        Button btTrack = new Button("Track");
+        btTrack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updateGuiVariables()) {
+                    gui_nt = imp.getNFrames()-imp.getT(); // only 'track' current position
+                    pTracked = null;
+                    pTracked = track3D(gui_t, gui_nt, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                    showTrackOnFrame();
+                }
+            }
+        });
+        gd.add(btTrack);
+
+        gd.addSlider("Show frame with track", 1, (int) imp.getNFrames(), 1);
         final Scrollbar sbCurrentFrame = (Scrollbar) gd.getSliders().get(3);
         sbCurrentFrame.addAdjustmentListener(new AdjustmentListener() {
             @Override
@@ -88,6 +102,7 @@ public class Registration implements PlugIn {
     public void showTrackOnFrame() {
         Point3D pCenter = pTracked[imp.getT() - 1];
         if (pCenter != null) {
+            //log("showTrackOnFrame: pCenter: "+pCenter.toString());
             int rx = (int) gui_pStackRadii.getX();
             int ry = (int) gui_pStackRadii.getY();
             Roi r = new PointRoi(pCenter.getX(), pCenter.getY());
@@ -152,20 +167,29 @@ public class Registration implements PlugIn {
         Point3D[] points = new Point3D[vss.nSlices];
         ImageStack stack;
         Point3D pOffset, pLocalCenter;
+        long startTime, stopTime, elapsedTime;
 
         for (int it = t; it <= t+nt; it++) {
 
+            log("track3D: Analzying time-point "+it);
+
             // get stack, ensuring that extracted stack is within bounds
             pStackCenter = curatePosition(pStackCenter, pStackRadii);
+            startTime = System.currentTimeMillis();
             stack = getImageStack(it, pStackCenter, pStackRadii);
+            stopTime = System.currentTimeMillis(); elapsedTime = stopTime - startTime;
+            log("  loaded data [ms]: " + elapsedTime);
 
             // compute center of mass (in zero-based local stack coordinates)
+            startTime = System.currentTimeMillis();
             pLocalCenter = iterativeCenterOfMass16bit(stack, bg, pCenterOfMassRadii, iterations);
+            stopTime = System.currentTimeMillis(); elapsedTime = stopTime - startTime;
+            log("  computed center of mass [ms]: " + elapsedTime);
 
             // compute offset to zero-based center of stack
             pOffset = pLocalCenter.subtract(pStackRadii);
             //pOffset = pOffset.subtract(pOnes);
-            log("track3D.pOffset: "+pOffset.toString());
+            log("  shift: "+pOffset.toString());
 
             // shift the global position of this stack and store to return array
             // todo:
@@ -183,7 +207,8 @@ public class Registration implements PlugIn {
         //log("Registration.getImageStack p[0]: "+p[0]+" z:"+p[3]);
         long startTime = System.currentTimeMillis();
         ImageStack stack = vss.getCroppedFrameAsImagePlus(it, 0, p, pr).getStack();
-        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("loaded stack in [ms]: " + elapsedTime);
+        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime;
+        //log("loaded stack in [ms]: " + elapsedTime);
         //imp.show();
         return(stack);
     }
@@ -218,18 +243,18 @@ public class Registration implements PlugIn {
         //log(""+pCenter.toString());
 
         for(int i=0; i<iterations; i++) {
-            log("# Iteration "+i);
+            //log("# Iteration "+i);
             pMin = pCenter.subtract(radii);
             pMax = pCenter.add(radii);
             pCenter = centerOfMass16bit(stack, bg, pMin, pMax);
-            log("iterativeCenterOfMass16bit: center: "+pCenter.toString());
+            //log("iterativeCenterOfMass16bit: center: "+pCenter.toString());
         }
         return(pCenter);
     }
 
     public Point3D centerOfMass16bit(ImageStack stack, int bg, Point3D pMin, Point3D pMax) {
 
-        long startTime = System.currentTimeMillis();
+        //long startTime = System.currentTimeMillis();
         double sum = 0.0, xsum = 0.0, ysum = 0.0, zsum = 0.0;
         int i, v;
         int width = stack.getWidth();
@@ -276,7 +301,7 @@ public class Registration implements PlugIn {
         double yCenterOfMass = (ysum / sum) - 1;
         double zCenterOfMass = (zsum / sum) - 1;
 
-        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("center of mass in [ms]: " + elapsedTime);
+        //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("center of mass in [ms]: " + elapsedTime);
 
         return(new Point3D(xCenterOfMass,yCenterOfMass,zCenterOfMass));
     }
