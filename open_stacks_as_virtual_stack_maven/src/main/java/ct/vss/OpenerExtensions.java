@@ -140,12 +140,14 @@ class OpenerExtensions extends Opener {
             infoModified[iz-z].nImages = 1;
             infoModified[iz-z].longOffset = infoModified[iz-z].getOffset();
             //infoModified[iz-z].longOffset += (y*fi.width+x)*fi.getBytesPerPixel();
+            infoModified[iz-z].longOffset += (y*fi.width+x)*fi.getBytesPerPixel();
             infoModified[iz-z].offset = 0;
             infoModified[iz-z].stripLengths = new int[ny];
             infoModified[iz-z].stripOffsets = new int[ny];
             for (int i=0; i<ny; i++) {
                 infoModified[iz-z].stripLengths[i] = nx * fi.getBytesPerPixel();
-                infoModified[iz-z].stripOffsets[i] = (int) infoModified[iz-z].getOffset() + ((((y+i)*fi.width) + x) * fi.getBytesPerPixel());
+            //    infoModified[iz-z].stripOffsets[i] = (int) infoModified[iz-z].getOffset() + ((((y+i)*fi.width) + x) * fi.getBytesPerPixel());
+                infoModified[iz-z].stripOffsets[i] = (int) (i * fi.width * fi.getBytesPerPixel());
             }
             infoModified[iz-z].height = ny;
             infoModified[iz-z].width = nx;
@@ -177,9 +179,9 @@ class OpenerExtensions extends Opener {
         FileOpener fo;
         for(int i=0; i<infoModified.length; i++) {
             fo = new FileOpener(infoModified[i]);
-            long startTime = System.currentTimeMillis();
+            //long startTime = System.currentTimeMillis();
             imp = fo.open(false);
-            long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("Cropped frame stack opened in [ms]: " + elapsedTime);
+            //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("Cropped frame stack opened in [ms]: " + elapsedTime);
             if(i==0){
                 stack = imp.getStack();
             } else {
@@ -187,6 +189,7 @@ class OpenerExtensions extends Opener {
             }
         }
         imp = new ImagePlus("",stack);
+        imp.show();
         return imp;
     }
 
