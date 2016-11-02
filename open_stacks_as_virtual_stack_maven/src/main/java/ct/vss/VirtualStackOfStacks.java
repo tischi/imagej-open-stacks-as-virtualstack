@@ -7,6 +7,7 @@ import ij.*;
 import ij.io.FileInfo;
 import ij.process.ImageProcessor;
 import static ij.IJ.log;
+import javafx.geometry.Point3D;
 
 /**
  This class represents an array of disk-resident images.
@@ -121,13 +122,13 @@ public class VirtualStackOfStacks extends ImageStack {
         return imp.getProcessor();
     }
 
-    public ImagePlus getCroppedFrameAsImagePlus(int t, int c, int z, int nz, int x, int nx, int y, int ny) {
+    public ImagePlus getCroppedFrameAsImagePlus(int t, int c, Point3D p, Point3D pr) {
 
         //log("opening slices " + z + " to " + (z+nz-1) + " of " + path + names[t]);
         //FileInfo fi = (FileInfo) fiRef.clone(); // make a deep copy so we can savely modify it to load what we want
         //fi.directory = path;
 
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[t], z, nz, x, nx, y, ny);
+        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[t], p, pr);
         //ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingFirstIFD(fi, z, nz, x, nx, y, ny);
 
         if (imp==null) {

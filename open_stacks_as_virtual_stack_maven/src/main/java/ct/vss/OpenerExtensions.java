@@ -4,6 +4,7 @@ import ij.ImagePlus;
 import ij.io.FileInfo;
 import ij.io.FileOpener;
 import ij.io.Opener;
+import javafx.geometry.Point3D;
 
 import static ij.IJ.log;
 
@@ -25,11 +26,19 @@ class OpenerExtensions extends Opener {
         return imp;
     }
 
-    public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, int z, int nz, int x, int nx, int y, int ny) {
+    public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, Point3D p, Point3D pr) {
 
         log("# openCroppedTiffStackUsingFirstIFD");
 
         if (fi0==null) return null;
+
+        // round the values
+        int x = (int) (p.getX()+0.5);
+        int y = (int) (p.getY()+0.5);
+        int z = (int) (p.getZ()+0.5);
+        int nx = 2 * (int) pr.getX() + 1;
+        int ny = 2 * (int) pr.getY() + 1;
+        int nz = 2 * (int) pr.getZ() + 1;
 
         log("filename: " + fi0.fileName);
         log("fi0.nImages: " + fi0.nImages);

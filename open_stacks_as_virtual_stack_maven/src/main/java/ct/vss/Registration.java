@@ -30,6 +30,8 @@ public class Registration implements PlugIn {
     public final static int MEAN=10, MEDIAN=11, MIN=12, MAX=13, VAR=14, MAXLOCAL=15; // Filters3D
     private static NonBlockingGenericDialog gd;
 
+
+
     public Registration(ImagePlus imp, boolean gui) {
         this.imp = imp;
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
@@ -54,40 +56,11 @@ public class Registration implements PlugIn {
         gd.addNumericField("Iterations",5,0);
         //gd.addStringField("File Name Contains:", "");
         //((Label)theLabel).setText(""+imp.getTitle());
-        Button bt = new Button("Recompute position");
+        Button bt = new Button("Correct current position");
         bt.addActionListener(new ActionListener() {
                                  public void actionPerformed(ActionEvent e) {
-                                     Roi roi = imp.getRoi();
-                                     Scrollbar s;
-                                     TextField tf;
-                                     ImageStack stack;
-
-                                     if ((roi != null) && (roi.getPolygon().npoints == 1)) {
-
-                                         // get values
-                                         int x = roi.getPolygon().xpoints[0];
-                                         int y = roi.getPolygon().ypoints[0];
-                                         int z = imp.getZ() - 1;
-                                         int t = imp.getT() - 1;
-
-                                         log("" + t + " " + z + " " + x + " " + y);
-
-                                         int rx = new Integer(getTextFieldTxt(gd, 0));
-                                         int ry = new Integer(getTextFieldTxt(gd, 1));
-                                         int rz = new Integer(getTextFieldTxt(gd, 2));
-                                         double marginFactor = new Double(getTextFieldTxt(gd, 3));
-                                         int bg = new Integer(getTextFieldTxt(gd, 4));
-                                         int iterations = new Integer(getTextFieldTxt(gd,5));
-
-                                         Point3D pCenterOfMassRadii = new Point3D(rx,ry,rz);
-                                         Point3D pStackRadii = pCenterOfMassRadii.multiply(marginFactor);
-                                         Point3D pCenter = new Point3D(x,y,z);
-                                         Point3D pStackMin = pCenter.subtract(pStackRadii);
-                                         Point3D pStackSize = pStackRadii.multiply(2);
-                                         pStackSize = pStackSize.add(1, 1, 1);
-
-                                         stack = getImageStack(t, pStackMin, pStackSize);
-                                         Point3D pStackCenter = iterativeCenterOfMass16bit(stack, bg, pCenterOfMassRadii, iterations);
+                                     int nt = 0; // only 'track' current position
+                                     Point3D[] points = guiCallTo_track(nt);
 
                                          pCenter = pStackCenter.add(pStackMin);
 
@@ -98,14 +71,56 @@ public class Registration implements PlugIn {
                                          imp.deleteRoi();
                                          imp.setRoi(r);
                                          imp.setOverlay(bounds, Color.blue, 2, null);
-                                     } else {
-                                         log("No PointTool selection");
-                                     }
+
                                  }
                              });
         gd.add(bt);
         gd.showDialog();
     }
+
+
+    public Point3D[] guiCallTo_track(int nt) {
+
+        Roi roi = imp.getRoi();
+        Scrollbar s;
+        TextField tf;
+        ImageStack stack;
+
+        if ((roi != null) && (roi.getPolygon().npoints == 1)) {
+
+            // get more values from GUI
+            int x = roi.getPolygon().xpoints[0];
+            int y = roi.getPolygon().ypoints[0];
+            int z = imp.getZ() - 1;
+            int t = imp.getT() - 1;
+
+            int rx = new Integer(getTextFieldTxt(gd, 0));
+            int ry = new Integer(getTextFieldTxt(gd, 1));
+            int rz = new Integer(getTextFieldTxt(gd, 2));
+            double marginFactor = new Double(getTextFieldTxt(gd, 3));
+            int bg = new Integer(getTextFieldTxt(gd, 4));
+            int iterations = new Integer(getTextFieldTxt(gd, 5));
+
+            Point3D pCenterOfMassRadii = new Point3D(rx, ry, rz);
+            Point3D pStackRadii = pCenterOfMassRadii.multiply(marginFactor);
+            Point3D pStackCenter = new Point3D(x, y, z);
+
+            //Point3D pStackMin = pCenter.subtract(pStackRadii);
+            // convert from radii to sizes
+            //Point3D pStackSize = pStackRadii.multiply(2);
+            //pStackSize = pStackSize.add(1, 1, 1);
+
+            // Track
+            Point3D[] points = track3D(t, nt, pStackCenter, pStackRadii, pCenterOfMassRadii, bg, iterations);
+            return(points);
+
+        } else {
+            log("No PointTool selection on image");
+            return(null);
+        }
+
+    }
+
 
     public String getTextFieldTxt(GenericDialog gd, int i) {
         TextField tf = (TextField) gd.getNumericFields().get(i);
@@ -113,32 +128,38 @@ public class Registration implements PlugIn {
     }
 
 
-    /*
-    public Point3D[] computeDrifts3D(int t, int nt, int z, int nz, int x, int nx, int y, int ny, String method, int bg) {
+    public Point3D[] track3D(int t, int nt, Point3D pStackCenter, Point3D pStackRadii, Point3D pCenterOfMassRadii, int bg, int iterations) {
         Point3D[] points = new Point3D[vss.nSlices];
         ImageStack stack;
-        Point3D pRef, pCurr, pDiff, pMin, pMax;
+        Point3D pRef, pLocalCenter, pDiff, pMin, pMax;
         Point3D posGlobalCurr = new Point3D(x, y, z);
 
-        int it = t;
+        //int it = t;
         // set position of reference image
-        points = setPosition(points, it, posGlobalCurr, nx, ny, nz);
-        stack = getImageStack(it,points[it], nx, ny, nz);
+        //points = curatePosition(points, t, posGlobalCurr, nx, ny, nz);
+
+        //pStackMin = getImageStack(t, pStackMin, pStackSize);
+
         // compute internal position
         //long startTime = System.currentTimeMillis();
         //stack = Filters3D.filter(stack, MEAN, 4, 4, 2);
         //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("filtered stack in [ms]: " + elapsedTime);
-        pRef = centerOfMass16bit(stack, bg, pMin, pMax);
+        //pRef = centerOfMass16bit(stack, bg, pMin, pMax);
         //pRef = maxLoc16bit(stack);
-        log("pRef "+t+": "+pRef.toString());
+        //log("pRef "+t+": "+pRef.toString());
 
-        for (it = t + 1; it < nt; it++) {
+        for (it = t; it <= t+nt; it++) {
 
-            // use current position (lower left) to extract next image
-            points = setPosition(points, it, posGlobalCurr, nx, ny, nz); // update position of this image
+            //  ensure that extracted stack is within bounds
+            pStackCenter = curatePosition(pStackCenter, pStackRadii);
 
-            // compute internal position
-            stack = getImageStack(it,points[it],nx,ny,nz);
+            // get stack
+            stack = getImageStack(it, pStackMin, pStackSize);
+
+            // compute center of mass (local stack coordinates)
+            pLocalCenter = iterativeCenterOfMass16bit(stack, bg, pCenterOfMassRadii, iterations);
+
+
             pCurr = centerOfMass16bit(stack, bg, pMin, pMax);
             //pCurr = maxLoc16bit(stack);
             log("pCurr "+it+": "+pCurr.toString());
@@ -161,40 +182,36 @@ public class Registration implements PlugIn {
         log("");
         return(points);
     }
-    */
 
-    private ImageStack getImageStack(int it, Point3D p, Point3D pn) {
+    private ImageStack getImageStack(int it, Point3D p, Point3D pr) {
         //log("Registration.getImageStack p[0]: "+p[0]+" z:"+p[3]);
         long startTime = System.currentTimeMillis();
-        ImagePlus imp = vss.getCroppedFrameAsImagePlus(it, 0, (int)p.getZ(), (int)pn.getZ(), (int)p.getX(), (int)pn.getX(), (int)p.getY(), (int)pn.getY());
+        ImageStack stack = vss.getCroppedFrameAsImagePlus(it, 0, p, pr).getStack();
         long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("loaded stack in [ms]: " + elapsedTime);
         //imp.show();
-        return(imp.getStack());
+        return(stack);
     }
 
-    public Point3D[] setPosition(Point3D[] points, int it, Point3D p, int nx, int ny, int nz) {
-
-        if (it < 0 || it >= points.length) {
-            throw new IllegalArgumentException("t="+it+" is out of range");
-        }
+    public Point3D curatePosition(Point3D p, Point3D pr) {
 
         // round the values
         int x = (int) (p.getX()+0.5);
         int y = (int) (p.getY()+0.5);
         int z = (int) (p.getZ()+0.5);
+        int rx = (int) pr.getX();
+        int ry = (int) pr.getY();
+        int rz = (int) pr.getZ();
 
         // make sure that the ROI stays within the image bounds
-        if (x < 0) x = 0;
-        if (y < 0) y = 0;
-        if (z < 0) z = 0;
+        if (x-rx < 0) x = 0;
+        if (y-ry < 0) y = 0;
+        if (z-rz < 0) z = 0;
 
-        if (x+nx >= imp.getWidth()) x = imp.getWidth()-nx;
-        if (y+ny >= imp.getHeight()) y = imp.getHeight()-ny;
-        if (z+nz >= imp.getNSlices()) z = imp.getNSlices()-nz;
+        if (x+rx >= imp.getWidth()) x = imp.getWidth()-rx;
+        if (y+ry >= imp.getHeight()) y = imp.getHeight()-ry;
+        if (z+rz >= imp.getNSlices()) z = imp.getNSlices()-rz;
 
-        points[it] = new Point3D(x,y,z);
-
-        return(points);
+        return(new Point3D(x,y,z));
     }
 
     public Point3D iterativeCenterOfMass16bit(ImageStack stack, int bg, Point3D radii, int iterations) {
@@ -264,7 +281,6 @@ public class Registration implements PlugIn {
 
         return(new Point3D(xCenterOfMass,yCenterOfMass,zCenterOfMass));
     }
-
 
     public Point3D maxLoc16bit(ImageStack stack) {
         long startTime = System.currentTimeMillis();
