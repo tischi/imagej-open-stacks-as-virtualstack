@@ -33,6 +33,7 @@ public class Registration implements PlugIn {
     // gui variables
     int gui_t, gui_nt, gui_bg, gui_iterations;
     Point3D gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii;
+    Point3D[] pTracked;
 
     public Registration(ImagePlus imp, boolean gui) {
         this.imp = imp;
@@ -41,6 +42,7 @@ public class Registration implements PlugIn {
             throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
         }
         this.vss = vss;
+        this.pTracked = new Point3D[vss.getNStacks()];
         if(gui) showDialog();
     }
 
@@ -54,41 +56,58 @@ public class Registration implements PlugIn {
         gd.addSlider("Radius center of mass y:", 0, (int) imp.getHeight() / 2, 20);
         gd.addSlider("Radius center of mass z:", 0, (int) imp.getNSlices() / 2, 20);
         gd.addNumericField("Image loading margin factor", 2, 1);
-        gd.addNumericField("Image background",100,0);
+        gd.addNumericField("Image background", 100, 0);
         gd.addNumericField("Iterations",6,0);
         //gd.addStringField("File Name Contains:", "");
         //((Label)theLabel).setText(""+imp.getTitle());
         Button bt = new Button("Correct current position");
         bt.addActionListener(new ActionListener() {
-                                 public void actionPerformed(ActionEvent e) {
-                                     if (updateGuiVariables()) {
-                                         gui_nt = 0; // only 'track' current position
-                                         Point3D[] points = track3D(gui_t, gui_nt, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
-                                         Point3D pCenter = points[gui_t];
-                                         // show on image, computing back to global coordinates
-                                         int rx = (int) gui_pStackRadii.getX();
-                                         int ry = (int) gui_pStackRadii.getY();
-                                         Roi r = new PointRoi(pCenter.getX(), pCenter.getY());
-                                         Overlay o = new Overlay();
-                                         Roi cropBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
-                                         o.add(cropBounds);
-                                         rx = (int) gui_pCenterOfMassRadii.getX();
-                                         ry = (int) gui_pCenterOfMassRadii.getY();
-                                         Roi comBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
-                                         o.add(comBounds);
-                                         imp.setPosition(0, ((int) pCenter.getZ() + 1), gui_t + 1);
-                                         imp.deleteRoi();
-                                         imp.setRoi(r);
-                                         o.setLabelColor(Color.blue);
-                                         imp.setOverlay(o);
-
-                                     }
-                                 }
-                             });
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updateGuiVariables()) {
+                    gui_nt = 0; // only 'track' current position
+                    pTracked = track3D(gui_t, gui_nt, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                    showTrackOnFrame();
+                }
+            }
+        });
         gd.add(bt);
+        gd.addSlider("Current frame", 1, (int) imp.getNFrames(), 1);
+        final Scrollbar sbCurrentFrame = (Scrollbar) gd.getSliders().get(3);
+        sbCurrentFrame.addAdjustmentListener(new AdjustmentListener() {
+            @Override
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                //log("Frame scrollbar:"+sbCurrentFrame.getValue());
+                imp.setPosition(imp.getC(), imp.getZ(), new Integer(sbCurrentFrame.getValue()));
+                showTrackOnFrame();
+            }
+        });
         gd.showDialog();
     }
 
+    public void showTrackOnFrame() {
+        Point3D pCenter = pTracked[imp.getT() - 1];
+        if (pCenter != null) {
+            int rx = (int) gui_pStackRadii.getX();
+            int ry = (int) gui_pStackRadii.getY();
+            Roi r = new PointRoi(pCenter.getX(), pCenter.getY());
+            Overlay o = new Overlay();
+            Roi cropBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
+            o.add(cropBounds);
+            rx = (int) gui_pCenterOfMassRadii.getX();
+            ry = (int) gui_pCenterOfMassRadii.getY();
+            Roi comBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
+            o.add(comBounds);
+            imp.setPosition(0, ((int) pCenter.getZ() + 1), imp.getT());
+            imp.deleteRoi();
+            imp.setRoi(r);
+            o.setLabelColor(Color.blue);
+            imp.setOverlay(o);
+        } else {
+            Overlay o = new Overlay();
+            imp.setOverlay(o);
+        }
+    }
     public boolean updateGuiVariables() {
 
         Roi roi = imp.getRoi();
