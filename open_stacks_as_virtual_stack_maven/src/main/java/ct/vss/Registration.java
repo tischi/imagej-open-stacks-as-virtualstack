@@ -34,6 +34,7 @@ public class Registration implements PlugIn {
     int gui_t, gui_tMax, gui_bg, gui_iterations;
     Point3D gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii;
     Point3D[] pTracked;
+    int tMinTrack=-1, tMaxTrack=-1;
 
     public Registration(ImagePlus imp) {
         this.imp = imp;
@@ -100,6 +101,7 @@ public class Registration implements PlugIn {
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
                     pTracked = null;
+                    tMinTrack=gui_t; tMaxTrack=gui_tMax;
                     pTracked = track3D(gui_t, gui_tMax, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
                     //addTrackAsOverlay();
                     showTrackOnFrame();
@@ -120,7 +122,11 @@ public class Registration implements PlugIn {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
-                    // save pTracked
+                    FileInfo[][] infos = vss.getFileInfos();
+                    //Point3D[] pos = new Point3D[tMaxTrack-tMinTrack];
+                    //System.arraycopy(pTracked, tMinTrack, pos, 0, tMaxTrack-tMinTrack);
+                    ImagePlus impCropped = OpenStacksAsVirtualStack.openCropped(infos, pTracked, gui_pStackRadii, tMinTrack, tMaxTrack);
+                    impCropped.show();
                 }
             }
         });

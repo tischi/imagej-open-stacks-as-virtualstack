@@ -21,9 +21,9 @@ public class VirtualStackOfStacks extends ImageStack {
     protected FileInfo[][] infos;
 
     /** Creates a new, empty virtual stack. */
-    public VirtualStackOfStacks(int width, int height, int depth) {
-        super(width, height, null);
-        this.depth = depth;
+    public VirtualStackOfStacks(Point3D pSize) {
+        super((int)pSize.getX(), (int)pSize.getY(), null);
+        this.depth = (int)pSize.getZ();
         this.infos = new FileInfo[INITIAL_SIZE][];
     }
 

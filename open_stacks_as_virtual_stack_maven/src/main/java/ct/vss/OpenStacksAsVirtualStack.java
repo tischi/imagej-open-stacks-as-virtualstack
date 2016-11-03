@@ -10,6 +10,7 @@ import ij.io.Opener;
 import ij.io.FileInfo;
 import ij.gui.*;
 import ij.plugin.PlugIn;
+import javafx.geometry.Point3D;
 
 import static ij.IJ.log;
 
@@ -23,7 +24,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 	private String info1;
 	private String directory;
 	private String fileAnalysisMethod; // "Tiff: use IDFs of first file for all"
-
 
 	public void run(String arg) {
 		this.directory = IJ.getDirectory("Select a Directory");
@@ -40,28 +40,29 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
 
-	/*
-    public ImagePlus openCropped(FileInfo[][] infos, int nz, int nx, int ny, Positions3D p) {
-        VirtualStackOfStacks stack = new VirtualStackOfStacks(nx, ny, nz);
+    public static ImagePlus openCropped(FileInfo[][] infos, Point3D[] pos, Point3D radii, int tMin, int tMax) {
+		Point3D size = radii.multiply(2);
+		size.add(new Point3D(1,1,1));
+		VirtualStackOfStacks stack = new VirtualStackOfStacks(size);
         OpenerExtensions oe = new OpenerExtensions();
-        FileInfo[] infoModified = new FileInfo[p.nt];
-        for(int it=p.t; it<p.nt; it++) {
-            int[] pos = p.getPosition(it);
-            infoModified = oe.cropFileInfo(infos[it],pos[3],nz,pos[1],nx,pos[2],ny);
+
+		FileInfo[] infoModified = new FileInfo[tMax-tMin];
+        for(int it=tMin; it<=tMax; it++) {
+            infoModified = oe.cropFileInfo(infos[it],pos[it],radii);
             stack.addStack(infoModified);
         }
         return(makeImagePlus(stack,infoModified[0]));
-    }*/
+    }
 
-    private ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfo fi) {
+    private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfo fi) {
         double min = Double.MAX_VALUE;
         double max = -Double.MAX_VALUE;
         ImagePlus imp = new ImagePlus(fi.directory, stack);
         if (imp.getType()==ImagePlus.GRAY16 || imp.getType()==ImagePlus.GRAY32)
             imp.getProcessor().setMinAndMax(min, max);
         imp.setFileInfo(fi); // saves FileInfo of the first image
-        if (imp.getStackSize()==1 && info1!=null)
-            imp.setProperty("Info", info1);
+        //if (imp.getStackSize()==1 && info1!=null)
+        //   imp.setProperty("Info", info1);
         int nC = 1;
         int nZ = imp.getNSlices() / stack.getNStacks();
         int nT = stack.getNStacks();
@@ -238,7 +239,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         depth = info.length;
                     }
 
-                    stack = new VirtualStackOfStacks(fi.width, fi.height, depth);
+                    stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, depth));
 
 				}
 				count = stack.getNStacks()+1;
