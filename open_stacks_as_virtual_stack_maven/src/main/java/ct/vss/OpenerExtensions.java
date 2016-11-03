@@ -207,10 +207,10 @@ class OpenerExtensions extends Opener {
     public ImagePlus openTiffStackSliceUsingIFDs(FileInfo[] info, int z) {
         ImagePlus imp;
 
-        long startTime = System.currentTimeMillis();
+        //long startTime = System.currentTimeMillis();
         FileOpener fo = new FileOpener(info[z]);
         imp = fo.open(false);
-        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("Whole slice opened in [ms]: " + elapsedTime);
+        //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("Whole slice opened in [ms]: " + elapsedTime);
 
         return imp;
     }
@@ -326,22 +326,21 @@ class OpenerExtensions extends Opener {
         long readingTime = 0;
         long settingStackTime = 0;
         long settingPixelsTime = 0;
+        long bufferReadingTime = 0;
 
 
-        log("strip.length "+strip.length);
-        log("pixels.length "+pixels.length);
-        log("imByteWidth "+imByteWidth);
+        //log("strip.length "+strip.length);
+        //log("pixels.length "+pixels.length);
+        //log("imByteWidth "+imByteWidth);
 
         long startTimeInputStream = System.currentTimeMillis();
 
         try {
             File f = new File(fi.directory + fi.fileName);
             InputStream in = new BufferedInputStream(new FileInputStream(f));
-            //InputStream in = new FileInputStream(f);
-
+            //FileInputStream in = new FileInputStream(f);
             //FileImageInputStream in = new FileImageInputStream(f);
-            //log("in.isCached() "+in.isCached());
-            //InputStream in = new FileInputStream(f);
+
             log("");
             for(int z=0; z<nz; z++) {
                 // skip to beginning of next crop region
@@ -350,6 +349,12 @@ class OpenerExtensions extends Opener {
                 startTime = System.currentTimeMillis();
                 pointer = skip(in, info[z].getOffset() - pointer, pointer);
                 skippingTime += (System.currentTimeMillis()-startTime);
+
+                /*
+                startTime = System.currentTimeMillis();
+                pointer = read(in, buffer, pointer);
+                bufferReadingTime += (System.currentTimeMillis()-startTime);
+                */
 
                 for (int y = 0; y < ny; y++) {
 
@@ -370,9 +375,6 @@ class OpenerExtensions extends Opener {
                 }
 
                 //log("buffer.length "+buffer.length);
-                //startTime = System.currentTimeMillis();
-                //pointer = read(in, buffer, pointer);
-                //readingTime += (System.currentTimeMillis()-startTime);
 
 
                 startTime = System.currentTimeMillis();
@@ -386,11 +388,12 @@ class OpenerExtensions extends Opener {
         } catch (Exception e) {
             IJ.handleException(e);
         }
-        log("Skipping [ms]: " + skippingTime);
-        log("Reading [ms]: " + readingTime);
-        log("Setting pixels [ms]: " + settingPixelsTime);
-        log("Setting to stack [ms]: " + settingStackTime);
-        log("Input stream total [ms]: " + (System.currentTimeMillis()-startTimeInputStream));
+        //log("Skipping [ms]: " + skippingTime);
+        //log("Reading [ms]: " + readingTime);
+        //log("BufferReading [ms]: " + bufferReadingTime);
+        //log("Setting pixels [ms]: " + settingPixelsTime);
+        //log("Setting to stack [ms]: " + settingStackTime);
+        //log("Input stream total [ms]: " + (System.currentTimeMillis()-startTimeInputStream));
         ImagePlus impStream = new ImagePlus("One stream",stackStream);
         //impStream.show();
 

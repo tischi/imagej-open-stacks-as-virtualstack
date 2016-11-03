@@ -58,25 +58,34 @@ public class Registration implements PlugIn {
         gd.addNumericField("Image loading margin factor", 2, 1);
         gd.addNumericField("Image background", 100, 0);
         gd.addNumericField("Iterations",6,0);
-        gd.addSlider("Analyze until time-point:", 1, (int) imp.getNFrames(), imp.getNFrames());
+        gd.addSlider("Track until:", 1, (int) imp.getNFrames(), imp.getNFrames());
         //gd.addStringField("File Name Contains:", "");
         //((Label)theLabel).setText(""+imp.getTitle());
-        Button btCorrectCurrent = new Button("Correct current position");
+        Button btCorrectCurrent = new Button("Correct");
         btCorrectCurrent.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                // temporarily change the "Track until" to track only current frame
                 Scrollbar sb = (Scrollbar) gd.getSliders().get(3);
-                sb.setValue(imp.getT());
                 TextField tf = (TextField) gd.getNumericFields().get(6);
+                int tMaxOld = sb.getValue();
+                sb.setValue(imp.getT());
                 tf.setText(""+imp.getT());
+
                 if (updateGuiVariables()) {
                     // only 'track' current position
                     pTracked = track3D(gui_t, gui_tMax, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                    //addTrackAsOverlay();
                     showTrackOnFrame();
                 }
+
+                // reset "Track until"
+                sb.setValue(tMaxOld);
+                tf.setText(""+tMaxOld);
+
             }
         });
-        gd.add(btCorrectCurrent);
         Button btTrack = new Button("Track");
         btTrack.addActionListener(new ActionListener() {
             @Override
@@ -84,13 +93,32 @@ public class Registration implements PlugIn {
                 if (updateGuiVariables()) {
                     pTracked = null;
                     pTracked = track3D(gui_t, gui_tMax, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                    //addTrackAsOverlay();
                     showTrackOnFrame();
                 }
             }
         });
-        gd.add(btTrack);
+        Button btSaveTrack = new Button("Save Coordinates");
+        btSaveTrack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updateGuiVariables()) {
+                    // save pTracked
+                }
+            }
+        });
+        Button btCropTrack = new Button("Crop Track");
+        btCropTrack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updateGuiVariables()) {
+                    // save pTracked
+                }
+            }
+        });
 
-        gd.addSlider("Show frame with track", 1, (int) imp.getNFrames(), 1);
+
+        gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
         final Scrollbar sbCurrentFrame = (Scrollbar) gd.getSliders().get(4);
         sbCurrentFrame.addAdjustmentListener(new AdjustmentListener() {
             @Override
@@ -100,8 +128,64 @@ public class Registration implements PlugIn {
                 showTrackOnFrame();
             }
         });
+
+        final Panel buttons = new Panel();
+        GridBagLayout bgbl = new GridBagLayout();
+        buttons.setLayout(bgbl);
+        GridBagConstraints bgbc = new GridBagConstraints();
+        bgbc.anchor = GridBagConstraints.WEST;
+
+        bgbc.insets = new Insets(0,0,0,5);
+        bgbl.setConstraints(btSaveTrack, bgbc);
+        buttons.add(btSaveTrack);
+
+        bgbc.insets = new Insets(0,0,0,5);
+        bgbl.setConstraints(btCropTrack, bgbc);
+        buttons.add(btCropTrack);
+
+        bgbc.insets = new Insets(0,0,0,5);
+        bgbl.setConstraints(btTrack,bgbc);
+        buttons.add(btTrack);
+
+        bgbc.insets = new Insets(0,0,0,0);
+        bgbl.setConstraints(btCorrectCurrent,bgbc);
+        buttons.add(btCorrectCurrent);
+
+        gd.addPanel(buttons,GridBagConstraints.WEST,new Insets(0,0,0,5));
+        bgbl = (GridBagLayout)gd.getLayout();
+        bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 1;
+        bgbl.setConstraints(buttons,bgbc);
+
         gd.showDialog();
     }
+
+    /*
+    public void addTrackAsOverlay() {
+        Point3D pCenter;
+        Overlay o = new Overlay();
+
+        for(int i=0; i<pTracked.length; i++) {
+            pCenter = pTracked[i];
+            if (pCenter != null) {
+                //log("showTrackOnFrame: pCenter: "+pCenter.toString());
+                int rx = (int) gui_pStackRadii.getX();
+                int ry = (int) gui_pStackRadii.getY();
+                Roi r = new PointRoi(pCenter.getX(), pCenter.getY());
+                Roi cropBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
+                cropBounds.set
+                o.add(cropBounds);
+                rx = (int) gui_pCenterOfMassRadii.getX();
+                ry = (int) gui_pCenterOfMassRadii.getY();
+                Roi comBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
+                o.add(comBounds);
+                imp.setPosition(0, ((int) pCenter.getZ() + 1), imp.getT());
+                imp.deleteRoi();
+                imp.setRoi(r);
+                o.setLabelColor(Color.blue);
+            }
+        }
+        imp.setOverlay(o);
+    }*/
 
     public void showTrackOnFrame() {
         Point3D pCenter = pTracked[imp.getT() - 1];
@@ -203,7 +287,7 @@ public class Registration implements PlugIn {
             pStackCenter = pStackCenter.add(pOffset);
             points[it] =  pStackCenter;
 
-            IJ.showProgress((double) it / (tMax-t));
+            IJ.showProgress(it,tMax);
 
         }
 

@@ -377,8 +377,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 		//IJ.debugMode = true;
 
-        boolean MATLAB = false;
-		boolean MATLAB_EXTERNAL = true;
+        boolean MATLAB = true;
+		boolean MATLAB_EXTERNAL = false;
 		boolean OME_MIP = false;
 		boolean OME = false;
         boolean OME_drift = false;
