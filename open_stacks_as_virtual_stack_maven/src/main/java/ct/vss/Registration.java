@@ -35,7 +35,7 @@ public class Registration implements PlugIn {
     Point3D gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii;
     Point3D[] pTracked;
 
-    public Registration(ImagePlus imp, boolean gui) {
+    public Registration(ImagePlus imp) {
         this.imp = imp;
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         if(vss==null) {
@@ -43,12 +43,20 @@ public class Registration implements PlugIn {
         }
         this.vss = vss;
         this.pTracked = new Point3D[vss.getNStacks()];
-        if(gui) showDialog();
     }
+
 
     public void run(String arg) {
-
+        this.imp = IJ.getImage();
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        if(vss==null) {
+            throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
+        }
+        this.vss = vss;
+        this.pTracked = new Point3D[vss.getNStacks()];
+        showDialog();
     }
+
     // todo: button: Show ROI
     public void showDialog() {
         gd = new NonBlockingGenericDialog("Registration");

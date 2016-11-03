@@ -389,14 +389,18 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		if (MATLAB_EXTERNAL) {
 			ImagePlus imp = ovs.open("/Volumes/My Passport/Res_13/", "Tiff: Use IFDs of first file for all", 1);
 			imp.show();
-			Registration register = new Registration(imp, true);
+			Registration register = new Registration(imp);
+			register.showDialog();
+
 		}
 
         if (MATLAB) {
             ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/MATLABtiff/", "Tiff: Use IFDs of first file for all", 1);
             imp.show();
-			Registration register = new Registration(imp, true);
-            }
+			Registration register = new Registration(imp);
+			register.showDialog();
+
+		}
 
 
         if(OME) {
@@ -426,7 +430,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             //VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
 
             // compute drift
-            Registration register = new Registration(imp, true);
+            Registration register = new Registration(imp);
 
             //Positions3D positions = register.computeDrifts3D(0,3,24,69-24,45,80,27,80, "center_of_mass", 200);
             //positions.printPositions();
@@ -441,7 +445,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		if (OME_MIP) {
 			ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/OME_MIPs/", "Tiff: Use IFDs of first file for all", 1);
             imp.show();
-            Registration register = new Registration(imp, true);
+            Registration register = new Registration(imp);
         }
 
     }
