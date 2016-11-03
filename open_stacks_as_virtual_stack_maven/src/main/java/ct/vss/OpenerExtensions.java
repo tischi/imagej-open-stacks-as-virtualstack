@@ -52,7 +52,7 @@ class OpenerExtensions extends Opener {
         return is;
     }
 
-    void skip(InputStream in, long skipCount) throws IOException {
+    long skip(InputStream in, long skipCount, long pointer) throws IOException {
         if (skipCount > 0) {
             long bytesRead = 0;
             int skipAttempts = 0;
@@ -65,9 +65,10 @@ class OpenerExtensions extends Opener {
                 //IJ.log("skip: "+skipCount+" "+count+" "+bytesRead+" "+skipAttempts);
             }
         }
+        return(pointer+skipCount);
     }
 
-    void read(InputStream in, byte[] buffer) {
+    long read(InputStream in, byte[] buffer, long pointer) {
         int bufferSize = buffer.length;
         int bufferCount = 0;
         int count;
@@ -78,15 +79,42 @@ class OpenerExtensions extends Opener {
                     if (bufferCount > 0)
                         for (int i = bufferCount; i < bufferSize; i++) buffer[i] = 0;
                     buffer = null;
-                    return; //EOF Error
+                    return(-1); //EOF Error
                 }
                 bufferCount += count;
             }
         } catch (IOException e) {
             IJ.log("" + e);
             buffer = null;
-            return;
+            return(-1);
         }
+        //log("read: buffer.length "+buffer.length);
+        return(pointer+(long)bufferSize);
+    }
+
+    short[] setShortPixels(FileInfo fi, short[] pixels, int base, byte[] buffer){
+        int bytesPerPixel = 2;
+        int pixelsRead = (int) buffer.length/bytesPerPixel;
+        //log("setShortPixels: base "+base);
+        //log("setShortPixels: pixelsRead "+pixelsRead);
+        //log("setShortPixels: pixels.length "+pixels.length);
+
+        if (fi.intelByteOrder) {
+            if (fi.fileType==FileInfo.GRAY16_SIGNED)
+                for (int i=base,j=0; i<(base+pixelsRead); i++,j+=2)
+                    pixels[i] = (short)((((buffer[j+1]&0xff)<<8) | (buffer[j]&0xff))+32768);
+            else
+                for (int i=base,j=0; i<(base+pixelsRead); i++,j+=2)
+                    pixels[i] = (short)(((buffer[j+1]&0xff)<<8) | (buffer[j]&0xff));
+        } else {
+            if (fi.fileType==FileInfo.GRAY16_SIGNED)
+                for (int i=base,j=0; i<(base+pixelsRead); i++,j+=2)
+                    pixels[i] = (short)((((buffer[j]&0xff)<<8) | (buffer[j+1]&0xff))+32768);
+            else
+                for (int i=base,j=0; i<(base+pixelsRead); i++,j+=2)
+                    pixels[i] = (short)(((buffer[j]&0xff)<<8) | (buffer[j+1]&0xff));
+        }
+        return(pixels);
     }
 
     public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, Point3D p, Point3D pr) {
@@ -164,6 +192,7 @@ class OpenerExtensions extends Opener {
         return imp;
     }*/
 
+
     public FileInfo[] cropFileInfo(FileInfo[] info, Point3D p, Point3D pr) {
         //log("OpenerExtensions.cropFileInfo:");
 
@@ -232,55 +261,88 @@ class OpenerExtensions extends Opener {
         //    log(""+info[i].getOffset());
         //}
 
+        // modify FileInfos to reflect the cropping
+        // todo: this can be shortened a lot as one the first fi needs to know about the cropping
+
+        int imByteWidth = infoAll[0].width*infoAll[0].getBytesPerPixel();
+
         FileInfo[] info = cropFileInfo(infoAll, p, pr);
 
 
-
-        //ImagePlus imp = openTiffStack(infoModified);
-        ImagePlus imp;
-        ImageProcessor ip;
-        ImageStack stack=null;
         FileOpener fo;
         FileInfo fi = info[0];
 
 
         // Read via one input stream
-        startTime = System.currentTimeMillis();
 
-        byte[] row = new byte[fi.width*fi.getBytesPerPixel()];
-        short[] pixels = new short[fi.width*fi.height];
-        int rowCount = 0;
-        int pixelCount = 0;
+        ImageStack stackStream = new ImageStack(info[0].width,info[0].height);
+        ImageProcessor ip;
+
+        int stripPixelLength = (int) fi.stripLengths[0]/fi.getBytesPerPixel();
+        int stripByteLength = (int) fi.stripLengths[0];
+        int nz = info.length;
+        byte[] strip = new byte[fi.stripLengths[0]];
+        short[][] pixels = new short[nz][fi.width*fi.height];
+        int pixelCount;
+        long pointer = 0L;
         fi = info[0];
+
+        long skippingTime = 0;
+        long readingTime = 0;
+        long settingStackTime = 0;
+        long settingPixelsTime = 0;
+
+
+        log("strip.length "+strip.length);
+        log("pixels.length "+pixels.length);
+        log("imByteWidth "+imByteWidth);
+
+        long startTimeInputStream = System.currentTimeMillis();
+
         try {
             InputStream in = createInputStream(fi);
-            in.skip(fi.getOffset());
-            for(int z=0; z<info.length; z++) {
+            log("");
+            for(int z=0; z<nz; z++) {
+                // skip to beginning of next crop region
+                //log("Skipping from: "+pointer);
+                //log("Skipping to: "+info[z].getOffset());
+                startTime = System.currentTimeMillis();
+                pointer = skip(in, info[z].getOffset() - pointer, pointer);
+                skippingTime += (System.currentTimeMillis()-startTime);
+
                 for (int y = 0; y < fi.stripOffsets.length; y++) {
-                    read(in, row);
-                    pixelCount = y * fi.width;
-                    setPixels(pixels, pixelCount, row);
-                    in.skip(fi.width);
-                    if (row == null) {
-                        log("Reading of row failed");
-                    }
-                    rowCount++;
+                    startTime = System.currentTimeMillis();
+                    pointer = read(in, strip, pointer);
+                    readingTime += (System.currentTimeMillis()-startTime);
+
+                    pixelCount = y * stripPixelLength;
+                    //pixels[z] = setShortPixels(fi, pixels[z], pixelCount, strip);
+                    //pointer = skip(in, imByteWidth-stripByteLength, pointer);
+
                 }
 
-                ip = new ShortProcessor(fi.width, fi.height, (short[]) pixels, null);
-                stack.addSlice(ip);
+                startTime = System.currentTimeMillis();
+                ip = new ShortProcessor(fi.width, fi.height, (short[]) pixels[z], null);
+                stackStream.addSlice(ip);
+                settingStackTime += (System.currentTimeMillis()-startTime);
+
             }
-            //imp = new ImagePlus(fi.fileName, ip);
+            
             in.close();
         } catch (Exception e) {
             IJ.handleException(e);
         }
-        log("Number of rows: "+rowCount);
-        log("Input stream [ms]: " + (System.currentTimeMillis()-startTime));
-
+        log("Skipping [ms]: " + skippingTime);
+        log("Reading [ms]: " + readingTime);
+        log("Setting to stack [ms]: " + settingStackTime);
+        log("Input stream [ms]: " + (System.currentTimeMillis()-startTimeInputStream));
+        ImagePlus impStream = new ImagePlus("One stream",stackStream);
+        impStream.show();
 
         // Loop via multiple input streams
         startTime = System.currentTimeMillis();
+        ImageStack stack = new ImageStack(info[0].width,info[0].height);
+        ImagePlus imp;
         for(int i=0; i<info.length; i++) {
             fi = info[i];
             fo = new FileOpener(fi);
@@ -291,12 +353,12 @@ class OpenerExtensions extends Opener {
                 stack.addSlice(imp.getProcessor());
             }
         }
-        imp = new ImagePlus("",stack);
+        ImagePlus impMany = new ImagePlus("Many streams",stack);
         log("Multiple streams [ms]: " + (System.currentTimeMillis()-startTime));
-        imp.show();
+        impMany.show();
 
         //imp.show();
-        return imp;
+        return impMany;
     }
 
 
