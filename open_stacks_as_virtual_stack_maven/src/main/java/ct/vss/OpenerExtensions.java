@@ -2,12 +2,21 @@ package ct.vss;
 
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.io.FileInfo;
-import ij.io.FileOpener;
-import ij.io.Opener;
+import ij.io.*;
 import javafx.geometry.Point3D;
+import java.awt.*;
+import java.awt.image.*;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.zip.GZIPInputStream;
+import ij.gui.*;
+import ij.process.*;
+import ij.measure.*;
+import ij.*;
 
 import static ij.IJ.log;
+import static ij.IJ.runMacroFile;
 import static ij.IJ.save;
 
 /** Opens the nth image of the specified TIFF stack.*/
@@ -27,6 +36,58 @@ class OpenerExtensions extends Opener {
         ImagePlus imp = openCroppedTiffStackUsingFirstIFD(fi0, z, nz, x, nx,  y,  ny);
         return imp;
     }*/
+
+    /** Returns an InputStream for the image described by this FileInfo. */
+    // https://github.com/imagej/imagej1/blob/master/ij/io/FileOpener.java#L442
+    public InputStream createInputStream(FileInfo fi) throws IOException, MalformedURLException {
+        InputStream is = null;
+        if (fi.inputStream!=null)
+            is = fi.inputStream;
+        else {
+            if (fi.directory.length()>0 && !fi.directory.endsWith(Prefs.separator))
+                fi.directory += Prefs.separator;
+            File f = new File(fi.directory + fi.fileName);
+            is = new FileInputStream(f);
+        }
+        return is;
+    }
+
+    void skip(InputStream in, long skipCount) throws IOException {
+        if (skipCount > 0) {
+            long bytesRead = 0;
+            int skipAttempts = 0;
+            long count;
+            while (bytesRead < skipCount) {
+                count = in.skip(skipCount - bytesRead);
+                skipAttempts++;
+                if (count == -1 || skipAttempts > 5) break;
+                bytesRead += count;
+                //IJ.log("skip: "+skipCount+" "+count+" "+bytesRead+" "+skipAttempts);
+            }
+        }
+    }
+
+    void read(InputStream in, byte[] buffer) {
+        int bufferSize = buffer.length;
+        int bufferCount = 0;
+        int count;
+        try {
+            while (bufferCount < bufferSize) { // fill the buffer
+                count = in.read(buffer, bufferCount, bufferSize - bufferCount);
+                if (count == -1) {
+                    if (bufferCount > 0)
+                        for (int i = bufferCount; i < bufferSize; i++) buffer[i] = 0;
+                    buffer = null;
+                    return; //EOF Error
+                }
+                bufferCount += count;
+            }
+        } catch (IOException e) {
+            IJ.log("" + e);
+            buffer = null;
+            return;
+        }
+    }
 
     public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, Point3D p, Point3D pr) {
 
@@ -82,7 +143,6 @@ class OpenerExtensions extends Opener {
         //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
         return imp;
     }
-
 
     public ImagePlus openTiffStackSliceUsingIFDs(FileInfo[] info, int z) {
         ImagePlus imp;
@@ -162,26 +222,69 @@ class OpenerExtensions extends Opener {
         return(infoModified);
     }
 
-    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, Point3D p, Point3D pr) {
+    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] infoAll, Point3D p, Point3D pr) {
         //log("# openCroppedTiffStackUsingIFDs");
+        long startTime, stopTime, elapsedTime;
 
-        if (info==null) return null;
+        if (infoAll==null) return null;
 
         //for(int i=0; i<info.length; i++) {
         //    log(""+info[i].getOffset());
         //}
 
-        FileInfo[] infoModified = cropFileInfo(info, p, pr);
+        FileInfo[] info = cropFileInfo(infoAll, p, pr);
+
+
 
         //ImagePlus imp = openTiffStack(infoModified);
         ImagePlus imp;
+        ImageProcessor ip;
         ImageStack stack=null;
         FileOpener fo;
-        for(int i=0; i<infoModified.length; i++) {
-            fo = new FileOpener(infoModified[i]);
-            //long startTime = System.currentTimeMillis();
+        FileInfo fi = info[0];
+
+
+        // Read via one input stream
+        startTime = System.currentTimeMillis();
+
+        byte[] row = new byte[fi.width*fi.getBytesPerPixel()];
+        short[] pixels = new short[fi.width*fi.height];
+        int rowCount = 0;
+        int pixelCount = 0;
+        fi = info[0];
+        try {
+            InputStream in = createInputStream(fi);
+            in.skip(fi.getOffset());
+            for(int z=0; z<info.length; z++) {
+                for (int y = 0; y < fi.stripOffsets.length; y++) {
+                    read(in, row);
+                    pixelCount = y * fi.width;
+                    setPixels(pixels, pixelCount, row);
+                    in.skip(fi.width);
+                    if (row == null) {
+                        log("Reading of row failed");
+                    }
+                    rowCount++;
+                }
+
+                ip = new ShortProcessor(fi.width, fi.height, (short[]) pixels, null);
+                stack.addSlice(ip);
+            }
+            //imp = new ImagePlus(fi.fileName, ip);
+            in.close();
+        } catch (Exception e) {
+            IJ.handleException(e);
+        }
+        log("Number of rows: "+rowCount);
+        log("Input stream [ms]: " + (System.currentTimeMillis()-startTime));
+
+
+        // Loop via multiple input streams
+        startTime = System.currentTimeMillis();
+        for(int i=0; i<info.length; i++) {
+            fi = info[i];
+            fo = new FileOpener(fi);
             imp = fo.open(false);
-            //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("Cropped frame stack opened in [ms]: " + elapsedTime);
             if(i==0){
                 stack = imp.getStack();
             } else {
@@ -189,7 +292,10 @@ class OpenerExtensions extends Opener {
             }
         }
         imp = new ImagePlus("",stack);
+        log("Multiple streams [ms]: " + (System.currentTimeMillis()-startTime));
         imp.show();
+
+        //imp.show();
         return imp;
     }
 

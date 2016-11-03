@@ -75,6 +75,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		this.directory = directory;
 		this.fileAnalysisMethod = fileAnalysisMethod;
 		this.increment = increment;
+		boolean checkOffsets = false;
         FileInfo[] info = null;
 		FileInfo[][] infos = null;
 		FileInfo fi = null;
@@ -92,36 +93,39 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 		try {
 
-			log("# Checking offsets to first image in all files");
-			long offset0 = 0;
-			boolean differentOffsets = false;
-			for(int i=0; i<list.length; i++) {
-				try {
-					TiffDecoderExtension tde = new TiffDecoderExtension(directory, list[i]);
-					fi = tde.getFirstIFD();
-					if(fi == null) {
-						IJ.showMessage("Tiff file checking", "Could not open "+directory+list[i]);
+			if(checkOffsets) {
+				log("# Checking offsets to first image in all files");
+				long offset0 = 0;
+				boolean differentOffsets = false;
+				for (int i = 0; i < list.length; i++) {
+					try {
+						TiffDecoderExtension tde = new TiffDecoderExtension(directory, list[i]);
+						fi = tde.getFirstIFD();
+						if (fi == null) {
+							IJ.showMessage("Tiff file checking", "Could not open " + directory + list[i]);
+						}
+					} catch (IOException ex) {
+						IJ.showMessage("File Checking", ex.toString());
+						return null;
 					}
-				} catch (IOException ex) {
-					IJ.showMessage("File Checking", ex.toString());
-					return null;
+					if (i == 0) {
+						offset0 = fi.getOffset();
+						log("File: " + list[i]);
+						log("Offset: " + fi.getOffset());
+					} else if (fi.getOffset() != offset0) {
+						log("File: " + list[i]);
+						log("Offset:" + i + ": " + fi.getOffset());
+						differentOffsets = true;
+					}
 				}
-				if (i == 0) {
-					offset0 = fi.getOffset();
-					log("File: " + list[i]);
-					log("Offset: " + fi.getOffset());
-				} else if (fi.getOffset() != offset0) {
-					log("File: " + list[i]);
-					log("Offset:" + i + ": " + fi.getOffset());
-					differentOffsets = true;
+				if (differentOffsets) {
+					log("");
+					log("There have been different offsets!");
+					log("");
+				} else {
+					log("All offsets are the same.");
 				}
 			}
-			if(differentOffsets) {
-				log("");log("There have been different offsets!");log("");
-			} else {
-				log("All offsets are the same.");
-			}
-
             log("# Analyzing IFDs from: " + list[0]);
             info = Opener.getTiffFileInfo(directory + list[0]);
 
@@ -373,8 +377,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 		//IJ.debugMode = true;
 
-        boolean MATLAB = true;
-		boolean MATLAB_EXTERNAL = false;
+        boolean MATLAB = false;
+		boolean MATLAB_EXTERNAL = true;
 		boolean OME_MIP = false;
 		boolean OME = false;
         boolean OME_drift = false;
