@@ -54,7 +54,7 @@ public class Registration implements PlugIn {
         gd = new NonBlockingGenericDialog("Registration");
         gd.addSlider("Radius center of mass x:", 0, (int) imp.getWidth() / 2, 20);
         gd.addSlider("Radius center of mass y:", 0, (int) imp.getHeight() / 2, 20);
-        gd.addSlider("Radius center of mass z:", 0, (int) imp.getNSlices() / 2, 20);
+        gd.addSlider("Radius center of mass z:", 0, (int) imp.getNSlices() / 2, 10);
         gd.addNumericField("Image loading margin factor", 2, 1);
         gd.addNumericField("Image background", 100, 0);
         gd.addNumericField("Iterations",6,0);

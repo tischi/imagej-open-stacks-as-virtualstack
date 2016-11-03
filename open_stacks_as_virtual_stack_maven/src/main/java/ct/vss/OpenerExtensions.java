@@ -14,6 +14,9 @@ import ij.gui.*;
 import ij.process.*;
 import ij.measure.*;
 import ij.*;
+import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageInputStream;
+
 
 import static ij.IJ.log;
 import static ij.IJ.runMacroFile;
@@ -69,6 +72,35 @@ class OpenerExtensions extends Opener {
     }
 
     long read(InputStream in, byte[] buffer, long pointer) {
+        int bufferSize = buffer.length;
+        int bufferCount = 0;
+        int count;
+        try {
+            while (bufferCount < bufferSize) { // fill the buffer
+                count = in.read(buffer, bufferCount, bufferSize - bufferCount);
+                if (count == -1) {
+                    if (bufferCount > 0)
+                        for (int i = bufferCount; i < bufferSize; i++) buffer[i] = 0;
+                    buffer = null;
+                    return(-1); //EOF Error
+                }
+                bufferCount += count;
+            }
+        } catch (IOException e) {
+            IJ.log("" + e);
+            buffer = null;
+            return(-1);
+        }
+        //log("read: buffer.length "+buffer.length);
+        return(pointer+(long)bufferSize);
+    }
+
+    long skip(FileImageInputStream in, long skipCount, long pointer) throws IOException {
+        in.seek(pointer+skipCount);
+        return(pointer+skipCount);
+    }
+
+    long read(FileImageInputStream in, byte[] buffer, long pointer) {
         int bufferSize = buffer.length;
         int bufferCount = 0;
         int count;
@@ -305,6 +337,11 @@ class OpenerExtensions extends Opener {
         try {
             File f = new File(fi.directory + fi.fileName);
             InputStream in = new BufferedInputStream(new FileInputStream(f));
+            //InputStream in = new FileInputStream(f);
+
+            //FileImageInputStream in = new FileImageInputStream(f);
+            //log("in.isCached() "+in.isCached());
+            //InputStream in = new FileInputStream(f);
             log("");
             for(int z=0; z<nz; z++) {
                 // skip to beginning of next crop region
