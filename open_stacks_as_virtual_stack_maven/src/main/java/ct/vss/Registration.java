@@ -32,7 +32,7 @@ public class Registration implements PlugIn {
     private final static Point3D pOnes = new Point3D(1,1,1);
     // gui variables
     int gui_t, gui_tMax, gui_bg, gui_iterations;
-    Point3D gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii;
+    Point3D gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_pCropRadii;
     Point3D[] pTracked;
     int tMinTrack=-1, tMaxTrack=-1;
 
@@ -60,16 +60,19 @@ public class Registration implements PlugIn {
 
     // todo: button: Show ROI
     public void showDialog() {
+
         gd = new NonBlockingGenericDialog("Registration");
-        gd.addSlider("Radius center of mass x:", 0, (int) imp.getWidth() / 2, 20);
-        gd.addSlider("Radius center of mass y:", 0, (int) imp.getHeight() / 2, 20);
-        gd.addSlider("Radius center of mass z:", 0, (int) imp.getNSlices() / 2, 10);
+
+        gd.addSlider("Radius center of mass x [pix]", 0, (int) imp.getWidth() / 2, 20);
+        gd.addSlider("Radius center of mass y [pix]", 0, (int) imp.getHeight() / 2, 20);
+        gd.addSlider("Radius center of mass z [pix]", 0, (int) imp.getNSlices() / 2, 10);
         gd.addNumericField("Image loading margin factor", 2, 1);
-        gd.addNumericField("Image background", 100, 0);
-        gd.addNumericField("Iterations",6,0);
-        gd.addSlider("Track until:", 1, (int) imp.getNFrames(), imp.getNFrames());
-        //gd.addStringField("File Name Contains:", "");
-        //((Label)theLabel).setText(""+imp.getTitle());
+        gd.addNumericField("Image background value", 100, 0);
+        gd.addNumericField("Center of mass iterations",6,0);
+        gd.addSlider("Track until [frame]:", 1, (int) imp.getNFrames(), imp.getNFrames());
+        gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
+        gd.addNumericField("Track cropping margin factor", 4, 1);
+
         Button btCorrectCurrent = new Button("Correct");
         btCorrectCurrent.addActionListener(new ActionListener() {
             @Override
@@ -125,14 +128,16 @@ public class Registration implements PlugIn {
                     FileInfo[][] infos = vss.getFileInfos();
                     //Point3D[] pos = new Point3D[tMaxTrack-tMinTrack];
                     //System.arraycopy(pTracked, tMinTrack, pos, 0, tMaxTrack-tMinTrack);
-                    ImagePlus impCropped = OpenStacksAsVirtualStack.openCropped(infos, pTracked, gui_pStackRadii, tMinTrack, tMaxTrack);
+
+                    ImagePlus impCropped = OpenStacksAsVirtualStack.openCropped(infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
                     impCropped.show();
+                    impCropped.setPosition(0, (int)(impCropped.getNSlices()/2+0.5), 0);
+                    impCropped.resetDisplayRange();
                 }
             }
         });
 
 
-        gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
         final Scrollbar sbCurrentFrame = (Scrollbar) gd.getSliders().get(4);
         sbCurrentFrame.addAdjustmentListener(new AdjustmentListener() {
             @Override
@@ -147,7 +152,7 @@ public class Registration implements PlugIn {
         GridBagLayout bgbl = new GridBagLayout();
         buttons.setLayout(bgbl);
         GridBagConstraints bgbc = new GridBagConstraints();
-        bgbc.anchor = GridBagConstraints.WEST;
+        bgbc.anchor = GridBagConstraints.EAST;
 
         bgbc.insets = new Insets(0,0,0,5);
         bgbl.setConstraints(btSaveTrack, bgbc);
@@ -165,12 +170,30 @@ public class Registration implements PlugIn {
         bgbl.setConstraints(btCorrectCurrent,bgbc);
         buttons.add(btCorrectCurrent);
 
-        gd.addPanel(buttons,GridBagConstraints.WEST,new Insets(0,0,0,5));
+        gd.addPanel(buttons,GridBagConstraints.EAST,new Insets(5,5,5,5));
         bgbl = (GridBagLayout)gd.getLayout();
-        bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 1;
+        bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 0;
         bgbl.setConstraints(buttons,bgbc);
 
+        // gd location
+        int gdX = (int) imp.getWindow().getLocationOnScreen().getX() + imp.getWindow().getWidth() + 10;
+        int gdY = (int) imp.getWindow().getLocationOnScreen().getY() + 30;
+        gd.centerDialog(false);
+        gd.setLocation(gdX, gdY);
+
+        gd.getHeight();
+
+        // log window location
+        log("# Registration");
+        Window lw = WindowManager.getFrame("Log");
+        if (lw!=null) {
+            lw.setLocation(gdX, gdY+400);
+            lw.setSize(600, 300);
+        }
+
         gd.showDialog();
+
+
     }
 
     /*
@@ -228,6 +251,19 @@ public class Registration implements PlugIn {
 
     public boolean updateGuiVariables() {
 
+
+        /*
+        gd.addSlider("Radius center of mass x [pix]", 0, (int) imp.getWidth() / 2, 20);
+        gd.addSlider("Radius center of mass y [pix]", 0, (int) imp.getHeight() / 2, 20);
+        gd.addSlider("Radius center of mass z [pix]", 0, (int) imp.getNSlices() / 2, 10);
+        gd.addNumericField("Image loading margin factor", 2, 1);
+        gd.addNumericField("Image background value", 100, 0);
+        gd.addNumericField("Center of mass iterations",6,0);
+        gd.addSlider("Track until [frame]:", 1, (int) imp.getNFrames(), imp.getNFrames());
+        gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
+        gd.addNumericField("Track cropping margin factor", 4, 1);
+        */
+
         Roi roi = imp.getRoi();
 
         if ((roi != null) && (roi.getPolygon().npoints == 1)) {
@@ -246,8 +282,12 @@ public class Registration implements PlugIn {
             gui_bg = new Integer(getTextFieldTxt(gd, 4));
             gui_iterations = new Integer(getTextFieldTxt(gd, 5));
             gui_tMax = (new Integer(getTextFieldTxt(gd, 6))) - 1;
+
+            double marginFactorCrop = new Double(getTextFieldTxt(gd, 8));
+
             gui_pCenterOfMassRadii = new Point3D(rx, ry, rz);
             gui_pStackRadii = gui_pCenterOfMassRadii.multiply(marginFactor);
+            gui_pCropRadii = gui_pCenterOfMassRadii.multiply(marginFactorCrop);
             gui_pStackCenter = new Point3D(x, y, z);
 
             return(true);
@@ -275,7 +315,7 @@ public class Registration implements PlugIn {
 
         for (int it = t; it <= tMax; it++) {
 
-            log("track3D: Analzying time-point "+it);
+            log("### track3D: Analzying time-point "+it);
 
             // get stack, ensuring that extracted stack is within bounds
             pStackCenter = curatePosition(pStackCenter, pStackRadii);
@@ -293,7 +333,10 @@ public class Registration implements PlugIn {
             // compute offset to zero-based center of stack
             pOffset = pLocalCenter.subtract(pStackRadii);
             //pOffset = pOffset.subtract(pOnes);
-            log("  shift: "+pOffset.toString());
+            log("  detected shift [pixel]:"+
+                    " x:"+String.format("%.2g%n", pOffset.getX())+
+                    " y:"+String.format("%.2g%n", pOffset.getY())+
+                    " z:"+String.format("%.2g%n", pOffset.getZ()));
 
             // shift the global position of this stack and store to return array
             // todo:

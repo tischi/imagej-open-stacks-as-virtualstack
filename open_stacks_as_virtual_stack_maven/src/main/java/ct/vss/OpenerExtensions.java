@@ -240,8 +240,10 @@ class OpenerExtensions extends Opener {
         //log("z,nz,x,nx,y,ny: " + z +","+ nz +","+ x +","+ nx +","+ y +","+ ny);
         //log("info.length: " + info.length);
 
-        if (z<0 || z>info.length)
-            throw new IllegalArgumentException("z="+z+" is out of range");
+        if (z<0 || z>info.length) {
+            IJ.showMessage("z=" + z + " is out of range. Please reduce your z-range.");
+            throw new IllegalArgumentException("z=" + z + " is out of range");
+        }
         // do the same for nx and ny and so on
 
         FileInfo[] infoModified = new FileInfo[nz];
@@ -341,7 +343,6 @@ class OpenerExtensions extends Opener {
             //FileInputStream in = new FileInputStream(f);
             //FileImageInputStream in = new FileImageInputStream(f);
 
-            log("");
             for(int z=0; z<nz; z++) {
                 // skip to beginning of next crop region
                 //log("Skipping from: "+pointer);
