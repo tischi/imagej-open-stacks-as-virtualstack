@@ -6,16 +6,25 @@ import ij.io.FileInfo;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
 import ij.plugin.Filters3D;
+
+import static ij.IJ.createImage;
 import static ij.IJ.log;
 import ij.plugin.frame.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
+
 import ij.*;
 import ij.plugin.*;
 import ij.process.*;
 import ij.gui.*;
 import ij.measure.*;
+
+import javax.swing.*;
+import java.io.IOException;
+import java.net.URL;
+import java.net.MalformedURLException;
+
 
 /**
  * Created by tischi on 31/10/16.
@@ -55,7 +64,9 @@ public class Registration implements PlugIn {
         }
         this.vss = vss;
         this.pTracked = new Point3D[vss.getNStacks()];
+
         showDialog();
+
     }
 
     // todo: button: Show ROI
@@ -187,12 +198,20 @@ public class Registration implements PlugIn {
         log("# Registration");
         Window lw = WindowManager.getFrame("Log");
         if (lw!=null) {
-            lw.setLocation(gdX, gdY+400);
+            lw.setLocation(gdX, gdY+450);
             lw.setSize(600, 300);
         }
 
-        gd.showDialog();
+        // set iconImage
+        ClassLoader classLoader = getClass().getClassLoader();
+        ImagePlus impIcon = IJ.openImage(classLoader.getResource("flower.gif").getFile());
+        if(impIcon==null) log("Could not open icon.");
+        else log("sss "+impIcon.getTitle());
+        if(impIcon!=null) gd.addImage(impIcon);
 
+
+        //gd.setForeground(Color.white);
+        gd.showDialog();
 
     }
 
