@@ -209,6 +209,7 @@ public class Registration implements PlugIn {
             lw.setSize(600, 300);
         }
 
+        // add logging checkbox
         final Checkbox cbLogging = new Checkbox("Verbose logging", false);
         cbLogging.addItemListener(new ItemListener() {
             @Override
@@ -216,7 +217,23 @@ public class Registration implements PlugIn {
                 IJ.debugMode = cbLogging.getState();
             }
         });
-        gd.add(cbLogging);
+
+        final Panel panel0 = new Panel();
+        GridBagLayout gbl0 = new GridBagLayout();
+        GridBagConstraints gbc0 = new GridBagConstraints();
+        panel0.setLayout(gbl0);
+        gbc0.anchor = GridBagConstraints.EAST;
+
+        gbc0.insets = new Insets(0,0,0,5);
+        gbl0.setConstraints(cbLogging, gbc0);
+        panel0.add(cbLogging);
+
+        gd.addPanel(panel0,GridBagConstraints.EAST,new Insets(5,5,5,5));
+        //bgbl = (GridBagLayout)gd.getLayout();
+        //bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 0;
+        //bgbl.setConstraints(buttons,bgbc);
+
+        //gd.add(cbLogging);
 
         gd.addHelp("https://github.com/tischi/imagej-open-stacks-as-virtualstack/blob/master/README.md");
 
