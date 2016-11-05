@@ -55,6 +55,7 @@
 		</dependency>
 	</dependencies>
 
+
 	<build>
 		<plugins>
 			<plugin>
@@ -65,9 +66,12 @@
 							<mainClass>${main-class}</mainClass>
 						</manifest>
 					</archive>
+					<finalName>OpenStacksAsVirtualStack_</finalName>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+
+
 
 </project>

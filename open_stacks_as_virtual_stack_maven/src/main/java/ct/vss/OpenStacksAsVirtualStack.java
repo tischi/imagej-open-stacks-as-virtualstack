@@ -13,359 +13,352 @@ import ij.plugin.PlugIn;
 import javafx.geometry.Point3D;
 
 import static ij.IJ.log;
+import static ij.IJ.open;
 
 /** Opens a folder of stacks as a virtual stack. */
 public class OpenStacksAsVirtualStack implements PlugIn {
 
-	private static boolean grayscale;
-	private static double scale = 100.0;
-	private int n=0, start=0, increment=0;
-	private String filter;
-	private String info1;
-	private String directory;
-	private String fileAnalysisMethod; // "Tiff: use IDFs of first file for all"
+    private static boolean grayscale;
+    private static double scale = 100.0;
+    private int n, start, increment;
+    private String filter;
+    private String info1;
+    private String directory;
+    private String[] list;
+    private String openingMethod; // tiffUseIFDsFirstFile;
 
-	public void run(String arg) {
-		this.directory = IJ.getDirectory("Select a Directory");
-		if (directory == null)
-			return;
-		//Macro.setOptions(null); // Prevents later use of OpenDialog from reopening the same file
-		//IJ.register(Open_Stacks_As_VirtualStack.class);
-		ImagePlus imp = open(directory, "", 0);
-		imp.show();
-	}
 
     public OpenStacksAsVirtualStack() {
-        // constructor
+        // empty constructor for opening from FileInfo[]
+    }
+
+    public OpenStacksAsVirtualStack(String directory, String filter, int increment, int n, String openingMethod) {
+        this.directory = directory;
+        this.filter = filter;
+        this.increment = increment;
+        this.n = n; // set = -1 if open all
+        this.list = getFilesInFolder(directory);
+        this.openingMethod = openingMethod;
+        // constructor for opening from directory
+    }
+
+    public void run(String arg) {
+        this.directory = IJ.getDirectory("Select a Directory");
+        if (directory == null)
+            return;
+        //Macro.setOptions(null); // Prevents later use of OpenDialog from reopening the same file
+        //IJ.register(Open_Stacks_As_VirtualStack.class);
+
+        this.list = getFilesInFolder(directory);
+        if (!showDialog(list)) return;
+
+        // todo: add this to gui
+        this.openingMethod = "tiffUseIFDsFirstFile";
+        ImagePlus imp = openFromDirectory();
+        imp.show();
+
+
+    }
+
+    boolean showDialog(String[] list) {
+        int fileCount = list.length;
+        VirtualOpenerDialog gd = new VirtualOpenerDialog("Sequence opening options", list);
+        gd.addNumericField("Number of Stacks:", fileCount, 0);
+        gd.addNumericField("Starting Stack:", 1, 0);
+        gd.addNumericField("Increment:", 1, 0);
+        gd.addStringField("File Name Contains:", "");
+        gd.showDialog();
+        if (gd.wasCanceled())
+            return false;
+
+        // set global variables
+        n = (int) gd.getNextNumber();
+        start = (int) gd.getNextNumber();
+        increment = (int) gd.getNextNumber();
+        if (increment < 1)
+            increment = 1;
+        filter = gd.getNextString();
+        return true;
+    }
+
+    String[] sortFileList(String[] rawlist) {
+        int count = 0;
+        for (int i = 0; i < rawlist.length; i++) {
+            String name = rawlist[i];
+            if (name.startsWith(".") || name.equals("Thumbs.db") || name.endsWith(".txt"))
+                rawlist[i] = null;
+            else
+                count++;
+        }
+        if (count == 0) return null;
+        String[] list = rawlist;
+        if (count < rawlist.length) {
+            list = new String[count];
+            int index = 0;
+            for (int i = 0; i < rawlist.length; i++) {
+                if (rawlist[i] != null)
+                    list[index++] = rawlist[i];
+            }
+        }
+        int listLength = list.length;
+        boolean allSameLength = true;
+        int len0 = list[0].length();
+        for (int i = 0; i < listLength; i++) {
+            if (list[i].length() != len0) {
+                allSameLength = false;
+                break;
+            }
+        }
+        if (allSameLength) {
+            ij.util.StringSorter.sort(list);
+            return list;
+        }
+        int maxDigits = 15;
+        String[] list2 = null;
+        char ch;
+        for (int i = 0; i < listLength; i++) {
+            int len = list[i].length();
+            String num = "";
+            for (int j = 0; j < len; j++) {
+                ch = list[i].charAt(j);
+                if (ch >= 48 && ch <= 57) num += ch;
+            }
+            if (list2 == null) list2 = new String[listLength];
+            if (num.length() == 0) num = "aaaaaa";
+            num = "000000000000000" + num; // prepend maxDigits leading zeroes
+            num = num.substring(num.length() - maxDigits);
+            list2[i] = num + list[i];
+        }
+        if (list2 != null) {
+            ij.util.StringSorter.sort(list2);
+            for (int i = 0; i < listLength; i++)
+                list2[i] = list2[i].substring(maxDigits);
+            return list2;
+        } else {
+            ij.util.StringSorter.sort(list);
+            return list;
+        }
+    }
+
+    String[] getFilesInFolder(String directory) {
+        log("");
+        log("# Finding files in folder: " + directory);
+        // todo: can getting the file-list be faster?
+        String[] list = new File(directory).list();
+        if (list == null || list.length == 0)
+            return null;
+        log("Number of files: " + list.length);
+        list = this.sortFileList(list);
+        if (list == null) return null;
+        else return (list);
     }
 
 
-    public static ImagePlus openCropped(FileInfo[][] infos, Point3D[] pos, Point3D radii, int tMin, int tMax) {
+    public ImagePlus openFromDirectory() {
+        boolean checkOffsets = false;
+        FileInfo[] info = null;
+        FileInfo fi = null;
+        VirtualStackOfStacks stack = null;
+
+        try {
+            // loop through file list
+            int count = 0;
+            int counter = 0;
+            for (int i = start - 1; i < list.length; i++) {
+
+                // skip files that don't obey the filter
+                if (filter != null && (!list[i].contains(filter)))
+                    continue;
+                if ((counter++ % increment) != 0)
+                    continue;
+
+                count = stack.getNStacks() + 1;
+
+                if (openingMethod == "tiffUseIFDsFirstFile") {
+
+                    if (count == 1) {
+                        log("Obtaining IFDs from first file and use for all.");
+                        info = Opener.getTiffFileInfo(directory + list[i]);
+                        fi = info[0];
+                        // init stack
+                        if (stack == null) {
+                            // Collect image stack information
+                            int depth;
+                            ColorModel cm = null;
+                            if (fi.nImages > 1) {
+                                depth = fi.nImages;
+                                fi.nImages = 1;
+                            } else {
+                                depth = info.length;
+                            }
+                            // Initialise stack
+                            stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, depth));
+                        }
+                        stack.addStack(info);
+                    } else {
+                        FileInfo[] infoModified = new FileInfo[info.length];
+                        for (int j = 0; j < info.length; j++) {
+                            infoModified[j] = (FileInfo) info[j].clone();
+                            infoModified[j].fileName = list[i];
+                        }
+                        stack.addStack(infoModified);
+                    }
+                }
+
+                if(n>=0) {
+                    IJ.showProgress((double) count / n);
+                    if (count >= n)
+                        break;
+                }
+
+            }
+        } catch (OutOfMemoryError e) {
+            IJ.outOfMemory("FolderOpener");
+            if (stack != null) stack.trim();
+            //}catch(IOException e){
+            //	  e.printStackTrace();
+        }
+
+        ImagePlus impFinal = null;
+        if(stack!=null && stack.getSize()>0)
+            impFinal = makeImagePlus(stack, fi);
+        IJ.showProgress(1.0);
+        return(impFinal);
+
+    }
+
+    // todo: implement
+    public void checkFiles() {
+    /*
+    if(checkOffsets) {
+        log("# Checking offsets to first image in all files");
+        long offset0 = 0;
+        boolean differentOffsets = false;
+        for (int i = 0; i < list.length; i++) {
+            try {
+                TiffDecoderExtension tde = new TiffDecoderExtension(directory, list[i]);
+                fi = tde.getFirstIFD();
+                if (fi == null) {
+                    IJ.showMessage("Tiff file checking", "Could not open " + directory + list[i]);
+                }
+            } catch (IOException ex) {
+                IJ.showMessage("File Checking", ex.toString());
+                return null;
+            }
+            if (i == 0) {
+                offset0 = fi.getOffset();
+                log("File: " + list[i]);
+                log("Offset: " + fi.getOffset());
+            } else if (fi.getOffset() != offset0) {
+                log("File: " + list[i]);
+                log("Offset:" + i + ": " + fi.getOffset());
+                differentOffsets = true;
+            }
+        }
+        if (differentOffsets) {
+            log("");
+            log("There have been different offsets!");
+            log("");
+        } else {
+            log("All offsets are the same.");
+        }
+    }
+    log("# Analyzing IFDs from: " + list[0]);
+    info = Opener.getTiffFileInfo(directory + list[0]);
+
+    if (info == null) {
+        log("Failed to open file!");
+        return (null);
+    }
+
+    if (info[0].width==0) {
+        IJ.showMessage("File Checking", "This folder does not appear to contain only TIFF Stacks");
+        return null;
+    }
+
+    fi = info[0]; // Set first IFD as reference
+
+    if(info.length > 1) {
+        log("Number of IFDs: " + info.length);
+        log("nImages: " + info[0].nImages);
+
+        int size = 0, sizeOfFirstImage = 0, gapBetweenImages = 0, gapBetweenFirstImages = 0;
+        for (int j = 0; j < info.length-1; j++) {
+            size = info[j].width*info[j].height*info[j].getBytesPerPixel();
+            gapBetweenImages = (int) (info[j+1].getOffset() - info[j].getOffset() - size);
+            //log(""+info[j].getOffset());
+            if (j==0) {
+                gapBetweenFirstImages = gapBetweenImages;
+                sizeOfFirstImage = size;
+                log("gapBetweenImages "+ j + ": " + gapBetweenFirstImages);
+                log("image size "+ j + ": " + sizeOfFirstImage);
+            } else if (gapBetweenImages != gapBetweenFirstImages) {
+                log("gapBetweenImages " + j + ": " + gapBetweenImages);
+                log("image size "+ j + ": " + size);
+                gapBetweenFirstImages = gapBetweenImages;
+                //IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
+                //return null;
+            }
+            if (size != sizeOfFirstImage) {
+                log("Size of image 1: " + sizeOfFirstImage);
+                log("Size of image "+j+": " + size);
+                log("Gap between images: " + gapBetweenImages);
+                //IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
+                //return null;
+            }
+            //log("Size image: "+info[j].width*info[j].height*info[j].getBytesPerPixel());
+            //log("Gap between images: " + gapBetweenImages);
+        }
+        log("Size of all images: "+info[0].width*info[0].height*info[0].getBytesPerPixel());
+        log("Gap between all images: " + gapBetweenImages);
+        fi.gapBetweenImages = gapBetweenFirstImages;
+    } else {
+        log("Number of IFDs: " + info.length);
+        log("nImages: " + fi.nImages);
+        log("Image size [B]: " + fi.width * fi.height * fi.getBytesPerPixel());
+        log("gapBetweenImages: " + fi.gapBetweenImages);
+    }
+    log("File checking done.\n");
+*/
+
+
+
+}
+
+	public static ImagePlus openFromCroppedFileInfo(FileInfo[][] infos, Point3D[] pos, Point3D radii, int tMin, int tMax) {
 		Point3D size = radii.multiply(2);
 		size.add(new Point3D(1,1,1));
 		VirtualStackOfStacks stack = new VirtualStackOfStacks(size);
-        OpenerExtensions oe = new OpenerExtensions();
+		OpenerExtensions oe = new OpenerExtensions();
 
 		FileInfo[] infoModified = new FileInfo[tMax-tMin];
-        for(int it=tMin; it<=tMax; it++) {
-            infoModified = oe.cropFileInfo(infos[it],pos[it],radii);
-            stack.addStack(infoModified);
-        }
-        return(makeImagePlus(stack,infoModified[0]));
-    }
-
-    private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfo fi) {
-        double min = Double.MAX_VALUE;
-        double max = -Double.MAX_VALUE;
-        ImagePlus imp = new ImagePlus(fi.directory, stack);
-        if (imp.getType()==ImagePlus.GRAY16 || imp.getType()==ImagePlus.GRAY32)
-            imp.getProcessor().setMinAndMax(min, max);
-        imp.setFileInfo(fi); // saves FileInfo of the first image
-        //if (imp.getStackSize()==1 && info1!=null)
-        //   imp.setProperty("Info", info1);
-        int nC = 1;
-        int nZ = imp.getNSlices() / stack.getNStacks();
-        int nT = stack.getNStacks();
-        imp.setDimensions(nC, nZ, nT);
-        imp.setOpenAsHyperStack(true);
-        imp.resetDisplayRange();
-        return(imp);
-    }
-
-    public ImagePlus open(String directory, String fileAnalysisMethod, int increment) {
-		this.directory = directory;
-		this.fileAnalysisMethod = fileAnalysisMethod;
-		this.increment = increment;
-		boolean checkOffsets = false;
-        FileInfo[] info = null;
-		FileInfo[][] infos = null;
-		FileInfo fi = null;
-		VirtualStackOfStacks stack = null;
-
-		log("");
-        log("");
-        log("# Analyzing folder: "+directory);
-        String[] list = new File(directory).list();
-		if (list==null || list.length==0)
-			return null;
-        log("Number of files: " + list.length);
-        list = this.sortFileList(list);
-		if (list==null) return null;
-
-		try {
-
-			if(checkOffsets) {
-				log("# Checking offsets to first image in all files");
-				long offset0 = 0;
-				boolean differentOffsets = false;
-				for (int i = 0; i < list.length; i++) {
-					try {
-						TiffDecoderExtension tde = new TiffDecoderExtension(directory, list[i]);
-						fi = tde.getFirstIFD();
-						if (fi == null) {
-							IJ.showMessage("Tiff file checking", "Could not open " + directory + list[i]);
-						}
-					} catch (IOException ex) {
-						IJ.showMessage("File Checking", ex.toString());
-						return null;
-					}
-					if (i == 0) {
-						offset0 = fi.getOffset();
-						log("File: " + list[i]);
-						log("Offset: " + fi.getOffset());
-					} else if (fi.getOffset() != offset0) {
-						log("File: " + list[i]);
-						log("Offset:" + i + ": " + fi.getOffset());
-						differentOffsets = true;
-					}
-				}
-				if (differentOffsets) {
-					log("");
-					log("There have been different offsets!");
-					log("");
-				} else {
-					log("All offsets are the same.");
-				}
-			}
-            log("# Analyzing IFDs from: " + list[0]);
-            info = Opener.getTiffFileInfo(directory + list[0]);
-
-            if (info == null) {
-                log("Failed to open file!");
-                return (null);
-            }
-
-            if (info[0].width==0) {
-                IJ.showMessage("File Checking", "This folder does not appear to contain only TIFF Stacks");
-                return null;
-            }
-
-            fi = info[0]; // Set first IFD as reference
-
-            if(info.length > 1) {
-                log("Number of IFDs: " + info.length);
-                log("nImages: " + info[0].nImages);
-
-                int size = 0, sizeOfFirstImage = 0, gapBetweenImages = 0, gapBetweenFirstImages = 0;
-                for (int j = 0; j < info.length-1; j++) {
-                    size = info[j].width*info[j].height*info[j].getBytesPerPixel();
-                    gapBetweenImages = (int) (info[j+1].getOffset() - info[j].getOffset() - size);
-					//log(""+info[j].getOffset());
-                    if (j==0) {
-                        gapBetweenFirstImages = gapBetweenImages;
-                        sizeOfFirstImage = size;
-                        log("gapBetweenImages "+ j + ": " + gapBetweenFirstImages);
-                        log("image size "+ j + ": " + sizeOfFirstImage);
-                    } else if (gapBetweenImages != gapBetweenFirstImages) {
-                        log("gapBetweenImages " + j + ": " + gapBetweenImages);
-                        log("image size "+ j + ": " + size);
-                        gapBetweenFirstImages = gapBetweenImages;
-                        //IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
-                        //return null;
-                    }
-                    if (size != sizeOfFirstImage) {
-                        log("Size of image 1: " + sizeOfFirstImage);
-                        log("Size of image "+j+": " + size);
-                        log("Gap between images: " + gapBetweenImages);
-                        //IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
-                        //return null;
-                    }
-                    //log("Size image: "+info[j].width*info[j].height*info[j].getBytesPerPixel());
-                    //log("Gap between images: " + gapBetweenImages);
-                }
-                log("Size of all images: "+info[0].width*info[0].height*info[0].getBytesPerPixel());
-                log("Gap between all images: " + gapBetweenImages);
-                fi.gapBetweenImages = gapBetweenFirstImages;
-            } else {
-                log("Number of IFDs: " + info.length);
-                log("nImages: " + fi.nImages);
-                log("Image size [B]: " + fi.width * fi.height * fi.getBytesPerPixel());
-                log("gapBetweenImages: " + fi.gapBetweenImages);
-            }
-            log("File checking done.\n");
-
-            if (increment == 0) {  // only show user dialog if increment is not set
-                if (!showDialog(info, list))
-                    return null;
-            }
-
-            // Collect files according to filter
-            if (n<1)
-				n = list.length;
-			if (start<1 || start>list.length)
-				start = 1;
-			if (start+n-1>list.length)
-				n = list.length-start+1;
-			int filteredImages = n;
-			if (filter!=null && (filter.equals("") || filter.equals("*")))
-				filter = null;
-			if (filter!=null) {
-				filteredImages = 0;
-				for (int i=start-1; i<start-1+n; i++) {
-					if (list[i].indexOf(filter)>=0)
-						filteredImages++;
-				}
-				if (filteredImages==0) {
-					IJ.error("None of the "+n+" files contain\n the string '"+filter+"' in their name.");
-					return null;
-				}
-			}
-			n = filteredImages;
-			
-			int count = 0;
-			int counter = 0;
-
-			for (int i=start-1; i<list.length; i++) {
-				//IJ.log("Processing "+list[i]);
-				if (filter!=null && (list[i].indexOf(filter)<0))
-					continue;
-				if ((counter++%increment)!=0)
-					continue;
-				if (stack==null) {
-
-					// only opens first slice
-					//log("Obtaining additional information by opening first slice of first stack...");
-					//imp = new OpenerExtensions().openPlaneInTiffUsingGivenFileInfo(directory, list[i], 1, info);
-					//imp = new Opener().openImage(directory+list[i], 1);
-                    // Collect image stack information
-
-                    int depth;
-                    ColorModel cm = null;
-                    if( fi.nImages > 1) {
-                        depth = fi.nImages;
-                        fi.nImages = 1;
-                    }
-                    else {
-                        depth = info.length;
-                    }
-
-                    stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, depth));
-
-				}
-				count = stack.getNStacks()+1;
-
-				if (fileAnalysisMethod == "Tiff: Use IFDs of first file for all") {
-                    //log("Tiff: Use IFDs of first file for all");
-                    FileInfo[] infoModified = new FileInfo[info.length];
-                    for (int j=0; j<info.length; j++) {
-                        infoModified[j] =  (FileInfo) info[j].clone();
-                        infoModified[j].fileName = list[i];
-
-                    }
-                    stack.addStack(infoModified);
-                }
-				if (fileAnalysisMethod == "Tiff: Load IFDs of all files") {
-                    //log("Tiff: Load IFDs of all files");
-					info = Opener.getTiffFileInfo(directory + list[i]);
-                    stack.addStack(info);
-                }
-
-				IJ.showProgress((double) count / n);
-				if (count>=n)
-					break;
-
-			}
-		} catch(OutOfMemoryError e) {
-			IJ.outOfMemory("FolderOpener");
-			if (stack!=null) stack.trim();
-		//}catch(IOException e){
-		//	  e.printStackTrace();
+		for(int it=tMin; it<=tMax; it++) {
+			infoModified = oe.cropFileInfo(infos[it],pos[it],radii);
+			stack.addStack(infoModified);
 		}
-        ImagePlus impFinal = null;
-		if (stack!=null && stack.getSize()>0) {
-            impFinal = makeImagePlus(stack, fi);
-		}
-		IJ.showProgress(1.0);
-        return(impFinal);
-	}
-	
-	boolean showDialog(FileInfo[] info, String[] list) {
-		int fileCount = list.length;
-		VirtualOpenerDialog gd = new VirtualOpenerDialog("Sequence Options", info, list);
-		gd.addNumericField("Number of Stacks:", fileCount, 0);
-		gd.addNumericField("Starting Stack:", 1, 0);
-		gd.addNumericField("Increment:", 1, 0);
-		gd.addStringField("File Name Contains:", "");
-		gd.addMessage("10000 x 10000 x 1000 (100.3MB)");
-		gd.showDialog();
-		if (gd.wasCanceled())
-			return false;
-
-		n = (int)gd.getNextNumber();
-		start = (int)gd.getNextNumber();
-		increment = (int)gd.getNextNumber();
-		if (increment<1)
-			increment = 1;
-		filter = gd.getNextString();
-		return true;
+		return(makeImagePlus(stack,infoModified[0]));
 	}
 
-	String[] sortFileList(String[] rawlist) {
-		int count = 0;
-		for (int i=0; i< rawlist.length; i++) {
-			String name = rawlist[i];
-			if (name.startsWith(".")||name.equals("Thumbs.db")||name.endsWith(".txt"))
-				rawlist[i] = null;
-			else
-				count++;
-		}
-		if (count==0) return null;
-		String[] list = rawlist;
-		if (count<rawlist.length) {
-			list = new String[count];
-			int index = 0;
-			for (int i=0; i< rawlist.length; i++) {
-				if (rawlist[i]!=null)
-					list[index++] = rawlist[i];
-			}
-		}
-		int listLength = list.length;
-		boolean allSameLength = true;
-		int len0 = list[0].length();
-		for (int i=0; i<listLength; i++) {
-			if (list[i].length()!=len0) {
-				allSameLength = false;
-				break;
-			}
-		}
-		if (allSameLength)
-			{ij.util.StringSorter.sort(list); return list;}
-		int maxDigits = 15;		
-		String[] list2 = null;	
-		char ch;	
-		for (int i=0; i<listLength; i++) {
-			int len = list[i].length();
-			String num = "";
-			for (int j=0; j<len; j++) {
-				ch = list[i].charAt(j);
-				if (ch>=48&&ch<=57) num += ch;
-			}
-			if (list2==null) list2 = new String[listLength];
-			if (num.length()==0) num = "aaaaaa";
-			num = "000000000000000" + num; // prepend maxDigits leading zeroes
-			num = num.substring(num.length()-maxDigits);
-			list2[i] = num + list[i];
-		}
-		if (list2!=null) {
-			ij.util.StringSorter.sort(list2);
-			for (int i=0; i<listLength; i++)
-				list2[i] = list2[i].substring(maxDigits);
-			return list2;	
-		} else {
-			ij.util.StringSorter.sort(list);
-			return list;   
-		}	
+	private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfo fi) {
+		double min = Double.MAX_VALUE;
+		double max = -Double.MAX_VALUE;
+		ImagePlus imp = new ImagePlus(fi.directory, stack);
+		if (imp.getType()==ImagePlus.GRAY16 || imp.getType()==ImagePlus.GRAY32)
+			imp.getProcessor().setMinAndMax(min, max);
+		imp.setFileInfo(fi); // saves FileInfo of the first image
+		//if (imp.getStackSize()==1 && info1!=null)
+		//   imp.setProperty("Info", info1);
+		int nC = 1;
+		int nZ = imp.getNSlices() / stack.getNStacks();
+		int nT = stack.getNStacks();
+		imp.setDimensions(nC, nZ, nT);
+		imp.setOpenAsHyperStack(true);
+		imp.resetDisplayRange();
+		return(imp);
 	}
 
-	/**
-	 * Main method for debugging.
-	 *
-	 * For debugging, it is convenient to have a method that starts ImageJ, loads an
-	 * image and calls the plugin, e.g. after setting breakpoints.
-	 *
-	 * @param args unused
-	 */
-	public static void main(String[] args) {
+	// main method for debugging
+    public static void main(String[] args) {
 		// set the plugins.dir property to make the plugin appear in the Plugins menu
 		Class<?> clazz = OpenStacksAsVirtualStack.class;
 		String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
@@ -384,26 +377,27 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		boolean OME = false;
         boolean OME_drift = false;
 
-        OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
+        OpenStacksAsVirtualStack ovs = null;
 
-
-		if (MATLAB_EXTERNAL) {
-			ImagePlus imp = ovs.open("/Volumes/My Passport/Res_13/", "Tiff: Use IFDs of first file for all", 1);
-			imp.show();
-			Registration register = new Registration(imp);
-			register.showDialog();
-
-		}
+        new OpenStacksAsVirtualStack();
 
         if (MATLAB) {
-            ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/MATLABtiff/", "Tiff: Use IFDs of first file for all", 1);
+            ovs = new OpenStacksAsVirtualStack("/Users/tischi/Desktop/example-data/MATLABtiff/", null, 1, -1, "tiffUseIFDsFirstFile");
+            ImagePlus imp = ovs.openFromDirectory();
             imp.show();
 			Registration register = new Registration(imp);
 			register.showDialog();
 
 		}
 
+        /*
+        if (MATLAB_EXTERNAL) {
+            ImagePlus imp = ovs.open("/Volumes/My Passport/Res_13/", "Tiff: Use IFDs of first file for all", 1);
+            imp.show();
+            Registration register = new Registration(imp);
+            register.showDialog();
 
+        }
         if(OME) {
             // intialise whole data set
             ImagePlus imp = ovs.open("/Users/tischi/Desktop/example-data/T88200-OMEtiff/", "Tiff: Use IFDs of first file for all", 1);
@@ -448,6 +442,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             imp.show();
             Registration register = new Registration(imp);
         }
+    */
 
     }
 
@@ -456,15 +451,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 
 class VirtualOpenerDialog extends GenericDialog {
-	FileInfo[] info;
 	int fileCount;
 	boolean eightBits;
 	String saveFilter = "";
 	String[] list;
 
-	public VirtualOpenerDialog(String title, FileInfo[] info, String[] list) {
+	public VirtualOpenerDialog(String title, String[] list) {
 		super(title);
-		this.info = info;
 		this.list = list;
 		this.fileCount = list.length;
 	}
@@ -482,15 +475,6 @@ class VirtualOpenerDialog extends GenericDialog {
 	}
 
 	void setStackInfo() {
-		FileInfo fi = info[0];
-		int width = fi.width;
-		int height = fi.height;
-		int depth = 0;
-
-		if(fi.nImages>0) 
-			depth = fi.nImages;
-		else
-			depth = info.length;
 
 		int n = getNumber(numberField.elementAt(0));
 		int start = getNumber(numberField.elementAt(1));
@@ -517,7 +501,7 @@ class VirtualOpenerDialog extends GenericDialog {
 				}
 			saveFilter = filter;
 		}
-		((Label)theLabel).setText("x:"+width+" y:"+height+" z:"+depth+" t:"+n);
+		((Label)theLabel).setText("Number of files:"+n);
 	}
 
 	public int getNumber(Object field) {

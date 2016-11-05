@@ -72,8 +72,17 @@ public class Registration implements PlugIn {
     // todo: button: Show ROI
     public void showDialog() {
 
-        gd = new NonBlockingGenericDialog("Registration");
+        gd = new NonBlockingGenericDialog("Track & Crop");
 
+
+        // set iconImage
+        ClassLoader classLoader = getClass().getClassLoader();
+        ImagePlus impIcon = IJ.openImage(classLoader.getResource("logo01-61x61.jpg").getFile());
+        if(impIcon==null) log("Could not open icon.");
+        else log("sss "+impIcon.getTitle());
+        if(impIcon!=null) gd.addImage(impIcon);
+
+        gd.addMessage("");
         gd.addSlider("Radius center of mass x [pix]", 0, (int) imp.getWidth() / 2, 20);
         gd.addSlider("Radius center of mass y [pix]", 0, (int) imp.getHeight() / 2, 20);
         gd.addSlider("Radius center of mass z [pix]", 0, (int) imp.getNSlices() / 2, 10);
@@ -139,8 +148,7 @@ public class Registration implements PlugIn {
                     FileInfo[][] infos = vss.getFileInfos();
                     //Point3D[] pos = new Point3D[tMaxTrack-tMinTrack];
                     //System.arraycopy(pTracked, tMinTrack, pos, 0, tMaxTrack-tMinTrack);
-
-                    ImagePlus impCropped = OpenStacksAsVirtualStack.openCropped(infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
+                    ImagePlus impCropped = OpenStacksAsVirtualStack.openFromCroppedFileInfo(infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
                     impCropped.show();
                     impCropped.setPosition(0, (int)(impCropped.getNSlices()/2+0.5), 0);
                     impCropped.resetDisplayRange();
@@ -186,6 +194,7 @@ public class Registration implements PlugIn {
         bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 0;
         bgbl.setConstraints(buttons,bgbc);
 
+
         // gd location
         int gdX = (int) imp.getWindow().getLocationOnScreen().getX() + imp.getWindow().getWidth() + 10;
         int gdY = (int) imp.getWindow().getLocationOnScreen().getY() + 30;
@@ -202,12 +211,7 @@ public class Registration implements PlugIn {
             lw.setSize(600, 300);
         }
 
-        // set iconImage
-        ClassLoader classLoader = getClass().getClassLoader();
-        ImagePlus impIcon = IJ.openImage(classLoader.getResource("flower.gif").getFile());
-        if(impIcon==null) log("Could not open icon.");
-        else log("sss "+impIcon.getTitle());
-        if(impIcon!=null) gd.addImage(impIcon);
+        gd.addHelp("https://github.com/tischi/imagej-open-stacks-as-virtualstack/blob/master/README.md");
 
 
         //gd.setForeground(Color.white);
