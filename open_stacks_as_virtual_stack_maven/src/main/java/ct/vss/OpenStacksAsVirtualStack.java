@@ -32,9 +32,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         // empty constructor for opening from FileInfo[]
     }
 
-    public OpenStacksAsVirtualStack(String directory, String filter, int increment, int n, String openingMethod) {
+    public OpenStacksAsVirtualStack(String directory, String filter, int start, int increment, int n, String openingMethod) {
         this.directory = directory;
         this.filter = filter;
+        this.start = start;
         this.increment = increment;
         this.n = n; // set = -1 if open all
         this.list = getFilesInFolder(directory);
@@ -172,11 +173,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 if ((counter++ % increment) != 0)
                     continue;
 
-                count = stack.getNStacks() + 1;
-
                 if (openingMethod == "tiffUseIFDsFirstFile") {
 
-                    if (count == 1) {
+                    if (count == 0) {
                         log("Obtaining IFDs from first file and use for all.");
                         info = Opener.getTiffFileInfo(directory + list[i]);
                         fi = info[0];
@@ -203,11 +202,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         }
                         stack.addStack(infoModified);
                     }
+
+                    count = stack.getNStacks();
                 }
 
                 if(n>=0) {
-                    IJ.showProgress((double) count / n);
-                    if (count >= n)
+                    IJ.showProgress((double) (count+1) / n);
+                    if ((count+1) >= n)
                         break;
                 }
 
@@ -327,13 +328,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 	public static ImagePlus openFromCroppedFileInfo(FileInfo[][] infos, Point3D[] pos, Point3D radii, int tMin, int tMax) {
 		Point3D size = radii.multiply(2);
-		size.add(new Point3D(1,1,1));
+        size = size.add(new Point3D(1,1,1));
 		VirtualStackOfStacks stack = new VirtualStackOfStacks(size);
 		OpenerExtensions oe = new OpenerExtensions();
 
 		FileInfo[] infoModified = new FileInfo[tMax-tMin];
 		for(int it=tMin; it<=tMax; it++) {
-			infoModified = oe.cropFileInfo(infos[it],pos[it],radii);
+			infoModified = oe.cropFileInfo(infos[it], 1, pos[it], radii);
 			stack.addStack(infoModified);
 		}
 		return(makeImagePlus(stack,infoModified[0]));
@@ -379,10 +380,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         OpenStacksAsVirtualStack ovs = null;
 
-        new OpenStacksAsVirtualStack();
-
         if (MATLAB) {
-            ovs = new OpenStacksAsVirtualStack("/Users/tischi/Desktop/example-data/MATLABtiff/", null, 1, -1, "tiffUseIFDsFirstFile");
+            ovs = new OpenStacksAsVirtualStack("/Users/tischi/Desktop/example-data/MATLABtiff/", null, 1, 1, -1, "tiffUseIFDsFirstFile");
             ImagePlus imp = ovs.openFromDirectory();
             imp.show();
 			Registration register = new Registration(imp);

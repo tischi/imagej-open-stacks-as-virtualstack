@@ -24,6 +24,14 @@ public class VirtualStackOfStacks extends ImageStack {
     public VirtualStackOfStacks(Point3D pSize) {
         super((int)pSize.getX(), (int)pSize.getY(), null);
         this.depth = (int)pSize.getZ();
+        if(IJ.debugMode) {
+            log("VirtualStackOfStacks");
+            log("x: "+(int)pSize.getX());
+            log("y: "+(int)pSize.getY());
+            log("z: "+(int)pSize.getZ());
+
+
+        }
         this.infos = new FileInfo[INITIAL_SIZE][];
     }
 
@@ -122,13 +130,13 @@ public class VirtualStackOfStacks extends ImageStack {
         return imp.getProcessor();
     }
 
-    public ImagePlus getCroppedFrameAsImagePlus(int t, int c, Point3D p, Point3D pr) {
+    public ImagePlus getCroppedFrameAsImagePlus(int t, int c, int dz, Point3D p, Point3D pr) {
 
         //log("opening slices " + z + " to " + (z+nz-1) + " of " + path + names[t]);
         //FileInfo fi = (FileInfo) fiRef.clone(); // make a deep copy so we can savely modify it to load what we want
         //fi.directory = path;
 
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[t], p, pr);
+        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[t], dz, p, pr);
         //ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingFirstIFD(fi, z, nz, x, nx, y, ny);
 
         if (imp==null) {

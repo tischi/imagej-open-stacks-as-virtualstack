@@ -206,11 +206,14 @@ class OpenerExtensions extends Opener {
 
     public ImagePlus openTiffStackSliceUsingIFDs(FileInfo[] info, int z) {
         ImagePlus imp;
-
-        //long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         FileOpener fo = new FileOpener(info[z]);
         imp = fo.open(false);
-        //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("Whole slice opened in [ms]: " + elapsedTime);
+        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime;
+        if(IJ.debugMode) {
+            log("OpenerExtension.openTiffStackSliceUsingIFDs");
+            log("Whole slice opened in [ms]: " + elapsedTime);
+        }
 
         return imp;
     }
@@ -225,20 +228,25 @@ class OpenerExtensions extends Opener {
     }*/
 
 
-    public FileInfo[] cropFileInfo(FileInfo[] info, Point3D p, Point3D pr) {
+    public FileInfo[] cropFileInfo(FileInfo[] info, int dz, Point3D p, Point3D pr) {
         //log("OpenerExtensions.cropFileInfo:");
 
         // round the values
         int x = (int) (p.getX() - pr.getX() + 0.5);
         int y = (int) (p.getY() - pr.getY() + 0.5);
         int z = (int) (p.getZ() - pr.getZ() + 0.5);
-        int nx = (int) (2 * pr.getX() + 1.0001);
-        int ny = (int) (2 * pr.getY() + 1.0001);
-        int nz = (int) (2 * pr.getZ() + 1.0001);
+        int nx = (int) (2.0 * pr.getX() + 1.5001); // to enable evenly sized stacks
+        int ny = (int) (2.0 * pr.getY() + 1.5001);
+        int nz = (int) ((2.0 * pr.getZ() / dz + 1.5001) );
 
-        //log("filename: " + info[0].fileName);
-        //log("z,nz,x,nx,y,ny: " + z +","+ nz +","+ x +","+ nx +","+ y +","+ ny);
-        //log("info.length: " + info.length);
+        if(IJ.debugMode) {
+            log("OpenerExtension.cropFileInfo:");
+            log("filename: " + info[0].fileName);
+            log("dz: " + dz);
+            log("rx,ry,rz: " + pr.getX() + "," + pr.getY() + "," + pr.getZ());
+            log("z,nz,x,nx,y,ny: " + z + "," + nz + "," + x + "," + nx + "," + y + "," + ny);
+            //log("info.length: " + info.length);
+        }
 
         if (z<0 || z>info.length) {
             IJ.showMessage("z=" + z + " is out of range. Please reduce your z-range.");
@@ -258,22 +266,22 @@ class OpenerExtensions extends Opener {
         //addedGapBetweenImages *= fi.getBytesPerPixel();
 
         // todo check if this is slow and make faster
-        for (int iz=z; iz<(z+nz); iz++){
-            infoModified[iz-z] = (FileInfo) info[iz].clone();
+        for (int iz=z, jz=z; iz<(z+nz); iz++, jz+=dz){
+            infoModified[iz-z] = (FileInfo) info[jz].clone();
             infoModified[iz-z].nImages = 1;
             infoModified[iz-z].longOffset = infoModified[iz-z].getOffset();
-            //infoModified[iz-z].longOffset += (y*fi.width+x)*fi.getBytesPerPixel();
-            infoModified[iz-z].longOffset += (y*fi.width+x)*fi.getBytesPerPixel();
             infoModified[iz-z].offset = 0;
             infoModified[iz-z].stripLengths = new int[ny];
             infoModified[iz-z].stripOffsets = new int[ny];
             for (int i=0; i<ny; i++) {
                 infoModified[iz-z].stripLengths[i] = nx * fi.getBytesPerPixel();
-            //    infoModified[iz-z].stripOffsets[i] = (int) infoModified[iz-z].getOffset() + ((((y+i)*fi.width) + x) * fi.getBytesPerPixel());
-                infoModified[iz-z].stripOffsets[i] = (int) (i * fi.width * fi.getBytesPerPixel());
+                infoModified[iz-z].stripOffsets[i] = (int) infoModified[iz-z].getOffset() + ((((y+i)*fi.width) + x) * fi.getBytesPerPixel());
+                //infoModified[iz-z].stripOffsets[i] = (int) (i * fi.width * fi.getBytesPerPixel());
             }
             infoModified[iz-z].height = ny;
             infoModified[iz-z].width = nx;
+            // next line is necessary for the IJ TiffReader, should not be
+            infoModified[iz-z].longOffset += (y*fi.width+x)*fi.getBytesPerPixel();
             //log(""+(iz-z)+" "+info[iz].getOffset());
             //log(""+infoModified[iz-z].stripOffsets[0]);
             //log(""+(iz-z)+" "+infoModified[iz-z].getOffset());
@@ -285,7 +293,7 @@ class OpenerExtensions extends Opener {
         return(infoModified);
     }
 
-    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] infoAll, Point3D p, Point3D pr) {
+    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] infoAll, int dz, Point3D p, Point3D pr) {
         //log("# openCroppedTiffStackUsingIFDs");
         long startTime, stopTime, elapsedTime;
 
@@ -300,12 +308,10 @@ class OpenerExtensions extends Opener {
 
         int imByteWidth = infoAll[0].width*infoAll[0].getBytesPerPixel();
 
-        FileInfo[] info = cropFileInfo(infoAll, p, pr);
-
+        FileInfo[] info = cropFileInfo(infoAll, dz, p, pr);
 
         FileOpener fo;
         FileInfo fi = info[0];
-
 
         // Read via one input stream
 
@@ -344,34 +350,24 @@ class OpenerExtensions extends Opener {
             //FileImageInputStream in = new FileImageInputStream(f);
 
             for(int z=0; z<nz; z++) {
-                // skip to beginning of next crop region
-                //log("Skipping from: "+pointer);
-                //log("Skipping to: "+info[z].getOffset());
-                startTime = System.currentTimeMillis();
-                pointer = skip(in, info[z].getOffset() - pointer, pointer);
-                skippingTime += (System.currentTimeMillis()-startTime);
-
-                /*
-                startTime = System.currentTimeMillis();
-                pointer = read(in, buffer, pointer);
-                bufferReadingTime += (System.currentTimeMillis()-startTime);
-                */
 
                 for (int y = 0; y < ny; y++) {
 
+                    // skip to strip
+                    startTime = System.currentTimeMillis();
+                    pointer = skip(in, info[z].stripOffsets[y] - pointer, pointer);
+                    skippingTime += (System.currentTimeMillis()-startTime);
+
+                    // read strip
                     startTime = System.currentTimeMillis();
                     pointer = read(in, strip, pointer);
                     readingTime += (System.currentTimeMillis()-startTime);
 
+                    // store strip in pixel array
                     startTime = System.currentTimeMillis();
                     pixelCount = y * stripPixelLength;
                     pixels[z] = setShortPixels(fi, pixels[z], pixelCount, strip);
                     settingPixelsTime += (System.currentTimeMillis()-startTime);
-
-                    startTime = System.currentTimeMillis();
-                    pointer = skip(in, imByteWidth - stripByteLength, pointer);
-                    skippingTime += (System.currentTimeMillis()-startTime);
-
 
                 }
 
@@ -389,13 +385,19 @@ class OpenerExtensions extends Opener {
         } catch (Exception e) {
             IJ.handleException(e);
         }
-        //log("Skipping [ms]: " + skippingTime);
-        //log("Reading [ms]: " + readingTime);
-        //log("BufferReading [ms]: " + bufferReadingTime);
-        //log("Setting pixels [ms]: " + settingPixelsTime);
-        //log("Setting to stack [ms]: " + settingStackTime);
-        //log("Input stream total [ms]: " + (System.currentTimeMillis()-startTimeInputStream));
+
+        if(IJ.debugMode) {
+            log("OpenerExtensions.openCroppedTiffStackUsingIFDs");
+            log("Skipping [ms]: " + skippingTime);
+            log("Reading [ms]: " + readingTime);
+            //log("BufferReading [ms]: " + bufferReadingTime);
+            log("Setting pixels [ms]: " + settingPixelsTime);
+            log("Setting stack [ms]: " + settingStackTime);
+            //log("Input stream total [ms]: " + (System.currentTimeMillis()-startTimeInputStream));
+        }
+
         ImagePlus impStream = new ImagePlus("One stream",stackStream);
+
         //impStream.show();
 
         // Loop via multiple input streams
