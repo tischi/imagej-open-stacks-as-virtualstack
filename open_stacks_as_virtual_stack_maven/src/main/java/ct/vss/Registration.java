@@ -52,7 +52,7 @@ public class Registration implements PlugIn {
             throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
         }
         this.vss = vss;
-        this.pTracked = new Point3D[vss.getNStacks()];
+        this.pTracked = new Point3D[imp.getNFrames()];
     }
 
     public void run(String arg) {
@@ -62,7 +62,7 @@ public class Registration implements PlugIn {
             throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
         }
         this.vss = vss;
-        this.pTracked = new Point3D[vss.getNStacks()];
+        this.pTracked = new Point3D[imp.getNFrames()];
 
         showDialog();
 
@@ -96,23 +96,13 @@ public class Registration implements PlugIn {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                // temporarily change the "Track until" to track only current frame
-                Scrollbar sb = (Scrollbar) gd.getSliders().get(5);
-                TextField tf = (TextField) gd.getNumericFields().get(8);
-                int tMaxOld = sb.getValue();
-                sb.setValue(imp.getT());
-                tf.setText(""+imp.getT());
-
                 if (updateGuiVariables()) {
                     // only 'track' current position
-                    pTracked = track3D(gui_t, gui_tMax, gui_dt, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                    // todo: does it only set one point? also at t=0?
+                    track3D(gui_t, gui_t, 1, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
                     //addTrackAsOverlay();
                     showTrackOnFrame();
                 }
-
-                // reset "Track until"
-                sb.setValue(tMaxOld);
-                tf.setText(""+tMaxOld);
 
             }
         });
@@ -123,13 +113,13 @@ public class Registration implements PlugIn {
                 if (updateGuiVariables()) {
                     pTracked = null;
                     tMinTrack=gui_t; tMaxTrack=gui_tMax;
-                    pTracked = track3D(gui_t, gui_tMax, gui_dt, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                    track3D(gui_t, gui_tMax, gui_dt, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
                     //addTrackAsOverlay();
                     showTrackOnFrame();
                 }
             }
         });
-        Button btSaveTrack = new Button("Save Coordinates");
+        Button btSaveTrack = new Button("Save coordinates");
         btSaveTrack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -138,7 +128,7 @@ public class Registration implements PlugIn {
                 }
             }
         });
-        Button btCropTrack = new Button("Crop Track");
+        Button btCropTrack = new Button("Crop track");
         btCropTrack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -246,6 +236,9 @@ public class Registration implements PlugIn {
     public void showTrackOnFrame() {
         Point3D pCenter = pTracked[imp.getT() - 1];
         if (pCenter != null) {
+            if(IJ.debugMode) {
+                log("Registration.showTrackOnFrame pTracked: "+pCenter.toString());
+            }
             //log("showTrackOnFrame: pCenter: "+pCenter.toString());
             int rx = (int) gui_pStackRadii.getX();
             int ry = (int) gui_pStackRadii.getY();
@@ -263,6 +256,9 @@ public class Registration implements PlugIn {
             o.setLabelColor(Color.blue);
             imp.setOverlay(o);
         } else {
+            if(IJ.debugMode) {
+                log("Registration.showTrackOnFrame: No track available for this time point");
+            }
             Overlay o = new Overlay();
             imp.setOverlay(o);
         }
@@ -330,8 +326,7 @@ public class Registration implements PlugIn {
         return(tf.getText());
     }
 
-    public Point3D[] track3D(int t, int tMax, int dt, int dz, Point3D pStackCenter, Point3D pStackRadii, Point3D pCenterOfMassRadii, int bg, int iterations) {
-        Point3D[] points = new Point3D[vss.nSlices];
+    public void track3D(int t, int tMax, int dt, int dz, Point3D pStackCenter, Point3D pStackRadii, Point3D pCenterOfMassRadii, int bg, int iterations) {
         ImageStack stack;
         Point3D pOffset, pLocalCenter;
         long startTime, stopTime, elapsedTime;
@@ -370,7 +365,7 @@ public class Registration implements PlugIn {
 
             // update time-points, using linear interpolation
             for(int j=0; j<dt; j++) {
-                points[it+j] = pStackCenter.add(pOffset.multiply((j+1.0)/dt));
+                pTracked[it+j] = pStackCenter.add(pOffset.multiply((j+1.0)/dt));
             }
 
             // update next center using Brownian motion model (position of next is same as this)
@@ -384,7 +379,7 @@ public class Registration implements PlugIn {
 
         log("Tracking done.");
         log("");
-        return(points);
+        return;
     }
 
     private ImageStack getImageStack(int it, int dz, Point3D p, Point3D pr) {
