@@ -56,9 +56,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //IJ.register(Open_Stacks_As_VirtualStack.class);
 
         this.list = getFilesInFolder(directory);
-        list = sortFileList(list);
-        log("# Files:");
-        for(String item : list) log("" + item);
         if (!showDialog(list)) return;
 
         // todo: add this to gui
@@ -77,7 +74,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         gd.addNumericField("Increment:", 1, 0);
         gd.addStringField("File name contains:", "");
         gd.addNumericField("Number of channels:", 1, 0);
-        String[] fileOrders = {"xyzct", "xyztc"};
+        String[] fileOrders = {"ct", "tc"};
         gd.addChoice("File order:", fileOrders, "ct");
 
         gd.showDialog();
@@ -164,6 +161,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             return null;
         log("Number of files: " + list.length);
         list = this.sortFileList(list);
+        log("Sorted files:");
+        for(String item : list) log("" + item);
         if (list == null) return null;
         else return (list);
     }
@@ -204,7 +203,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                                 nSlices = info.length;
                             }
                             // Initialise stack
-                            stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), order);
+                            stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels, order);
                         }
                         stack.addStack(info);
                     } else {
@@ -346,7 +345,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         size = size.add(new Point3D(1,1,1));
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack(); // needed below to get the order (ct or tc);
         String order = vss.getOrder();
-        VirtualStackOfStacks stack = new VirtualStackOfStacks(size, order);
+        VirtualStackOfStacks stack = new VirtualStackOfStacks(size, imp.getNChannels(), order);
 		OpenerExtensions oe = new OpenerExtensions();
 
 		FileInfo[] infoModified = new FileInfo[tMax-tMin];
@@ -393,21 +392,29 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 		//Globals.verbose = true;
 
-        boolean MATLAB = true;
-		boolean MATLAB_EXTERNAL = false;
+        boolean MATLAB = false;
+        boolean Mitosis_ome = true;
+        boolean MATLAB_EXTERNAL = false;
 		boolean OME_MIP = false;
 		boolean OME = false;
         boolean OME_drift = false;
 
         OpenStacksAsVirtualStack ovs = null;
 
+
+        if (Mitosis_ome) {
+            ovs = new OpenStacksAsVirtualStack("/Users/tischi/Desktop/example-data/Mitosis-ome/", null, 1, 1, -1, 2, "tiffUseIFDsFirstFile", "tc");
+            ImagePlus imp = ovs.openFromDirectory();
+            imp.show();
+            Registration register = new Registration(imp);
+            register.showDialog();
+        }
         if (MATLAB) {
             ovs = new OpenStacksAsVirtualStack("/Users/tischi/Desktop/example-data/MATLABtiff/", null, 1, 1, -1, 1, "tiffUseIFDsFirstFile", "xyzct");
             ImagePlus imp = ovs.openFromDirectory();
             imp.show();
 			Registration register = new Registration(imp);
 			register.showDialog();
-
 		}
 
         /*

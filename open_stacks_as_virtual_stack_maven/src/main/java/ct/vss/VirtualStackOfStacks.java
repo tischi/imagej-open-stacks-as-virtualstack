@@ -17,16 +17,18 @@ import javafx.geometry.Point3D;
 public class VirtualStackOfStacks extends ImageStack {
 
     static final int INITIAL_SIZE = 100;
-    int depth;
     int nSlices;
     int nStacks;
-    String order; // "xyzct", "xyztc"
+    int nZ, nC, nT;
+
+    String order; // "ct", "tc"
     protected FileInfo[][] infos;
 
     /** Creates a new, empty virtual stack. */
-    public VirtualStackOfStacks(Point3D pSize, String order) {
+    public VirtualStackOfStacks(Point3D pSize, int nC, String order) {
         super((int)pSize.getX(), (int)pSize.getY(), null);
-        this.depth = (int)pSize.getZ();
+        this.nZ = (int)pSize.getZ();
+        this.nC = nC;
         this.order = order;
         if(Globals.verbose) {
             log("VirtualStackOfStacks");
@@ -45,8 +47,9 @@ public class VirtualStackOfStacks extends ImageStack {
     public void addStack(FileInfo[] info) {
         if (info==null)
             throw new IllegalArgumentException("'info' is null!");
-        nSlices = nSlices + depth;
+        nSlices = nSlices + nZ;
         nStacks ++;
+        nT = (int) (nStacks/nC);
         if (nStacks==infos.length) {
             FileInfo[][] tmp_infos = new FileInfo[nStacks*2][];
             System.arraycopy(infos, 0, tmp_infos, 0, nStacks);
@@ -106,36 +109,42 @@ public class VirtualStackOfStacks extends ImageStack {
     /** Returns an ImageProcessor for the specified slice,
      were 1<=n<=nslices. Returns null if the stack is empty.
      */
+    /* the n is computed by IJ assuming the czt ordering
+    n = ( c + z*nC + t*nZ*nC ) + 1
+    */
     public ImageProcessor getProcessor(int n) {
-        int iFile, z;
-        // get z-th slice of a tif stack
-        iFile = (int) (n-1) / depth;
-        z = (n-1) - iFile * depth; // zero-based in my opener functions
+        n -= 1;
+
+        int c = (n % nC);
+        int z = ((n-c)%(nZ*nC))/nC;
+        int t = (n-c-z*nC)/(nZ*nC);
+
+        int iFile = 0;
+        if(order=="tc") {
+            iFile = t + (nT*c);
+        }
+        if(order=="ct") {
+            iFile = (t*nC) + c;
+        }
+
         if(Globals.verbose) {
             log("# VirtualStackOfStacks.getProcessor");
+            log("order: "+order);
+            log("nZ: "+nZ);
+            log("nC: "+nC);
+            log("nT: "+nT);
             log("requested slice: "+n);
-            log("stack depth: "+depth);
+            log("c: "+c);
+            log("z: "+z);
+            log("t: "+t);
             log("opening iFile [zero-based]: "+iFile);
             log("opening filename: "+infos[iFile][0].fileName);
             log("opening z-slice [one-based]: "+(z+1));
         }
-        // IJ.log("requested slice: "+n);
-        //log("opening slice " + nSlice + " of " + path + names[nFile]);
-        // potentially check and adapt first offset again by loading the first IFD of this file
-        // ...
-        //log("opening slices " + z + " to " + (z+nz-1) + " of " + path + names[t]);
-        //FileInfo fi = (FileInfo) fiRef.clone(); // make a deep copy so we can savely modify it to load what we want
-        //fi.fileName = names[nFile];
-        //ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingFirstIFD(fi, z);
-        //ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[iFile], z);
+
         ImagePlus imp = new OpenerExtensions().openTiffStackSliceUsingIFDs(infos[iFile], z);
 
         if (imp==null) {
-            //int w = imp.getWidth();
-            //int h = imp.getHeight();
-            //int type = imp.getType();
-            //ColorModel cm = imp.getProcessor().getColorModel();
-        //} else {
             log("Error: loading failed!");
             return null;
         }
@@ -171,7 +180,7 @@ public class VirtualStackOfStacks extends ImageStack {
     /** Returns the file name of the Nth image. */
     public String getSliceLabel(int n) {
         int nFile;
-        nFile = (n-1) / depth;
+        nFile = (n-1) / nZ;
         return infos[nFile][0].fileName;
     }
 

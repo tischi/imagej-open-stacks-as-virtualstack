@@ -93,7 +93,7 @@ public class Registration implements PlugIn {
         gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
         gd.addSlider("Channel for tracking", 1, (int) imp.getNChannels(), 1);
 
-        Button btCorrectCurrent = new Button("Correct");
+        Button btCorrectCurrent = new Button("Locate");
         btCorrectCurrent.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
