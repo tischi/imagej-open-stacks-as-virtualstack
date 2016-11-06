@@ -40,7 +40,7 @@ public class Registration implements PlugIn {
     private static NonBlockingGenericDialog gd;
     private final static Point3D pOnes = new Point3D(1,1,1);
     // gui variables
-    int gui_t, gui_tMax, gui_bg, gui_iterations, gui_dt, gui_dz;
+    int gui_c, gui_t, gui_tMax, gui_bg, gui_iterations, gui_dt, gui_dz;
     Point3D gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_pCropRadii;
     Point3D[] pTracked;
     int tMinTrack=-1, tMaxTrack=-1;
@@ -53,6 +53,8 @@ public class Registration implements PlugIn {
         }
         this.vss = vss;
         this.pTracked = new Point3D[imp.getNFrames()];
+        log("pTracked.length "+pTracked.length);
+
     }
 
     public void run(String arg) {
@@ -73,7 +75,6 @@ public class Registration implements PlugIn {
 
         gd = new NonBlockingGenericDialog("Track & Crop");
 
-
         // set iconImage
         ClassLoader classLoader = getClass().getClassLoader();
         ImagePlus impIcon = IJ.openImage(classLoader.getResource("logo01-61x61.jpg").getFile());
@@ -90,6 +91,7 @@ public class Registration implements PlugIn {
         gd.addNumericField("Center of mass iterations",6,0);
         gd.addSlider("Track until [frame]:", 1, (int) imp.getNFrames(), imp.getNFrames());
         gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
+        gd.addSlider("Channel for tracking", 1, (int) imp.getNChannels(), 1);
 
         Button btCorrectCurrent = new Button("Correct");
         btCorrectCurrent.addActionListener(new ActionListener() {
@@ -99,7 +101,7 @@ public class Registration implements PlugIn {
                 if (updateGuiVariables()) {
                     // only 'track' current position
                     // todo: does it only set one point? also at t=0?
-                    track3D(gui_t, gui_t, 1, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                    track3D(gui_c, gui_t, gui_t, 1, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
                     //addTrackAsOverlay();
                     showTrackOnFrame();
                 }
@@ -111,9 +113,12 @@ public class Registration implements PlugIn {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
-                    pTracked = null;
+                    // clean up track
+                    for(int i=0; i<pTracked.length; i++) {
+                        pTracked[i] = null;
+                    }
                     tMinTrack=gui_t; tMaxTrack=gui_tMax;
-                    track3D(gui_t, gui_tMax, gui_dt, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                    track3D(gui_c, gui_t, gui_tMax, gui_dt, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
                     //addTrackAsOverlay();
                     showTrackOnFrame();
                 }
@@ -136,7 +141,7 @@ public class Registration implements PlugIn {
                     FileInfo[][] infos = vss.getFileInfos();
                     //Point3D[] pos = new Point3D[tMaxTrack-tMinTrack];
                     //System.arraycopy(pTracked, tMinTrack, pos, 0, tMaxTrack-tMinTrack);
-                    ImagePlus impCropped = OpenStacksAsVirtualStack.openFromCroppedFileInfo(infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
+                    ImagePlus impCropped = OpenStacksAsVirtualStack.openFromCroppedFileInfo(imp, infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
                     impCropped.show();
                     impCropped.setPosition(0, (int)(impCropped.getNSlices()/2+0.5), 0);
                     impCropped.resetDisplayRange();
@@ -204,7 +209,7 @@ public class Registration implements PlugIn {
         cbLogging.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                IJ.debugMode = cbLogging.getState();
+                Globals.verbose = cbLogging.getState();
             }
         });
 
@@ -236,7 +241,7 @@ public class Registration implements PlugIn {
     public void showTrackOnFrame() {
         Point3D pCenter = pTracked[imp.getT() - 1];
         if (pCenter != null) {
-            if(IJ.debugMode) {
+            if(Globals.verbose) {
                 log("Registration.showTrackOnFrame pTracked: "+pCenter.toString());
             }
             //log("showTrackOnFrame: pCenter: "+pCenter.toString());
@@ -256,7 +261,7 @@ public class Registration implements PlugIn {
             o.setLabelColor(Color.blue);
             imp.setOverlay(o);
         } else {
-            if(IJ.debugMode) {
+            if(Globals.verbose) {
                 log("Registration.showTrackOnFrame: No track available for this time point");
             }
             Overlay o = new Overlay();
@@ -265,22 +270,6 @@ public class Registration implements PlugIn {
     }
 
     public boolean updateGuiVariables() {
-
-
-        /*
-        gd.addSlider("Radius center of mass x [pix]", 0, (int) imp.getWidth() / 2, 20);
-        gd.addSlider("Radius center of mass y [pix]", 0, (int) imp.getHeight() / 2, 20);
-        gd.addSlider("Radius center of mass z [pix]", 0, (int) imp.getNSlices() / 2, 10);
-        gui_dz
-        gui_dt
-        gd.addNumericField("Image loading margin factor", 2, 1);
-        gd.addNumericField("Image background value", 100, 0);
-        gd.addNumericField("Center of mass iterations",6,0);
-        gd.addSlider("Track until [frame]:", 1, (int) imp.getNFrames(), imp.getNFrames());
-        gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
-        gd.addNumericField("Track cropping margin factor", 4, 1);
-        */
-
 
         Roi roi = imp.getRoi();
 
@@ -303,6 +292,8 @@ public class Registration implements PlugIn {
             gui_iterations = new Integer(getTextFieldTxt(gd, iTxt++));
             gui_tMax = (new Integer(getTextFieldTxt(gd, iTxt++))) - 1;
             iTxt++; // frame slider
+            gui_c = (new Integer(getTextFieldTxt(gd, iTxt++))) - 1;
+
             //double marginFactorCrop = new Double(getTextFieldTxt(gd, iTxt++));
 
             gui_pCenterOfMassRadii = new Point3D(rx, ry, rz);
@@ -326,14 +317,15 @@ public class Registration implements PlugIn {
         return(tf.getText());
     }
 
-    public void track3D(int t, int tMax, int dt, int dz, Point3D pStackCenter, Point3D pStackRadii, Point3D pCenterOfMassRadii, int bg, int iterations) {
+    public void track3D(int c, int t, int tMax, int dt, int dz, Point3D pStackCenter, Point3D pStackRadii, Point3D pCenterOfMassRadii, int bg, int iterations) {
         ImageStack stack;
         Point3D pOffset, pLocalCenter;
         long startTime, stopTime, elapsedTime;
 
-        if(IJ.debugMode) {
+        if(Globals.verbose) {
             log("Registration.track3D:");
             log("t, tMax, dt, dz "+t+","+tMax+","+dt+","+dz);
+            log("pTracked.length "+pTracked.length);
         }
 
         for (int it=t; it<=tMax; it=it+dt) {
@@ -343,7 +335,7 @@ public class Registration implements PlugIn {
             // get stack, ensuring that extracted stack is still within bounds
             pStackCenter = curatePosition(pStackCenter, pStackRadii);
             startTime = System.currentTimeMillis();
-            stack = getImageStack(it, dz, pStackCenter, pStackRadii);
+            stack = getImageStack(it, c, dz, pStackCenter, pStackRadii);
             stopTime = System.currentTimeMillis(); elapsedTime = stopTime - startTime;
             log("Loaded data [ms]: " + elapsedTime);
 
@@ -365,7 +357,8 @@ public class Registration implements PlugIn {
 
             // update time-points, using linear interpolation
             for(int j=0; j<dt; j++) {
-                pTracked[it+j] = pStackCenter.add(pOffset.multiply((j+1.0)/dt));
+                if((it+j)<pTracked.length)
+                    pTracked[it+j] = pStackCenter.add(pOffset.multiply((j+1.0)/dt));
             }
 
             // update next center using Brownian motion model (position of next is same as this)
@@ -382,13 +375,15 @@ public class Registration implements PlugIn {
         return;
     }
 
-    private ImageStack getImageStack(int it, int dz, Point3D p, Point3D pr) {
+    private ImageStack getImageStack(int t, int c, int dz, Point3D p, Point3D pr) {
         //log("Registration.getImageStack p[0]: "+p[0]+" z:"+p[3]);
-        if(IJ.debugMode) {
+        if(Globals.verbose) {
             log("Registration.getImageStack");
+            log(""+imp.getStackIndex(c+1,1,t+1));
         }
         long startTime = System.currentTimeMillis();
-        ImageStack stack = vss.getCroppedFrameAsImagePlus(it, 0, dz, p, pr).getStack();
+
+        ImageStack stack = vss.getCroppedFrameAsImagePlus(t, c, dz, p, pr).getStack();
         long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime;
         //log("loaded stack in [ms]: " + elapsedTime);
         //imp.show();

@@ -1,4 +1,6 @@
-package ct.vss; /**
+package ct.vss;
+
+/**
  * Created by tischi on 27/10/16.
  */
 
@@ -18,19 +20,19 @@ public class VirtualStackOfStacks extends ImageStack {
     int depth;
     int nSlices;
     int nStacks;
+    String order; // "xyzct", "xyztc"
     protected FileInfo[][] infos;
 
     /** Creates a new, empty virtual stack. */
-    public VirtualStackOfStacks(Point3D pSize) {
+    public VirtualStackOfStacks(Point3D pSize, String order) {
         super((int)pSize.getX(), (int)pSize.getY(), null);
         this.depth = (int)pSize.getZ();
-        if(IJ.debugMode) {
+        this.order = order;
+        if(Globals.verbose) {
             log("VirtualStackOfStacks");
             log("x: "+(int)pSize.getX());
             log("y: "+(int)pSize.getY());
             log("z: "+(int)pSize.getZ());
-
-
         }
         this.infos = new FileInfo[INITIAL_SIZE][];
     }
@@ -84,6 +86,9 @@ public class VirtualStackOfStacks extends ImageStack {
             deleteSlice(nSlices);
     }
 
+    public String getOrder() {
+        return(order);
+    }
     /** Returns the pixel array for the specified slice, were 1<=n<=nslices. */
     public Object getPixels(int n) {
         ImageProcessor ip = getProcessor(n);
@@ -105,8 +110,15 @@ public class VirtualStackOfStacks extends ImageStack {
         int iFile, z;
         // get z-th slice of a tif stack
         iFile = (int) (n-1) / depth;
-        //log("iFile: "+iFile); log("filename: "+infos[iFile][0].fileName);
         z = (n-1) - iFile * depth; // zero-based in my opener functions
+        if(Globals.verbose) {
+            log("# VirtualStackOfStacks.getProcessor");
+            log("requested slice: "+n);
+            log("stack depth: "+depth);
+            log("opening iFile [zero-based]: "+iFile);
+            log("opening filename: "+infos[iFile][0].fileName);
+            log("opening z-slice [one-based]: "+(z+1));
+        }
         // IJ.log("requested slice: "+n);
         //log("opening slice " + nSlice + " of " + path + names[nFile]);
         // potentially check and adapt first offset again by loading the first IFD of this file
@@ -174,7 +186,7 @@ public class VirtualStackOfStacks extends ImageStack {
 
     /** Always return true. */
     public boolean isVirtual() {
-        return true;
+        return true; // do we need this?
     }
 
     /** Does nothing. */

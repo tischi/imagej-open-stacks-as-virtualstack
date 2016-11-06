@@ -210,7 +210,7 @@ class OpenerExtensions extends Opener {
         FileOpener fo = new FileOpener(info[z]);
         imp = fo.open(false);
         long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime;
-        if(IJ.debugMode) {
+        if(Globals.verbose) {
             log("OpenerExtension.openTiffStackSliceUsingIFDs");
             log("Whole slice opened in [ms]: " + elapsedTime);
         }
@@ -239,7 +239,7 @@ class OpenerExtensions extends Opener {
         int ny = (int) (2.0 * pr.getY() + 1.5001);
         int nz = (int) ((2.0 * pr.getZ() / dz + 1.5001) );
 
-        if(IJ.debugMode) {
+        if(Globals.verbose) {
             log("OpenerExtension.cropFileInfo:");
             log("filename: " + info[0].fileName);
             log("dz: " + dz);
@@ -386,7 +386,7 @@ class OpenerExtensions extends Opener {
             IJ.handleException(e);
         }
 
-        if(IJ.debugMode) {
+        if(Globals.verbose) {
             log("OpenerExtensions.openCroppedTiffStackUsingIFDs");
             log("Skipping [ms]: " + skippingTime);
             log("Reading [ms]: " + readingTime);
