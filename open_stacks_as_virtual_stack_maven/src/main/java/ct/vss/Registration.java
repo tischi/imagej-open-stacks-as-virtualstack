@@ -44,8 +44,7 @@ public class Registration implements PlugIn {
     Point3D gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_pCropRadii;
     Point3D[] pTracked;
     int tMinTrack=-1, tMaxTrack=-1;
-
-
+    private String gui_centeringMethod;
 
     public Registration(ImagePlus imp) {
         this.imp = imp;
@@ -93,10 +92,13 @@ public class Registration implements PlugIn {
         gd.addSlider("Tracking dt [frames]", 1, (int) imp.getNSlices() / 5, 2);
         gd.addNumericField("Tracking margin factor", 1.5, 1);
         gd.addNumericField("Image background value", 100, 0);
-        gd.addNumericField("Center of mass iterations",6,0);
+        gd.addNumericField("Center of mass iterations", 6, 0);
         gd.addSlider("Track until [frame]:", 1, (int) imp.getNFrames(), imp.getNFrames());
         gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
         gd.addSlider("Channel for tracking", 1, (int) imp.getNChannels(), 1);
+        gd.addSlider("Channel for tracking", 1, (int) imp.getNChannels(), 1);
+        String [] centeringMethodChoices = {"centroid","center of mass"};
+        gd.addChoice("Centering method", centeringMethodChoices, "centroid");
 
         Button btCorrectCurrent = new Button("Locate");
         btCorrectCurrent.addActionListener(new ActionListener() {
@@ -105,10 +107,16 @@ public class Registration implements PlugIn {
 
                 if (updateGuiVariables()) {
                     // only 'track' current position
-                    // todo: does it only set one point? also at t=0?
-                    track3D(gui_c, gui_t, gui_t, 1, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
-                    //addTrackAsOverlay();
-                    showTrackOnFrame();
+                    Thread t1 = new Thread(new Runnable() {
+                        public void run() {
+                            try {
+                                track3D(gui_c, gui_t, gui_t, 1, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                            } finally {
+                                showTrackOnFrame();
+                                }
+                            }
+                    });
+                    t1.start();
                 }
 
             }
@@ -123,9 +131,16 @@ public class Registration implements PlugIn {
                         pTracked[i] = null;
                     }
                     tMinTrack=gui_t; tMaxTrack=gui_tMax;
-                    track3D(gui_c, gui_t, gui_tMax, gui_dt, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
-                    //addTrackAsOverlay();
-                    showTrackOnFrame();
+                    Thread t1 = new Thread(new Runnable() {
+                        public void run() {
+                            try {
+                                track3D(gui_c, gui_t, gui_tMax, gui_dt, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
+                            } finally {
+                                showTrackOnFrame();
+                            }
+                        }
+                    });
+                    t1.start();
                 }
             }
         });
@@ -286,7 +301,7 @@ public class Registration implements PlugIn {
             int z = imp.getZ() - 1;
             gui_t = imp.getT() - 1;
 
-            int iTxt = 0;
+            int iTxt = 0, iChoice = 0;
             int rx = new Integer(getTextFieldTxt(gd, iTxt++));
             int ry = new Integer(getTextFieldTxt(gd, iTxt++));
             int rz = new Integer(getTextFieldTxt(gd, iTxt++));
@@ -298,6 +313,8 @@ public class Registration implements PlugIn {
             gui_tMax = (new Integer(getTextFieldTxt(gd, iTxt++))) - 1;
             iTxt++; // frame slider
             gui_c = (new Integer(getTextFieldTxt(gd, iTxt++))) - 1;
+            Choice centeringMethod = (Choice) gd.getChoices().get(iChoice++);
+            gui_centeringMethod = centeringMethod.getSelectedItem();
 
             //double marginFactorCrop = new Double(getTextFieldTxt(gd, iTxt++));
 
@@ -343,6 +360,7 @@ public class Registration implements PlugIn {
             stack = getImageStack(it, c, dz, pStackCenter, pStackRadii);
             stopTime = System.currentTimeMillis(); elapsedTime = stopTime - startTime;
             log("Loaded data [ms]: " + elapsedTime);
+            log("Loading speed [MB/s]: " + stack.getHeight()*stack.getWidth()*stack.getSize()*2/((elapsedTime+0.001)*1000));
 
             // compute center of mass (in zero-based local stack coordinates)
             startTime = System.currentTimeMillis();
@@ -371,11 +389,13 @@ public class Registration implements PlugIn {
             // - also have a linear motion model for the update, i.e. add pOffset*2
             pStackCenter = pStackCenter.add(pOffset);
 
-            IJ.showProgress(it,tMax);
+            IJ.showStatus(""+it+"/"+tMax);
+            IJ.showProgress((double)(it-t)/(tMax-t));
 
         }
-
         log("Tracking done.");
+        IJ.showStatus(""+tMax+"/"+tMax);
+        IJ.showProgress(1.0);
         log("");
         return;
     }
@@ -428,13 +448,13 @@ public class Registration implements PlugIn {
             //log("# Iteration "+i);
             pMin = pCenter.subtract(radii);
             pMax = pCenter.add(radii);
-            pCenter = centerOfMass16bit(stack, bg, pMin, pMax);
+            pCenter = computeCenter16bit(stack, bg, pMin, pMax);
             //log("iterativeCenterOfMass16bit: center: "+pCenter.toString());
         }
         return(pCenter);
     }
 
-    public Point3D centerOfMass16bit(ImageStack stack, int bg, Point3D pMin, Point3D pMax) {
+    public Point3D computeCenter16bit(ImageStack stack, int bg, Point3D pMin, Point3D pMax) {
 
         //long startTime = System.currentTimeMillis();
         double sum = 0.0, xsum = 0.0, ysum = 0.0, zsum = 0.0;
@@ -469,23 +489,30 @@ public class Registration implements PlugIn {
                 for (int x = xmin+1; x<=xmax+1; x++) {
                     v = pixels[i] & 0xffff;
                     if (v >= bg) {
-                        sum += v;
-                        xsum += x * v;
-                        ysum += y * v;
-                        zsum += z * v;
+                        if (gui_centeringMethod == "center of mass") {
+                            sum += v;
+                            xsum += x * v;
+                            ysum += y * v;
+                            zsum += z * v;
+                        } else if (gui_centeringMethod == "centroid") {
+                            sum += 1;
+                            xsum += x;
+                            ysum += y;
+                            zsum += z;
+                        } // could add maximum here
                     }
                     i++;
                 }
             }
         }
         // computation is one-based; result should be zero-based
-        double xCenterOfMass = (xsum / sum) - 1;
-        double yCenterOfMass = (ysum / sum) - 1;
-        double zCenterOfMass = (zsum / sum) - 1;
+        double xCenter = (xsum / sum) - 1;
+        double yCenter = (ysum / sum) - 1;
+        double zCenter = (zsum / sum) - 1;
 
         //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("center of mass in [ms]: " + elapsedTime);
 
-        return(new Point3D(xCenterOfMass,yCenterOfMass,zCenterOfMass));
+        return(new Point3D(xCenter,yCenter,zCenter));
     }
 
     public Point3D maxLoc16bit(ImageStack stack) {

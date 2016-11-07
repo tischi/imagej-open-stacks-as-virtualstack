@@ -29,32 +29,6 @@ class OpenerExtensions extends Opener {
 
     }
 
-    /*
-    public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, int z) {
-        int nz = 1;
-        int x = 0;
-        int nx = fi0.width;
-        int y = 0;
-        int ny = fi0.height;
-        ImagePlus imp = openCroppedTiffStackUsingFirstIFD(fi0, z, nz, x, nx,  y,  ny);
-        return imp;
-    }*/
-
-    /** Returns an InputStream for the image described by this FileInfo. */
-    // https://github.com/imagej/imagej1/blob/master/ij/io/FileOpener.java#L442
-    public InputStream createInputStream(FileInfo fi) throws IOException, MalformedURLException {
-        InputStream is = null;
-        if (fi.inputStream!=null)
-            is = fi.inputStream;
-        else {
-            if (fi.directory.length()>0 && !fi.directory.endsWith(Prefs.separator))
-                fi.directory += Prefs.separator;
-            File f = new File(fi.directory + fi.fileName);
-            is = new FileInputStream(f);
-        }
-        return is;
-    }
-
     long skip(InputStream in, long skipCount, long pointer) throws IOException {
         if (skipCount > 0) {
             long bytesRead = 0;
@@ -124,7 +98,7 @@ class OpenerExtensions extends Opener {
         return(pointer+(long)bufferSize);
     }
 
-    short[] setShortPixels(FileInfo fi, short[] pixels, int base, byte[] buffer){
+    void setShortPixels(FileInfo fi, short[] pixels, int base, byte[] buffer){
         int bytesPerPixel = 2;
         int pixelsRead = (int) buffer.length/bytesPerPixel;
         //log("setShortPixels: base "+base);
@@ -146,62 +120,33 @@ class OpenerExtensions extends Opener {
                 for (int i=base,j=0; i<(base+pixelsRead); i++,j+=2)
                     pixels[i] = (short)(((buffer[j]&0xff)<<8) | (buffer[j+1]&0xff));
         }
-        return(pixels);
     }
 
-    public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, Point3D p, Point3D pr) {
+    void setShortPixelsFromAllStrips(FileInfo fi, short[] pixels, int imByteWidth, byte[] buffer){
+        int nz = fi.stripLengths.length;
+        int ip = 0;
+        int bs, be;
 
-        log("# openCroppedTiffStackUsingFirstIFD");
+        for(int z=0; z<nz; z++ ) {
+            bs = z * imByteWidth;
+            be = bs + fi.stripLengths[0];
 
-        if (fi0==null) return null;
-
-        // round the values
-        int x = (int) (p.getX()+0.5);
-        int y = (int) (p.getY()+0.5);
-        int z = (int) (p.getZ()+0.5);
-        int nx = 2 * (int) pr.getX() + 1;
-        int ny = 2 * (int) pr.getY() + 1;
-        int nz = 2 * (int) pr.getZ() + 1;
-
-        log("filename: " + fi0.fileName);
-        log("fi0.nImages: " + fi0.nImages);
-        log("z,nz,x,nx,y,ny: " + z +","+ nz +","+ x +","+ nx +","+ y +","+ ny);
-
-        if (z<0 || z>fi0.nImages)
-            throw new IllegalArgumentException("z="+z+" is out of range");
-        // do the same for nx and ny and so on
-
-        //long startTime = System.currentTimeMillis();
-
-        FileInfo fi = (FileInfo) fi0.clone(); // make a deep copy so we can savely modify it to load what we want
-        long size = fi.width*fi.height*fi.getBytesPerPixel();
-        fi.longOffset = fi.getOffset() + (z*(size+fi.gapBetweenImages));
-        fi.longOffset = fi.longOffset + (y*fi.width+x)*fi.getBytesPerPixel();
-        fi.offset = 0;
-        fi.nImages = nz;
-        fi.gapBetweenImages += (int) (fi.width-(x+nx-1));
-        fi.gapBetweenImages += (int) (fi.height-(y+ny))*fi.width;
-        fi.gapBetweenImages += (int) (y*fi.width);
-        fi.gapBetweenImages += (int) (x-1);
-        fi.gapBetweenImages *= fi.getBytesPerPixel();
-        //log("  fi.gapBetweenImages: "+fi.gapBetweenImages);
-
-        int[] newStripLengths = new int[ny];
-        int[] newStripOffsets = new int[ny];
-        for (int i=0; i<newStripLengths .length; i++) {
-            newStripLengths[i] = nx * fi.getBytesPerPixel();
-            newStripOffsets[i] = i * fi.width * fi.getBytesPerPixel();
+            if (fi.intelByteOrder) {
+                if (fi.fileType == FileInfo.GRAY16_SIGNED)
+                    for (int j = bs; j < be; j += 2)
+                        pixels[ip++] = (short) ((((buffer[j + 1] & 0xff) << 8) | (buffer[j] & 0xff)) + 32768);
+                else
+                    for (int j = bs; j < be; j += 2)
+                        pixels[ip++] = (short) (((buffer[j + 1] & 0xff) << 8) | (buffer[j] & 0xff));
+            } else {
+                if (fi.fileType == FileInfo.GRAY16_SIGNED)
+                    for (int j = bs; j < be; j += 2)
+                        pixels[ip++] = (short) ((((buffer[j] & 0xff) << 8) | (buffer[j + 1] & 0xff)) + 32768);
+                else
+                    for (int j = bs; j < be; j += 2)
+                        pixels[ip++] = (short) (((buffer[j] & 0xff) << 8) | (buffer[j + 1] & 0xff));
+            }
         }
-
-        fi.stripOffsets = newStripOffsets;
-        fi.stripLengths = newStripLengths;
-        fi.height = ny;
-        fi.width = nx;
-
-        FileOpener fo = new FileOpener(fi);
-        ImagePlus imp = fo.open(false);
-        //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
-        return imp;
     }
 
     public ImagePlus openTiffStackSliceUsingIFDs(FileInfo[] info, int z) {
@@ -213,20 +158,11 @@ class OpenerExtensions extends Opener {
         if(Globals.verbose) {
             log("OpenerExtension.openTiffStackSliceUsingIFDs");
             log("Whole slice opened in [ms]: " + elapsedTime);
+            log("Reading speed [MB/s]: " + (info[z].width*info[z].height*info[z].getBytesPerPixel())/((elapsedTime+0.001)*1000));
         }
 
         return imp;
     }
-
-    // todo: make special version when whole image is opened
-    /*
-    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, int z) {
-        Point3D p = new Point3D(0,0,z);
-        Point3D pr = new Point3D(info[0].width/2-0.5, info[0].height/2-0.5, 0); // to also open images with even widths correctly
-        ImagePlus imp = openCroppedTiffStackUsingIFDs(info, p, pr);
-        return imp;
-    }*/
-
 
     public FileInfo[] cropFileInfo(FileInfo[] info, int dz, Point3D p, Point3D pr) {
         //log("OpenerExtensions.cropFileInfo:");
@@ -306,6 +242,7 @@ class OpenerExtensions extends Opener {
         // modify FileInfos to reflect the cropping
         // todo: this can be shortened a lot as one the first fi needs to know about the cropping
 
+        // get size of image before cropping
         int imByteWidth = infoAll[0].width*infoAll[0].getBytesPerPixel();
 
         FileInfo[] info = cropFileInfo(infoAll, dz, p, pr);
@@ -342,88 +279,152 @@ class OpenerExtensions extends Opener {
         //log("imByteWidth "+imByteWidth);
 
         long startTimeInputStream = System.currentTimeMillis();
+        String openMethod = "allStrips";
+        //openMethod = "stripByStrip";
 
         try {
             File f = new File(fi.directory + fi.fileName);
-            InputStream in = new BufferedInputStream(new FileInputStream(f));
-            //FileInputStream in = new FileInputStream(f);
+            //InputStream in = new BufferedInputStream(new FileInputStream(f));
+            InputStream in = new FileInputStream(f);
             //FileImageInputStream in = new FileImageInputStream(f);
 
             for(int z=0; z<nz; z++) {
 
-                for (int y = 0; y < ny; y++) {
+                if(openMethod == "stripByStrip") {
 
-                    // skip to strip
-                    startTime = System.currentTimeMillis();
-                    pointer = skip(in, info[z].stripOffsets[y] - pointer, pointer);
-                    skippingTime += (System.currentTimeMillis()-startTime);
+                    for (int y = 0; y < ny; y++) {
 
-                    // read strip
-                    startTime = System.currentTimeMillis();
-                    pointer = read(in, strip, pointer);
-                    readingTime += (System.currentTimeMillis()-startTime);
+                        // skip to strip
+                        startTime = System.currentTimeMillis();
+                        pointer = skip(in, info[z].stripOffsets[y] - pointer, pointer);
+                        skippingTime += (System.currentTimeMillis() - startTime);
 
-                    // store strip in pixel array
+                        // read strip
+                        startTime = System.currentTimeMillis();
+                        pointer = read(in, strip, pointer);
+                        readingTime += (System.currentTimeMillis() - startTime);
+
+                        // store strip in pixel array
+                        startTime = System.currentTimeMillis();
+                        pixelCount = y * stripPixelLength;
+                        setShortPixels(fi, pixels[z], pixelCount, strip);
+                        settingPixelsTime += (System.currentTimeMillis() - startTime);
+
+                    }
+
+                    // add pixels to stack
                     startTime = System.currentTimeMillis();
-                    pixelCount = y * stripPixelLength;
-                    pixels[z] = setShortPixels(fi, pixels[z], pixelCount, strip);
-                    settingPixelsTime += (System.currentTimeMillis()-startTime);
+                    ip = new ShortProcessor(fi.width, fi.height, (short[]) pixels[z], null);
+                    stackStream.addSlice(ip);
+                    settingStackTime += (System.currentTimeMillis()-startTime);
+
+                } else if (openMethod == "allStrips") {
+
+                    // skip to first strip
+                    startTime = System.currentTimeMillis();
+                    pointer = skip(in, info[z].stripOffsets[0] - pointer, pointer);
+                    skippingTime += (System.currentTimeMillis() - startTime);
+
+                    // read all strips
+                    startTime = System.currentTimeMillis();
+                    pointer = read(in, buffer, pointer);
+                    readingTime += (System.currentTimeMillis() - startTime);
+
+                    // store strips in pixel array
+                    startTime = System.currentTimeMillis();
+                    setShortPixelsFromAllStrips(fi, pixels[z], imByteWidth, buffer);
+                    settingPixelsTime += (System.currentTimeMillis() - startTime);
+
+                    // add pixels to stack
+                    startTime = System.currentTimeMillis();
+                    ip = new ShortProcessor(fi.width, fi.height, (short[]) pixels[z], null);
+                    stackStream.addSlice(ip);
+                    settingStackTime += (System.currentTimeMillis()-startTime);
 
                 }
 
-                //log("buffer.length "+buffer.length);
-
-
-                startTime = System.currentTimeMillis();
-                ip = new ShortProcessor(fi.width, fi.height, (short[]) pixels[z], null);
-                stackStream.addSlice(ip);
-                settingStackTime += (System.currentTimeMillis()-startTime);
-
-            }
+            } // z
             
             in.close();
         } catch (Exception e) {
             IJ.handleException(e);
         }
 
+
         if(Globals.verbose) {
+            int byteRead = nz*fi.width*fi.height*fi.getBytesPerPixel();
             log("OpenerExtensions.openCroppedTiffStackUsingIFDs");
             log("Skipping [ms]: " + skippingTime);
             log("Reading [ms]: " + readingTime);
-            //log("BufferReading [ms]: " + bufferReadingTime);
+            log("Reading speed [MB/s]: " + byteRead/((readingTime+0.001)*1000));
             log("Setting pixels [ms]: " + settingPixelsTime);
             log("Setting stack [ms]: " + settingStackTime);
-            //log("Input stream total [ms]: " + (System.currentTimeMillis()-startTimeInputStream));
         }
 
         ImagePlus impStream = new ImagePlus("One stream",stackStream);
 
-        //impStream.show();
-
-        // Loop via multiple input streams
-        /*
-        startTime = System.currentTimeMillis();
-        ImageStack stack = new ImageStack(info[0].width,info[0].height);
-        ImagePlus imp;
-        for(int i=0; i<info.length; i++) {
-            fi = info[i];
-            fo = new FileOpener(fi);
-            imp = fo.open(false);
-            if(i==0){
-                stack = imp.getStack();
-            } else {
-                stack.addSlice(imp.getProcessor());
-            }
-        }
-        ImagePlus impMany = new ImagePlus("Many streams",stack);
-        log("Multiple streams [ms]: " + (System.currentTimeMillis()-startTime));
-        impMany.show();
-        */
-
-        //imp.show();
         return impStream;
     }
 
 
 }
 
+
+/*
+
+    public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, Point3D p, Point3D pr) {
+
+        log("# openCroppedTiffStackUsingFirstIFD");
+
+        if (fi0==null) return null;
+
+        // round the values
+        int x = (int) (p.getX()+0.5);
+        int y = (int) (p.getY()+0.5);
+        int z = (int) (p.getZ()+0.5);
+        int nx = 2 * (int) pr.getX() + 1;
+        int ny = 2 * (int) pr.getY() + 1;
+        int nz = 2 * (int) pr.getZ() + 1;
+
+        log("filename: " + fi0.fileName);
+        log("fi0.nImages: " + fi0.nImages);
+        log("z,nz,x,nx,y,ny: " + z +","+ nz +","+ x +","+ nx +","+ y +","+ ny);
+
+        if (z<0 || z>fi0.nImages)
+            throw new IllegalArgumentException("z="+z+" is out of range");
+        // do the same for nx and ny and so on
+
+        //long startTime = System.currentTimeMillis();
+
+        FileInfo fi = (FileInfo) fi0.clone(); // make a deep copy so we can savely modify it to load what we want
+        long size = fi.width*fi.height*fi.getBytesPerPixel();
+        fi.longOffset = fi.getOffset() + (z*(size+fi.gapBetweenImages));
+        fi.longOffset = fi.longOffset + (y*fi.width+x)*fi.getBytesPerPixel();
+        fi.offset = 0;
+        fi.nImages = nz;
+        fi.gapBetweenImages += (int) (fi.width-(x+nx-1));
+        fi.gapBetweenImages += (int) (fi.height-(y+ny))*fi.width;
+        fi.gapBetweenImages += (int) (y*fi.width);
+        fi.gapBetweenImages += (int) (x-1);
+        fi.gapBetweenImages *= fi.getBytesPerPixel();
+        //log("  fi.gapBetweenImages: "+fi.gapBetweenImages);
+
+        int[] newStripLengths = new int[ny];
+        int[] newStripOffsets = new int[ny];
+        for (int i=0; i<newStripLengths .length; i++) {
+            newStripLengths[i] = nx * fi.getBytesPerPixel();
+            newStripOffsets[i] = i * fi.width * fi.getBytesPerPixel();
+        }
+
+        fi.stripOffsets = newStripOffsets;
+        fi.stripLengths = newStripLengths;
+        fi.height = ny;
+        fi.width = nx;
+
+        FileOpener fo = new FileOpener(fi);
+        ImagePlus imp = fo.open(false);
+        //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("opened in [ms]: " + elapsedTime);
+        return imp;
+    }
+
+ */

@@ -16,6 +16,8 @@ import javafx.geometry.Point3D;
 import static ij.IJ.log;
 import static ij.IJ.open;
 
+// todo: implement a class for efficient saving of the cropped stacks
+
 /** Opens a folder of stacks as a virtual stack. */
 public class OpenStacksAsVirtualStack implements PlugIn {
 
@@ -159,8 +161,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         String[] list = new File(directory).list();
         if (list == null || list.length == 0)
             return null;
-        log("Number of files: " + list.length);
         list = this.sortFileList(list);
+        log("Number of files: " + list.length);
         log("Sorted files:");
         for(String item : list) log("" + item);
         if (list == null) return null;
@@ -392,8 +394,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 		//Globals.verbose = true;
 
-        boolean interactive = true;
-        boolean MATLAB = false;
+        boolean interactive = false;
+        boolean MATLAB = true;
         boolean Mitosis_ome = false;
         boolean MATLAB_EXTERNAL = false;
 		boolean OME_MIP = false;
