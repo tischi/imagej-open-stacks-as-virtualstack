@@ -20,16 +20,14 @@ public class VirtualStackOfStacks extends ImageStack {
     int nSlices;
     int nStacks;
     int nZ, nC, nT;
-
-    String order; // "ct", "tc"
+    String order = "tc"; // "ct", "tc"
     protected FileInfo[][] infos;
 
     /** Creates a new, empty virtual stack. */
-    public VirtualStackOfStacks(Point3D pSize, int nC, String order) {
+    public VirtualStackOfStacks(Point3D pSize, int nC) {
         super((int)pSize.getX(), (int)pSize.getY(), null);
         this.nZ = (int)pSize.getZ();
         this.nC = nC;
-        this.order = order;
         if(Globals.verbose) {
             log("VirtualStackOfStacks");
             log("x: "+(int)pSize.getX());
@@ -130,7 +128,6 @@ public class VirtualStackOfStacks extends ImageStack {
 
         if(Globals.verbose) {
             log("# VirtualStackOfStacks.getProcessor");
-            log("order: "+order);
             log("nZ: "+nZ);
             log("nC: "+nC);
             log("nT: "+nT);
@@ -153,13 +150,20 @@ public class VirtualStackOfStacks extends ImageStack {
     }
 
     public ImagePlus getCroppedFrameAsImagePlus(int t, int c, int dz, Point3D p, Point3D pr) {
-
-        //log("opening slices " + z + " to " + (z+nz-1) + " of " + path + names[t]);
-        //FileInfo fi = (FileInfo) fiRef.clone(); // make a deep copy so we can savely modify it to load what we want
-        //fi.directory = path;
-
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[t], dz, p, pr);
-        //ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingFirstIFD(fi, z, nz, x, nx, y, ny);
+        int iFile = 0;
+        if(order=="tc") {
+            iFile = t + (nT*c);
+        } else {
+            IJ.showMessage("Unsupported file order: "+order);
+        }
+        if(Globals.verbose) {
+            log("# VirtualStackOfStacks.getCroppedFrameAsImagePlus");
+            log("t: "+t);
+            log("c: "+c);
+            log("directory: "+infos[iFile][0].directory);
+            log("filename: "+infos[iFile][0].fileName);
+        }
+        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[iFile], dz, p, pr);
 
         if (imp==null) {
             log("Error: loading failed!");

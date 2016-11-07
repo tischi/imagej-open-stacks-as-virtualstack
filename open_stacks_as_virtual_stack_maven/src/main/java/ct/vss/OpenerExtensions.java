@@ -168,41 +168,48 @@ class OpenerExtensions extends Opener {
         //log("OpenerExtensions.cropFileInfo:");
 
         // round the values
-        int x = (int) (p.getX() - pr.getX() + 0.5);
-        int y = (int) (p.getY() - pr.getY() + 0.5);
-        int z = (int) (p.getZ() - pr.getZ() + 0.5);
+        /*
+        int x = (int) (p.getX() - pr.getX());
+        int y = (int) (p.getY() - pr.getY());
+        int z = (int) (p.getZ() - pr.getZ());
         int nx = (int) (2.0 * pr.getX() + 1.5001); // to enable evenly sized stacks
         int ny = (int) (2.0 * pr.getY() + 1.5001);
         int nz = (int) ((2.0 * pr.getZ() / dz + 1.5001) );
+        */
+        int x = (int) (p.getX()+0.5);
+        int y = (int) (p.getY()+0.5);
+        int z = (int) (p.getZ()+0.5);
+        int rx = (int) (pr.getX()+0.5);
+        int ry = (int) (pr.getY()+0.5);
+        int rz = (int) (pr.getZ()+0.5);
+        int nx = (int) (2 * rx + 1);
+        int ny = (int) (2 * ry + 1);
+        int nz = (int) (2 * rz + 1);
+        x=x-rx;
+        y=y-ry;
+        z=z-rz;
+
+        if(dz>1) {
+            nz = (int) (1.0*nz/dz + 0.5);
+        }
 
         if(Globals.verbose) {
-            log("OpenerExtension.cropFileInfo:");
+            log("# OpenerExtension.cropFileInfo:");
             log("filename: " + info[0].fileName);
             log("dz: " + dz);
             log("rx,ry,rz: " + pr.getX() + "," + pr.getY() + "," + pr.getZ());
             log("z,nz,x,nx,y,ny: " + z + "," + nz + "," + x + "," + nx + "," + y + "," + ny);
-            //log("info.length: " + info.length);
+            log("info.length: " + info.length);
         }
-
-        if (z<0 || z>info.length) {
-            IJ.showMessage("z=" + z + " is out of range. Please reduce your z-range.");
-            throw new IllegalArgumentException("z=" + z + " is out of range");
-        }
-        // do the same for nx and ny and so on
 
         FileInfo[] infoModified = new FileInfo[nz];
         FileInfo fi = info[0];
 
-        // adjusted gap
-        //int addedGapBetweenImages = 0;
-        //addedGapBetweenImages += (int) (fi.width-(x+nx-1));
-        //addedGapBetweenImages += (int) (fi.height-(y+ny))*fi.width;
-        //addedGapBetweenImages += (int) (y*fi.width);
-        //addedGapBetweenImages += (int) (x-1);
-        //addedGapBetweenImages *= fi.getBytesPerPixel();
-
-        // todo check if this is slow and make faster
         for (int iz=z, jz=z; iz<(z+nz); iz++, jz+=dz){
+            if (jz<0 || jz>=info.length) {
+                IJ.showMessage("z=" + jz + " is out of range. Please reduce your z-radius.");
+                throw new IllegalArgumentException("z=" + jz + " is out of range; iz="+iz);
+            }
             infoModified[iz-z] = (FileInfo) info[jz].clone();
             infoModified[iz-z].nImages = 1;
             infoModified[iz-z].longOffset = infoModified[iz-z].getOffset();

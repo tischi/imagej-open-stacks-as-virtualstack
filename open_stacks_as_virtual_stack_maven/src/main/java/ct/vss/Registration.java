@@ -88,14 +88,13 @@ public class Registration implements PlugIn {
         gd.addSlider("Object radius x [pix]", 0, (int) imp.getWidth() / 2, 30);
         gd.addSlider("Object radius y [pix]", 0, (int) imp.getHeight() / 2, 30);
         gd.addSlider("Object radius z [pix]", 0, (int) imp.getNSlices() / 2, 10);
-        gd.addSlider("Tracking dz [pix]", 1, (int) imp.getNSlices() / 5, 2);
-        gd.addSlider("Tracking dt [frames]", 1, (int) imp.getNSlices() / 5, 2);
-        gd.addNumericField("Tracking margin factor", 1.5, 1);
+        gd.addSlider("Tracking dz [pix]", 1, (int) imp.getNSlices() / 2, 2);
+        gd.addSlider("Tracking dt [frames]", 1, (int) imp.getNFrames() / 5, 2);
+        gd.addNumericField("Tracking margin factor", 2, 1);
         gd.addNumericField("Image background value", 100, 0);
-        gd.addNumericField("Center of mass iterations", 6, 0);
+        gd.addNumericField("Center computation iterations", 6, 0);
         gd.addSlider("Track until [frame]:", 1, (int) imp.getNFrames(), imp.getNFrames());
         gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
-        gd.addSlider("Channel for tracking", 1, (int) imp.getNChannels(), 1);
         gd.addSlider("Channel for tracking", 1, (int) imp.getNChannels(), 1);
         String [] centeringMethodChoices = {"centroid","center of mass"};
         gd.addChoice("Centering method", centeringMethodChoices, "centroid");
@@ -421,18 +420,32 @@ public class Registration implements PlugIn {
         int x = (int) (p.getX()+0.5);
         int y = (int) (p.getY()+0.5);
         int z = (int) (p.getZ()+0.5);
-        int rx = (int) pr.getX();
-        int ry = (int) pr.getY();
-        int rz = (int) pr.getZ();
+        int rx = (int) (pr.getX()+0.5);
+        int ry = (int) (pr.getY()+0.5);
+        int rz = (int) (pr.getZ()+0.5);
 
         // make sure that the ROI stays within the image bounds
         if (x-rx < 0) x = rx;
         if (y-ry < 0) y = ry;
         if (z-rz < 0) z = rz;
 
-        if (x+rx >= imp.getWidth()) x = imp.getWidth()-rx;
-        if (y+ry >= imp.getHeight()) y = imp.getHeight()-ry;
-        if (z+rz >= imp.getNSlices()) z = imp.getNSlices()-rz;
+        if (x+rx > imp.getWidth()-1) x = imp.getWidth()-rx;
+        if (y+ry > imp.getHeight()-1) y = imp.getHeight()-ry;
+        if (z+rz > imp.getNSlices()-1) z = imp.getNSlices()-rz;
+
+        // check if it is ok now, otherwise the chose radius is simply too large
+        if (x-rx < 0)  {
+            IJ.showMessage("x_radius*margin_factor is too large; please reduce!");
+            throw new IllegalArgumentException("out of range");
+        }
+        if (y-ry < 0){
+            IJ.showMessage("y_radius*margin_factor is too large; please reduce!");
+            throw new IllegalArgumentException("out of range");
+        }
+        if (z-rz < 0) {
+            IJ.showMessage("z_radius*margin_factor is too large; please reduce!");
+            throw new IllegalArgumentException("out of range");
+        }
 
         return(new Point3D(x,y,z));
     }

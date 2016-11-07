@@ -169,12 +169,19 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         else return (list);
     }
 
-
     public ImagePlus openFromDirectory() {
         boolean checkOffsets = false;
         FileInfo[] info = null;
         FileInfo fi = null;
         VirtualStackOfStacks stack = null;
+
+        // get filtered list if necessary
+
+        // loop through channels and time and deduce the right file from the list
+        // also check that the length of the file list is nt*nc
+        // then sort them with first all time-points of one channel
+
+        log(""+order);
 
         try {
             // loop through file list
@@ -205,7 +212,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                                 nSlices = info.length;
                             }
                             // Initialise stack
-                            stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels, order);
+                            stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels);
                         }
                         stack.addStack(info);
                     } else {
@@ -237,7 +244,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         ImagePlus impFinal = null;
         if(stack!=null && stack.getSize()>0) {
             nFrames = stack.getNStacks()/nChannels;
-            impFinal = makeImagePlus(stack, fi, nChannels, nFrames, nSlices, order);
+            impFinal = makeImagePlus(stack, fi, nChannels, nFrames, nSlices);
             }
         IJ.showProgress(1.0);
         return(impFinal);
@@ -345,20 +352,31 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 	public static ImagePlus openFromCroppedFileInfo(ImagePlus imp, FileInfo[][] infos, Point3D[] pos, Point3D radii, int tMin, int tMax) {
 		Point3D size = radii.multiply(2);
         size = size.add(new Point3D(1,1,1));
-        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack(); // needed below to get the order (ct or tc);
-        String order = vss.getOrder();
-        VirtualStackOfStacks stack = new VirtualStackOfStacks(size, imp.getNChannels(), order);
+        VirtualStackOfStacks stack = new VirtualStackOfStacks(size, imp.getNChannels());
 		OpenerExtensions oe = new OpenerExtensions();
 
-		FileInfo[] infoModified = new FileInfo[tMax-tMin];
-		for(int it=tMin; it<=tMax; it++) {
-			infoModified = oe.cropFileInfo(infos[it], 1, pos[it], radii);
-			stack.addStack(infoModified);
-		}
-        return(makeImagePlus(stack, infoModified[0], imp.getNChannels(), stack.getNStacks()/imp.getNChannels(), infoModified.length, order));
+        if(Globals.verbose){
+            log("# OpenStacksAsVirtualStack.openFromCroppedFileInfo");
+            log("tMin: "+tMin);
+            log("tMax: "+tMax);
+        }
+
+        FileInfo[] infoModified = null;
+
+        for(int ic=0; ic<imp.getNChannels(); ic++) {
+
+            for (int it = tMin; it <= tMax; it++) {
+
+                infoModified = oe.cropFileInfo(infos[it+ic*imp.getNFrames()], 1, pos[it], radii);
+                stack.addStack(infoModified);
+
+            }
+        }
+
+        return(makeImagePlus(stack, infoModified[0], imp.getNChannels(), tMax-tMin+1, infoModified.length));
 	}
 
-	private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfo fi, int nChannels, int nFrames, int nSlices, String order) {
+	private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfo fi, int nChannels, int nFrames, int nSlices) {
 		double min = Double.MAX_VALUE;
 		double max = -Double.MAX_VALUE;
 		ImagePlus imp = new ImagePlus(fi.directory, stack);
@@ -371,10 +389,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             log("# OpenStacksAsVirtualStack.makeImagePlus");
             log("nChannels: "+nChannels);
             log("nSlices: "+nSlices);
-            log("nFrames: "+nFrames);
+            log("nFrames: " + nFrames);
+            log("stack.getNStacks: "+stack.getNStacks());
+
         }
         imp.setDimensions(nChannels, nSlices, nFrames);
-        //imp = HyperStackConverter.toHyperStack(imp, nChannels, nSlices, nFrames, order, "Composite");
         imp.setOpenAsHyperStack(true);
 		imp.resetDisplayRange();
 		return(imp);
@@ -395,8 +414,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		//Globals.verbose = true;
 
         boolean interactive = false;
-        boolean MATLAB = true;
-        boolean Mitosis_ome = false;
+        boolean MATLAB = false;
+        boolean Mitosis_ome = true;
         boolean MATLAB_EXTERNAL = false;
 		boolean OME_MIP = false;
 		boolean OME = false;
