@@ -122,9 +122,10 @@ public class VirtualStackOfStacks extends ImageStack {
         int iFile = 0;
         if(order=="tc") {
             iFile = t + (nT*c);
-        }
-        if(order=="ct") {
+        } else if(order=="ct") {
             iFile = (t*nC) + c;
+        } else {
+            IJ.showMessage("Unsupported file order: "+order);
         }
 
         if(Globals.verbose) {

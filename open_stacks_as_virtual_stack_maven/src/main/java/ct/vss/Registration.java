@@ -45,6 +45,8 @@ public class Registration implements PlugIn {
     Point3D[] pTracked;
     int tMinTrack=-1, tMaxTrack=-1;
 
+
+
     public Registration(ImagePlus imp) {
         this.imp = imp;
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
@@ -57,6 +59,9 @@ public class Registration implements PlugIn {
 
     }
 
+    public Registration() {
+        // for run method
+    }
     public void run(String arg) {
         this.imp = IJ.getImage();
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();

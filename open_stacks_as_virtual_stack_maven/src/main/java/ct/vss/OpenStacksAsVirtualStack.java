@@ -87,9 +87,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         increment = (int) gd.getNextNumber();
         if (increment < 1)
             increment = 1;
-        nChannels = (int) gd.getNextNumber();
         filter = gd.getNextString();
-        order = gd.getNextString();
+        nChannels = (int) gd.getNextNumber();
+        order = gd.getNextChoice();
         return true;
     }
 
@@ -392,8 +392,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 		//Globals.verbose = true;
 
+        boolean interactive = true;
         boolean MATLAB = false;
-        boolean Mitosis_ome = true;
+        boolean Mitosis_ome = false;
         boolean MATLAB_EXTERNAL = false;
 		boolean OME_MIP = false;
 		boolean OME = false;
@@ -401,6 +402,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         OpenStacksAsVirtualStack ovs = null;
 
+
+        if(interactive) {
+            ovs = new OpenStacksAsVirtualStack();
+            ovs.run("");
+            Registration register = new Registration();
+            register.run("");
+        }
 
         if (Mitosis_ome) {
             ovs = new OpenStacksAsVirtualStack("/Users/tischi/Desktop/example-data/Mitosis-ome/", null, 1, 1, -1, 2, "tiffUseIFDsFirstFile", "tc");
@@ -410,11 +418,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             register.showDialog();
         }
         if (MATLAB) {
-            ovs = new OpenStacksAsVirtualStack("/Users/tischi/Desktop/example-data/MATLABtiff/", null, 1, 1, -1, 1, "tiffUseIFDsFirstFile", "xyzct");
+            ovs = new OpenStacksAsVirtualStack("/Users/tischi/Desktop/example-data/MATLABtiff/", null, 1, 1, -1, 1, "tiffUseIFDsFirstFile", "tc");
             ImagePlus imp = ovs.openFromDirectory();
             imp.show();
-			Registration register = new Registration(imp);
-			register.showDialog();
+            Registration register = new Registration(imp);
+            register.showDialog();
 		}
 
         /*
@@ -528,7 +536,7 @@ class VirtualOpenerDialog extends GenericDialog {
 				}
 			saveFilter = filter;
 		}
-		((Label)theLabel).setText("Number of files:"+n);
+		//((Label)theLabel).setText("Number of files:"+n);
 	}
 
 	public int getNumber(Object field) {
