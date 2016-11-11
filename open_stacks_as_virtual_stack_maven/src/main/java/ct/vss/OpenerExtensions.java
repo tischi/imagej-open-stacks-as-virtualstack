@@ -276,7 +276,6 @@ class OpenerExtensions extends Opener {
     public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, int zs, int ze, int nz, int dz, int xs, int xe, int ys, int ye) {
         long startTime;
         boolean hasStrips = false;
-        boolean isCompressed = false;
 
         if (info == null) return null;
         FileInfo fi = info[0];
@@ -291,23 +290,17 @@ class OpenerExtensions extends Opener {
             //log("rx,ry,rz: " + pr.getX() + "," + pr.getY() + "," + pr.getZ());
             log("zs,dz,ze,nz,xs,xe,ys,ye: " + zs + "," + dz + "," + ze + "," + nz + "," + xs + "," + xe + "," + ys + "," + ye);
             log("info.length: " + info.length);
-
         }
 
 
         // get size of image before cropping
         int imByteWidth = fi.width*fi.getBytesPerPixel();
 
-        FileOpener fo;
-
         ImageStack stackStream = new ImageStack(nx, ny);
         ImageProcessor ip;
 
-        int stripPixelLength = (int) fi.stripLengths[0]/fi.getBytesPerPixel();
-        int stripByteLength = (int) fi.stripLengths[0];
-        byte[] strip = new byte[fi.stripLengths[0]];
-        byte[] buffer = new byte[ny*imByteWidth];
-
+        byte[] strip;
+        byte[] buffer;
         short[][] pixels = new short[nz][nx*ny];
 
 
@@ -316,16 +309,6 @@ class OpenerExtensions extends Opener {
         long uncompressTime = 0;
         long settingStackTime = 0;
         long settingPixelsTime = 0;
-        long bufferReadingTime = 0;
-
-
-        //log("strip.length "+strip.length);
-        //log("pixels.length "+pixels.length);
-        //log("imByteWidth "+imByteWidth);
-
-        long startTimeInputStream = System.currentTimeMillis();
-        String openMethod = "allStrips";
-        //openMethod = "stripByStrip";
 
         try {
             // get input stream to file
@@ -351,10 +334,6 @@ class OpenerExtensions extends Opener {
                     hasStrips = true;
                 }
 
-                if((fi.compression>0)) {
-                    isCompressed = true;
-                }
-
                 /*
                 if(Globals.verbose) {
                     log("z-plane " + z);
@@ -363,7 +342,11 @@ class OpenerExtensions extends Opener {
                 } */
 
                 if(hasStrips) {
-                    byte[] unCompressedBuffer = new byte[ny*imByteWidth];
+
+                    // check what we have to read
+                    int rps = fi.rowsPerStrip;
+                    int ss = ys;
+                    int se = ye;
 
                     // skip to first strip of this z-plane
                     startTime = System.currentTimeMillis();
@@ -372,8 +355,8 @@ class OpenerExtensions extends Opener {
 
                     // compute read length
                     readLength = 0;
-                    for (int y = ys; y <= ye; y++) {
-                        readLength += fi.stripLengths[y];
+                    for (int s = ss; s <= se; s++) {
+                        readLength += fi.stripLengths[s];
                     }
 
                     // read all data
@@ -386,27 +369,30 @@ class OpenerExtensions extends Opener {
 
                     // deal with compression
                     if(fi.compression == LZW) {
+                        startTime = System.currentTimeMillis();
+
+                        byte[] unCompressedBuffer = new byte[ny*imByteWidth];
                         int pos = 0;
-                        for (int y = ys; y <= ye; y++) {
-                            int stripLength = fi.stripLengths[y];
+                        for (int s = ss; s <= se; s++) {
+                            int stripLength = fi.stripLengths[s];
                             strip = new byte[stripLength];
-                            // get current strip
+                            // get strip from read data
                             System.arraycopy(buffer, pos, strip, 0, stripLength);
                             //log("strip.length " + strip.length);
-
-                            startTime = System.currentTimeMillis();
+                            // uncompress strip
                             strip = lzwUncompress(strip, imByteWidth);
-                            uncompressTime += (System.currentTimeMillis() - startTime);
 
                             //log("strip.length [pixels] " + strip.length/fi.getBytesPerPixel());
                             //log("imWidth [pixels] " + imByteWidth/fi.getBytesPerPixel());
 
-                            // put into large array
-                            System.arraycopy(strip, 0, unCompressedBuffer, (y-ys)*imByteWidth, imByteWidth);
+                            // put uncompressed strip into large array
+                            System.arraycopy(strip, 0, unCompressedBuffer, (s-ss)*imByteWidth*rps, imByteWidth*rps);
                             pos += stripLength;
                             readLength += stripLength;
                         }
                         buffer = unCompressedBuffer;
+                        uncompressTime += (System.currentTimeMillis() - startTime);
+
                     }
 
                     // convert pixels to 16bit gray values and store in pixels[z]
@@ -415,7 +401,8 @@ class OpenerExtensions extends Opener {
 
                     // store strips in pixel array
                     startTime = System.currentTimeMillis();
-                    setShortPixelsFromAllStrips(fi, pixels[z-zs], 0, ny, xs, nx, imByteWidth, buffer);
+                    ys = 0; // todo: this will be different for the rps>1 cases
+                    setShortPixelsFromAllStrips(fi, pixels[z-zs], ys, ny, xs, nx, imByteWidth, buffer);
                     settingPixelsTime += (System.currentTimeMillis() - startTime);
 
                     // add pixels to stack
