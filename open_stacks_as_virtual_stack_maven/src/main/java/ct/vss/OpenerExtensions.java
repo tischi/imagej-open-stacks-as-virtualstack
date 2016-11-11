@@ -1,26 +1,27 @@
 package ct.vss;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.io.*;
+import ij.io.BitBuffer;
+import ij.io.FileInfo;
+import ij.io.FileOpener;
+import ij.io.Opener;
+import ij.process.ImageProcessor;
+import ij.process.ShortProcessor;
 import javafx.geometry.Point3D;
-import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.zip.GZIPInputStream;
-import ij.gui.*;
-import ij.process.*;
-import ij.measure.*;
-import ij.*;
-import javax.imageio.ImageIO;
+
 import javax.imageio.stream.FileImageInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+//import org.apache.commons.lang.ArrayUtils;
+
 
 
 import static ij.IJ.log;
-import static ij.IJ.runMacroFile;
-import static ij.IJ.save;
 
 /** Opens the nth image of the specified TIFF stack.*/
 class OpenerExtensions extends Opener {
@@ -37,7 +38,6 @@ class OpenerExtensions extends Opener {
 
     // uncompress
     byte[][] symbolTable = new byte[4096][1];
-
 
     public OpenerExtensions() {
 
@@ -460,12 +460,9 @@ class OpenerExtensions extends Opener {
         long startTime3, totalTime3 = 0;
         long startTime4, totalTime4 = 0;
         long startTime5, totalTime5 = 0;
-
-        startTime4 = System.nanoTime();
-        totalTime4 = (System.nanoTime() - startTime4);
-
-        startTime5 = System.nanoTime();
-        totalTime5 = (System.nanoTime() - startTime5);
+        long startTime6, totalTime6 = 0;
+        long startTime7, totalTime7 = 0;
+        long startTime8, totalTime8 = 0;
 
         startTime1 = System.nanoTime();
 
@@ -475,18 +472,23 @@ class OpenerExtensions extends Opener {
         int bitsToRead = 9;
         int nextSymbol = 258;
         int code;
+        int symbolLength, symbolLengthMax=0;
         int oldCode = -1;
-        ByteVector out = new ByteVector(8192);
+        //ByteVector out = new ByteVector(8192);
+        byte[] out = new byte[byteCount];
+        int iOut = 0, i;
         BitBuffer bb = new BitBuffer(input);
-
 
         byte[] byteBuffer1 = new byte[16];
         byte[] byteBuffer2 = new byte[16];
 
+        // todo: can this be larger?
+        //byte[] symbol = new byte[100];
+
         totalTime1 = (System.nanoTime() - startTime1);
 
-
-        while (out.size()<byteCount) {
+        //while (out.size()<byteCount) {
+        while (iOut<byteCount) {
 
             startTime2 = System.nanoTime();
 
@@ -494,59 +496,97 @@ class OpenerExtensions extends Opener {
 
             totalTime2 += (System.nanoTime() - startTime2);
 
-            startTime3 = System.nanoTime();
 
             if (code==EOI_CODE || code==-1)
                 break;
             if (code==CLEAR_CODE) {
+                startTime4 = System.nanoTime();
                 // initialize symbol table
-                for (int i = 0; i < 256; i++)
+                for (i = 0; i < 256; i++)
                     symbolTable[i][0] = (byte)i;
                 nextSymbol = 258;
                 bitsToRead = 9;
                 code = bb.getBits(bitsToRead);
                 if (code==EOI_CODE || code==-1)
                     break;
-                out.add(symbolTable[code]);
+                //out.add(symbolTable[code]);
+                System.arraycopy(symbolTable[code], 0, out, iOut, symbolTable[code].length);
+                iOut += symbolTable[code].length;
                 oldCode = code;
+                totalTime4 += (System.nanoTime() - startTime4);
+
             } else {
                 if (code<nextSymbol) {
                     // code is in table
-                    out.add(symbolTable[code]);
+                    startTime5 = System.nanoTime();
+                    //out.add(symbolTable[code]);
+                    symbolLength = symbolTable[code].length;
+                    if(symbolLength>symbolLengthMax) symbolLengthMax=symbolLength;
+                    System.arraycopy(symbolTable[code], 0, out, iOut, symbolLength);
+                    iOut += symbolLength;
+                    totalTime5 += (System.nanoTime() - startTime5);
                     // add string to table
-                    ByteVector symbol = new ByteVector(byteBuffer1);
-                    symbol.add(symbolTable[oldCode]);
-                    symbol.add(symbolTable[code][0]);
-                    symbolTable[nextSymbol] = symbol.toByteArray(); //**
+
+                    startTime6 = System.nanoTime();
+                    //ByteVector symbol = new ByteVector(byteBuffer1);
+                    //symbol.add(symbolTable[oldCode]);
+                    //symbol.add(symbolTable[code][0]);
+                    int lengthOld = symbolTable[oldCode].length;
+                    startTime7 = System.nanoTime();
+                    byte[] newSymbol = new byte[lengthOld+1];
+                    totalTime7 += (System.nanoTime() - startTime7);
+
+                    startTime8 = System.nanoTime();
+                    System.arraycopy(symbolTable[oldCode], 0, newSymbol, 0, lengthOld);
+                    totalTime8 += (System.nanoTime() - startTime8);
+
+                    newSymbol[lengthOld] = symbolTable[code][0];
+                    symbolTable[nextSymbol] = newSymbol;
+                    //symbolTable[nextSymbol] = symbol.toByteArray(); //**
                     oldCode = code;
                     nextSymbol++;
+                    totalTime6 += (System.nanoTime() - startTime6);
+
                 } else {
+
+                    startTime3 = System.nanoTime();
                     // out of table
                     ByteVector symbol = new ByteVector(byteBuffer2);
                     symbol.add(symbolTable[oldCode]);
                     symbol.add(symbolTable[oldCode][0]);
                     byte[] outString = symbol.toByteArray();
-                    out.add(outString);
+                    //out.add(outString);
+                    System.arraycopy(outString, 0, out, iOut, outString.length);
+                    iOut += outString.length;
                     symbolTable[nextSymbol] = outString; //**
                     oldCode = code;
                     nextSymbol++;
+                    totalTime3 += (System.nanoTime() - startTime3);
+
                 }
                 if (nextSymbol == 511) { bitsToRead = 10; }
                 if (nextSymbol == 1023) { bitsToRead = 11; }
                 if (nextSymbol == 2047) { bitsToRead = 12; }
             }
-            totalTime3 += (System.nanoTime() - startTime3);
+
         }
 
         totalTimeGlob = (System.nanoTime() - startTimeGlob);
-        log("total : "+totalTimeGlob);
+
+        log("total : "+totalTimeGlob/1000);
+        totalTimeGlob = 1000;
         log("fraction1 : "+(double)totalTime1/totalTimeGlob);
         log("fraction2 : "+(double)totalTime2/totalTimeGlob);
         log("fraction3 : "+(double)totalTime3/totalTimeGlob);
         log("fraction4 : "+(double)totalTime4/totalTimeGlob);
         log("fraction5 : "+(double)totalTime5/totalTimeGlob);
+        log("fraction6 : "+(double)totalTime6/totalTimeGlob);
+        log("fraction7 : "+(double)totalTime7/totalTimeGlob);
+        log("fraction8 : "+(double)totalTime8/totalTimeGlob);
 
-        return out.toByteArray();
+        log("symbolLengthMax "+symbolLengthMax);
+        //return out.toByteArray();
+        return out;
     }
 
 }
