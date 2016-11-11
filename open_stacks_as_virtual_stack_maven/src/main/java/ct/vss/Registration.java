@@ -88,8 +88,8 @@ public class Registration implements PlugIn {
         gd.addSlider("Object radius x [pix]", 0, (int) imp.getWidth() / 2, 30);
         gd.addSlider("Object radius y [pix]", 0, (int) imp.getHeight() / 2, 30);
         gd.addSlider("Object radius z [pix]", 0, (int) imp.getNSlices() / 2, 10);
-        gd.addSlider("Tracking dz [pix]", 1, (int) imp.getNSlices() / 2, 2);
-        gd.addSlider("Tracking dt [frames]", 1, (int) imp.getNFrames() / 5, 2);
+        gd.addSlider("Tracking dz [pix]", 1, (int) imp.getNSlices() / 2, 1);
+        gd.addSlider("Tracking dt [frames]", 1, (int) imp.getNFrames() / 5, 1);
         gd.addNumericField("Tracking margin factor", 2, 1);
         gd.addNumericField("Image background value", 100, 0);
         gd.addNumericField("Center computation iterations", 6, 0);

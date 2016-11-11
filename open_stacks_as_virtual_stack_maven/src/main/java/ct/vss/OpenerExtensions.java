@@ -32,6 +32,12 @@ class OpenerExtensions extends Opener {
     public static final int LZW_WITH_DIFFERENCING = 3;
     public static final int JPEG = 4;
     public static final int PACK_BITS = 5;
+    private static final int CLEAR_CODE = 256;
+    private static final int EOI_CODE = 257;
+
+    // uncompress
+    byte[][] symbolTable = new byte[4096][1];
+
 
     public OpenerExtensions() {
 
@@ -107,11 +113,11 @@ class OpenerExtensions extends Opener {
     }
 
     void setShortPixels(FileInfo fi, short[] pixels, int base, byte[] buffer){
-        int bytesPerPixel = 2;
+        int bytesPerPixel = fi.getBytesPerPixel();
         int pixelsRead = (int) buffer.length/bytesPerPixel;
-        //log("setShortPixels: base "+base);
-        //log("setShortPixels: pixelsRead "+pixelsRead);
-        //log("setShortPixels: pixels.length "+pixels.length);
+        log("setShortPixels: base "+base);
+        log("setShortPixels: pixels in buffer "+pixelsRead);
+        log("setShortPixels: pixels.length "+pixels.length);
 
         if (fi.intelByteOrder) {
             if (fi.fileType==FileInfo.GRAY16_SIGNED)
@@ -130,14 +136,14 @@ class OpenerExtensions extends Opener {
         }
     }
 
-    void setShortPixelsFromAllStrips(FileInfo fi, short[] pixels, int imByteWidth, byte[] buffer){
-        int nz = fi.stripLengths.length;
+    void setShortPixelsFromAllStrips(FileInfo fi, short[] pixels, int ys, int ny, int xs, int nx, int imByteWidth, byte[] buffer){
         int ip = 0;
         int bs, be;
 
-        for(int z=0; z<nz; z++ ) {
-            bs = z * imByteWidth;
-            be = bs + fi.stripLengths[0];
+        for(int y=ys; y<ys+ny; y++ ) {
+
+            bs = y * imByteWidth + xs * fi.getBytesPerPixel();
+            be = bs + nx * fi.getBytesPerPixel();
 
             if (fi.intelByteOrder) {
                 if (fi.fileType == FileInfo.GRAY16_SIGNED)
@@ -273,10 +279,6 @@ class OpenerExtensions extends Opener {
             nz = (int) (1.0*nz/dz + 0.5);
         }
 
-
-        // only needed for uncompress, but does not hurt to instantiate anyway
-        ImageReader reader = new ImageReader(fi);
-
         if(Globals.verbose) {
             log("# openCroppedTiffStackUsingIFDs");
             log("directory: " + info[0].directory);
@@ -293,7 +295,7 @@ class OpenerExtensions extends Opener {
 
         FileOpener fo;
 
-        ImageStack stackStream = new ImageStack(info[0].width,info[0].height);
+        ImageStack stackStream = new ImageStack(nx, ny);
         ImageProcessor ip;
 
         int stripPixelLength = (int) fi.stripLengths[0]/fi.getBytesPerPixel();
@@ -348,14 +350,15 @@ class OpenerExtensions extends Opener {
                     isCompressed = true;
                 }
 
-
+                /*
                 if(Globals.verbose) {
                     log("z-plane " + z);
                     log("hasStrips: " + hasStrips);
                     log("isCompressed: " + isCompressed);
-                }
+                } */
 
                 if(hasStrips) {
+                    byte[] unCompressedBuffer = new byte[ny*imByteWidth];
 
                     // skip to first strip of this z-plane
                     startTime = System.currentTimeMillis();
@@ -368,35 +371,53 @@ class OpenerExtensions extends Opener {
                         readLength += fi.stripLengths[y];
                     }
 
-                    log("read: " + hasStrips);
-
                     // read all data
                     startTime = System.currentTimeMillis();
                     buffer = new byte[readLength];
                     pointer = read(in, buffer, pointer);
                     readingTime += (System.currentTimeMillis() - startTime);
 
-                    log("buffer.length: " + buffer.length);
+                    //log("buffer.length: " + buffer.length);
 
                     // deal with compression
-
-
                     if(fi.compression == LZW) {
+                        int pos = 0;
                         for (int y = ys; y <= ye; y++) {
-                            System.arraycopy(array, 0, data, size, length);
+                            int stripLength = fi.stripLengths[y];
+                            strip = new byte[stripLength];
+                            // get current strip
+                            System.arraycopy(buffer, pos, strip, 0, stripLength);
+                            //log("strip.length " + strip.length);
 
-                            readLength += fi.stripLengths[y];
-                            buffer = reader.lzwUncompress(buffer);
+                            startTime = System.currentTimeMillis();
+                            strip = lzwUncompress(strip, imByteWidth);
+                            uncompressTime += (System.currentTimeMillis() - startTime);
+
+                            //log("strip.length [pixels] " + strip.length/fi.getBytesPerPixel());
+                            //log("imWidth [pixels] " + imByteWidth/fi.getBytesPerPixel());
+
+                            // put into large array
+                            System.arraycopy(strip, 0, unCompressedBuffer, (y-ys)*imByteWidth, imByteWidth);
+                            pos += stripLength;
+                            readLength += stripLength;
+                        }
+                        buffer = unCompressedBuffer;
                     }
 
-
-                    }
-                    log("buffer.length: " + buffer.length);
+                    // convert pixels to 16bit gray values and store in pixels[z]
+                    //log("buffer.length: " + buffer.length);
+                    //log("ny*imByteWidth " + (ny*imByteWidth));
 
                     // store strips in pixel array
                     startTime = System.currentTimeMillis();
-                    setShortPixelsFromAllStrips(fi, pixels[z], imByteWidth, buffer);
+                    setShortPixelsFromAllStrips(fi, pixels[z], 0, ny, xs, nx, imByteWidth, buffer);
                     settingPixelsTime += (System.currentTimeMillis() - startTime);
+
+                    // add pixels to stack
+                    startTime = System.currentTimeMillis();
+                    ip = new ShortProcessor(nx, ny, (short[]) pixels[z], null);
+                    stackStream.addSlice(ip);
+                    settingStackTime += (System.currentTimeMillis()-startTime);
 
                 } else {
 
@@ -419,16 +440,175 @@ class OpenerExtensions extends Opener {
             log("Skipping [ms]: " + skippingTime);
             log("Reading [ms]: " + readingTime);
             log("Effective reading speed [MB/s]: " + byteRead/((readingTime+0.001)*1000));
-            log("UnCompress [ms]" + uncompressTime);
+            log("UnCompressing [ms]: " + uncompressTime);
             log("Setting pixels [ms]: " + settingPixelsTime);
             log("Setting stack [ms]: " + settingStackTime);
         }
 
-        ImagePlus impStream = new ImagePlus("One stream",stackStream);
+        ImagePlus impStream = new ImagePlus("One stream", stackStream);
+        impStream.show();
 
         return impStream;
     }
 
+    public byte[] lzwUncompress(byte[] input, int byteCount) {
+        long startTimeGlob = System.nanoTime();
+        long totalTimeGlob = 0;
+        long startTime0, totalTime0 = 0;
+        long startTime1, totalTime1 = 0;
+        long startTime2, totalTime2 = 0;
+        long startTime3, totalTime3 = 0;
+        long startTime4, totalTime4 = 0;
+        long startTime5, totalTime5 = 0;
+
+        startTime4 = System.nanoTime();
+        totalTime4 = (System.nanoTime() - startTime4);
+
+        startTime5 = System.nanoTime();
+        totalTime5 = (System.nanoTime() - startTime5);
+
+        startTime1 = System.nanoTime();
+
+        if (input==null || input.length==0)
+            return input;
+
+        int bitsToRead = 9;
+        int nextSymbol = 258;
+        int code;
+        int oldCode = -1;
+        ByteVector out = new ByteVector(8192);
+        BitBuffer bb = new BitBuffer(input);
+
+
+        byte[] byteBuffer1 = new byte[16];
+        byte[] byteBuffer2 = new byte[16];
+
+        totalTime1 = (System.nanoTime() - startTime1);
+
+
+        while (out.size()<byteCount) {
+
+            startTime2 = System.nanoTime();
+
+            code = bb.getBits(bitsToRead);
+
+            totalTime2 += (System.nanoTime() - startTime2);
+
+            startTime3 = System.nanoTime();
+
+            if (code==EOI_CODE || code==-1)
+                break;
+            if (code==CLEAR_CODE) {
+                // initialize symbol table
+                for (int i = 0; i < 256; i++)
+                    symbolTable[i][0] = (byte)i;
+                nextSymbol = 258;
+                bitsToRead = 9;
+                code = bb.getBits(bitsToRead);
+                if (code==EOI_CODE || code==-1)
+                    break;
+                out.add(symbolTable[code]);
+                oldCode = code;
+            } else {
+                if (code<nextSymbol) {
+                    // code is in table
+                    out.add(symbolTable[code]);
+                    // add string to table
+                    ByteVector symbol = new ByteVector(byteBuffer1);
+                    symbol.add(symbolTable[oldCode]);
+                    symbol.add(symbolTable[code][0]);
+                    symbolTable[nextSymbol] = symbol.toByteArray(); //**
+                    oldCode = code;
+                    nextSymbol++;
+                } else {
+                    // out of table
+                    ByteVector symbol = new ByteVector(byteBuffer2);
+                    symbol.add(symbolTable[oldCode]);
+                    symbol.add(symbolTable[oldCode][0]);
+                    byte[] outString = symbol.toByteArray();
+                    out.add(outString);
+                    symbolTable[nextSymbol] = outString; //**
+                    oldCode = code;
+                    nextSymbol++;
+                }
+                if (nextSymbol == 511) { bitsToRead = 10; }
+                if (nextSymbol == 1023) { bitsToRead = 11; }
+                if (nextSymbol == 2047) { bitsToRead = 12; }
+            }
+            totalTime3 += (System.nanoTime() - startTime3);
+        }
+
+        totalTimeGlob = (System.nanoTime() - startTimeGlob);
+        log("total : "+totalTimeGlob);
+        log("fraction1 : "+(double)totalTime1/totalTimeGlob);
+        log("fraction2 : "+(double)totalTime2/totalTimeGlob);
+        log("fraction3 : "+(double)totalTime3/totalTimeGlob);
+        log("fraction4 : "+(double)totalTime4/totalTimeGlob);
+        log("fraction5 : "+(double)totalTime5/totalTimeGlob);
+
+        return out.toByteArray();
+    }
+
+}
+
+
+
+/** A growable array of bytes. */
+class ByteVector {
+    private byte[] data;
+    private int size;
+
+    public ByteVector() {
+        data = new byte[10];
+        size = 0;
+    }
+
+    public ByteVector(int initialSize) {
+        data = new byte[initialSize];
+        size = 0;
+    }
+
+    public ByteVector(byte[] byteBuffer) {
+        data = byteBuffer;
+        size = 0;
+    }
+
+    public void add(byte x) {
+        if (size>=data.length) {
+            doubleCapacity();
+            add(x);
+        } else
+            data[size++] = x;
+    }
+
+    public int size() {
+        return size;
+    }
+
+    public void add(byte[] array) {
+        int length = array.length;
+        while (data.length-size<length)
+            doubleCapacity();
+        System.arraycopy(array, 0, data, size, length);
+        size += length;
+    }
+
+    void doubleCapacity() {
+        //IJ.log("double: "+data.length*2);
+        byte[] tmp = new byte[data.length*2 + 1];
+        System.arraycopy(data, 0, tmp, 0, data.length);
+        data = tmp;
+    }
+
+    public void clear() {
+        size = 0;
+    }
+
+    public byte[] toByteArray() {
+        byte[] bytes = new byte[size];
+        System.arraycopy(data, 0, bytes, 0, size);
+        return bytes;
+    }
 
 }
 
