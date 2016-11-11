@@ -1,20 +1,21 @@
 package ct.vss;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
-import java.awt.event.*;
-import ij.*;
+import ij.IJ;
+import ij.ImageJ;
 import ij.ImagePlus;
-import ij.io.Opener;
+import ij.gui.GenericDialog;
 import ij.io.FileInfo;
-import ij.gui.*;
+import ij.io.Opener;
 import ij.plugin.PlugIn;
-import ij.plugin.HyperStackConverter;
 import javafx.geometry.Point3D;
 
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.TextEvent;
+import java.awt.image.ColorModel;
+import java.io.File;
+
 import static ij.IJ.log;
-import static ij.IJ.open;
 
 // todo: implement a class for efficient saving of the cropped stacks
 
@@ -485,7 +486,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //String openingMethod = "tiffUseIFDsFirstFile";
         String order = "tc";
 
-        Globals.verbose = true;
+        //Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack(directory, filter, start, increment, n, nChannels, openingMethod, order);
         ImagePlus imp = ovs.openFromDirectory();
         imp.show();

@@ -1,29 +1,19 @@
 package ct.vss;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.WindowManager;
+import ij.gui.*;
 import ij.io.FileInfo;
+import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
-import ij.plugin.Filters3D;
 
-import static ij.IJ.createImage;
-import static ij.IJ.log;
-import ij.plugin.frame.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.*;
 
-import ij.*;
-import ij.plugin.*;
-import ij.process.*;
-import ij.gui.*;
-import ij.measure.*;
-
-import javax.swing.*;
-import java.io.IOException;
-import java.net.URL;
-import java.net.MalformedURLException;
+import static ij.IJ.log;
 
 
 /**

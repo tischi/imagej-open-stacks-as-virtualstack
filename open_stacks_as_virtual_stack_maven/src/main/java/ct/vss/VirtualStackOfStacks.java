@@ -4,12 +4,14 @@ package ct.vss;
  * Created by tischi on 27/10/16.
  */
 
-import java.awt.image.*;
-import ij.*;
+import ij.IJ;
+import ij.ImagePlus;
+import ij.ImageStack;
 import ij.io.FileInfo;
 import ij.process.ImageProcessor;
-import static ij.IJ.log;
 import javafx.geometry.Point3D;
+
+import static ij.IJ.log;
 
 /**
  This class represents an array of disk-resident images.
@@ -140,7 +142,8 @@ public class VirtualStackOfStacks extends ImageStack {
             log("opening z-slice [one-based]: "+(z+1));
         }
 
-        ImagePlus imp = new OpenerExtensions().openTiffStackSliceUsingIFDs(infos[iFile], z);
+        //ImagePlus imp = new OpenerExtensions().openTiffStackSliceUsingIFDs(infos[iFile], z);
+        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[iFile], z, z, 1, 1, 0, infos[iFile][0].width-1, 0, infos[iFile][0].height-1);
 
         if (imp==null) {
             log("Error: loading failed!");

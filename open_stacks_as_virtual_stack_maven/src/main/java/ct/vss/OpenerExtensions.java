@@ -17,11 +17,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-//import org.apache.commons.lang.ArrayUtils;
-
-
-
 import static ij.IJ.log;
+
+
 
 /** Opens the nth image of the specified TIFF stack.*/
 class OpenerExtensions extends Opener {
@@ -251,39 +249,46 @@ class OpenerExtensions extends Opener {
     }
 
     public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, int dz, Point3D p, Point3D pr) {
+
+        // compute ranges to be loaded
+        int xc = (int) (p.getX() + 0.5);
+        int yc = (int) (p.getY() + 0.5);
+        int zc = (int) (p.getZ() + 0.5);
+        int rx = (int) (pr.getX() + 0.5);
+        int ry = (int) (pr.getY() + 0.5);
+        int rz = (int) (pr.getZ() + 0.5);
+        int xs = xc - rx;
+        int ys = yc - ry;
+        int zs = zc - rz;
+        int xe = xc + rx;
+        int ye = yc + ry;
+        int ze = zc + rz;
+        int nz = ze - zs + 1;
+
+        if (dz > 1) {
+            nz = (int) (1.0 * nz / dz + 0.5);
+        }
+
+        return(openCroppedTiffStackUsingIFDs(info, zs, ze, nz, dz, xs, xe, ys, ye));
+
+    }
+
+    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, int zs, int ze, int nz, int dz, int xs, int xe, int ys, int ye) {
         long startTime;
         boolean hasStrips = false;
         boolean isCompressed = false;
 
-        if (info==null) return null;
+        if (info == null) return null;
         FileInfo fi = info[0];
 
-        // compute ranges to be loaded
-        int xc = (int) (p.getX()+0.5);
-        int yc = (int) (p.getY()+0.5);
-        int zc = (int) (p.getZ()+0.5);
-        int rx = (int) (pr.getX()+0.5);
-        int ry = (int) (pr.getY()+0.5);
-        int rz = (int) (pr.getZ()+0.5);
-        int xs = xc-rx;
-        int ys = yc-ry;
-        int zs = zc-rz;
-        int xe = xc+rx;
-        int ye = yc+ry;
-        int ze = zc+rz;
         int nx = xe - xs + 1;
         int ny = ye - ys + 1;
-        int nz = ze - zs + 1;
-
-        if(dz>1) {
-            nz = (int) (1.0*nz/dz + 0.5);
-        }
 
         if(Globals.verbose) {
             log("# openCroppedTiffStackUsingIFDs");
             log("directory: " + info[0].directory);
             log("filename: " + info[0].fileName);
-            log("rx,ry,rz: " + pr.getX() + "," + pr.getY() + "," + pr.getZ());
+            //log("rx,ry,rz: " + pr.getX() + "," + pr.getY() + "," + pr.getZ());
             log("zs,dz,ze,nz,xs,xe,ys,ye: " + zs + "," + dz + "," + ze + "," + nz + "," + xs + "," + xe + "," + ys + "," + ye);
             log("info.length: " + info.length);
 
@@ -410,12 +415,12 @@ class OpenerExtensions extends Opener {
 
                     // store strips in pixel array
                     startTime = System.currentTimeMillis();
-                    setShortPixelsFromAllStrips(fi, pixels[z], 0, ny, xs, nx, imByteWidth, buffer);
+                    setShortPixelsFromAllStrips(fi, pixels[z-zs], 0, ny, xs, nx, imByteWidth, buffer);
                     settingPixelsTime += (System.currentTimeMillis() - startTime);
 
                     // add pixels to stack
                     startTime = System.currentTimeMillis();
-                    ip = new ShortProcessor(nx, ny, (short[]) pixels[z], null);
+                    ip = new ShortProcessor(nx, ny, (short[]) pixels[z-zs], null);
                     stackStream.addSlice(ip);
                     settingStackTime += (System.currentTimeMillis()-startTime);
 
@@ -446,7 +451,7 @@ class OpenerExtensions extends Opener {
         }
 
         ImagePlus impStream = new ImagePlus("One stream", stackStream);
-        impStream.show();
+        //impStream.show();
 
         return impStream;
     }
@@ -463,8 +468,9 @@ class OpenerExtensions extends Opener {
         long startTime6, totalTime6 = 0;
         long startTime7, totalTime7 = 0;
         long startTime8, totalTime8 = 0;
+        long startTime9, totalTime9 = 0;
 
-        startTime1 = System.nanoTime();
+        //startTime1 = System.nanoTime();
 
         if (input==null || input.length==0)
             return input;
@@ -477,6 +483,7 @@ class OpenerExtensions extends Opener {
         //ByteVector out = new ByteVector(8192);
         byte[] out = new byte[byteCount];
         int iOut = 0, i;
+        int k=0;
         BitBuffer bb = new BitBuffer(input);
 
         byte[] byteBuffer1 = new byte[16];
@@ -485,22 +492,22 @@ class OpenerExtensions extends Opener {
         // todo: can this be larger?
         //byte[] symbol = new byte[100];
 
-        totalTime1 = (System.nanoTime() - startTime1);
+        //totalTime1 = (System.nanoTime() - startTime1);
 
         //while (out.size()<byteCount) {
         while (iOut<byteCount) {
 
-            startTime2 = System.nanoTime();
+            //startTime2 = System.nanoTime();
 
             code = bb.getBits(bitsToRead);
 
-            totalTime2 += (System.nanoTime() - startTime2);
+            //totalTime2 += (System.nanoTime() - startTime2);
 
 
             if (code==EOI_CODE || code==-1)
                 break;
             if (code==CLEAR_CODE) {
-                startTime4 = System.nanoTime();
+                //startTime4 = System.nanoTime();
                 // initialize symbol table
                 for (i = 0; i < 256; i++)
                     symbolTable[i][0] = (byte)i;
@@ -513,43 +520,39 @@ class OpenerExtensions extends Opener {
                 System.arraycopy(symbolTable[code], 0, out, iOut, symbolTable[code].length);
                 iOut += symbolTable[code].length;
                 oldCode = code;
-                totalTime4 += (System.nanoTime() - startTime4);
+                //totalTime4 += (System.nanoTime() - startTime4);
 
             } else {
                 if (code<nextSymbol) {
+                    //startTime6 = System.nanoTime();
                     // code is in table
-                    startTime5 = System.nanoTime();
+                    //startTime5 = System.nanoTime();
                     //out.add(symbolTable[code]);
                     symbolLength = symbolTable[code].length;
-                    if(symbolLength>symbolLengthMax) symbolLengthMax=symbolLength;
                     System.arraycopy(symbolTable[code], 0, out, iOut, symbolLength);
                     iOut += symbolLength;
-                    totalTime5 += (System.nanoTime() - startTime5);
+                    //totalTime5 += (System.nanoTime() - startTime5);
                     // add string to table
 
-                    startTime6 = System.nanoTime();
                     //ByteVector symbol = new ByteVector(byteBuffer1);
                     //symbol.add(symbolTable[oldCode]);
                     //symbol.add(symbolTable[code][0]);
                     int lengthOld = symbolTable[oldCode].length;
-                    startTime7 = System.nanoTime();
-                    byte[] newSymbol = new byte[lengthOld+1];
-                    totalTime7 += (System.nanoTime() - startTime7);
 
-                    startTime8 = System.nanoTime();
-                    System.arraycopy(symbolTable[oldCode], 0, newSymbol, 0, lengthOld);
-                    totalTime8 += (System.nanoTime() - startTime8);
 
-                    newSymbol[lengthOld] = symbolTable[code][0];
-                    symbolTable[nextSymbol] = newSymbol;
-                    //symbolTable[nextSymbol] = symbol.toByteArray(); //**
+                    //byte[] newSymbol = new byte[lengthOld+1];
+                    symbolTable[nextSymbol] = new byte[lengthOld+1];
+                    System.arraycopy(symbolTable[oldCode], 0, symbolTable[nextSymbol], 0, lengthOld);
+                    symbolTable[nextSymbol][lengthOld] = symbolTable[code][0];
+                    //symbolTable[nextSymbol] = newSymbol;
+
                     oldCode = code;
                     nextSymbol++;
-                    totalTime6 += (System.nanoTime() - startTime6);
+                    //totalTime6 += (System.nanoTime() - startTime6);
 
                 } else {
 
-                    startTime3 = System.nanoTime();
+                    //startTime3 = System.nanoTime();
                     // out of table
                     ByteVector symbol = new ByteVector(byteBuffer2);
                     symbol.add(symbolTable[oldCode]);
@@ -561,7 +564,7 @@ class OpenerExtensions extends Opener {
                     symbolTable[nextSymbol] = outString; //**
                     oldCode = code;
                     nextSymbol++;
-                    totalTime3 += (System.nanoTime() - startTime3);
+                    //totalTime3 += (System.nanoTime() - startTime3);
 
                 }
                 if (nextSymbol == 511) { bitsToRead = 10; }
@@ -572,7 +575,7 @@ class OpenerExtensions extends Opener {
         }
 
         totalTimeGlob = (System.nanoTime() - startTimeGlob);
-
+        /*
         log("total : "+totalTimeGlob/1000);
         totalTimeGlob = 1000;
         log("fraction1 : "+(double)totalTime1/totalTimeGlob);
@@ -583,9 +586,10 @@ class OpenerExtensions extends Opener {
         log("fraction6 : "+(double)totalTime6/totalTimeGlob);
         log("fraction7 : "+(double)totalTime7/totalTimeGlob);
         log("fraction8 : "+(double)totalTime8/totalTimeGlob);
-
+        log("fraction9 : "+(double)totalTime9/totalTimeGlob);
         log("symbolLengthMax "+symbolLengthMax);
-        //return out.toByteArray();
+        */
+
         return out;
     }
 
