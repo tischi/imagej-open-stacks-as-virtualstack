@@ -25,6 +25,14 @@ import static ij.IJ.save;
 /** Opens the nth image of the specified TIFF stack.*/
 class OpenerExtensions extends Opener {
 
+    // Compression modes
+    public static final int COMPRESSION_UNKNOWN = 0;
+    public static final int COMPRESSION_NONE= 1;
+    public static final int LZW = 2;
+    public static final int LZW_WITH_DIFFERENCING = 3;
+    public static final int JPEG = 4;
+    public static final int PACK_BITS = 5;
+
     public OpenerExtensions() {
 
     }
@@ -236,23 +244,217 @@ class OpenerExtensions extends Opener {
         return(infoModified);
     }
 
-    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] infoAll, int dz, Point3D p, Point3D pr) {
+    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, int dz, Point3D p, Point3D pr) {
+        long startTime;
+        boolean hasStrips = false;
+        boolean isCompressed = false;
+
+        if (info==null) return null;
+        FileInfo fi = info[0];
+
+        // compute ranges to be loaded
+        int xc = (int) (p.getX()+0.5);
+        int yc = (int) (p.getY()+0.5);
+        int zc = (int) (p.getZ()+0.5);
+        int rx = (int) (pr.getX()+0.5);
+        int ry = (int) (pr.getY()+0.5);
+        int rz = (int) (pr.getZ()+0.5);
+        int xs = xc-rx;
+        int ys = yc-ry;
+        int zs = zc-rz;
+        int xe = xc+rx;
+        int ye = yc+ry;
+        int ze = zc+rz;
+        int nx = xe - xs + 1;
+        int ny = ye - ys + 1;
+        int nz = ze - zs + 1;
+
+        if(dz>1) {
+            nz = (int) (1.0*nz/dz + 0.5);
+        }
+
+
+        // only needed for uncompress, but does not hurt to instantiate anyway
+        ImageReader reader = new ImageReader(fi);
+
+        if(Globals.verbose) {
+            log("# openCroppedTiffStackUsingIFDs");
+            log("directory: " + info[0].directory);
+            log("filename: " + info[0].fileName);
+            log("rx,ry,rz: " + pr.getX() + "," + pr.getY() + "," + pr.getZ());
+            log("zs,dz,ze,nz,xs,xe,ys,ye: " + zs + "," + dz + "," + ze + "," + nz + "," + xs + "," + xe + "," + ys + "," + ye);
+            log("info.length: " + info.length);
+
+        }
+
+
+        // get size of image before cropping
+        int imByteWidth = fi.width*fi.getBytesPerPixel();
+
+        FileOpener fo;
+
+        ImageStack stackStream = new ImageStack(info[0].width,info[0].height);
+        ImageProcessor ip;
+
+        int stripPixelLength = (int) fi.stripLengths[0]/fi.getBytesPerPixel();
+        int stripByteLength = (int) fi.stripLengths[0];
+        byte[] strip = new byte[fi.stripLengths[0]];
+        byte[] buffer = new byte[ny*imByteWidth];
+
+        short[][] pixels = new short[nz][nx*ny];
+
+
+        long skippingTime = 0;
+        long readingTime = 0;
+        long uncompressTime = 0;
+        long settingStackTime = 0;
+        long settingPixelsTime = 0;
+        long bufferReadingTime = 0;
+
+
+        //log("strip.length "+strip.length);
+        //log("pixels.length "+pixels.length);
+        //log("imByteWidth "+imByteWidth);
+
+        long startTimeInputStream = System.currentTimeMillis();
+        String openMethod = "allStrips";
+        //openMethod = "stripByStrip";
+
+        try {
+            // get input stream to file
+            File f = new File(fi.directory + fi.fileName);
+            InputStream in = new FileInputStream(f);
+            //InputStream in = new BufferedInputStream(new FileInputStream(f));
+            //FileImageInputStream in = new FileImageInputStream(f);
+
+            int readLength;
+            long pointer=0L;
+
+            for(int z=zs; z<=ze; z+=dz) {
+
+                if (z<0 || z>=info.length) {
+                    IJ.showMessage("z=" + z + " is out of range. Please reduce your z-radius.");
+                    throw new IllegalArgumentException("z=" + z + " is out of range");
+                }
+
+                // get current FileInfo
+                fi = info[z];
+
+                if((fi.stripOffsets!=null&&fi.stripOffsets.length>1)) {
+                    hasStrips = true;
+                }
+
+                if((fi.compression>0)) {
+                    isCompressed = true;
+                }
+
+
+                if(Globals.verbose) {
+                    log("z-plane " + z);
+                    log("hasStrips: " + hasStrips);
+                    log("isCompressed: " + isCompressed);
+                }
+
+                if(hasStrips) {
+
+                    // skip to first strip of this z-plane
+                    startTime = System.currentTimeMillis();
+                    pointer = skip(in, info[z].stripOffsets[ys] - pointer, pointer);
+                    skippingTime += (System.currentTimeMillis() - startTime);
+
+                    // compute read length
+                    readLength = 0;
+                    for (int y = ys; y <= ye; y++) {
+                        readLength += fi.stripLengths[y];
+                    }
+
+                    log("read: " + hasStrips);
+
+                    // read all data
+                    startTime = System.currentTimeMillis();
+                    buffer = new byte[readLength];
+                    pointer = read(in, buffer, pointer);
+                    readingTime += (System.currentTimeMillis() - startTime);
+
+                    log("buffer.length: " + buffer.length);
+
+                    // deal with compression
+
+
+                    if(fi.compression == LZW) {
+                        for (int y = ys; y <= ye; y++) {
+                            System.arraycopy(array, 0, data, size, length);
+
+                            readLength += fi.stripLengths[y];
+                            buffer = reader.lzwUncompress(buffer);
+                    }
+
+
+                    }
+                    log("buffer.length: " + buffer.length);
+
+                    // store strips in pixel array
+                    startTime = System.currentTimeMillis();
+                    setShortPixelsFromAllStrips(fi, pixels[z], imByteWidth, buffer);
+                    settingPixelsTime += (System.currentTimeMillis() - startTime);
+
+                } else {
+
+                    // ...
+
+                }
+
+            } // z
+            
+            in.close();
+
+        } catch (Exception e) {
+            IJ.handleException(e);
+        }
+
+
+        if(Globals.verbose) {
+            int byteRead = nz*(xe-xs)*(ye-ys)*fi.getBytesPerPixel();
+            log("OpenerExtensions.openCroppedTiffStackUsingIFDs");
+            log("Skipping [ms]: " + skippingTime);
+            log("Reading [ms]: " + readingTime);
+            log("Effective reading speed [MB/s]: " + byteRead/((readingTime+0.001)*1000));
+            log("UnCompress [ms]" + uncompressTime);
+            log("Setting pixels [ms]: " + settingPixelsTime);
+            log("Setting stack [ms]: " + settingStackTime);
+        }
+
+        ImagePlus impStream = new ImagePlus("One stream",stackStream);
+
+        return impStream;
+    }
+
+
+}
+
+
+/*
+
+
+    public ImagePlus OLDopenCroppedTiffStackUsingIFDs(FileInfo[] infoAll, int dz, Point3D p, Point3D pr) {
         //log("# openCroppedTiffStackUsingIFDs");
         long startTime, stopTime, elapsedTime;
+        FileInfo[] info;
 
         if (infoAll==null) return null;
-
-        //for(int i=0; i<info.length; i++) {
-        //    log(""+info[i].getOffset());
-        //}
-
-        // modify FileInfos to reflect the cropping
-        // todo: this can be shortened a lot as one the first fi needs to know about the cropping
+        FileInfo fi = infoAll[0];
 
         // get size of image before cropping
         int imByteWidth = infoAll[0].width*infoAll[0].getBytesPerPixel();
 
-        FileInfo[] info = cropFileInfo(infoAll, dz, p, pr);
+        // add strips to the FileInfo to enable reading of a subset of the data
+        // todo: as this turns out to be slow anyway, i could get rid of it and just compute the
+        // start and end point of the region that is to be read
+        if((fi.stripOffsets!=null&&fi.stripOffsets.length>1)) {
+            info = infoAll;
+        } else { // no strips present, need to add my own ones
+            info = cropFileInfo(infoAll, dz, p, pr);
+        }
 
         FileOpener fo;
         FileInfo fi = info[0];
@@ -351,7 +553,7 @@ class OpenerExtensions extends Opener {
                 }
 
             } // z
-            
+
             in.close();
         } catch (Exception e) {
             IJ.handleException(e);
@@ -373,11 +575,6 @@ class OpenerExtensions extends Opener {
         return impStream;
     }
 
-
-}
-
-
-/*
 
     public ImagePlus openCroppedTiffStackUsingFirstIFD(FileInfo fi0, Point3D p, Point3D pr) {
 

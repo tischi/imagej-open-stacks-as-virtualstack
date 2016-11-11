@@ -170,6 +170,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     public ImagePlus openFromDirectory() {
+        log("# openFromDirectory");
+
         boolean checkOffsets = false;
         FileInfo[] info = null;
         FileInfo fi = null;
@@ -201,21 +203,18 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         log("Obtaining IFDs from first file and use for all.");
                         info = Opener.getTiffFileInfo(directory + list[i]);
                         fi = info[0];
-                        // init stack
-                        if (stack == null) {
-                            // Collect image stack information
-                            ColorModel cm = null;
-                            if (fi.nImages > 1) {
-                                nSlices = fi.nImages;
-                                fi.nImages = 1;
-                            } else {
-                                nSlices = info.length;
-                            }
-                            // Initialise stack
-                            stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels);
+                        // Collect image stack information
+                        ColorModel cm = null;
+                        if (fi.nImages > 1) {
+                            nSlices = fi.nImages;
+                            fi.nImages = 1;
+                        } else {
+                            nSlices = info.length;
                         }
+                        // Initialise stack
+                        stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels);
                         stack.addStack(info);
-                    } else {
+                    } else { // construct IFDs from first file
                         FileInfo[] infoModified = new FileInfo[info.length];
                         for (int j = 0; j < info.length; j++) {
                             infoModified[j] = (FileInfo) info[j].clone();
@@ -225,6 +224,52 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     }
 
                     count = stack.getNStacks();
+                }
+
+                if(openingMethod=="tiffLoadAllIFDs") {
+
+                    log("# tiffLoadAllIFDs");
+
+                    info = Opener.getTiffFileInfo(directory + list[i]);
+
+                    log(""+list[i]);
+                    log("info.length "+info.length);
+                    log("info[0].compression "+info[0].compression);
+                    log("info[0].rowsPerStrip "+info[0].rowsPerStrip);
+                    log("info[0].width "+info[0].width);
+
+                    for(int k=0; k<info[0].stripLengths.length; k++) {
+                        int sl = info[0].stripLengths[k];
+                        double rsl = 1.0*sl/info[0].getBytesPerPixel()/info[0].width/info[0].rowsPerStrip;
+
+                        log("relative stripLength "+rsl);
+                        log("info[0].stripLength "+sl);
+                        if(k<(info[0].stripLengths.length-1)) {
+                            int sod = info[0].stripOffsets[k+1] - info[0].stripOffsets[k];
+                            log("difference stripOffsets "+sod);
+                            log("difference stripOffsets and stripLength "+(sod-sl));
+                        }
+
+                    }
+
+                    if (count == 0) {
+                        fi = info[0];
+                        // Collect image stack information
+                        ColorModel cm = null;
+                        if (fi.nImages > 1) {
+                            nSlices = fi.nImages;
+                            fi.nImages = 1;
+                        } else {
+                            nSlices = info.length;
+                        }
+                        // Initialise stack
+                        stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels);
+
+                    }
+
+                    stack.addStack(info);
+                    count = stack.getNStacks();
+
                 }
 
                 if(n>=0) {
@@ -411,26 +456,43 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		new ImageJ();
         //IJ.run("Memory & Threads...", "maximum=3000 parallel=4 run");
 
-		//Globals.verbose = true;
-
-        boolean interactive = false;
-        boolean MATLAB = false;
-        boolean Mitosis_ome = true;
-        boolean MATLAB_EXTERNAL = false;
-		boolean OME_MIP = false;
-		boolean OME = false;
-        boolean OME_drift = false;
 
         OpenStacksAsVirtualStack ovs = null;
 
+        // todo: remove the initialisation from the constructor and put it into openFromDirectory
 
-        if(interactive) {
+        /*if(interactive) {
             ovs = new OpenStacksAsVirtualStack();
             ovs.run("");
             Registration register = new Registration();
             register.run("");
-        }
+        }*/
 
+
+        String directory = "/Users/tischi/Desktop/example-data/compressedSingleStrip/";
+
+        //String directory = "/Users/tischi/Desktop/example-data/compressed/";
+        String filter = "lzw";
+
+        //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
+        //String filter = null;
+
+        int start = 1;
+        int increment = 1;
+        int n = -1;
+        int nChannels = 1;
+        String openingMethod = "tiffLoadAllIFDs";
+        //String openingMethod = "tiffUseIFDsFirstFile";
+        String order = "tc";
+
+        Globals.verbose = true;
+        ovs = new OpenStacksAsVirtualStack(directory, filter, start, increment, n, nChannels, openingMethod, order);
+        ImagePlus imp = ovs.openFromDirectory();
+        imp.show();
+        Registration register = new Registration(imp);
+        register.showDialog();
+
+        /*
         if (Mitosis_ome) {
             ovs = new OpenStacksAsVirtualStack("/Users/tischi/Desktop/example-data/Mitosis-ome/", null, 1, 1, -1, 2, "tiffUseIFDsFirstFile", "tc");
             ImagePlus imp = ovs.openFromDirectory();
@@ -438,6 +500,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             Registration register = new Registration(imp);
             register.showDialog();
         }
+
         if (MATLAB) {
             ovs = new OpenStacksAsVirtualStack("/Users/tischi/Desktop/example-data/MATLABtiff/", null, 1, 1, -1, 1, "tiffUseIFDsFirstFile", "tc");
             ImagePlus imp = ovs.openFromDirectory();
@@ -445,6 +508,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             Registration register = new Registration(imp);
             register.showDialog();
 		}
+        */
 
         /*
         if (MATLAB_EXTERNAL) {
