@@ -77,7 +77,7 @@ public class Registration implements PlugIn {
         gd.addMessage("");
         gd.addSlider("Object radius x [pix]", 0, (int) imp.getWidth() / 2, 30);
         gd.addSlider("Object radius y [pix]", 0, (int) imp.getHeight() / 2, 30);
-        gd.addSlider("Object radius z [pix]", 0, (int) imp.getNSlices() / 2, 0);
+        gd.addSlider("Object radius z [pix]", 0, (int) imp.getNSlices() / 2, 5);
         gd.addSlider("Tracking dz [pix]", 1, (int) imp.getNSlices() / 2, 1);
         gd.addSlider("Tracking dt [frames]", 1, (int) imp.getNFrames() / 5, 1);
         gd.addNumericField("Tracking margin factor", 2, 1);
@@ -87,7 +87,7 @@ public class Registration implements PlugIn {
         gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
         gd.addSlider("Channel for tracking", 1, (int) imp.getNChannels(), 1);
         String [] centeringMethodChoices = {"centroid","center of mass"};
-        gd.addChoice("Centering method", centeringMethodChoices, "centroid");
+        gd.addChoice("Centering method", centeringMethodChoices, "center of mass");
 
         Button btCorrectCurrent = new Button("Locate");
         btCorrectCurrent.addActionListener(new ActionListener() {

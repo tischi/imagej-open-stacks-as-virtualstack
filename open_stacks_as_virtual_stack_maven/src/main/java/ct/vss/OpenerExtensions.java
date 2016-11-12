@@ -351,10 +351,10 @@ class OpenerExtensions extends Opener {
                 int stripLength = fi.stripLengths[s];
                 byte[] strip = new byte[stripLength];
                 // get strip from read data
-                System.arraycopy(buffer[0], pos, strip, 0, stripLength);
+                System.arraycopy(buffer[z-zs], pos, strip, 0, stripLength);
                 //log("strip.length " + strip.length);
                 // uncompress strip
-                strip = lzwUncompress(strip, imByteWidth);
+                strip = lzwUncompressAAA(strip, imByteWidth);
 
                 //log("strip.length [pixels] " + strip.length/fi.getBytesPerPixel());
                 //log("imWidth [pixels] " + imByteWidth/fi.getBytesPerPixel());
@@ -364,9 +364,9 @@ class OpenerExtensions extends Opener {
                 pos += stripLength;
             }
 
-        buffer[0] = unCompressedBuffer;
+        buffer[z-zs] = unCompressedBuffer;
 
-        //log("uncompressed buffer.length: " + buffer[0].length);
+        //log("uncompressed buffer.length: " + buffer[z-zs].length);
         }
 
 
@@ -375,131 +375,19 @@ class OpenerExtensions extends Opener {
         //
 
         // convert pixels to 16bit gray values and store in pixels[z]
-        //log("buffer.length: " + buffer[0].length);
+        //log("buffer.length: " + buffer[z-zs].length);
         //log("ny*imByteWidth " + (ny*imByteWidth));
 
         // store strips in pixel array
         ys=ys%rps;
-        setShortPixelsFromAllStrips(fi, pixels[z-zs], ys, ny, xs, nx, imByteWidth, buffer[0]);
+        setShortPixelsFromAllStrips(fi, pixels[z-zs], ys, ny, xs, nx, imByteWidth, buffer[z-zs]);
 
         // add pixels to stack
         stack.addSlice(new ShortProcessor(nx, ny, (short[])pixels[z-zs],null));
 
     }
 
-    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, int zs, int ze, int nz, int dz, int xs, int xe, int ys, int ye) {
-        long startTime;
-        boolean hasStrips = false;
-
-        if (info == null) return null;
-        FileInfo fi = info[0];
-
-        int nx = xe - xs + 1;
-        int ny = ye - ys + 1;
-
-        if(Globals.verbose) {
-            log("# openCroppedTiffStackUsingIFDs");
-            log("directory: " + info[0].directory);
-            log("filename: " + info[0].fileName);
-            //log("rx,ry,rz: " + pr.getX() + "," + pr.getY() + "," + pr.getZ());
-            log("zs,dz,ze,nz,xs,xe,ys,ye: " + zs + "," + dz + "," + ze + "," + nz + "," + xs + "," + xe + "," + ys + "," + ye);
-            log("info.length: " + info.length);
-        }
-
-
-        // get size of image before cropping
-        int imByteWidth = fi.width*fi.getBytesPerPixel();
-        ImageStack stack = new ImageStack(nx, ny);
-        byte[][] buffer = new byte[nz][1];
-        short[][] pixels = new short[nz][nx*ny];
-
-        ExecutorService es = Executors.newCachedThreadPool();
-
-
-        long readingTime = 0;
-        long processTime = 0;
-
-        try {
-            // get input stream to file
-            File f = new File(fi.directory + fi.fileName);
-            FileInputStream in = new FileInputStream(f);
-
-            if(in==null) {
-                IJ.showMessage("Could not open file: "+fi.directory+fi.fileName);
-                throw new IllegalArgumentException("could not open file");
-            }
-            //InputStream in = new BufferedInputStream(new FileInputStream(f));
-            //FileImageInputStream in = new FileImageInputStream(f);
-
-            long pointer=0L;
-
-            for(int z=zs; z<=ze; z+=dz) {
-
-                if (z<0 || z>=info.length) {
-                    IJ.showMessage("z=" + z + " is out of range. Please reduce your z-radius.");
-                    throw new IllegalArgumentException("z=" + z + " is out of range");
-                }
-
-                fi = info[z];
-
-                //
-                // Read data of z-slice
-                //
-
-                //log("buffer.length "+buffer[0].length);
-                startTime = System.currentTimeMillis();
-                pointer = readFromPlane(fi, in, pointer, buffer, z, zs, ys, ye) ;
-                readingTime += (System.currentTimeMillis() - startTime);
-                //log("buffer.length "+buffer[0].length);
-
-                //
-                // Decompress Rearrange Crop And Put Into Stack
-                //
-
-                //for(int i=0;i<5;i++)
-
-                //startTime = System.currentTimeMillis();
-                es.execute(new process2stack(fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth));
-                //decompressRearrangeCropAndPutIntoStack(fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth);
-                //processTime += (System.currentTimeMillis() - startTime);
-
-
-            } // z
-
-            in.close();
-
-        } catch (Exception e) {
-            IJ.handleException(e);
-        }
-
-
-        try {
-            log("waiting for processing to be finished...");
-            es.shutdown();
-            while(!es.awaitTermination(1, TimeUnit.MINUTES));
-        }
-        catch (InterruptedException e) {
-            System.err.println("tasks interrupted");
-        }
-        log("done.");
-
-
-        if(Globals.verbose) {
-            int byteRead = nz*(xe-xs)*(ye-ys)*fi.getBytesPerPixel();
-            log("OpenerExtensions.openCroppedTiffStackUsingIFDs");
-            log("Pure reading [ms]: " + readingTime);
-            log("Reading and processing [ms]" + "");
-            log("Effective reading speed [MB/s]: " + byteRead/((readingTime+0.001)*1000));
-            //log("Processing [ms]: " + processTime);
-        }
-
-        ImagePlus imp = new ImagePlus("One stream", stack);
-        imp.show();
-
-        return imp;
-    }
-
-    public byte[] lzwUncompress(byte[] input, int byteCount) {
+    public byte[] lzwUncompressAAA(byte[] input, int byteCount) {
         long startTimeGlob = System.nanoTime();
         long totalTimeGlob = 0;
         long startTime0, totalTime0 = 0;
@@ -636,6 +524,122 @@ class OpenerExtensions extends Opener {
         return out;
     }
 
+    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfo[] info, int zs, int ze, int nz, int dz, int xs, int xe, int ys, int ye) {
+        long startTime;
+        long readingTime = 0;
+        long totalTime = 0;
+        long threadInitTime = 0;
+
+        if (info == null) return null;
+        FileInfo fi = info[0];
+
+        int nx = xe - xs + 1;
+        int ny = ye - ys + 1;
+
+        if(Globals.verbose) {
+            log("# openCroppedTiffStackUsingIFDs");
+            log("directory: " + info[0].directory);
+            log("filename: " + info[0].fileName);
+            log("info.length: " + info.length);
+            log("zs,dz,ze,nz,xs,xe,ys,ye: " + zs + "," + dz + "," + ze + "," + nz + "," + xs + "," + xe + "," + ys + "," + ye);
+        }
+
+        totalTime = System.currentTimeMillis();
+
+        // initialisation and allocation
+        startTime = System.currentTimeMillis();
+
+        int imByteWidth = fi.width*fi.getBytesPerPixel();
+        ImageStack stack = ImageStack.create(nx, ny, nz, fi.getBytesPerPixel()*8);
+        byte[][] buffer = new byte[nz][1];
+        short[][] pixels = new short[nz][nx*ny];
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        long allocationTime = (System.currentTimeMillis() - startTime);
+
+
+        try {
+            // get input stream to file
+            File f = new File(fi.directory + fi.fileName);
+            FileInputStream in = new FileInputStream(f);
+
+            if(in==null) {
+                IJ.showMessage("Could not open file: "+fi.directory+fi.fileName);
+                throw new IllegalArgumentException("could not open file");
+            }
+            //InputStream in = new BufferedInputStream(new FileInputStream(f));
+            //FileImageInputStream in = new FileImageInputStream(f);
+
+            long pointer=0L;
+
+            for(int z=zs; z<=ze; z+=dz) {
+
+                if (z<0 || z>=info.length) {
+                    IJ.showMessage("z=" + z + " is out of range. Please reduce your z-radius.");
+                    throw new IllegalArgumentException("z=" + z + " is out of range");
+                }
+
+                fi = info[z];
+
+                //
+                // Read data of z-slice
+                //
+
+                startTime = System.currentTimeMillis();
+                pointer = readFromPlane(fi, in, pointer, buffer, z, zs, ys, ye) ;
+                readingTime += (System.currentTimeMillis() - startTime);
+
+                //
+                // Decompress Rearrange Crop And Put Into Stack
+                //
+
+
+                startTime = System.currentTimeMillis();
+                es.execute(new process2stack(fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth));
+                threadInitTime += (System.currentTimeMillis() - startTime);
+
+                //decompressRearrangeCropAndPutIntoStack(fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth);
+
+
+            } // z
+
+            in.close();
+
+        } catch (Exception e) {
+            IJ.handleException(e);
+        }
+
+        startTime = System.currentTimeMillis();
+        try {
+            es.shutdown();
+            while(!es.awaitTermination(1, TimeUnit.MINUTES));
+        }
+        catch (InterruptedException e) {
+            System.err.println("tasks interrupted");
+        }
+        long threadRunningTime = (System.currentTimeMillis() - startTime);
+
+
+        ImagePlus imp = new ImagePlus("One stream", stack);
+        //imp.show();
+
+        totalTime = (System.currentTimeMillis() - totalTime);
+
+        if(Globals.verbose) {
+            int usefulBytesRead = nz*nx*ny*fi.getBytesPerPixel();
+            log("readingTime [ms]: " + readingTime);
+            log("Effective reading speed [MB/s]: " + usefulBytesRead/((readingTime+0.001)*1000));
+            log("allocationTime [ms]: "+allocationTime);
+            log("threadInitTime [ms]: "+threadInitTime);
+            log("additional threadRunningTime [ms]: "+threadRunningTime);
+            log("totalTime [ms]: " + totalTime);
+            //log("Processing [ms]: " + processTime);
+        }
+
+        return imp;
+    }
+
+
 }
 
 class process2stack implements Runnable {
@@ -662,7 +666,6 @@ class process2stack implements Runnable {
     FileInfo fi;
     int z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth;
 
-
     process2stack(FileInfo fi, ImageStack stack, short[][] pixels, byte[][] buffer, int z, int zs, int ze, int ys, int ye, int ny, int xs, int xe, int nx, int imByteWidth) {
         threadName = ""+z;
         this.fi = fi;
@@ -683,7 +686,7 @@ class process2stack implements Runnable {
     }
 
     public void run() {
-        log("Running " +  threadName );
+        //log("Running " +  threadName );
         //try {
             // check what we have read
             int rps = fi.rowsPerStrip;
@@ -707,7 +710,7 @@ class process2stack implements Runnable {
                     int stripLength = fi.stripLengths[s];
                     byte[] strip = new byte[stripLength];
                     // get strip from read data
-                    System.arraycopy(buffer[0], pos, strip, 0, stripLength);
+                    System.arraycopy(buffer[z-zs], pos, strip, 0, stripLength);
                     //log("strip.length " + strip.length);
                     // uncompress strip
                     strip = lzwUncompress(strip, imByteWidth);
@@ -720,9 +723,9 @@ class process2stack implements Runnable {
                     pos += stripLength;
                 }
 
-                buffer[0] = unCompressedBuffer;
+                buffer[z-zs] = unCompressedBuffer;
 
-                //log("uncompressed buffer.length: " + buffer[0].length);
+                //log("uncompressed buffer.length: " + buffer[z-zs].length);
             }
 
 
@@ -731,15 +734,16 @@ class process2stack implements Runnable {
             //
 
             // convert pixels to 16bit gray values and store in pixels[z]
-            //log("buffer.length: " + buffer[0].length);
+            //log("buffer.length: " + buffer[z-zs].length);
             //log("ny*imByteWidth " + (ny*imByteWidth));
 
             // store strips in pixel array
             ys=ys%rps;
-            setShortPixelsFromAllStrips(fi, pixels[z-zs], ys, ny, xs, nx, imByteWidth, buffer[0]);
+            setShortPixelsFromAllStrips(fi, pixels[z-zs], ys, ny, xs, nx, imByteWidth, buffer[z-zs]);
 
             // add pixels to stack
-            stack.addSlice(new ShortProcessor(nx, ny, (short[])pixels[z-zs],null));
+            //stack.setPixels(new ShortProcessor(nx, ny, pixels[z-zs], null), z-zs);
+            stack.setPixels(pixels[z-zs], z-zs+1);
 
         //} catch (InterruptedException e) {
         //    log("Thread " +  threadName + " interrupted.");
@@ -747,7 +751,6 @@ class process2stack implements Runnable {
 
         //log("Thread " +  threadName + " exiting.");
     }
-
 
     public byte[] lzwUncompress(byte[] input, int byteCount) {
         long startTimeGlob = System.nanoTime();
@@ -1207,7 +1210,7 @@ class ByteVector {
                 int stripLength = fi.stripLengths[s];
                 byte[] strip = new byte[stripLength];
                 // get strip from read data
-                System.arraycopy(buffer[0], pos, strip, 0, stripLength);
+                System.arraycopy(buffer[z-zs], pos, strip, 0, stripLength);
                 //log("strip.length " + strip.length);
                 // uncompress strip
                 strip = lzwUncompress(strip, imByteWidth);
@@ -1220,9 +1223,9 @@ class ByteVector {
                 pos += stripLength;
             }
 
-            buffer[0] = unCompressedBuffer;
+            buffer[z-zs] = unCompressedBuffer;
 
-            //log("uncompressed buffer.length: " + buffer[0].length);
+            //log("uncompressed buffer.length: " + buffer[z-zs].length);
         }
 
 
