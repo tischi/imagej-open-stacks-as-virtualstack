@@ -15,6 +15,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static ij.IJ.log;
 
@@ -133,7 +136,7 @@ class OpenerExtensions extends Opener {
         }
     }
 
-    void setShortPixelsFromAllStrips(FileInfo fi, short[] pixels, int ys, int ny, int xs, int nx, int imByteWidth, byte[] buffer) {
+    public void setShortPixelsFromAllStrips(FileInfo fi, short[] pixels, int ys, int ny, int xs, int nx, int imByteWidth, byte[] buffer) {
         int ip = 0;
         int bs, be;
 
@@ -273,7 +276,7 @@ class OpenerExtensions extends Opener {
 
     }
 
-    private long readFromPlane(FileInfo fi, FileInputStream in, long pointer, byte[][] buffer, int ys, int ye) {
+    private long readFromPlane(FileInfo fi, FileInputStream in, long pointer, byte[][] buffer, int z, int zs, int ys, int ye) {
         boolean hasStrips = false;
         int readLength;
 
@@ -309,11 +312,11 @@ class OpenerExtensions extends Opener {
 
                 // read all data
                 //startTime = System.currentTimeMillis();
-                buffer[0] = new byte[readLength];
-                pointer = read(in, buffer[0], pointer);
+                buffer[z-zs] = new byte[readLength];
+                pointer = read(in, buffer[z-zs], pointer);
                 //readingTime += (System.currentTimeMillis() - startTime);
 
-                log("buffer.length: " + buffer[0].length);
+                //log("buffer.length: " + buffer[z-zs].length);
             }
 
         } catch (Exception e) {
@@ -339,7 +342,7 @@ class OpenerExtensions extends Opener {
         // deal with compression
         if(fi.compression==LZW) {
 
-            log("lzw uncompression of slice " + z);
+            //log("lzw uncompression of slice " + z);
 
             byte[] unCompressedBuffer = new byte[ny * imByteWidth];
 
@@ -407,8 +410,10 @@ class OpenerExtensions extends Opener {
         // get size of image before cropping
         int imByteWidth = fi.width*fi.getBytesPerPixel();
         ImageStack stack = new ImageStack(nx, ny);
-        byte[][] buffer = new byte[1][1];
+        byte[][] buffer = new byte[nz][1];
         short[][] pixels = new short[nz][nx*ny];
+
+        ExecutorService es = Executors.newCachedThreadPool();
 
 
         long readingTime = 0;
@@ -441,23 +446,26 @@ class OpenerExtensions extends Opener {
                 // Read data of z-slice
                 //
 
-                log("buffer.length "+buffer[0].length);
+                //log("buffer.length "+buffer[0].length);
                 startTime = System.currentTimeMillis();
-                pointer = readFromPlane(fi, in, pointer, buffer, ys, ye) ;
+                pointer = readFromPlane(fi, in, pointer, buffer, z, zs, ys, ye) ;
                 readingTime += (System.currentTimeMillis() - startTime);
-                log("buffer.length "+buffer[0].length);
+                //log("buffer.length "+buffer[0].length);
 
                 //
                 // Decompress Rearrange Crop And Put Into Stack
                 //
 
-                startTime = System.currentTimeMillis();
-                decompressRearrangeCropAndPutIntoStack(fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth);
-                processTime += (System.currentTimeMillis() - startTime);
+                //for(int i=0;i<5;i++)
+
+                //startTime = System.currentTimeMillis();
+                es.execute(new process2stack(fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth));
+                //decompressRearrangeCropAndPutIntoStack(fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth);
+                //processTime += (System.currentTimeMillis() - startTime);
 
 
             } // z
-            
+
             in.close();
 
         } catch (Exception e) {
@@ -465,16 +473,28 @@ class OpenerExtensions extends Opener {
         }
 
 
+        try {
+            log("waiting for processing to be finished...");
+            es.shutdown();
+            while(!es.awaitTermination(1, TimeUnit.MINUTES));
+        }
+        catch (InterruptedException e) {
+            System.err.println("tasks interrupted");
+        }
+        log("done.");
+
+
         if(Globals.verbose) {
             int byteRead = nz*(xe-xs)*(ye-ys)*fi.getBytesPerPixel();
             log("OpenerExtensions.openCroppedTiffStackUsingIFDs");
-            log("Reading [ms]: " + readingTime);
+            log("Pure reading [ms]: " + readingTime);
+            log("Reading and processing [ms]" + "");
             log("Effective reading speed [MB/s]: " + byteRead/((readingTime+0.001)*1000));
-            log("Processing [ms]: " + processTime);
+            //log("Processing [ms]: " + processTime);
         }
 
         ImagePlus imp = new ImagePlus("One stream", stack);
-        //impStream.show();
+        imp.show();
 
         return imp;
     }
@@ -618,6 +638,289 @@ class OpenerExtensions extends Opener {
 
 }
 
+class process2stack implements Runnable {
+    private Thread t;
+    private String threadName;
+    //
+    // Compression modes
+    public static final int COMPRESSION_UNKNOWN = 0;
+    public static final int COMPRESSION_NONE = 1;
+    public static final int LZW = 2;
+    public static final int LZW_WITH_DIFFERENCING = 3;
+    public static final int JPEG = 4;
+    public static final int PACK_BITS = 5;
+    private static final int CLEAR_CODE = 256;
+    private static final int EOI_CODE = 257;
+
+    // uncompress
+    byte[][] symbolTable = new byte[4096][1];
+
+    // input
+    ImageStack stack;
+    short[][] pixels;
+    byte[][] buffer;
+    FileInfo fi;
+    int z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth;
+
+
+    process2stack(FileInfo fi, ImageStack stack, short[][] pixels, byte[][] buffer, int z, int zs, int ze, int ys, int ye, int ny, int xs, int xe, int nx, int imByteWidth) {
+        threadName = ""+z;
+        this.fi = fi;
+        this.stack = stack;
+        this.buffer = buffer;
+        this.pixels = pixels;
+        this.z = z;
+        this.zs = zs;
+        this.ze = ze;
+        this.ys = ys;
+        this.ye = ye;
+        this.ny = ny;
+        this.xs = xs;
+        this.xe = xe;
+        this.nx = nx;
+        this.imByteWidth = imByteWidth;
+        //log("Creating process2stack of slice: " +  threadName );
+    }
+
+    public void run() {
+        log("Running " +  threadName );
+        //try {
+            // check what we have read
+            int rps = fi.rowsPerStrip;
+            int ss = (int) ys / rps;
+            int se = (int) ye / rps;
+
+            //log(""+ss);
+            //log(""+se);
+            //log(""+fi.compression);
+
+            // deal with compression
+            final int LZW = 2;
+            if(fi.compression==LZW) {
+
+                //log("lzw uncompression of slice " + z);
+
+                byte[] unCompressedBuffer = new byte[ny * imByteWidth];
+
+                int pos = 0;
+                for (int s = ss; s <= se; s++) {
+                    int stripLength = fi.stripLengths[s];
+                    byte[] strip = new byte[stripLength];
+                    // get strip from read data
+                    System.arraycopy(buffer[0], pos, strip, 0, stripLength);
+                    //log("strip.length " + strip.length);
+                    // uncompress strip
+                    strip = lzwUncompress(strip, imByteWidth);
+
+                    //log("strip.length [pixels] " + strip.length/fi.getBytesPerPixel());
+                    //log("imWidth [pixels] " + imByteWidth/fi.getBytesPerPixel());
+
+                    // put uncompressed strip into large array
+                    System.arraycopy(strip, 0, unCompressedBuffer, (s - ss) * imByteWidth * rps, imByteWidth * rps);
+                    pos += stripLength;
+                }
+
+                buffer[0] = unCompressedBuffer;
+
+                //log("uncompressed buffer.length: " + buffer[0].length);
+            }
+
+
+            //
+            // Rearrange data into pixels, crop it and put into image stack
+            //
+
+            // convert pixels to 16bit gray values and store in pixels[z]
+            //log("buffer.length: " + buffer[0].length);
+            //log("ny*imByteWidth " + (ny*imByteWidth));
+
+            // store strips in pixel array
+            ys=ys%rps;
+            setShortPixelsFromAllStrips(fi, pixels[z-zs], ys, ny, xs, nx, imByteWidth, buffer[0]);
+
+            // add pixels to stack
+            stack.addSlice(new ShortProcessor(nx, ny, (short[])pixels[z-zs],null));
+
+        //} catch (InterruptedException e) {
+        //    log("Thread " +  threadName + " interrupted.");
+       //}
+
+        //log("Thread " +  threadName + " exiting.");
+    }
+
+
+    public byte[] lzwUncompress(byte[] input, int byteCount) {
+        long startTimeGlob = System.nanoTime();
+        long totalTimeGlob = 0;
+        long startTime0, totalTime0 = 0;
+        long startTime1, totalTime1 = 0;
+        long startTime2, totalTime2 = 0;
+        long startTime3, totalTime3 = 0;
+        long startTime4, totalTime4 = 0;
+        long startTime5, totalTime5 = 0;
+        long startTime6, totalTime6 = 0;
+        long startTime7, totalTime7 = 0;
+        long startTime8, totalTime8 = 0;
+        long startTime9, totalTime9 = 0;
+
+        //startTime1 = System.nanoTime();
+
+        if (input==null || input.length==0)
+            return input;
+
+        int bitsToRead = 9;
+        int nextSymbol = 258;
+        int code;
+        int symbolLength, symbolLengthMax=0;
+        int oldCode = -1;
+        //ByteVector out = new ByteVector(8192);
+        byte[] out = new byte[byteCount];
+        int iOut = 0, i;
+        int k=0;
+        BitBuffer bb = new BitBuffer(input);
+
+        byte[] byteBuffer1 = new byte[16];
+        byte[] byteBuffer2 = new byte[16];
+
+        // todo: can this be larger?
+        //byte[] symbol = new byte[100];
+
+        //totalTime1 = (System.nanoTime() - startTime1);
+
+        //while (out.size()<byteCount) {
+        while (iOut<byteCount) {
+
+            //startTime2 = System.nanoTime();
+
+            code = bb.getBits(bitsToRead);
+
+            //totalTime2 += (System.nanoTime() - startTime2);
+
+
+            if (code==EOI_CODE || code==-1)
+                break;
+            if (code==CLEAR_CODE) {
+                //startTime4 = System.nanoTime();
+                // initialize symbol table
+                for (i = 0; i < 256; i++)
+                    symbolTable[i][0] = (byte)i;
+                nextSymbol = 258;
+                bitsToRead = 9;
+                code = bb.getBits(bitsToRead);
+                if (code==EOI_CODE || code==-1)
+                    break;
+                //out.add(symbolTable[code]);
+                System.arraycopy(symbolTable[code], 0, out, iOut, symbolTable[code].length);
+                iOut += symbolTable[code].length;
+                oldCode = code;
+                //totalTime4 += (System.nanoTime() - startTime4);
+
+            } else {
+                if (code<nextSymbol) {
+                    //startTime6 = System.nanoTime();
+                    // code is in table
+                    //startTime5 = System.nanoTime();
+                    //out.add(symbolTable[code]);
+                    symbolLength = symbolTable[code].length;
+                    System.arraycopy(symbolTable[code], 0, out, iOut, symbolLength);
+                    iOut += symbolLength;
+                    //totalTime5 += (System.nanoTime() - startTime5);
+                    // add string to table
+
+                    //ByteVector symbol = new ByteVector(byteBuffer1);
+                    //symbol.add(symbolTable[oldCode]);
+                    //symbol.add(symbolTable[code][0]);
+                    int lengthOld = symbolTable[oldCode].length;
+
+
+                    //byte[] newSymbol = new byte[lengthOld+1];
+                    symbolTable[nextSymbol] = new byte[lengthOld+1];
+                    System.arraycopy(symbolTable[oldCode], 0, symbolTable[nextSymbol], 0, lengthOld);
+                    symbolTable[nextSymbol][lengthOld] = symbolTable[code][0];
+                    //symbolTable[nextSymbol] = newSymbol;
+
+                    oldCode = code;
+                    nextSymbol++;
+                    //totalTime6 += (System.nanoTime() - startTime6);
+
+                } else {
+
+                    //startTime3 = System.nanoTime();
+                    // out of table
+                    ByteVector symbol = new ByteVector(byteBuffer2);
+                    symbol.add(symbolTable[oldCode]);
+                    symbol.add(symbolTable[oldCode][0]);
+                    byte[] outString = symbol.toByteArray();
+                    //out.add(outString);
+                    System.arraycopy(outString, 0, out, iOut, outString.length);
+                    iOut += outString.length;
+                    symbolTable[nextSymbol] = outString; //**
+                    oldCode = code;
+                    nextSymbol++;
+                    //totalTime3 += (System.nanoTime() - startTime3);
+
+                }
+                if (nextSymbol == 511) { bitsToRead = 10; }
+                if (nextSymbol == 1023) { bitsToRead = 11; }
+                if (nextSymbol == 2047) { bitsToRead = 12; }
+            }
+
+        }
+
+        totalTimeGlob = (System.nanoTime() - startTimeGlob);
+        /*
+        log("total : "+totalTimeGlob/1000);
+        totalTimeGlob = 1000;
+        log("fraction1 : "+(double)totalTime1/totalTimeGlob);
+        log("fraction2 : "+(double)totalTime2/totalTimeGlob);
+        log("fraction3 : "+(double)totalTime3/totalTimeGlob);
+        log("fraction4 : "+(double)totalTime4/totalTimeGlob);
+        log("fraction5 : "+(double)totalTime5/totalTimeGlob);
+        log("fraction6 : "+(double)totalTime6/totalTimeGlob);
+        log("fraction7 : "+(double)totalTime7/totalTimeGlob);
+        log("fraction8 : "+(double)totalTime8/totalTimeGlob);
+        log("fraction9 : "+(double)totalTime9/totalTimeGlob);
+        log("symbolLengthMax "+symbolLengthMax);
+        */
+
+        return out;
+    }
+
+    public void setShortPixelsFromAllStrips(FileInfo fi, short[] pixels, int ys, int ny, int xs, int nx, int imByteWidth, byte[] buffer) {
+        int ip = 0;
+        int bs, be;
+
+        for (int y = ys; y < ys + ny; y++) {
+
+            bs = y * imByteWidth + xs * fi.getBytesPerPixel();
+            be = bs + nx * fi.getBytesPerPixel();
+
+            if (fi.intelByteOrder) {
+                if (fi.fileType == FileInfo.GRAY16_SIGNED)
+                    for (int j = bs; j < be; j += 2)
+                        pixels[ip++] = (short) ((((buffer[j + 1] & 0xff) << 8) | (buffer[j] & 0xff)) + 32768);
+                else
+                    for (int j = bs; j < be; j += 2)
+                        pixels[ip++] = (short) (((buffer[j + 1] & 0xff) << 8) | (buffer[j] & 0xff));
+            } else {
+                if (fi.fileType == FileInfo.GRAY16_SIGNED)
+                    for (int j = bs; j < be; j += 2)
+                        pixels[ip++] = (short) ((((buffer[j] & 0xff) << 8) | (buffer[j + 1] & 0xff)) + 32768);
+                else
+                    for (int j = bs; j < be; j += 2)
+                        pixels[ip++] = (short) (((buffer[j] & 0xff) << 8) | (buffer[j + 1] & 0xff));
+            }
+        }
+    }
+
+    public void start () {
+        log("Starting " +  threadName );
+        if (t == null) {
+            t = new Thread (this, threadName);
+            t.start ();
+        }
+    }
+}
 
 
 /** A growable array of bytes. */
@@ -879,3 +1182,64 @@ class ByteVector {
     }
 
  */
+
+    /*
+    private void process2stack(FileInfo fi, ImageStack stack, short[][] pixels, byte[][] buffer, int z, int zs, int ze, int ys, int ye, int ny, int xs, int xe, int nx, int imByteWidth) {
+
+        // check what we have read
+        int rps = fi.rowsPerStrip;
+        int ss = (int) ys / rps;
+        int se = (int) ye / rps;
+
+        //log(""+ss);
+        //log(""+se);
+        //log(""+fi.compression);
+
+        // deal with compression
+        if(fi.compression==LZW) {
+
+            log("lzw uncompression of slice " + z);
+
+            byte[] unCompressedBuffer = new byte[ny * imByteWidth];
+
+            int pos = 0;
+            for (int s = ss; s <= se; s++) {
+                int stripLength = fi.stripLengths[s];
+                byte[] strip = new byte[stripLength];
+                // get strip from read data
+                System.arraycopy(buffer[0], pos, strip, 0, stripLength);
+                //log("strip.length " + strip.length);
+                // uncompress strip
+                strip = lzwUncompress(strip, imByteWidth);
+
+                //log("strip.length [pixels] " + strip.length/fi.getBytesPerPixel());
+                //log("imWidth [pixels] " + imByteWidth/fi.getBytesPerPixel());
+
+                // put uncompressed strip into large array
+                System.arraycopy(strip, 0, unCompressedBuffer, (s - ss) * imByteWidth * rps, imByteWidth * rps);
+                pos += stripLength;
+            }
+
+            buffer[0] = unCompressedBuffer;
+
+            //log("uncompressed buffer.length: " + buffer[0].length);
+        }
+
+
+        //
+        // Rearrange data into pixels, crop it and put into image stack
+        //
+
+        // convert pixels to 16bit gray values and store in pixels[z]
+        //log("buffer.length: " + buffer[0].length);
+        //log("ny*imByteWidth " + (ny*imByteWidth));
+
+        // store strips in pixel array
+        ys=ys%rps;
+        setShortPixelsFromAllStrips(fi, pixels[z-zs], ys, ny, xs, nx, imByteWidth, buffer[0]);
+
+        // add pixels to stack
+        stack.addSlice(new ShortProcessor(nx, ny, (short[])pixels[z-zs],null));
+
+    };
+*/
