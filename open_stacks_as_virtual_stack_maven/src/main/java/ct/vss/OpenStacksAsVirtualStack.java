@@ -186,17 +186,31 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         log(""+order);
 
+
+        /* obtain a filtered list
+
+        // skip files that don't obey the filter
+        if (filter != null && (!list[i].contains(filter)))
+            continue;
+        // use the increment
+        if ((counter++ % increment) != 0)
+            continue;
+        int counter = 0;
+        */
+
+        // loop through filtered list and add file-info
         try {
             // loop through file list
             int count = 0;
             int counter = 0;
-            for (int i = start - 1; i < list.length; i++) {
 
-                // skip files that don't obey the filter
+            for (int i = start - 1; i < list.length; i++) {
                 if (filter != null && (!list[i].contains(filter)))
                     continue;
+                // use the increment
                 if ((counter++ % increment) != 0)
                     continue;
+
 
                 if (openingMethod == "tiffUseIFDsFirstFile") {
 
@@ -234,21 +248,23 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     info = Opener.getTiffFileInfo(directory + list[i]);
 
                     log(""+list[i]);
+                    /*
                     log("info.length "+info.length);
                     log("info[0].compression "+info[0].compression);
                     log("info[0].rowsPerStrip "+info[0].rowsPerStrip);
                     log("info[0].width "+info[0].width);
+                    */
 
                     for(int k=0; k<info[0].stripLengths.length; k++) {
                         int sl = info[0].stripLengths[k];
                         double rsl = 1.0*sl/info[0].getBytesPerPixel()/info[0].width/info[0].rowsPerStrip;
 
-                        log("relative stripLength "+rsl);
-                        log("info[0].stripLength "+sl);
+                        //log("relative stripLength "+rsl);
+                        //log("info[0].stripLength "+sl);
                         if(k<(info[0].stripLengths.length-1)) {
                             int sod = info[0].stripOffsets[k+1] - info[0].stripOffsets[k];
-                            log("difference stripOffsets "+sod);
-                            log("difference stripOffsets and stripLength "+(sod-sl));
+                            //log("difference stripOffsets "+sod);
+                            //log("difference stripOffsets and stripLength "+(sod-sl));
                         }
 
                     }
@@ -291,7 +307,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         if(stack!=null && stack.getSize()>0) {
             nFrames = stack.getNStacks()/nChannels;
             impFinal = makeImagePlus(stack, fi, nChannels, nFrames, nSlices);
-            }
+        }
         IJ.showProgress(1.0);
         return(impFinal);
 
@@ -486,7 +502,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //String openingMethod = "tiffUseIFDsFirstFile";
         String order = "tc";
 
-        //Globals.verbose = true;
+        Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack(directory, filter, start, increment, n, nChannels, openingMethod, order);
         ImagePlus imp = ovs.openFromDirectory();
         imp.show();

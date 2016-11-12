@@ -143,7 +143,14 @@ public class VirtualStackOfStacks extends ImageStack {
         }
 
         //ImagePlus imp = new OpenerExtensions().openTiffStackSliceUsingIFDs(infos[iFile], z);
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[iFile], z, z, 1, 1, 0, infos[iFile][0].width-1, 0, infos[iFile][0].height-1);
+        long startTime = System.currentTimeMillis();
+        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[iFile], z, z, 1, 1, 0, infos[iFile][0].width - 1, 0, infos[iFile][0].height - 1);
+        long readingTime = (System.currentTimeMillis() - startTime);
+
+        if(Globals.verbose) {
+            log("Loading whole slice [ms]: "+readingTime);
+        }
+
 
         if (imp==null) {
             log("Error: loading failed!");
