@@ -5,6 +5,7 @@ import ij.ImageJ;
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
 import ij.io.FileInfo;
+
 import ij.io.Opener;
 import ij.plugin.PlugIn;
 import javafx.geometry.Point3D;
@@ -14,6 +15,14 @@ import java.awt.event.ItemEvent;
 import java.awt.event.TextEvent;
 import java.awt.image.ColorModel;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import org.apache.commons.lang.SerializationUtils;
+
+
 
 import static ij.IJ.log;
 
@@ -55,18 +64,27 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         this.directory = IJ.getDirectory("Select a Directory");
         if (directory == null)
             return;
+        log("Selected directory: "+directory);
+        ImagePlus imp = null;
+
         //Macro.setOptions(null); // Prevents later use of OpenDialog from reopening the same file
         //IJ.register(Open_Stacks_As_VirtualStack.class);
 
-        this.list = getFilesInFolder(directory);
-        if (!showDialog(list)) return;
-
-        // todo: add this to gui
-        this.openingMethod = "tiffUseIFDsFirstFile";
-        ImagePlus imp = openFromDirectory();
-        imp.show();
-
-
+        // does it contain a header file that we can use to open everything?
+        File f = new File(directory+"TiffFileInfos.ser");
+        if(f.exists() && !f.isDirectory()) {
+            log("Found TiffFileInfos file.");
+            imp = null;
+        } else {
+            this.list = getFilesInFolder(directory);
+            if (!showDialog(list)) return;
+            // todo: add this to gui
+            this.openingMethod = "tiffUseIFDsFirstFile";
+            imp = openFromDirectory();
+        }
+        if(imp!=null) {
+            imp.show();
+        }
     }
 
     boolean showDialog(String[] list) {
@@ -307,10 +325,49 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         if(stack!=null && stack.getSize()>0) {
             nFrames = stack.getNStacks()/nChannels;
             impFinal = makeImagePlus(stack, fi, nChannels, nFrames, nSlices);
+            saveFileInfos(stack.getFileInfos(), directory+"TiffFileInfos.ser");
         }
+
         IJ.showProgress(1.0);
         return(impFinal);
 
+    }
+
+
+    public boolean saveFileInfos(FileInfo[][] infos, String path) {
+        FileInfoSer[] infoS = new FileInfoSer[2];
+
+
+        infoS[0] = new FileInfoSer(infos[0][0]);
+        infoS[1] = new FileInfoSer(infos[1][0]);
+
+
+        try{
+            FileOutputStream fout = new FileOutputStream(path, true);
+            ObjectOutputStream oos = new ObjectOutputStream(fout);
+            oos.writeObject(SerializationUtils.serialize(infoS));
+            oos.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            log("Could not write: " + path);
+            return false;
+        }
+        log("Wrote: " + path);
+        return true;
+    }
+
+    public FileInfo[][] readFileInfos(String path) {
+        FileInfo[][] infos = null;
+        try {
+            FileInputStream streamIn = new FileInputStream("G:\\address.ser");
+            ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
+            infos = (FileInfo[][]) objectinputstream.readObject();
+            objectinputstream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return(infos);
     }
 
     // todo: implement

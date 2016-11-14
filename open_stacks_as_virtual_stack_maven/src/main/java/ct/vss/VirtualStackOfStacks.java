@@ -14,18 +14,19 @@ import javafx.geometry.Point3D;
 import static ij.IJ.log;
 
 /**
- This class represents an array of disk-resident images.
+ This class represents an array of disk-resident image stacks.
  */
 public class VirtualStackOfStacks extends ImageStack {
 
     static final int INITIAL_SIZE = 100;
-    int nSlices;
-    int nStacks;
+    int nSlices = 0;
+    int nFiles;
     int nZ, nC, nT;
     String order = "tc"; // "ct", "tc"
-    protected FileInfo[][] infos;
+    protected FileInfoSer[][][] infos;
 
     /** Creates a new, empty virtual stack. */
+    /*
     public VirtualStackOfStacks(Point3D pSize, int nC) {
         super((int)pSize.getX(), (int)pSize.getY(), null);
         this.nZ = (int)pSize.getZ();
@@ -36,15 +37,39 @@ public class VirtualStackOfStacks extends ImageStack {
             log("y: "+(int)pSize.getY());
             log("z: "+(int)pSize.getZ());
         }
-        this.infos = new FileInfo[INITIAL_SIZE][];
+        this.infos = new FileInfoSer[INITIAL_SIZE][INITIAL_SIZE][];
+    }
+    */
+
+    /** Creates a new, empty virtual stack of known size */
+    public VirtualStackOfStacks(Point3D pSize, int nC, int nT) {
+        super((int)pSize.getX(), (int)pSize.getY(), null);
+        this.nZ = (int)pSize.getZ();
+        this.nC = nC;
+        this.nT = nT;
+        if(Globals.verbose) {
+            log("VirtualStackOfStacks");
+            log("x: "+(int)pSize.getX());
+            log("y: "+(int)pSize.getY());
+            log("z: "+(int)pSize.getZ());
+            log("c: "+nC);
+            log("t: "+nT);
+        }
+        this.infos = new FileInfoSer[nT][nC][];
     }
 
-    public FileInfo[][] getFileInfos() {
+
+    public FileInfoSer[][][] getFileInfos() {
         return(infos);
     }
 
+    public void setFileInfos(FileInfoSer[][][] infos) {
+        this.infos = infos;
+    }
+
     /** Adds an stack to the end of the stack. */
-    public void addStack(FileInfo[] info) {
+    /*
+    public void addStack(FileInfoSer[] info) {
         if (info==null)
             throw new IllegalArgumentException("'info' is null!");
         nSlices = nSlices + nZ;
@@ -57,7 +82,17 @@ public class VirtualStackOfStacks extends ImageStack {
         }
         infos[nStacks-1] = info;
         //("Added file: "+infos[nStacks-1][0].fileName);
+    }*/
+
+    /** Adds an image stack to the stack. */
+    public void addStack(FileInfoSer[] info, int t, int c) {
+        if (info==null)
+            throw new IllegalArgumentException("'info' is null!");
+        nSlices = nSlices + nZ;
+        nFiles ++;
+        infos[t][c] = info;
     }
+
 
     /** Does nothing. */
     public void addSlice(String sliceLabel, Object pixels) {
@@ -71,7 +106,7 @@ public class VirtualStackOfStacks extends ImageStack {
     public void addSlice(String sliceLabel, ImageProcessor ip, int n) {
     }
 
-    /** Deletes the specified slice, were 1<=n<=nslices. */
+    /** Does noting. */
     public void deleteSlice(int n) {
         if (n<1 || n>nSlices)
             throw new IllegalArgumentException("Argument out of range: "+n);
@@ -89,9 +124,6 @@ public class VirtualStackOfStacks extends ImageStack {
             deleteSlice(nSlices);
     }
 
-    public String getOrder() {
-        return(order);
-    }
     /** Returns the pixel array for the specified slice, were 1<=n<=nslices. */
     public Object getPixels(int n) {
         ImageProcessor ip = getProcessor(n);
@@ -119,14 +151,7 @@ public class VirtualStackOfStacks extends ImageStack {
         int z = ((n-c)%(nZ*nC))/nC;
         int t = (n-c-z*nC)/(nZ*nC);
 
-        int iFile = 0;
-        if(order=="tc") {
-            iFile = t + (nT*c);
-        } else if(order=="ct") {
-            iFile = (t*nC) + c;
-        } else {
-            IJ.showMessage("Unsupported file order: "+order);
-        }
+        FileInfoSer[] info = infos[t][c];
 
         if(Globals.verbose) {
             log("# VirtualStackOfStacks.getProcessor");
@@ -137,17 +162,15 @@ public class VirtualStackOfStacks extends ImageStack {
             log("c: "+c);
             log("z: "+z);
             log("t: "+t);
-            log("opening iFile [zero-based]: "+iFile);
-            log("opening filename: "+infos[iFile][0].fileName);
+            log("opening file: "+info[0].fileName);
             log("opening z-slice [one-based]: "+(z+1));
         }
 
         //ImagePlus imp = new OpenerExtensions().openTiffStackSliceUsingIFDs(infos[iFile], z);
         long startTime = System.currentTimeMillis();
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[iFile], z, z, 1, 1, 0, infos[iFile][0].width - 1, 0, infos[iFile][0].height - 1);
+        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(info, z, z, 1, 1, 0, info[0].width - 1, 0, info[0].height - 1);
         long readingTime = (System.currentTimeMillis() - startTime);
-
-
+        
         if (imp==null) {
             log("Error: loading failed!");
             return null;
@@ -214,4 +237,23 @@ public class VirtualStackOfStacks extends ImageStack {
     }
 
 }
+
+
+/*
+    public void deleteSlice(int n) {
+        if (n<1 || n>nSlices)
+            throw new IllegalArgumentException("Argument out of range: "+n);
+        if (nSlices<1)
+            return;
+        for (int i=n; i<nSlices; i++)
+            infos[i-1] = infos[i];
+        infos[nSlices-1] = null;
+        nSlices--;
+    }
+
+    /** Deletes the last slice in the stack.
+    public void deleteLastSlice() {
+        if (nSlices>0)
+            deleteSlice(nSlices);
+    }*/
 

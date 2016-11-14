@@ -27,6 +27,7 @@ import static ij.IJ.log;
 class OpenerExtensions extends Opener {
 
     // Compression modes
+    // todo: get this from the FileInfoSer object
     public static final int COMPRESSION_UNKNOWN = 0;
     public static final int COMPRESSION_NONE = 1;
     public static final int LZW = 2;
