@@ -4,7 +4,6 @@ import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
-
 import ij.io.FileInfo;
 import ij.io.Opener;
 import ij.plugin.PlugIn;
@@ -13,17 +12,7 @@ import javafx.geometry.Point3D;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.TextEvent;
-import java.awt.image.ColorModel;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.FilenameFilter;
-
-import org.apache.commons.lang.SerializationUtils;
-
-
+import java.io.*;
 
 import static ij.IJ.log;
 
@@ -42,7 +31,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String[] channelFolders;
     private String[][] lists; // c, t
     private String openingMethod; // tiffUseIFDsFirstFile;
-
+    private String fileOrder;
 
     public OpenStacksAsVirtualStack() {
         // empty constructor for opening from FileInfoSer[]
@@ -52,17 +41,72 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         this.directory = directory;
         this.filter = filter;
 
-        // todo: depending on the fileOrder do different things
-        // todo: add the filter to the getFilesInFolder function
-        this.channelFolders = getFoldersInFolder(directory);
-        this.nChannels = channelFolders.length;
-        this.lists = new String[nChannels][];
-        for(int i=0; i<nChannels; i++) {
-            this.lists[i] = getFilesInFolder(channelFolders[0]);
+
+
+        String path = directory+"test.ser";
+        int[] a = {0,1,2,3};
+        FileInfoSer fi = new FileInfoSer(new FileInfo());
+        fi.fileName = "sfsfd";
+        try {
+            FileOutputStream fos = new FileOutputStream(path, false);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(fi);
+            oos.flush();
+            oos.close();
+            fos.close();
+            log("Wrote: " + path);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            log("Could not write: " + path);
         }
-        // todo consistency check the list lengths
-        this.nFrames = lists[0].length;
-        this.openingMethod = openingMethod;
+
+        try {
+            FileInputStream fis = new FileInputStream(path);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            FileInfoSer b = (FileInfoSer) ois.readObject();
+            log(""+b.fileName);
+            ois.close();
+            fis.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        File f = new File(directory+"TiffFileInfos.ser");
+
+        if(true && f.exists() && !f.isDirectory()) {
+            log("Loading TiffFileInfos file...");
+            FileInfoSer[][][] infos = readFileInfosSer(directory + "TiffFileInfos.ser");
+            log("nC: " + infos.length);
+            log("nT: " + infos[0].length);
+            log("nz: " + infos[0][0].length);
+        }
+
+
+            // todo: depending on the fileOrder do different things
+            // todo: add the filter to the getFilesInFolder function
+            this.channelFolders = getFoldersInFolder(directory);
+
+            if (channelFolders == null) {
+                log("No channel sub-folders found.");
+                return;
+            }
+            this.nChannels = channelFolders.length;
+            this.lists = new String[nChannels][];
+            for (int i = 0; i < nChannels; i++) {
+                lists[i] = getFilesInFolder(directory + channelFolders[i]);
+                if (lists[i] == null) {
+                    log("No files found.");
+                    return;
+                } else {
+                    log("Number of files: " + lists[i].length);
+                }
+            }
+            // todo consistency check the list lengths
+            this.nFrames = lists[0].length;
+            this.openingMethod = openingMethod;
+
     }
 
     public void run(String arg) {
@@ -76,6 +120,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //IJ.register(Open_Stacks_As_VirtualStack.class);
 
         // does it contain a header file that we can use to open everything?
+        /*
         File f = new File(directory+"TiffFileInfos.ser");
         if(f.exists() && !f.isDirectory()) {
             log("Found TiffFileInfos file.");
@@ -89,7 +134,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
         if(imp!=null) {
             imp.show();
-        }
+        }*/
     }
 
     boolean showDialog(String[] list) {
@@ -115,7 +160,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             increment = 1;
         filter = gd.getNextString();
         nChannels = (int) gd.getNextNumber();
-        order = gd.getNextChoice();
+        fileOrder = gd.getNextChoice();
         return true;
     }
 
@@ -178,18 +223,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
     }
 
-
-    // todo: add filtering below
-    // skip files that don't obey the filter
-    /*
-    if (filter != null && (!list[i].contains(filter)))
-            continue;
-    // use the increment
-    if ((counter++ % increment) != 0)
-            continue;
-    int counter = 0;
-    */
-
     String[] getFilesInFolder(String directory) {
         log("");
         log("# Finding files in folder: " + directory);
@@ -228,6 +261,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         FileInfo[] info = null;
         FileInfo fi = null;
         FileInfoSer[] infoSer = null;
+        String path = "";
         VirtualStackOfStacks stack = null;
 
         // loop through filtered list and add file-info
@@ -241,11 +275,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                         log("# tiffLoadAllIFDs");
 
-                        info = Opener.getTiffFileInfo(directory + lists[c][t]);
+                        info = Opener.getTiffFileInfo(directory + channelFolders[c] + "/" + lists[c][t]);
 
                         log("c" + c + "t" + t + ":" + lists[c][t]);
 
                         if (Globals.verbose) {
+                            log(directory + channelFolders[c] + "/" + lists[c][t]);
                             log("info.length " + info.length);
                             log("info[0].compression " + info[0].compression);
                             log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
@@ -294,44 +329,48 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
 
         IJ.showProgress(1.0);
-        return(impFinal);
+        return(imp);
 
     }
 
-    public boolean writeFileInfosSer(FileInfoSer[][] infos, String path) {
-        //FileInfoSer[] infoS = new FileInfoSer[2];
 
-
-        //infoS[0] = new FileInfoSer(infos[0][0]);
-        //infoS[1] = new FileInfoSer(infos[1][0]);
-
+    public boolean writeFileInfosSer(FileInfoSer[][][] infos, String path) {
 
         try{
             FileOutputStream fout = new FileOutputStream(path, true);
             ObjectOutputStream oos = new ObjectOutputStream(fout);
-            oos.writeObject(SerializationUtils.serialize(infos));
+            oos.writeObject(infos[0][0][0].fileName);
+            log(infos[0][0][0].fileName);
+            oos.flush();
             oos.close();
+            fout.close();
+            log("Wrote: " + path);
+            return true;
         } catch (Exception ex) {
             ex.printStackTrace();
             log("Could not write: " + path);
             return false;
         }
-        log("Wrote: " + path);
-        return true;
+
     }
 
     public FileInfoSer[][][] readFileInfosSer(String path) {
-        FileInfoSer[][][] infos = null;
         try {
-            FileInputStream streamIn = new FileInputStream("G:\\address.ser");
-            ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
-            infos = (FileInfoSer[][][]) objectinputstream.readObject();
-            objectinputstream.close();
+            FileInputStream fis = new FileInputStream(path);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            //FileInfoSer infos[][][] = (FileInfoSer[][][]) objectinputstream.readObject();
+            //FileInfoSer info = (FileInfoSer) objectinputstream.readObject();
+            String filename = (String) ois.readObject();
+            log(filename);
+            //
+            //List<FileInfoSer> objectinputstream = (List<FileInfoSer>)objectinputstream.readObject();
+            ois.close();
+            return(null);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-        return(infos);
+
     }
 
     // todo: implement
@@ -431,8 +470,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 
 }
-/*
-	public static ImagePlus openFromCroppedFileInfo(ImagePlus imp, FileInfoSer[][] infos, Point3D[] pos, Point3D radii, int tMin, int tMax) {
+
+    /*
+	public static ImagePlus openCroppedFromFileInfoSer(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] pos, Point3D radii, int tMin, int tMax) {
 		Point3D size = radii.multiply(2);
         size = size.add(new Point3D(1,1,1));
         VirtualStackOfStacks stack = new VirtualStackOfStacks(size, imp.getNChannels());
@@ -506,7 +546,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-        String directory = "/Users/tischi/Desktop/example-data/compressedSingleStrip/";
+        String directory = "/Users/tischi/Desktop/example-data/compressedMultiChannel/";
 
         //String directory = "/Users/tischi/Desktop/example-data/compressed/";
         String filter = "lzw";
@@ -523,7 +563,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         String order = "tc";
 
         Globals.verbose = true;
-        ovs = new OpenStacksAsVirtualStack(directory, filter, start, increment, n, nChannels, openingMethod, order);
+        ovs = new OpenStacksAsVirtualStack(directory, filter, openingMethod, order);
         ImagePlus imp = ovs.openFromDirectory();
         imp.show();
         Registration register = new Registration(imp);

@@ -146,10 +146,13 @@ public class Registration implements PlugIn {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
-                    FileInfo[][] infos = vss.getFileInfos();
+                    FileInfoSer[][][] infos = vss.getFileInfosSer();
                     //Point3D[] pos = new Point3D[tMaxTrack-tMinTrack];
                     //System.arraycopy(pTracked, tMinTrack, pos, 0, tMaxTrack-tMinTrack);
-                    ImagePlus impCropped = OpenStacksAsVirtualStack.openFromCroppedFileInfo(imp, infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
+
+                    //ImagePlus impCropped = OpenStacksAsVirtualStack.openFromCroppedFileInfo(imp, infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
+                    ImagePlus impCropped = null;
+
                     impCropped.show();
                     impCropped.setPosition(0, (int)(impCropped.getNSlices()/2+0.5), 0);
                     impCropped.resetDisplayRange();

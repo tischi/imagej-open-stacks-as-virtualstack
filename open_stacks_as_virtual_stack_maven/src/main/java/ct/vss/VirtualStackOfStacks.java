@@ -20,9 +20,7 @@ public class VirtualStackOfStacks extends ImageStack {
     int nSlices = 0;
     int nFiles;
     int nZ, nC, nT;
-    String order = "tc"; // "ct", "tc"
-    //protected FileInfoSeSer[][][] infos;
-    protected FileInfoSer[][][] infos;
+    protected FileInfoSer[][][] infos;  // c, t, z
 
     /** Creates a new, empty virtual stack. */
     /*
@@ -47,14 +45,14 @@ public class VirtualStackOfStacks extends ImageStack {
         this.nC = nC;
         this.nT = nT;
         if(Globals.verbose) {
-            log("VirtualStackOfStacks");
+            log("# VirtualStackOfStacks");
             log("x: "+(int)pSize.getX());
             log("y: "+(int)pSize.getY());
             log("z: "+(int)pSize.getZ());
             log("c: "+nC);
             log("t: "+nT);
         }
-        this.infos = new FileInfoSer[nT][nC][];
+        this.infos = new FileInfoSer[nC][nT][];
     }
 
 
@@ -89,7 +87,7 @@ public class VirtualStackOfStacks extends ImageStack {
             throw new IllegalArgumentException("'info' is null!");
         nSlices = nSlices + nZ;
         nFiles ++;
-        infos[t][c] = info;
+        infos[c][t] = info;
     }
 
 
@@ -107,6 +105,7 @@ public class VirtualStackOfStacks extends ImageStack {
 
     /** Does noting. */
     public void deleteSlice(int n) {
+        /*
         if (n<1 || n>nSlices)
             throw new IllegalArgumentException("Argument out of range: "+n);
         if (nSlices<1)
@@ -115,12 +114,14 @@ public class VirtualStackOfStacks extends ImageStack {
             infos[i-1] = infos[i];
         infos[nSlices-1] = null;
         nSlices--;
+        */
     }
 
     /** Deletes the last slice in the stack. */
     public void deleteLastSlice() {
-        if (nSlices>0)
+        /*if (nSlices>0)
             deleteSlice(nSlices);
+            */
     }
 
     /** Returns the pixel array for the specified slice, were 1<=n<=nslices. */
@@ -150,7 +151,7 @@ public class VirtualStackOfStacks extends ImageStack {
         int z = ((n-c)%(nZ*nC))/nC;
         int t = (n-c-z*nC)/(nZ*nC);
 
-        FileInfoSer[] info = infos[t][c];
+        FileInfoSer[] info = infos[c][t];
 
         if(Globals.verbose) {
             log("# VirtualStackOfStacks.getProcessor");
@@ -179,7 +180,7 @@ public class VirtualStackOfStacks extends ImageStack {
 
     public ImagePlus getCroppedFrameAsImagePlus(int t, int c, int dz, Point3D p, Point3D pr) {
         int iFile = 0;
-        FileInfoSer[] info = infos[t][c];
+        FileInfoSer[] info = infos[c][t];
 
         if(Globals.verbose) {
             log("# VirtualStackOfStacks.getCroppedFrameAsImagePlus");
