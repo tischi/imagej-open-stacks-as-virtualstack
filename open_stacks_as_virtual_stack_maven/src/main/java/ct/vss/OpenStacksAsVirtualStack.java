@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.FilenameFilter;
 
 import org.apache.commons.lang.SerializationUtils;
 
@@ -38,26 +39,30 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String filter;
     private String info1;
     private String directory;
-    private String[] list;
+    private String[] channelFolders;
+    private String[][] lists; // c, t
     private String openingMethod; // tiffUseIFDsFirstFile;
-    private String order; // ct, tc
 
 
     public OpenStacksAsVirtualStack() {
         // empty constructor for opening from FileInfoSer[]
     }
 
-    public OpenStacksAsVirtualStack(String directory, String filter, int start, int increment, int n, int nChannels, String openingMethod, String order) {
+    public OpenStacksAsVirtualStack(String directory, String filter, String openingMethod, String fileOrder) {
         this.directory = directory;
         this.filter = filter;
-        this.start = start;
-        this.increment = increment;
-        this.n = n; // set = -1 if open all
-        this.list = getFilesInFolder(directory);
+
+        // todo: depending on the fileOrder do different things
+        // todo: add the filter to the getFilesInFolder function
+        this.channelFolders = getFoldersInFolder(directory);
+        this.nChannels = channelFolders.length;
+        this.lists = new String[nChannels][];
+        for(int i=0; i<nChannels; i++) {
+            this.lists[i] = getFilesInFolder(channelFolders[0]);
+        }
+        // todo consistency check the list lengths
+        this.nFrames = lists[0].length;
         this.openingMethod = openingMethod;
-        this.order = order;
-        this.nChannels = nChannels;
-        // constructor for opening from directory
     }
 
     public void run(String arg) {
@@ -173,6 +178,18 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
     }
 
+
+    // todo: add filtering below
+    // skip files that don't obey the filter
+    /*
+    if (filter != null && (!list[i].contains(filter)))
+            continue;
+    // use the increment
+    if ((counter++ % increment) != 0)
+            continue;
+    int counter = 0;
+    */
+
     String[] getFilesInFolder(String directory) {
         log("");
         log("# Finding files in folder: " + directory);
@@ -188,145 +205,91 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         else return (list);
     }
 
+    String[] getFoldersInFolder(String directory) {
+        log("");
+        log("# Finding folders in folder: " + directory);
+        String[] list = new File(directory).list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+        if (list == null || list.length == 0)
+            return null;
+        list = this.sortFileList(list);
+        for(String item : list) log("" + item);
+        return (list);
+
+    }
+
     public ImagePlus openFromDirectory() {
         log("# openFromDirectory");
 
-        boolean checkOffsets = false;
         FileInfo[] info = null;
         FileInfo fi = null;
+        FileInfoSer[] infoSer = null;
         VirtualStackOfStacks stack = null;
-
-        // get filtered list if necessary
-
-        // loop through channels and time and deduce the right file from the list
-        // also check that the length of the file list is nt*nc
-        // then sort them with first all time-points of one channel
-
-        log(""+order);
-
-
-        /* obtain a filtered list
-
-        // skip files that don't obey the filter
-        if (filter != null && (!list[i].contains(filter)))
-            continue;
-        // use the increment
-        if ((counter++ % increment) != 0)
-            continue;
-        int counter = 0;
-        */
 
         // loop through filtered list and add file-info
         try {
-            // loop through file list
-            int count = 0;
-            int counter = 0;
 
-            for (int i = start - 1; i < list.length; i++) {
-                if (filter != null && (!list[i].contains(filter)))
-                    continue;
-                // use the increment
-                if ((counter++ % increment) != 0)
-                    continue;
+            for (int c = 0; c < nChannels; c++) {
 
-                /*
-                if (openingMethod == "tiffUseIFDsFirstFile") {
+                for (int t = 0; t < nFrames; t++) {
 
-                    if (count == 0) {
-                        log("Obtaining IFDs from first file and use for all.");
-                        info = Opener.getTiffFileInfo(directory + list[i]);
-                        fi = info[0];
-                        // Collect image stack information
-                        ColorModel cm = null;
-                        if (fi.nImages > 1) {
-                            nSlices = fi.nImages;
-                            fi.nImages = 1;
-                        } else {
-                            nSlices = info.length;
+                    if (openingMethod == "tiffLoadAllIFDs") {
+
+                        log("# tiffLoadAllIFDs");
+
+                        info = Opener.getTiffFileInfo(directory + lists[c][t]);
+
+                        log("c" + c + "t" + t + ":" + lists[c][t]);
+
+                        if (Globals.verbose) {
+                            log("info.length " + info.length);
+                            log("info[0].compression " + info[0].compression);
+                            log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
+                            log("info[0].width " + info[0].width);
                         }
-                        // Initialise stack
-                        stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels, nT);
-                        stack.addStack(info);
-                    } else { // construct IFDs from first file
-                        FileInfo[] infoModified = new FileInfo[info.length];
-                        for (int j = 0; j < info.length; j++) {
-                            infoModified[j] = (FileInfo) info[j].clone();
-                            infoModified[j].fileName = list[i];
+
+                        // first file
+                        if (t == 0 && c == 0) {
+                            fi = info[0];
+                            if (fi.nImages > 1) {
+                                nSlices = fi.nImages;
+                                fi.nImages = 1;
+                            } else {
+                                nSlices = info.length;
+                            }
+
+                            // init the VSS
+                            stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels, nFrames);
+
                         }
-                        stack.addStack(infoModified);
+
+                        // convert ij.io.FileInfo[] to FileInfoSer[]
+                        infoSer = new FileInfoSer[info.length];
+                        for (int i = 0; i < info.length; i++) {
+                            infoSer[i] = new FileInfoSer((FileInfo) info[i].clone());
+                        }
+                        stack.addStack(infoSer, t, c);
+
                     }
 
-                    count = stack.getNStacks();
-                }*/
-
-                if(openingMethod=="tiffLoadAllIFDs") {
-
-                    log("# tiffLoadAllIFDs");
-
-                    info = Opener.getTiffFileInfo(directory + list[i]);
-
-                    log(""+list[i]);
-
-                    /*
-                    log("info.length "+info.length);
-                    log("info[0].compression "+info[0].compression);
-                    log("info[0].rowsPerStrip "+info[0].rowsPerStrip);
-                    log("info[0].width "+info[0].width);
-                    */
-
-                    /*
-                    for(int k=0; k<info[0].stripLengths.length; k++) {
-                        int sl = info[0].stripLengths[k];
-                        double rsl = 1.0*sl/info[0].getBytesPerPixel()/info[0].width/info[0].rowsPerStrip;
-
-                        //log("relative stripLength "+rsl);
-                        //log("info[0].stripLength "+sl);
-                        //if(k<(info[0].stripLengths.length-1)) {
-                        //    int sod = info[0].stripOffsets[k+1] - info[0].stripOffsets[k];
-                            //log("difference stripOffsets "+sod);
-                            //log("difference stripOffsets and stripLength "+(sod-sl));
-                        //}
-
-                    }*/
-
-                    if (count == 0) {
-                        fi = info[0];
-                        // Collect image stack information
-                        ColorModel cm = null;
-                        if (fi.nImages > 1) {
-                            nSlices = fi.nImages;
-                            fi.nImages = 1;
-                        } else {
-                            nSlices = info.length;
-                        }
-                        // Initialise stack
-                        stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels, nFrames);
-
+                    if (t >= 0) {
+                        IJ.showProgress((double) (t + 1) / nFrames);
                     }
-                    // todo: I have to know here which t and c it is!
-                    stack.addStack(info, t, c);
-                    count = stack.getNStacks();
 
                 }
-
-                if(n>=0) {
-                    IJ.showProgress((double) (count+1) / n);
-                    if ((count+1) >= n)
-                        break;
-                }
-
             }
-        } catch (OutOfMemoryError e) {
+        } catch(OutOfMemoryError e) {
             IJ.outOfMemory("FolderOpener");
             if (stack != null) stack.trim();
-            //}catch(IOException e){
-            //	  e.printStackTrace();
         }
 
-        ImagePlus impFinal = null;
+        ImagePlus imp = null;
         if(stack!=null && stack.getSize()>0) {
-            nFrames = stack.getNStacks()/nChannels;
-            impFinal = makeImagePlus(stack, fi, nChannels, nFrames, nSlices);
+            imp = makeImagePlus(stack, infoSer[0], nChannels, nFrames, nSlices);
             writeFileInfosSer(stack.getFileInfosSer(), directory+"TiffFileInfos.ser");
         }
 
@@ -334,7 +297,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         return(impFinal);
 
     }
-
 
     public boolean writeFileInfosSer(FileInfoSer[][] infos, String path) {
         //FileInfoSer[] infoS = new FileInfoSer[2];
@@ -715,4 +677,36 @@ class VirtualOpenerDialog extends GenericDialog {
 	  }
 
 }
+
+
+
+                /*
+                if (openingMethod == "tiffUseIFDsFirstFile") {
+
+                    if (count == 0) {
+                        log("Obtaining IFDs from first file and use for all.");
+                        info = Opener.getTiffFileInfo(directory + list[i]);
+                        fi = info[0];
+                        // Collect image stack information
+                        ColorModel cm = null;
+                        if (fi.nImages > 1) {
+                            nSlices = fi.nImages;
+                            fi.nImages = 1;
+                        } else {
+                            nSlices = info.length;
+                        }
+                        // Initialise stack
+                        stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels, nT);
+                        stack.addStack(info);
+                    } else { // construct IFDs from first file
+                        FileInfo[] infoModified = new FileInfo[info.length];
+                        for (int j = 0; j < info.length; j++) {
+                            infoModified[j] = (FileInfo) info[j].clone();
+                            infoModified[j].fileName = list[i];
+                        }
+                        stack.addStack(infoModified);
+                    }
+
+                    count = stack.getNStacks();
+                }*/
 

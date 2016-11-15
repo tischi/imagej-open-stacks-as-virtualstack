@@ -52,7 +52,6 @@ public class FileInfoSer implements Cloneable, Serializable {
         this.pixelHeight = info.pixelHeight;
         this.pixelDepth = info.pixelDepth;
         this.frameInterval = info.frameInterval;
-
         this.bytesPerPixel = info.getBytesPerPixel();
 
     }
