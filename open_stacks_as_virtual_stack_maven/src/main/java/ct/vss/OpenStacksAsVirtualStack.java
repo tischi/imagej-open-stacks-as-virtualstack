@@ -4,8 +4,8 @@ import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
-import ij.io.FileInfo;
 
+import ij.io.FileInfo;
 import ij.io.Opener;
 import ij.plugin.PlugIn;
 import javafx.geometry.Point3D;
@@ -44,7 +44,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 
     public OpenStacksAsVirtualStack() {
-        // empty constructor for opening from FileInfo[]
+        // empty constructor for opening from FileInfoSer[]
     }
 
     public OpenStacksAsVirtualStack(String directory, String filter, int start, int increment, int n, int nChannels, String openingMethod, String order) {
@@ -229,7 +229,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 if ((counter++ % increment) != 0)
                     continue;
 
-
+                /*
                 if (openingMethod == "tiffUseIFDsFirstFile") {
 
                     if (count == 0) {
@@ -245,7 +245,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             nSlices = info.length;
                         }
                         // Initialise stack
-                        stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels);
+                        stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels, nT);
                         stack.addStack(info);
                     } else { // construct IFDs from first file
                         FileInfo[] infoModified = new FileInfo[info.length];
@@ -257,7 +257,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     }
 
                     count = stack.getNStacks();
-                }
+                }*/
 
                 if(openingMethod=="tiffLoadAllIFDs") {
 
@@ -266,6 +266,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     info = Opener.getTiffFileInfo(directory + list[i]);
 
                     log(""+list[i]);
+
                     /*
                     log("info.length "+info.length);
                     log("info[0].compression "+info[0].compression);
@@ -273,19 +274,20 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     log("info[0].width "+info[0].width);
                     */
 
+                    /*
                     for(int k=0; k<info[0].stripLengths.length; k++) {
                         int sl = info[0].stripLengths[k];
                         double rsl = 1.0*sl/info[0].getBytesPerPixel()/info[0].width/info[0].rowsPerStrip;
 
                         //log("relative stripLength "+rsl);
                         //log("info[0].stripLength "+sl);
-                        if(k<(info[0].stripLengths.length-1)) {
-                            int sod = info[0].stripOffsets[k+1] - info[0].stripOffsets[k];
+                        //if(k<(info[0].stripLengths.length-1)) {
+                        //    int sod = info[0].stripOffsets[k+1] - info[0].stripOffsets[k];
                             //log("difference stripOffsets "+sod);
                             //log("difference stripOffsets and stripLength "+(sod-sl));
-                        }
+                        //}
 
-                    }
+                    }*/
 
                     if (count == 0) {
                         fi = info[0];
@@ -298,11 +300,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             nSlices = info.length;
                         }
                         // Initialise stack
-                        stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels);
+                        stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels, nFrames);
 
                     }
-
-                    stack.addStack(info);
+                    // todo: I have to know here which t and c it is!
+                    stack.addStack(info, t, c);
                     count = stack.getNStacks();
 
                 }
@@ -325,7 +327,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         if(stack!=null && stack.getSize()>0) {
             nFrames = stack.getNStacks()/nChannels;
             impFinal = makeImagePlus(stack, fi, nChannels, nFrames, nSlices);
-            saveFileInfos(stack.getFileInfos(), directory+"TiffFileInfos.ser");
+            writeFileInfosSer(stack.getFileInfosSer(), directory+"TiffFileInfos.ser");
         }
 
         IJ.showProgress(1.0);
@@ -334,18 +336,18 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
 
-    public boolean saveFileInfos(FileInfo[][] infos, String path) {
-        FileInfoSer[] infoS = new FileInfoSer[2];
+    public boolean writeFileInfosSer(FileInfoSer[][] infos, String path) {
+        //FileInfoSer[] infoS = new FileInfoSer[2];
 
 
-        infoS[0] = new FileInfoSer(infos[0][0]);
-        infoS[1] = new FileInfoSer(infos[1][0]);
+        //infoS[0] = new FileInfoSer(infos[0][0]);
+        //infoS[1] = new FileInfoSer(infos[1][0]);
 
 
         try{
             FileOutputStream fout = new FileOutputStream(path, true);
             ObjectOutputStream oos = new ObjectOutputStream(fout);
-            oos.writeObject(SerializationUtils.serialize(infoS));
+            oos.writeObject(SerializationUtils.serialize(infos));
             oos.close();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -356,12 +358,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         return true;
     }
 
-    public FileInfo[][] readFileInfos(String path) {
-        FileInfo[][] infos = null;
+    public FileInfoSer[][][] readFileInfosSer(String path) {
+        FileInfoSer[][][] infos = null;
         try {
             FileInputStream streamIn = new FileInputStream("G:\\address.ser");
             ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
-            infos = (FileInfo[][]) objectinputstream.readObject();
+            infos = (FileInfoSer[][][]) objectinputstream.readObject();
             objectinputstream.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -467,8 +469,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 
 }
-
-	public static ImagePlus openFromCroppedFileInfo(ImagePlus imp, FileInfo[][] infos, Point3D[] pos, Point3D radii, int tMin, int tMax) {
+/*
+	public static ImagePlus openFromCroppedFileInfo(ImagePlus imp, FileInfoSer[][] infos, Point3D[] pos, Point3D radii, int tMin, int tMax) {
 		Point3D size = radii.multiply(2);
         size = size.add(new Point3D(1,1,1));
         VirtualStackOfStacks stack = new VirtualStackOfStacks(size, imp.getNChannels());
@@ -493,17 +495,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
 
         return(makeImagePlus(stack, infoModified[0], imp.getNChannels(), tMax-tMin+1, infoModified.length));
-	}
+	}*/
 
-	private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfo fi, int nChannels, int nFrames, int nSlices) {
+	private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfoSer fi, int nChannels, int nFrames, int nSlices) {
 		double min = Double.MAX_VALUE;
 		double max = -Double.MAX_VALUE;
 		ImagePlus imp = new ImagePlus(fi.directory, stack);
 		if (imp.getType()==ImagePlus.GRAY16 || imp.getType()==ImagePlus.GRAY32)
 			imp.getProcessor().setMinAndMax(min, max);
-		imp.setFileInfo(fi); // saves FileInfo of the first image
-		//if (imp.getStackSize()==1 && info1!=null)
-		//   imp.setProperty("Info", info1);
+		imp.setFileInfo(fi.getFileInfo()); // saves FileInfo of the first image
+
         if(Globals.verbose) {
             log("# OpenStacksAsVirtualStack.makeImagePlus");
             log("nChannels: "+nChannels);

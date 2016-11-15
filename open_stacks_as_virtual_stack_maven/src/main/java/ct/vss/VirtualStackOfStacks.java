@@ -4,10 +4,8 @@ package ct.vss;
  * Created by tischi on 27/10/16.
  */
 
-import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.io.FileInfo;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
 
@@ -23,6 +21,7 @@ public class VirtualStackOfStacks extends ImageStack {
     int nFiles;
     int nZ, nC, nT;
     String order = "tc"; // "ct", "tc"
+    //protected FileInfoSeSer[][][] infos;
     protected FileInfoSer[][][] infos;
 
     /** Creates a new, empty virtual stack. */
@@ -37,7 +36,7 @@ public class VirtualStackOfStacks extends ImageStack {
             log("y: "+(int)pSize.getY());
             log("z: "+(int)pSize.getZ());
         }
-        this.infos = new FileInfoSer[INITIAL_SIZE][INITIAL_SIZE][];
+        this.infos = new FileInfoSeSer[INITIAL_SIZE][INITIAL_SIZE][];
     }
     */
 
@@ -59,11 +58,11 @@ public class VirtualStackOfStacks extends ImageStack {
     }
 
 
-    public FileInfoSer[][][] getFileInfos() {
+    public FileInfoSer[][][] getFileInfosSer() {
         return(infos);
     }
 
-    public void setFileInfos(FileInfoSer[][][] infos) {
+    public void setFileInfosSer(FileInfoSer[][][] infos) {
         this.infos = infos;
     }
 
@@ -180,19 +179,16 @@ public class VirtualStackOfStacks extends ImageStack {
 
     public ImagePlus getCroppedFrameAsImagePlus(int t, int c, int dz, Point3D p, Point3D pr) {
         int iFile = 0;
-        if(order=="tc") {
-            iFile = t + (nT*c);
-        } else {
-            IJ.showMessage("Unsupported file order: "+order);
-        }
+        FileInfoSer[] info = infos[t][c];
+
         if(Globals.verbose) {
             log("# VirtualStackOfStacks.getCroppedFrameAsImagePlus");
             log("t: "+t);
             log("c: "+c);
-            log("directory: "+infos[iFile][0].directory);
-            log("filename: "+infos[iFile][0].fileName);
+            log("directory: "+info[0].directory);
+            log("filename: "+info[0].fileName);
         }
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(infos[iFile], dz, p, pr);
+        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(info, dz, p, pr);
 
         if (imp==null) {
             log("Error: loading failed!");
@@ -208,14 +204,15 @@ public class VirtualStackOfStacks extends ImageStack {
 
     /** Returns the number of stacks in this stack. */
     public int getNStacks() {
-        return nStacks;
+        return nT*nC;
     }
 
     /** Returns the file name of the Nth image. */
     public String getSliceLabel(int n) {
-        int nFile;
-        nFile = (n-1) / nZ;
-        return infos[nFile][0].fileName;
+        //int nFile;
+        //nFile = (n-1) / nZ;
+        //return infos[nFile][0].fileName;
+        return "slice label";
     }
 
     /** Returns null. */

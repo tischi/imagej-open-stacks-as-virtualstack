@@ -5,7 +5,6 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.WindowManager;
 import ij.gui.*;
-import ij.io.FileInfo;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
