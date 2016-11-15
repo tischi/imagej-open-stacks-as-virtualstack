@@ -15,30 +15,12 @@ import static ij.IJ.log;
  This class represents an array of disk-resident image stacks.
  */
 public class VirtualStackOfStacks extends ImageStack {
-
-    static final int INITIAL_SIZE = 100;
-    int nSlices = 0;
-    int nFiles;
+    int nSlices;
     int nZ, nC, nT;
     protected FileInfoSer[][][] infos;  // c, t, z
 
-    /** Creates a new, empty virtual stack. */
-    /*
-    public VirtualStackOfStacks(Point3D pSize, int nC) {
-        super((int)pSize.getX(), (int)pSize.getY(), null);
-        this.nZ = (int)pSize.getZ();
-        this.nC = nC;
-        if(Globals.verbose) {
-            log("VirtualStackOfStacks");
-            log("x: "+(int)pSize.getX());
-            log("y: "+(int)pSize.getY());
-            log("z: "+(int)pSize.getZ());
-        }
-        this.infos = new FileInfoSeSer[INITIAL_SIZE][INITIAL_SIZE][];
-    }
-    */
 
-    /** Creates a new, empty virtual stack of known size */
+    /** Creates a new, empty virtual stack of required size */
     public VirtualStackOfStacks(Point3D pSize, int nC, int nT) {
         super((int)pSize.getX(), (int)pSize.getY(), null);
         this.nZ = (int)pSize.getZ();
@@ -53,6 +35,15 @@ public class VirtualStackOfStacks extends ImageStack {
             log("t: "+nT);
         }
         this.infos = new FileInfoSer[nC][nT][];
+        nSlices = nC*nT*nZ;
+    }
+
+    public VirtualStackOfStacks(FileInfoSer[][][] infos) {
+        this.infos = infos;
+        nC = infos.length;
+        nT = infos[0].length;
+        nZ = infos[0][0].length;
+        nSlices = nC*nT*nZ;
     }
 
 
@@ -60,33 +51,10 @@ public class VirtualStackOfStacks extends ImageStack {
         return(infos);
     }
 
-    public void setFileInfosSer(FileInfoSer[][][] infos) {
-        this.infos = infos;
-    }
-
-    /** Adds an stack to the end of the stack. */
-    /*
-    public void addStack(FileInfoSer[] info) {
-        if (info==null)
-            throw new IllegalArgumentException("'info' is null!");
-        nSlices = nSlices + nZ;
-        nStacks ++;
-        nT = (int) (nStacks/nC);
-        if (nStacks==infos.length) {
-            FileInfo[][] tmp_infos = new FileInfo[nStacks*2][];
-            System.arraycopy(infos, 0, tmp_infos, 0, nStacks);
-            infos = tmp_infos;
-        }
-        infos[nStacks-1] = info;
-        //("Added file: "+infos[nStacks-1][0].fileName);
-    }*/
-
-    /** Adds an image stack to the stack. */
+    /** Adds an image stack. */
     public void addStack(FileInfoSer[] info, int t, int c) {
         if (info==null)
             throw new IllegalArgumentException("'info' is null!");
-        nSlices = nSlices + nZ;
-        nFiles ++;
         infos[c][t] = info;
     }
 

@@ -24,7 +24,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private static boolean grayscale;
     private static double scale = 100.0;
     private int n, start, increment;
-    private int nChannels, nFrames, nSlices;
+    private int nC, nT, nZ;
     private String filter;
     private String info1;
     private String directory;
@@ -34,79 +34,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String fileOrder;
 
     public OpenStacksAsVirtualStack() {
-        // empty constructor for opening from FileInfoSer[]
-    }
-
-    public OpenStacksAsVirtualStack(String directory, String filter, String openingMethod, String fileOrder) {
-        this.directory = directory;
-        this.filter = filter;
-
-
-
-        String path = directory+"test.ser";
-        int[] a = {0,1,2,3};
-        FileInfoSer fi = new FileInfoSer(new FileInfo());
-        fi.fileName = "sfsfd";
-        try {
-            FileOutputStream fos = new FileOutputStream(path, false);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(fi);
-            oos.flush();
-            oos.close();
-            fos.close();
-            log("Wrote: " + path);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            log("Could not write: " + path);
-        }
-
-        try {
-            FileInputStream fis = new FileInputStream(path);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            FileInfoSer b = (FileInfoSer) ois.readObject();
-            log(""+b.fileName);
-            ois.close();
-            fis.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        File f = new File(directory+"TiffFileInfos.ser");
-
-        if(true && f.exists() && !f.isDirectory()) {
-            log("Loading TiffFileInfos file...");
-            FileInfoSer[][][] infos = readFileInfosSer(directory + "TiffFileInfos.ser");
-            log("nC: " + infos.length);
-            log("nT: " + infos[0].length);
-            log("nz: " + infos[0][0].length);
-        }
-
-
-            // todo: depending on the fileOrder do different things
-            // todo: add the filter to the getFilesInFolder function
-            this.channelFolders = getFoldersInFolder(directory);
-
-            if (channelFolders == null) {
-                log("No channel sub-folders found.");
-                return;
-            }
-            this.nChannels = channelFolders.length;
-            this.lists = new String[nChannels][];
-            for (int i = 0; i < nChannels; i++) {
-                lists[i] = getFilesInFolder(directory + channelFolders[i]);
-                if (lists[i] == null) {
-                    log("No files found.");
-                    return;
-                } else {
-                    log("Number of files: " + lists[i].length);
-                }
-            }
-            // todo consistency check the list lengths
-            this.nFrames = lists[0].length;
-            this.openingMethod = openingMethod;
-
     }
 
     public void run(String arg) {
@@ -159,9 +86,145 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         if (increment < 1)
             increment = 1;
         filter = gd.getNextString();
-        nChannels = (int) gd.getNextNumber();
+        nC = (int) gd.getNextNumber();
         fileOrder = gd.getNextChoice();
         return true;
+    }
+
+    public ImagePlus openFromInfoFile(String path){
+
+        File f = new File(path);
+
+        if(f.exists() && !f.isDirectory()) {
+
+            log("Loading TiffFileInfos file...");
+            FileInfoSer[][][] infos = readFileInfosSer(path);
+
+            nC = infos.length;
+            nT = infos[0].length;
+            nZ = infos[0][0].length;
+
+            if(Globals.verbose) {
+                log("nC: " + infos.length);
+                log("nT: " + infos[0].length);
+                log("nz: " + infos[0][0].length);
+            }
+
+            // init the VSS
+            VirtualStackOfStacks stack = new VirtualStackOfStacks(infos);
+            ImagePlus imp = makeImagePlus(stack, infos[0][0][0], nC, nT, nZ);
+            return(imp);
+
+        } else {
+            return (null);
+        }
+    }
+
+    public ImagePlus openFromDirectory(String directory, String filter, String openingMethod, String fileOrder) {
+
+        log("# openFromDirectory");
+
+        this.directory = directory;
+        this.filter = filter;
+
+        // todo: depending on the fileOrder do different things
+        // todo: add the filter to the getFilesInFolder function
+        this.channelFolders = getFoldersInFolder(directory);
+
+        if (channelFolders == null) {
+            log("No channel sub-folders found.");
+            return(null);
+        }
+        this.nC = channelFolders.length;
+        this.lists = new String[nC][];
+        for (int i = 0; i < nC; i++) {
+            lists[i] = getFilesInFolder(directory + channelFolders[i]);
+            if (lists[i] == null) {
+                log("No files found.");
+                return(null);
+            } else {
+                log("Number of files: " + lists[i].length);
+            }
+        }
+        // todo consistency check the list lengths
+        this.nT = lists[0].length;
+
+        // todo: not used
+        this.openingMethod = openingMethod;
+
+        FileInfo[] info = null;
+        FileInfo fi = null;
+        FileInfoSer[] infoSer = null;
+        String path = "";
+        VirtualStackOfStacks stack = null;
+
+        // loop through filtered list and add file-info
+        try {
+
+            for (int c = 0; c < nC; c++) {
+
+                for (int t = 0; t < nT; t++) {
+
+                    if (openingMethod == "tiffLoadAllIFDs") {
+
+                        log("# tiffLoadAllIFDs");
+
+                        info = Opener.getTiffFileInfo(directory + channelFolders[c] + "/" + lists[c][t]);
+
+                        log("c" + c + "t" + t + ":" + lists[c][t]);
+
+                        if (Globals.verbose) {
+                            log(directory + channelFolders[c] + "/" + lists[c][t]);
+                            log("info.length " + info.length);
+                            log("info[0].compression " + info[0].compression);
+                            log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
+                            log("info[0].width " + info[0].width);
+                        }
+
+                        // first file
+                        if (t == 0 && c == 0) {
+                            fi = info[0];
+                            if (fi.nImages > 1) {
+                                nZ = fi.nImages;
+                                fi.nImages = 1;
+                            } else {
+                                nZ = info.length;
+                            }
+
+                            // init the VSS
+                            stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nZ), nC, nT);
+
+                        }
+
+                        // convert ij.io.FileInfo[] to FileInfoSer[]
+                        infoSer = new FileInfoSer[info.length];
+                        for (int i = 0; i < info.length; i++) {
+                            infoSer[i] = new FileInfoSer((FileInfo) info[i].clone());
+                        }
+                        stack.addStack(infoSer, t, c);
+
+                    }
+
+                    if (t >= 0) {
+                        IJ.showProgress((double) (t + 1) / nT);
+                    }
+
+                }
+            }
+        } catch(OutOfMemoryError e) {
+            IJ.outOfMemory("FolderOpener");
+            if (stack != null) stack.trim();
+        }
+
+        ImagePlus imp = null;
+        if(stack!=null && stack.getSize()>0) {
+            imp = makeImagePlus(stack, infoSer[0], nC, nT, nZ);
+            writeFileInfosSer(stack.getFileInfosSer(), directory+"TiffFileInfos.ser");
+        }
+
+        IJ.showProgress(1.0);
+        return(imp);
+
     }
 
     String[] sortFileList(String[] rawlist) {
@@ -255,92 +318,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     }
 
-    public ImagePlus openFromDirectory() {
-        log("# openFromDirectory");
-
-        FileInfo[] info = null;
-        FileInfo fi = null;
-        FileInfoSer[] infoSer = null;
-        String path = "";
-        VirtualStackOfStacks stack = null;
-
-        // loop through filtered list and add file-info
-        try {
-
-            for (int c = 0; c < nChannels; c++) {
-
-                for (int t = 0; t < nFrames; t++) {
-
-                    if (openingMethod == "tiffLoadAllIFDs") {
-
-                        log("# tiffLoadAllIFDs");
-
-                        info = Opener.getTiffFileInfo(directory + channelFolders[c] + "/" + lists[c][t]);
-
-                        log("c" + c + "t" + t + ":" + lists[c][t]);
-
-                        if (Globals.verbose) {
-                            log(directory + channelFolders[c] + "/" + lists[c][t]);
-                            log("info.length " + info.length);
-                            log("info[0].compression " + info[0].compression);
-                            log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
-                            log("info[0].width " + info[0].width);
-                        }
-
-                        // first file
-                        if (t == 0 && c == 0) {
-                            fi = info[0];
-                            if (fi.nImages > 1) {
-                                nSlices = fi.nImages;
-                                fi.nImages = 1;
-                            } else {
-                                nSlices = info.length;
-                            }
-
-                            // init the VSS
-                            stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels, nFrames);
-
-                        }
-
-                        // convert ij.io.FileInfo[] to FileInfoSer[]
-                        infoSer = new FileInfoSer[info.length];
-                        for (int i = 0; i < info.length; i++) {
-                            infoSer[i] = new FileInfoSer((FileInfo) info[i].clone());
-                        }
-                        stack.addStack(infoSer, t, c);
-
-                    }
-
-                    if (t >= 0) {
-                        IJ.showProgress((double) (t + 1) / nFrames);
-                    }
-
-                }
-            }
-        } catch(OutOfMemoryError e) {
-            IJ.outOfMemory("FolderOpener");
-            if (stack != null) stack.trim();
-        }
-
-        ImagePlus imp = null;
-        if(stack!=null && stack.getSize()>0) {
-            imp = makeImagePlus(stack, infoSer[0], nChannels, nFrames, nSlices);
-            writeFileInfosSer(stack.getFileInfosSer(), directory+"TiffFileInfos.ser");
-        }
-
-        IJ.showProgress(1.0);
-        return(imp);
-
-    }
-
-
     public boolean writeFileInfosSer(FileInfoSer[][][] infos, String path) {
 
         try{
             FileOutputStream fout = new FileOutputStream(path, true);
             ObjectOutputStream oos = new ObjectOutputStream(fout);
-            oos.writeObject(infos[0][0][0].fileName);
-            log(infos[0][0][0].fileName);
+            oos.writeObject(infos);
             oos.flush();
             oos.close();
             fout.close();
@@ -358,14 +341,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         try {
             FileInputStream fis = new FileInputStream(path);
             ObjectInputStream ois = new ObjectInputStream(fis);
-            //FileInfoSer infos[][][] = (FileInfoSer[][][]) objectinputstream.readObject();
-            //FileInfoSer info = (FileInfoSer) objectinputstream.readObject();
-            String filename = (String) ois.readObject();
-            log(filename);
-            //
-            //List<FileInfoSer> objectinputstream = (List<FileInfoSer>)objectinputstream.readObject();
+            FileInfoSer infos[][][] = (FileInfoSer[][][]) ois.readObject();
             ois.close();
-            return(null);
+            fis.close();
+            return(infos);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -475,7 +454,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 	public static ImagePlus openCroppedFromFileInfoSer(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] pos, Point3D radii, int tMin, int tMax) {
 		Point3D size = radii.multiply(2);
         size = size.add(new Point3D(1,1,1));
-        VirtualStackOfStacks stack = new VirtualStackOfStacks(size, imp.getNChannels());
+        VirtualStackOfStacks stack = new VirtualStackOfStacks(size, imp.getnC());
 		OpenerExtensions oe = new OpenerExtensions();
 
         if(Globals.verbose){
@@ -486,20 +465,20 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         FileInfo[] infoModified = null;
 
-        for(int ic=0; ic<imp.getNChannels(); ic++) {
+        for(int ic=0; ic<imp.getnC(); ic++) {
 
             for (int it = tMin; it <= tMax; it++) {
 
-                infoModified = oe.cropFileInfo(infos[it+ic*imp.getNFrames()], 1, pos[it], radii);
+                infoModified = oe.cropFileInfo(infos[it+ic*imp.getnT()], 1, pos[it], radii);
                 stack.addStack(infoModified);
 
             }
         }
 
-        return(makeImagePlus(stack, infoModified[0], imp.getNChannels(), tMax-tMin+1, infoModified.length));
+        return(makeImagePlus(stack, infoModified[0], imp.getnC(), tMax-tMin+1, infoModified.length));
 	}*/
 
-	private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfoSer fi, int nChannels, int nFrames, int nSlices) {
+	private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfoSer fi, int nC, int nT, int nZ) {
 		double min = Double.MAX_VALUE;
 		double max = -Double.MAX_VALUE;
 		ImagePlus imp = new ImagePlus(fi.directory, stack);
@@ -509,13 +488,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         if(Globals.verbose) {
             log("# OpenStacksAsVirtualStack.makeImagePlus");
-            log("nChannels: "+nChannels);
-            log("nSlices: "+nSlices);
-            log("nFrames: " + nFrames);
+            log("nC: "+nC);
+            log("nZ: "+nZ);
+            log("nT: " + nT);
             log("stack.getNStacks: "+stack.getNStacks());
 
         }
-        imp.setDimensions(nChannels, nSlices, nFrames);
+        imp.setDimensions(nC, nZ, nT);
         imp.setOpenAsHyperStack(true);
 		imp.resetDisplayRange();
 		return(imp);
@@ -557,14 +536,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         int start = 1;
         int increment = 1;
         int n = -1;
-        int nChannels = 1;
+        int nC = 1;
         String openingMethod = "tiffLoadAllIFDs";
         //String openingMethod = "tiffUseIFDsFirstFile";
         String order = "tc";
 
         Globals.verbose = true;
-        ovs = new OpenStacksAsVirtualStack(directory, filter, openingMethod, order);
-        ImagePlus imp = ovs.openFromDirectory();
+        ovs = new OpenStacksAsVirtualStack();
+        ImagePlus imp = ovs.openFromDirectory(directory, filter, openingMethod, order);
         imp.show();
         Registration register = new Registration(imp);
         register.showDialog();
@@ -730,13 +709,13 @@ class VirtualOpenerDialog extends GenericDialog {
                         // Collect image stack information
                         ColorModel cm = null;
                         if (fi.nImages > 1) {
-                            nSlices = fi.nImages;
+                            nZ = fi.nImages;
                             fi.nImages = 1;
                         } else {
-                            nSlices = info.length;
+                            nZ = info.length;
                         }
                         // Initialise stack
-                        stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nSlices), nChannels, nT);
+                        stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nZ), nC, nT);
                         stack.addStack(info);
                     } else { // construct IFDs from first file
                         FileInfo[] infoModified = new FileInfo[info.length];
