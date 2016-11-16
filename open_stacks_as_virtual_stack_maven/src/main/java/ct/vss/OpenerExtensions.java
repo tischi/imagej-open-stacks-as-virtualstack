@@ -259,12 +259,14 @@ class OpenerExtensions extends Opener {
             hasStrips = true;
         }
 
-        /*
+
         if(Globals.verbose) {
+            log("# readFromPlane");
             log("z-plane " + z);
             log("hasStrips: " + hasStrips);
-            log("isCompressed: " + isCompressed);
-        } */
+            //log("isCompressed: " + isCompressed);
+        }
+
         try {
 
             if (hasStrips) {
@@ -274,9 +276,9 @@ class OpenerExtensions extends Opener {
                 int ss = (int) ys / rps;
                 int se = (int) ye / rps;
 
-                // skip to first strip of this z-plane
+                // skip to first strip that we need to read of this z-plane
                 //startTime = System.currentTimeMillis();
-                pointer = skip(in, fi.stripOffsets[ys] - pointer, pointer);
+                pointer = skip(in, fi.stripOffsets[ss] - pointer, pointer);
                 //skippingTime += (System.currentTimeMillis() - startTime);
 
                 // compute read length
@@ -291,7 +293,11 @@ class OpenerExtensions extends Opener {
                 pointer = read(in, buffer[z-zs], pointer);
                 //readingTime += (System.currentTimeMillis() - startTime);
 
-                //log("buffer.length: " + buffer[z-zs].length);
+                //log("# readFromPlane:");
+                //log("ss: " + ss);
+                //log("se: " + se);
+                //log("readLength: " + readLength);
+
             }
 
         } catch (Exception e) {
@@ -365,13 +371,13 @@ class OpenerExtensions extends Opener {
                 //
 
                 startTime = System.currentTimeMillis();
+                log("AAAA");
                 pointer = readFromPlane(fi, in, pointer, buffer, z, zs, ys, ye) ;
                 readingTime += (System.currentTimeMillis() - startTime);
 
                 //
                 // Decompress Rearrange Crop And Put Into Stack
                 //
-
 
                 startTime = System.currentTimeMillis();
                 es.execute(new process2stack(fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth));
@@ -485,24 +491,39 @@ class process2stack implements Runnable {
 
             // deal with compression
             final int LZW = 2;
+
             if(fi.compression==LZW) {
 
-                //log("lzw uncompression of slice " + z);
-
-                byte[] unCompressedBuffer = new byte[ny * imByteWidth];
+                // needs to hold all data present in the uncompressed strips
+                byte[] unCompressedBuffer = new byte[ (se-ss+1) * rps * imByteWidth];
 
                 int pos = 0;
                 for (int s = ss; s <= se; s++) {
                     int stripLength = fi.stripLengths[s];
                     byte[] strip = new byte[stripLength];
+
                     // get strip from read data
-                    System.arraycopy(buffer[z-zs], pos, strip, 0, stripLength);
+                    try {
+                        System.arraycopy(buffer[z - zs], pos, strip, 0, stripLength);
+                    } catch (Exception e) {
+                        log(""+e.toString());
+                        log("------- s [#] : " + s);
+                        log("stripLength [bytes] : " + strip.length);
+                        log("pos [bytes] : "+pos);
+                        log("pos + stripLength [bytes] : "+(pos+stripLength));
+                        log("z-zs : "+(z-zs));
+                        log("buffer[z-zs].length : "+buffer[z-zs].length);
+                        log("imWidth [bytes] : " + imByteWidth);
+                        log("rows per strip [#] : " + rps);
+                        log("ny [#] : " + ny);
+                        log("(s - ss) * imByteWidth * rps [bytes] : " + ((s - ss) * imByteWidth * rps));
+                        log("unCompressedBuffer.length [bytes] : " + unCompressedBuffer.length);
+                    }
+
                     //log("strip.length " + strip.length);
                     // uncompress strip
-                    strip = lzwUncompress(strip, imByteWidth);
+                    strip = lzwUncompress(strip, imByteWidth*rps);
 
-                    //log("strip.length [pixels] " + strip.length/fi.bytesPerPixel);
-                    //log("imWidth [pixels] " + imByteWidth/fi.bytesPerPixel);
 
                     // put uncompressed strip into large array
                     System.arraycopy(strip, 0, unCompressedBuffer, (s - ss) * imByteWidth * rps, imByteWidth * rps);
@@ -524,7 +545,8 @@ class process2stack implements Runnable {
             //log("ny*imByteWidth " + (ny*imByteWidth));
 
             // store strips in pixel array
-            ys=ys%rps;
+
+            ys=ys%rps; // we might have to skip a few rows in the beginning because the strips can hold several rows
             setShortPixelsFromAllStrips(fi, pixels[z-zs], ys, ny, xs, nx, imByteWidth, buffer[z-zs]);
 
             // add pixels to stack
