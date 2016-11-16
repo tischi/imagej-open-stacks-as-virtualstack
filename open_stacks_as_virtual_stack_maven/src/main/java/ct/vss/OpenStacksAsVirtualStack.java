@@ -1,5 +1,8 @@
 package ct.vss;
 
+import ch.systemsx.cisd.hdf5.HDF5DataSetInformation;
+import ch.systemsx.cisd.hdf5.HDF5Factory;
+import ch.systemsx.cisd.hdf5.IHDF5Reader;
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
@@ -24,7 +27,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private static boolean grayscale;
     private static double scale = 100.0;
     private int n, start, increment;
-    private int nC, nT, nZ;
+    private int nC, nT, nZ, nX, nY;
     private String filter;
     private String info1;
     private String directory;
@@ -123,6 +126,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     public ImagePlus openFromDirectory(String directory, String filter, String openingMethod, String fileOrder) {
 
         log("# openFromDirectory");
+        log("openingMethod : "+openingMethod);
 
         this.directory = directory;
         this.filter = filter;
@@ -165,24 +169,25 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 for (int t = 0; t < nT; t++) {
 
+                    log("c" + c + "t" + t + ":" + lists[c][t]);
+                    String ctPath = directory + channelFolders[c] + "/" + lists[c][t];
+
                     if (openingMethod == "tiffLoadAllIFDs") {
 
-                        log("# tiffLoadAllIFDs");
-
-                        info = Opener.getTiffFileInfo(directory + channelFolders[c] + "/" + lists[c][t]);
-
-                        log("c" + c + "t" + t + ":" + lists[c][t]);
+                        info = Opener.getTiffFileInfo(ctPath);
 
                         if (Globals.verbose) {
-                            log(directory + channelFolders[c] + "/" + lists[c][t]);
+                            log(ctPath);
                             log("info.length " + info.length);
                             log("info[0].compression " + info[0].compression);
                             log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
                             log("info[0].width " + info[0].width);
+                            log("info[0].height " + info[0].height);
                         }
 
                         // first file
                         if (t == 0 && c == 0) {
+
                             fi = info[0];
                             if (fi.nImages > 1) {
                                 nZ = fi.nImages;
@@ -190,9 +195,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             } else {
                                 nZ = info.length;
                             }
+                            nX = fi.width;
+                            nY = fi.height;
 
                             // init the VSS
-                            stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nZ), nC, nT);
+                            stack = new VirtualStackOfStacks(new Point3D(nX, nY, nZ), nC, nT);
 
                         }
 
@@ -201,6 +208,54 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         for (int i = 0; i < info.length; i++) {
                             infoSer[i] = new FileInfoSer((FileInfo) info[i].clone());
                         }
+
+                        stack.addStack(infoSer, t, c);
+
+                    }
+
+                    if (openingMethod == "h5") {
+
+                        log("# h5");
+
+                        info = Opener.getTiffFileInfo(directory + channelFolders[c] + "/" + lists[c][t]);
+
+                        log("c" + c + "t" + t + ":" + lists[c][t]);
+
+                        if (Globals.verbose) {
+                            log(ctPath);
+                            log("info.length " + info.length);
+                            log("info[0].compression " + info[0].compression);
+                            log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
+                            log("info[0].width " + info[0].width);
+                        }
+
+                        // first file
+                        if (t == 0 && c == 0) {
+                            String dataSet = "Data444";
+                            IHDF5Reader reader = HDF5Factory.openForReading(ctPath);
+                            HDF5DataSetInformation dsInfo = reader.object().getDataSetInformation("/"+dataSet);
+                            nZ = (int)dsInfo.getDimensions()[0];
+                            nY = (int)dsInfo.getDimensions()[1];
+                            nX = (int)dsInfo.getDimensions()[2];
+
+                            // init the VSS
+                            stack = new VirtualStackOfStacks(new Point3D(nX, nY, nZ), nC, nT);
+
+                        }
+
+                        // construct a FileInfoSer
+                        // todo: this could be much leaner
+                        // e.g. the nX, nY and bit depth
+                        infoSer = new FileInfoSer[info.length];
+                        for (int i = 0; i < nZ; i++) {
+                            infoSer[i] = new FileInfoSer();
+                            infoSer[i].fileName = lists[c][t];
+                            infoSer[i].directory = directory + channelFolders[c];
+                            infoSer[i].width = nX;
+                            infoSer[i].height = nY;
+                            infoSer[i].bytesPerPixel = 2; // todo: how to get the bit-depth from the info?
+                        }
+
                         stack.addStack(infoSer, t, c);
 
                     }
@@ -527,7 +582,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-        String directory = "/Users/tischi/Desktop/example-data/compressedMultiChannel/";
+         //String directory = "/Users/tischi/Desktop/example-data/compressedMultiChannel/";
+        String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
         //String directory = "/Users/tischi/Desktop/example-data/compressed/";
         String filter = "lzw";
@@ -539,16 +595,19 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         int increment = 1;
         int n = -1;
         int nC = 1;
-        String openingMethod = "tiffLoadAllIFDs";
-        //String openingMethod = "tiffUseIFDsFirstFile";
+        //String openingMethod = "tiffLoadAllIFDs";
+        String openingMethod = "h5";
         String order = "tc";
 
+        //OpenHDF5test oh5 = new OpenHDF5test();
+        //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
         ImagePlus imp = ovs.openFromDirectory(directory, filter, openingMethod, order);
         imp.show();
-        Registration register = new Registration(imp);
-        register.showDialog();
+
+        //Registration register = new Registration(imp);
+        //register.showDialog();
 
         /*
         if (Mitosis_ome) {

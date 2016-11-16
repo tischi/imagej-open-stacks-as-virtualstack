@@ -33,6 +33,9 @@ public class FileInfoSer implements Cloneable, Serializable {
 
     public int bytesPerPixel;
 
+    public FileInfoSer() {
+
+    }
 
     public FileInfoSer(FileInfo info) {
         this.fileFormat = info.fileFormat;

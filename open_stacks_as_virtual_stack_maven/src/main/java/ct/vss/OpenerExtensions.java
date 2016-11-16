@@ -1,10 +1,14 @@
 package ct.vss;
 
+import ch.systemsx.cisd.base.mdarray.MDShortArray;
+import ch.systemsx.cisd.hdf5.HDF5Factory;
+import ch.systemsx.cisd.hdf5.IHDF5Reader;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.io.BitBuffer;
 import ij.io.Opener;
+import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
 
 import javax.imageio.stream.FileImageInputStream;
@@ -18,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import static ij.IJ.log;
 
-
+// hdf5:  http://svnsis.ethz.ch/doc/hdf5/hdf5-14.12/
 
 /** Opens the nth image of the specified TIFF stack.*/
 class OpenerExtensions extends Opener {
@@ -249,6 +253,14 @@ class OpenerExtensions extends Opener {
 
     }
 
+    /*public ImagePlus openCroppedH5stack() {
+        ImagePlus imp = null;
+
+        MDShortArray rawdata = reader.uint16().readMDArrayBlockWithOffset(dsetName, loadBlockDimensions, loadBlockOffset);
+
+        return(imp);
+    }*/
+
     private long readFromPlane(FileInfoSer fi, FileInputStream in, long pointer, byte[][] buffer, int z, int zs, int ys, int ye) {
         boolean hasStrips = false;
         int readLength;
@@ -305,6 +317,68 @@ class OpenerExtensions extends Opener {
 
         return (pointer);
 
+    }
+
+    public ImagePlus openCroppedH5stack(FileInfoSer[] info, int zs, int ze, int nz, int dz, int xs, int xe, int ys, int ye) {
+        long startTime;
+        long readingTime = 0;
+        long totalTime = 0;
+        long threadInitTime = 0;
+        long allocationTime = 0;
+
+        String dataSet = "Data444";
+
+        if (info == null) return null;
+        FileInfoSer fi = info[0];
+
+        int nx = xe - xs + 1;
+        int ny = ye - ys + 1;
+
+        if(Globals.verbose) {
+            log("# openCroppedH5stack");
+            log("directory: " + fi.directory);
+            log("filename: " + fi.fileName);
+            log("info.length: " + info.length);
+            log("zs,dz,ze,nz,xs,xe,ys,ye: " + zs + "," + dz + "," + ze + "," + nz + "," + xs + "," + xe + "," + ys + "," + ye);
+        }
+
+        totalTime = System.currentTimeMillis();
+
+        // initialisation and allocation
+        startTime = System.currentTimeMillis();
+        ImageStack stack = ImageStack.create(nx, ny, nz, fi.bytesPerPixel*8);
+        ImagePlus imp = new ImagePlus("cropped", stack);
+        allocationTime += (System.currentTimeMillis() - startTime);
+
+        // load everything in one go
+        startTime = System.currentTimeMillis();
+        IHDF5Reader reader = HDF5Factory.openForReading(fi.directory + fi.fileName);
+        final MDShortArray block = reader.uint16().readMDArrayBlockWithOffset(dataSet, new int[]{nz, ny, nx}, new long[]{zs, ys, xs});
+        final short[] asFlatArray = block.getAsFlatArray();
+        readingTime += (System.currentTimeMillis() - startTime);
+
+        // put into stack
+        // todo: could be done in parallel threads
+        int imByteSize = nx*ny*fi.bytesPerPixel;
+        for(int z=zs; z<=ze; z+=dz) {
+            ImageProcessor ip = imp.getStack().getProcessor(imp.getStackIndex(0, (z-zs), 0));
+            System.arraycopy(asFlatArray, (z-zs)*imByteSize, (short[]) ip.getPixels(), 0, imByteSize);
+        }
+
+        totalTime = (System.currentTimeMillis() - totalTime);
+
+        if(Globals.verbose) {
+            int usefulBytesRead = nz*nx*ny*fi.bytesPerPixel;
+            log("readingTime [ms]: " + readingTime);
+            log("effective reading speed [MB/s]: " + usefulBytesRead/((readingTime+0.001)*1000));
+            log("allocationTime [ms]: "+allocationTime);
+            log("threadInitTime [ms]: "+threadInitTime);
+            //log("additional threadRunningTime [ms]: "+threadRunningTime);
+            log("totalTime [ms]: " + totalTime);
+            //log("Processing [ms]: " + processTime);
+        }
+
+        return(imp);
     }
 
     public ImagePlus openCroppedTiffStackUsingIFDs(FileInfoSer[] info, int zs, int ze, int nz, int dz, int xs, int xe, int ys, int ye) {
@@ -369,7 +443,6 @@ class OpenerExtensions extends Opener {
                 //
 
                 startTime = System.currentTimeMillis();
-                log("AAAA");
                 pointer = readFromPlane(fi, in, pointer, buffer, z, zs, ys, ye) ;
                 readingTime += (System.currentTimeMillis() - startTime);
 
@@ -730,7 +803,6 @@ class process2stack implements Runnable {
         }
     }
 }
-
 
 /** A growable array of bytes. */
 class ByteVector {
