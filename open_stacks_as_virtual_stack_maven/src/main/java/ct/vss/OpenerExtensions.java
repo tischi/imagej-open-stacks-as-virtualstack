@@ -224,8 +224,6 @@ class OpenerExtensions extends Opener {
         }
     }
 
-
-
     public ImagePlus openCroppedTiffStackUsingIFDs(FileInfoSer[] info, int dz, Point3D p, Point3D pr) {
 
         // compute ranges to be loaded
@@ -260,12 +258,12 @@ class OpenerExtensions extends Opener {
         }
 
 
+        /*
         if(Globals.verbose) {
             log("# readFromPlane");
             log("z-plane " + z);
             log("hasStrips: " + hasStrips);
-            //log("isCompressed: " + isCompressed);
-        }
+        }*/
 
         try {
 

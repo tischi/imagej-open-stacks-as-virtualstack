@@ -496,6 +496,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
         imp.setDimensions(nC, nZ, nT);
         imp.setOpenAsHyperStack(true);
+        if(nC>1) imp.setDisplayMode(IJ.COMPOSITE);
+        imp.setPosition(1, (int) nZ/2, 1);
 		imp.resetDisplayRange();
 		return(imp);
 	}
