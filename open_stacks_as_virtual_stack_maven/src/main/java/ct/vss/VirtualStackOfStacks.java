@@ -18,14 +18,16 @@ public class VirtualStackOfStacks extends ImageStack {
     int nSlices;
     int nZ, nC, nT;
     protected FileInfoSer[][][] infos;  // c, t, z
-
+    protected String fileType = "tiff"; // h5
 
     /** Creates a new, empty virtual stack of required size */
-    public VirtualStackOfStacks(Point3D pSize, int nC, int nT) {
+    public VirtualStackOfStacks(Point3D pSize, int nC, int nT, String fileType) {
         super((int)pSize.getX(), (int)pSize.getY(), null);
         this.nZ = (int)pSize.getZ();
         this.nC = nC;
         this.nT = nT;
+        this.fileType = fileType;
+
         if(Globals.verbose) {
             log("# VirtualStackOfStacks");
             log("x: "+(int)pSize.getX());
@@ -113,6 +115,8 @@ public class VirtualStackOfStacks extends ImageStack {
     n = ( c + z*nC + t*nZ*nC ) + 1
     */
     public ImageProcessor getProcessor(int n) {
+        ImagePlus imp = null;
+
         n -= 1;
 
         int c = (n % nC);
@@ -134,11 +138,11 @@ public class VirtualStackOfStacks extends ImageStack {
             log("opening z-slice [one-based]: "+(z+1));
         }
 
-        //ImagePlus imp = new OpenerExtensions().openTiffStackSliceUsingIFDs(infos[iFile], z);
-        long startTime = System.currentTimeMillis();
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(info, z, z, 1, 1, 0, info[0].width - 1, 0, info[0].height - 1);
-        long readingTime = (System.currentTimeMillis() - startTime);
-        
+        if(fileType == "tiff")
+            imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(info, z, z, 1, 1, 0, info[0].width - 1, 0, info[0].height - 1);
+        if(fileType == "h5")
+            imp = new OpenerExtensions().openCroppedH5stack(info, z, z, 1, 1, 0, info[0].width - 1, 0, info[0].height - 1);
+
         if (imp==null) {
             log("Error: loading failed!");
             return null;

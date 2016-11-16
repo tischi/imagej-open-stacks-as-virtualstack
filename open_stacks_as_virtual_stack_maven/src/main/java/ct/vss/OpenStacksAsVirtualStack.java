@@ -33,7 +33,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String directory;
     private String[] channelFolders;
     private String[][] lists; // c, t
-    private String openingMethod; // tiffUseIFDsFirstFile;
     private String fileOrder;
 
     public OpenStacksAsVirtualStack() {
@@ -123,10 +122,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
     }
 
-    public ImagePlus openFromDirectory(String directory, String filter, String openingMethod, String fileOrder) {
+    public ImagePlus openFromDirectory(String directory, String filter, String fileType, String fileOrder) {
 
         log("# openFromDirectory");
-        log("openingMethod : "+openingMethod);
+        log("fileType : "+fileType);
 
         this.directory = directory;
         this.filter = filter;
@@ -153,8 +152,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         // todo consistency check the list lengths
         this.nT = lists[0].length;
 
-        // todo: not used
-        this.openingMethod = openingMethod;
 
         FileInfo[] info = null;
         FileInfo fi = null;
@@ -169,15 +166,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 for (int t = 0; t < nT; t++) {
 
-                    log("c" + c + "t" + t + ":" + lists[c][t]);
+                    log("c" + c + "t" + t + ": " + lists[c][t]);
                     String ctPath = directory + channelFolders[c] + "/" + lists[c][t];
 
-                    if (openingMethod == "tiffLoadAllIFDs") {
+                    if (fileType == "tiff") {
 
                         info = Opener.getTiffFileInfo(ctPath);
 
                         if (Globals.verbose) {
-                            log(ctPath);
                             log("info.length " + info.length);
                             log("info[0].compression " + info[0].compression);
                             log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
@@ -199,13 +195,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             nY = fi.height;
 
                             // init the VSS
-                            stack = new VirtualStackOfStacks(new Point3D(nX, nY, nZ), nC, nT);
+                            stack = new VirtualStackOfStacks(new Point3D(nX, nY, nZ), nC, nT, fileType);
 
                         }
 
                         // convert ij.io.FileInfo[] to FileInfoSer[]
-                        infoSer = new FileInfoSer[info.length];
-                        for (int i = 0; i < info.length; i++) {
+                        infoSer = new FileInfoSer[nZ];
+                        for (int i = 0; i < nZ; i++) {
                             infoSer[i] = new FileInfoSer((FileInfo) info[i].clone());
                         }
 
@@ -213,20 +209,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     }
 
-                    if (openingMethod == "h5") {
+                    if (fileType == "h5") {
 
-                        log("# h5");
 
                         info = Opener.getTiffFileInfo(directory + channelFolders[c] + "/" + lists[c][t]);
 
-                        log("c" + c + "t" + t + ":" + lists[c][t]);
-
                         if (Globals.verbose) {
-                            log(ctPath);
-                            log("info.length " + info.length);
-                            log("info[0].compression " + info[0].compression);
-                            log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
-                            log("info[0].width " + info[0].width);
+                            //log("info.length " + info.length);
+                            //log("info[0].compression " + info[0].compression);
+                            //log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
+                            //log("info[0].width " + info[0].width);
                         }
 
                         // first file
@@ -239,18 +231,17 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             nX = (int)dsInfo.getDimensions()[2];
 
                             // init the VSS
-                            stack = new VirtualStackOfStacks(new Point3D(nX, nY, nZ), nC, nT);
-
+                            stack = new VirtualStackOfStacks(new Point3D(nX, nY, nZ), nC, nT, fileType);
                         }
 
                         // construct a FileInfoSer
                         // todo: this could be much leaner
                         // e.g. the nX, nY and bit depth
-                        infoSer = new FileInfoSer[info.length];
+                        infoSer = new FileInfoSer[nZ];
                         for (int i = 0; i < nZ; i++) {
                             infoSer[i] = new FileInfoSer();
                             infoSer[i].fileName = lists[c][t];
-                            infoSer[i].directory = directory + channelFolders[c];
+                            infoSer[i].directory = directory + channelFolders[c] + "/";
                             infoSer[i].width = nX;
                             infoSer[i].height = nY;
                             infoSer[i].bytesPerPixel = 2; // todo: how to get the bit-depth from the info?

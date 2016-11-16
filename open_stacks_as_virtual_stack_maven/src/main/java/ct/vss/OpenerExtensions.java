@@ -359,10 +359,11 @@ class OpenerExtensions extends Opener {
 
         // put into stack
         // todo: could be done in parallel threads
-        int imByteSize = nx*ny*fi.bytesPerPixel;
+        int imShortSize = nx*ny;
+        
         for(int z=zs; z<=ze; z+=dz) {
-            ImageProcessor ip = imp.getStack().getProcessor(imp.getStackIndex(0, (z-zs), 0));
-            System.arraycopy(asFlatArray, (z-zs)*imByteSize, (short[]) ip.getPixels(), 0, imByteSize);
+            ImageProcessor ip = imp.getStack().getProcessor(imp.getStackIndex(1, (z-zs)+1, 1));
+            System.arraycopy(asFlatArray, (z-zs)*imShortSize, (short[]) ip.getPixels(), 0, imShortSize);
         }
 
         totalTime = (System.currentTimeMillis() - totalTime);
