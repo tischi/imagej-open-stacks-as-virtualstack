@@ -41,6 +41,10 @@ public class VirtualStackOfStacks extends ImageStack {
     public VirtualStackOfStacks(FileInfoSer[][][] infos) {
         super();
 
+        this.infos = infos;
+        nC = infos.length;
+        nT = infos[0].length;
+
         if(infos[0][0][0].isCropped) {
             nX = (int) infos[0][0][0].pCropSize.getX();
             nY = (int) infos[0][0][0].pCropSize.getY();
@@ -51,10 +55,6 @@ public class VirtualStackOfStacks extends ImageStack {
             nZ = (int) infos[0][0].length;
         }
 
-        this.infos = infos;
-        nC = infos.length;
-        nT = infos[0].length;
-        nZ = infos[0][0].length;
         nSlices = nC*nT*nZ;
 
         if(infos[0][0][0].fileName.endsWith(".h5"))
@@ -82,12 +82,12 @@ public class VirtualStackOfStacks extends ImageStack {
         return(infos);
     }
 
-    /** Adds an image stack.
-    public void addStack(FileInfoSer[] info, int t, int c) {
+    /* Adds an image stack */
+    public void setStack(FileInfoSer[] info, int t, int c) {
         if (info==null)
             throw new IllegalArgumentException("'info' is null!");
         infos[c][t] = info;
-    } */
+    }
 
 
     /** Does nothing. */
@@ -159,19 +159,19 @@ public class VirtualStackOfStacks extends ImageStack {
             log("opening file: "+infos[c][t][0].fileName);
         }
 
-        // todo: put this decision into the OpenerExtensions
-
         int dz = 1;
         Point3D po, ps;
+        FileInfoSer fi = infos[c][t][0];
 
-        if(infos[c][t][0].isCropped) {
+        if(fi.isCropped) {
             // load cropped slice
-            po = infos[c][t][0].pCropOffset;
-            ps = new Point3D(infos[c][t][0].pCropSize.getX(),infos[c][t][0].pCropSize.getY(),1);
+            po = new Point3D(fi.pCropOffset.getX(),fi.pCropOffset.getY(),fi.pCropOffset.getZ()+z);;
+            ps = new Point3D(fi.pCropSize.getX(),fi.pCropSize.getY(),1);
+
         } else {
             // load full slice
-            po = new Point3D(0,0,0);
-            ps = new Point3D(infos[c][t][0].width,infos[c][t][0].height,1);
+            po = new Point3D(0,0,z);
+            ps = new Point3D(fi.width,fi.height,1);
         }
 
         ImagePlus imp = new OpenerExtensions().openCroppedStackOffsetSize(infos[c][t], dz, po, ps);

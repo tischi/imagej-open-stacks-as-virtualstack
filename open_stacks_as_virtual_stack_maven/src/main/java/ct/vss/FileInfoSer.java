@@ -37,9 +37,11 @@ public class FileInfoSer implements Cloneable, Serializable {
     public int bytesPerPixel;
     public String h5DataSet;
     public String fileTypeString;
-    public boolean isCropped;
+    public boolean isCropped = false;
     public Point3D pCropOffset;
     public Point3D pCropSize;
+
+    // todo: there is a lot of duplicated information that would only be needed once
 
     public FileInfoSer() {
 

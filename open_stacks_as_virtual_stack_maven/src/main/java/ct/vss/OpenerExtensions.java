@@ -467,12 +467,12 @@ class OpenerExtensions extends Opener {
         return imp;
     }
 
-    public FileInfoSer[] cropInfo(FileInfoSer[] info, int dz, Point3D p, Point3D pr) {
+    public FileInfoSer[] cropInfoCenterRadius(FileInfoSer[] info, int dz, Point3D pc, Point3D pr) {
 
         // todo: make this some methods in some class!!!
-        int x = (int) (p.getX() + 0.5);
-        int y = (int) (p.getY() + 0.5);
-        int z = (int) (p.getZ() + 0.5);
+        int x = (int) (pc.getX() + 0.5);
+        int y = (int) (pc.getY() + 0.5);
+        int z = (int) (pc.getZ() + 0.5);
         int rx = (int) (pr.getX() + 0.5);
         int ry = (int) (pr.getY() + 0.5);
         int rz = (int) (pr.getZ() + 0.5);
@@ -499,7 +499,9 @@ class OpenerExtensions extends Opener {
         FileInfoSer[] croppedInfo = new FileInfoSer[nz];
         FileInfoSer fi = info[0];
 
-        if(fi.fileTypeString == "tif") {
+
+
+        /*if(fi.fileTypeString == "tif") {
 
             for (int iz = z, jz = z; iz < (z + nz); iz++, jz += dz) {
                 if (jz < 0 || jz >= info.length) {
@@ -521,7 +523,7 @@ class OpenerExtensions extends Opener {
 
         } else if(fi.fileTypeString == "h5") {
 
-        }
+        }*/
 
         return (croppedInfo);
     }

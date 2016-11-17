@@ -150,7 +150,7 @@ public class Registration implements PlugIn {
                     //Point3D[] pos = new Point3D[tMaxTrack-tMinTrack];
                     //System.arraycopy(pTracked, tMinTrack, pos, 0, tMaxTrack-tMinTrack);
 
-                    ImagePlus impCropped = OpenStacksAsVirtualStack.openCroppedFromInfos(imp, infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
+                    ImagePlus impCropped = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
 
                     impCropped.show();
                     impCropped.setPosition(0, (int)(impCropped.getNSlices()/2+0.5), 0);

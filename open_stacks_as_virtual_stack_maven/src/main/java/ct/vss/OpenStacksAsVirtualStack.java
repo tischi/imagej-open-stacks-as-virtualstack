@@ -213,7 +213,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             infoSer[i].fileTypeString = fileType;
                         }
 
-                        stack.addStack(infoSer, t, c);
+                        stack.setStack(infoSer, t, c);
 
                     }
 
@@ -256,7 +256,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             infoSer[i].fileTypeString = fileType;
                         }
 
-                        stack.addStack(infoSer, t, c);
+                        stack.setStack(infoSer, t, c);
 
                     }
 
@@ -506,11 +506,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 }
 
 
-	public static ImagePlus openCroppedFromInfos(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] p, Point3D pr, int tMin, int tMax) {
-		int nC = infos[0].length;
+	public static ImagePlus openCroppedCenterRadiusFromInfos(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] pc, Point3D pr, int tMin, int tMax) {
+		int nC = infos.length;
         int nT = tMax-tMin+1;
-        int rz = (int) (pr.getZ() + 0.5);
-        int nZ = 2 * rz + 1;
+        int nZ = infos[0][0].length;
 
         FileInfoSer[][][] croppedInfos = new FileInfoSer[nC][nT][nZ];
 
@@ -524,9 +523,20 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         for(int c=0; c<nC; c++) {
 
-            for (int t = tMin; t <= tMax; t++) {
+            for(int t=tMin; t<=tMax; t++) {
 
-                croppedInfos[c][t] = oe.cropInfo(infos[c][t], 1, p[t], pr);
+                for(int z=0; z<nZ; z++) {
+
+                    croppedInfos[c][t-tMin][z] = (FileInfoSer) infos[c][t][z].clone();
+                    croppedInfos[c][t-tMin][z].isCropped = true;
+                    croppedInfos[c][t-tMin][z].pCropOffset = pc[t].subtract(pr);
+                    croppedInfos[c][t-tMin][z].pCropSize = pr.multiply(2).add(1, 1, 1);
+                    log("c "+c);
+                    log("t "+t);
+                    log("z "+z);
+                    log("offset "+croppedInfos[c][t-tMin][z].pCropOffset.toString());
+
+                }
 
             }
 
@@ -607,8 +617,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
-        //ImagePlus imp = ovs.openFromDirectory(directory, null);
-        ImagePlus imp = ovs.openFromInfoFile(directory+"ovs.ser");
+        ImagePlus imp = ovs.openFromDirectory(directory, null);
+        //ImagePlus imp = ovs.openFromInfoFile(directory+"ovs.ser");
         imp.show();
 
         //ovs.run("");
