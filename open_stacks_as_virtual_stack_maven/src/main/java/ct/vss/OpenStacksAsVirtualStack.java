@@ -112,7 +112,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             // init the VSS
             VirtualStackOfStacks stack = new VirtualStackOfStacks(infos);
-            ImagePlus imp = makeImagePlus(stack, infos[0][0][0], nC, nT, nZ);
+            ImagePlus imp = makeImagePlus(stack, infos[0][0][0]);
             return(imp);
 
         } else {
@@ -273,7 +273,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         ImagePlus imp = null;
         if(stack!=null && stack.getSize()>0) {
-            imp = makeImagePlus(stack, infoSer[0], nC, nT, nZ);
+            imp = makeImagePlus(stack, infoSer[0]);
             writeFileInfosSer(stack.getFileInfosSer(), directory+"ovs.ser");
         }
 
@@ -505,39 +505,50 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 }
 
-    /*
-	public static ImagePlus openCroppedFromFileInfoSer(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] pos, Point3D radii, int tMin, int tMax) {
-		Point3D size = radii.multiply(2);
-        size = size.add(new Point3D(1,1,1));
-        VirtualStackOfStacks stack = new VirtualStackOfStacks(size, imp.getnC());
-		OpenerExtensions oe = new OpenerExtensions();
+
+	public static ImagePlus openCroppedFromInfos(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] p, Point3D pr, int tMin, int tMax) {
+		int nC = infos[0].length;
+        int nT = tMax-tMin+1;
+        int rz = (int) (pr.getZ() + 0.5);
+        int nZ = 2 * rz + 1;
+
+        FileInfoSer[][][] croppedInfos = new FileInfoSer[nC][nT][nZ];
 
         if(Globals.verbose){
-            log("# OpenStacksAsVirtualStack.openFromCroppedFileInfo");
+            log("# OpenStacksAsVirtualStack.openCroppedFromInfos");
             log("tMin: "+tMin);
             log("tMax: "+tMax);
         }
 
-        FileInfo[] infoModified = null;
+        OpenerExtensions oe = new OpenerExtensions();
 
-        for(int ic=0; ic<imp.getnC(); ic++) {
+        for(int c=0; c<nC; c++) {
 
-            for (int it = tMin; it <= tMax; it++) {
+            for (int t = tMin; t <= tMax; t++) {
 
-                infoModified = oe.cropFileInfo(infos[it+ic*imp.getnT()], 1, pos[it], radii);
-                stack.addStack(infoModified);
+                croppedInfos[c][t] = oe.cropInfo(infos[c][t], 1, p[t], pr);
 
             }
+
         }
 
-        return(makeImagePlus(stack, infoModified[0], imp.getnC(), tMax-tMin+1, infoModified.length));
-	}*/
+        VirtualStackOfStacks stack = new VirtualStackOfStacks(croppedInfos);
 
-	private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfoSer fi, int nC, int nT, int nZ) {
-		double min = Double.MAX_VALUE;
+        return(makeImagePlus(stack, croppedInfos[0][0][0]));
+
+    }
+
+
+	private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfoSer fi) {
+        int nC=stack.nC;
+        int nT=stack.nT;
+        int nZ=stack.nZ;
+
+        double min = Double.MAX_VALUE;
 		double max = -Double.MAX_VALUE;
 		ImagePlus imp = new ImagePlus(fi.directory, stack);
-		if (imp.getType()==ImagePlus.GRAY16 || imp.getType()==ImagePlus.GRAY32)
+
+        if (imp.getType()==ImagePlus.GRAY16 || imp.getType()==ImagePlus.GRAY32)
 			imp.getProcessor().setMinAndMax(min, max);
 		imp.setFileInfo(fi.getFileInfo()); // saves FileInfo of the first image
 
@@ -546,9 +557,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             log("nC: "+nC);
             log("nZ: "+nZ);
             log("nT: " + nT);
-            log("stack.getNStacks: "+stack.getNStacks());
-
         }
+
         imp.setDimensions(nC, nZ, nT);
         imp.setOpenAsHyperStack(true);
         if(nC>1) imp.setDisplayMode(IJ.COMPOSITE);

@@ -143,6 +143,7 @@ public class VirtualStackOfStacks extends ImageStack {
             log("opening z-slice [one-based]: "+(z+1));
         }
 
+        // todo: put this decision into the OpenerExtensions
         if(fileType == "tif")
             imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(info, z, z, 1, 1, 0, info[0].width - 1, 0, info[0].height - 1);
         if (fileType == "h5")
@@ -162,9 +163,7 @@ public class VirtualStackOfStacks extends ImageStack {
             log("# VirtualStackOfStacks.getCroppedFrameAsImagePlus");
             log("t: "+t);
             log("c: "+c);
-            log("directory: "+info[0].directory);
-            log("filename: "+info[0].fileName);
-        }
+            }
 
         ImagePlus imp = new OpenerExtensions().openCroppedStack(info, dz, p, pr);
         if (imp==null) {

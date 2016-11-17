@@ -78,7 +78,7 @@ public class Registration implements PlugIn {
         gd.addSlider("Object radius y [pix]", 0, (int) imp.getHeight() / 2, 30);
         gd.addSlider("Object radius z [pix]", 0, (int) imp.getNSlices() / 2, 5);
         gd.addSlider("Tracking dz [pix]", 1, (int) imp.getNSlices() / 2, 1);
-        gd.addSlider("Tracking dt [frames]", 1, (int) imp.getNFrames() / 5, 1);
+        gd.addSlider("Tracking dt [frames]", 1, Math.max(1, (int) imp.getNFrames()/5), 1);
         gd.addNumericField("Tracking margin factor", 2, 1);
         gd.addNumericField("Image background value", 100, 0);
         gd.addNumericField("Center computation iterations", 6, 0);
@@ -150,8 +150,7 @@ public class Registration implements PlugIn {
                     //Point3D[] pos = new Point3D[tMaxTrack-tMinTrack];
                     //System.arraycopy(pTracked, tMinTrack, pos, 0, tMaxTrack-tMinTrack);
 
-                    //ImagePlus impCropped = OpenStacksAsVirtualStack.openFromCroppedFileInfo(imp, infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
-                    ImagePlus impCropped = null;
+                    ImagePlus impCropped = OpenStacksAsVirtualStack.openCroppedFromInfos(imp, infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
 
                     impCropped.show();
                     impCropped.setPosition(0, (int)(impCropped.getNSlices()/2+0.5), 0);
@@ -397,8 +396,8 @@ public class Registration implements PlugIn {
             log("Registration.getImageStack");
             log(""+imp.getStackIndex(c+1,1,t+1));
         }
-        long startTime = System.currentTimeMillis();
 
+        long startTime = System.currentTimeMillis();
         ImageStack stack = vss.getCroppedFrameAsImagePlus(t, c, dz, p, pr).getStack();
         long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime;
         //log("loaded stack in [ms]: " + elapsedTime);

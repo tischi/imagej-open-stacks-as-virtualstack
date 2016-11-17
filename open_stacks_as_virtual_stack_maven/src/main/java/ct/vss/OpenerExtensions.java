@@ -8,10 +8,8 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.io.BitBuffer;
 import ij.io.Opener;
-import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
 
-import javax.imageio.stream.FileImageInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -147,59 +145,6 @@ class OpenerExtensions extends Opener {
         return (pointer + (long) bufferSize);
     }
 
-    long skip(FileImageInputStream in, long skipCount, long pointer) throws IOException {
-        in.seek(pointer + skipCount);
-        return (pointer + skipCount);
-    }
-
-    long read(FileImageInputStream in, byte[] buffer, long pointer) {
-        int bufferSize = buffer.length;
-        int bufferCount = 0;
-        int count;
-        try {
-            while (bufferCount < bufferSize) { // fill the buffer
-                count = in.read(buffer, bufferCount, bufferSize - bufferCount);
-                if (count == -1) {
-                    if (bufferCount > 0)
-                        for (int i = bufferCount; i < bufferSize; i++) buffer[i] = 0;
-                    buffer = null;
-                    return (-1); //EOF Error
-                }
-                bufferCount += count;
-            }
-        } catch (IOException e) {
-            IJ.log("" + e);
-            buffer = null;
-            return (-1);
-        }
-        //log("read: buffer.length "+buffer.length);
-        return (pointer + (long) bufferSize);
-    }
-
-    void setShortPixels(FileInfoSer fi, short[] pixels, int base, byte[] buffer) {
-        int bytesPerPixel = fi.bytesPerPixel;
-        int pixelsRead = (int) buffer.length / bytesPerPixel;
-        log("setShortPixels: base " + base);
-        log("setShortPixels: pixels in buffer " + pixelsRead);
-        log("setShortPixels: pixels.length " + pixels.length);
-
-        if (fi.intelByteOrder) {
-            if (fi.fileType == GRAY16_SIGNED)
-                for (int i = base, j = 0; i < (base + pixelsRead); i++, j += 2)
-                    pixels[i] = (short) ((((buffer[j + 1] & 0xff) << 8) | (buffer[j] & 0xff)) + 32768);
-            else
-                for (int i = base, j = 0; i < (base + pixelsRead); i++, j += 2)
-                    pixels[i] = (short) (((buffer[j + 1] & 0xff) << 8) | (buffer[j] & 0xff));
-        } else {
-            if (fi.fileType == GRAY16_SIGNED)
-                for (int i = base, j = 0; i < (base + pixelsRead); i++, j += 2)
-                    pixels[i] = (short) ((((buffer[j] & 0xff) << 8) | (buffer[j + 1] & 0xff)) + 32768);
-            else
-                for (int i = base, j = 0; i < (base + pixelsRead); i++, j += 2)
-                    pixels[i] = (short) (((buffer[j] & 0xff) << 8) | (buffer[j + 1] & 0xff));
-        }
-    }
-
     // todo: make this faster and easier by removing all the if statements?!
     public void setShortPixelsFromAllStrips(FileInfoSer fi, short[] pixels, int ys, int ny, int xs, int nx, int imByteWidth, byte[] buffer) {
         int ip = 0;
@@ -260,14 +205,6 @@ class OpenerExtensions extends Opener {
 
     }
 
-    /*public ImagePlus openCroppedH5stack() {
-        ImagePlus imp = null;
-
-        MDShortArray rawdata = reader.uint16().readMDArrayBlockWithOffset(dsetName, loadBlockDimensions, loadBlockOffset);
-
-        return(imp);
-    }*/
-
     private long readFromPlane(FileInfoSer fi, FileInputStream in, long pointer, byte[][] buffer, int z, int zs, int ys, int ye) {
         boolean hasStrips = false;
         int readLength;
@@ -275,7 +212,6 @@ class OpenerExtensions extends Opener {
         if ((fi.stripOffsets != null && fi.stripOffsets.length > 1)) {
             hasStrips = true;
         }
-
 
         /*
         if(Globals.verbose) {
@@ -333,7 +269,6 @@ class OpenerExtensions extends Opener {
         long threadInitTime = 0;
         long allocationTime = 0;
 
-
         if (info == null) return null;
         FileInfoSer fi = info[0];
 
@@ -356,7 +291,6 @@ class OpenerExtensions extends Opener {
         ImagePlus imp = new ImagePlus("cropped", stack);
         allocationTime += (System.currentTimeMillis() - startTime);
 
-
         // load everything in one go
         startTime = System.currentTimeMillis();
         IHDF5Reader reader = HDF5Factory.openForReading(fi.directory + fi.fileName);
@@ -369,8 +303,8 @@ class OpenerExtensions extends Opener {
         int imShortSize = nx*ny;
 
         for(int z=zs; z<=ze; z+=dz) {
-            ImageProcessor ip = imp.getStack().getProcessor(imp.getStackIndex(1, (z-zs)+1, 1));
-            System.arraycopy(asFlatArray, (z-zs)*imShortSize, (short[]) ip.getPixels(), 0, imShortSize);
+            short[] pixels = (short[]) imp.getStack().getPixels(z-zs+1);
+            System.arraycopy(asFlatArray, (z-zs)*imShortSize, pixels, 0, imShortSize);
         }
 
         totalTime = (System.currentTimeMillis() - totalTime);
@@ -378,6 +312,7 @@ class OpenerExtensions extends Opener {
         if(Globals.verbose) {
             int usefulBytesRead = nz*nx*ny*fi.bytesPerPixel;
             log("readingTime [ms]: " + readingTime);
+            log("pixels read: "+asFlatArray.length);
             log("effective reading speed [MB/s]: " + usefulBytesRead/((readingTime+0.001)*1000));
             log("allocationTime [ms]: "+allocationTime);
             log("threadInitTime [ms]: "+threadInitTime);
@@ -503,6 +438,64 @@ class OpenerExtensions extends Opener {
         return imp;
     }
 
+    public FileInfoSer[] cropInfo(FileInfoSer[] info, int dz, Point3D p, Point3D pr) {
+
+        // todo: make this some methods in some class!!!
+        int x = (int) (p.getX() + 0.5);
+        int y = (int) (p.getY() + 0.5);
+        int z = (int) (p.getZ() + 0.5);
+        int rx = (int) (pr.getX() + 0.5);
+        int ry = (int) (pr.getY() + 0.5);
+        int rz = (int) (pr.getZ() + 0.5);
+        int nx = (int) (2 * rx + 1);
+        int ny = (int) (2 * ry + 1);
+        int nz = (int) (2 * rz + 1);
+        x = x - rx;
+        y = y - ry;
+        z = z - rz;
+
+        if (dz > 1) {
+            nz = (int) (1.0 * nz / dz + 0.5);
+        }
+
+        if (Globals.verbose) {
+            log("# OpenerExtension.cropInfo:");
+            log("filename: " + info[0].fileName);
+            log("dz: " + dz);
+            log("rx,ry,rz: " + pr.getX() + "," + pr.getY() + "," + pr.getZ());
+            log("z,nz,x,nx,y,ny: " + z + "," + nz + "," + x + "," + nx + "," + y + "," + ny);
+            log("info.length: " + info.length);
+        }
+
+        FileInfoSer[] croppedInfo = new FileInfoSer[nz];
+        FileInfoSer fi = info[0];
+
+        if(fi.fileTypeString == "tif") {
+
+            for (int iz = z, jz = z; iz < (z + nz); iz++, jz += dz) {
+                if (jz < 0 || jz >= info.length) {
+                    IJ.showMessage("z=" + jz + " is out of range. Please reduce your z-radius.");
+                    throw new IllegalArgumentException("z=" + jz + " is out of range; iz=" + iz);
+                }
+                croppedInfo[iz-z] = (FileInfoSer) info[jz].clone();
+                croppedInfo[iz-z].longOffset = croppedInfo[iz-z].longOffset;
+                croppedInfo[iz-z].stripLengths = new int[ny];
+                croppedInfo[iz-z].stripOffsets = new int[ny];
+                for (int i = 0; i < ny; i++) {
+                    croppedInfo[iz-z].stripLengths[i] = nx * fi.bytesPerPixel;
+                    croppedInfo[iz-z].stripOffsets[i] = (int) croppedInfo[iz-z].longOffset + ((((y + i) * fi.width) + x) * fi.bytesPerPixel);
+                    //infoModified[iz-z].stripOffsets[i] = (int) (i * fi.width * fi.bytesPerPixel);
+                }
+                croppedInfo[iz-z].height = ny;
+                croppedInfo[iz-z].width = nx;
+            }
+
+        } else if(fi.fileTypeString == "h5") {
+
+        }
+
+        return (croppedInfo);
+    }
 
 }
 
@@ -873,6 +866,61 @@ class ByteVector {
 
 
 /*
+
+
+    long skip(FileImageInputStream in, long skipCount, long pointer) throws IOException {
+        in.seek(pointer + skipCount);
+        return (pointer + skipCount);
+    }
+
+    long read(FileImageInputStream in, byte[] buffer, long pointer) {
+        int bufferSize = buffer.length;
+        int bufferCount = 0;
+        int count;
+        try {
+            while (bufferCount < bufferSize) { // fill the buffer
+                count = in.read(buffer, bufferCount, bufferSize - bufferCount);
+                if (count == -1) {
+                    if (bufferCount > 0)
+                        for (int i = bufferCount; i < bufferSize; i++) buffer[i] = 0;
+                    buffer = null;
+                    return (-1); //EOF Error
+                }
+                bufferCount += count;
+            }
+        } catch (IOException e) {
+            IJ.log("" + e);
+            buffer = null;
+            return (-1);
+        }
+        //log("read: buffer.length "+buffer.length);
+        return (pointer + (long) bufferSize);
+    }
+
+    void setShortPixels(FileInfoSer fi, short[] pixels, int base, byte[] buffer) {
+        int bytesPerPixel = fi.bytesPerPixel;
+        int pixelsRead = (int) buffer.length / bytesPerPixel;
+        log("setShortPixels: base " + base);
+        log("setShortPixels: pixels in buffer " + pixelsRead);
+        log("setShortPixels: pixels.length " + pixels.length);
+
+        if (fi.intelByteOrder) {
+            if (fi.fileType == GRAY16_SIGNED)
+                for (int i = base, j = 0; i < (base + pixelsRead); i++, j += 2)
+                    pixels[i] = (short) ((((buffer[j + 1] & 0xff) << 8) | (buffer[j] & 0xff)) + 32768);
+            else
+                for (int i = base, j = 0; i < (base + pixelsRead); i++, j += 2)
+                    pixels[i] = (short) (((buffer[j + 1] & 0xff) << 8) | (buffer[j] & 0xff));
+        } else {
+            if (fi.fileType == GRAY16_SIGNED)
+                for (int i = base, j = 0; i < (base + pixelsRead); i++, j += 2)
+                    pixels[i] = (short) ((((buffer[j] & 0xff) << 8) | (buffer[j + 1] & 0xff)) + 32768);
+            else
+                for (int i = base, j = 0; i < (base + pixelsRead); i++, j += 2)
+                    pixels[i] = (short) (((buffer[j] & 0xff) << 8) | (buffer[j + 1] & 0xff));
+        }
+    }
+
 
 
     public ImagePlus OLDopenCroppedTiffStackUsingIFDs(FileInfo[] infoAll, int dz, Point3D p, Point3D pr) {

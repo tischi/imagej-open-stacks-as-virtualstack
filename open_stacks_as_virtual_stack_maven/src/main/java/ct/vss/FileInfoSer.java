@@ -35,6 +35,7 @@ public class FileInfoSer implements Cloneable, Serializable {
     public int bytesPerPixel;
     public String h5DataSet;
     public String fileTypeString;
+    public int offsetX=0, offsetY=0, offsetZ=0;
 
     public FileInfoSer() {
 
@@ -59,7 +60,6 @@ public class FileInfoSer implements Cloneable, Serializable {
         this.pixelDepth = info.pixelDepth;
         this.frameInterval = info.frameInterval;
         this.bytesPerPixel = info.getBytesPerPixel();
-
     }
 
     public FileInfo getFileInfo() {
@@ -83,6 +83,11 @@ public class FileInfoSer implements Cloneable, Serializable {
         fi.frameInterval = this.frameInterval;
 
         return(fi);
+    }
+
+    public synchronized Object clone() {
+        try {return super.clone();}
+        catch (CloneNotSupportedException e) {return null;}
     }
 
 }
