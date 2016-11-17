@@ -31,7 +31,10 @@ public class FileInfoSer implements Cloneable, Serializable {
     public double pixelDepth=1.0;
     public double frameInterval;
 
+    // own stuff
     public int bytesPerPixel;
+    public String h5DataSet;
+    public String fileTypeString;
 
     public FileInfoSer() {
 

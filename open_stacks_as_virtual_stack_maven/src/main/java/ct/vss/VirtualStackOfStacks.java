@@ -46,6 +46,11 @@ public class VirtualStackOfStacks extends ImageStack {
         nT = infos[0].length;
         nZ = infos[0][0].length;
         nSlices = nC*nT*nZ;
+        if(infos[0][0][0].fileName.endsWith(".h5"))
+            this.fileType = "h5";
+        if(infos[0][0][0].fileName.endsWith(".tif"))
+            this.fileType = "tif";
+
     }
 
 
@@ -138,11 +143,10 @@ public class VirtualStackOfStacks extends ImageStack {
             log("opening z-slice [one-based]: "+(z+1));
         }
 
-        if(fileType == "tiff")
+        if(fileType == "tif")
             imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(info, z, z, 1, 1, 0, info[0].width - 1, 0, info[0].height - 1);
-        if(fileType == "h5")
+        if (fileType == "h5")
             imp = new OpenerExtensions().openCroppedH5stack(info, z, z, 1, 1, 0, info[0].width - 1, 0, info[0].height - 1);
-
         if (imp==null) {
             log("Error: loading failed!");
             return null;
@@ -161,13 +165,14 @@ public class VirtualStackOfStacks extends ImageStack {
             log("directory: "+info[0].directory);
             log("filename: "+info[0].fileName);
         }
-        ImagePlus imp = new OpenerExtensions().openCroppedTiffStackUsingIFDs(info, dz, p, pr);
 
+        ImagePlus imp = new OpenerExtensions().openCroppedStack(info, dz, p, pr);
         if (imp==null) {
             log("Error: loading failed!");
             return null;
+        } else {
+            return imp;
         }
-        return imp;
     }
 
     /** Returns the number of slices in this stack. */

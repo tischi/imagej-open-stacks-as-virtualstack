@@ -34,6 +34,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String[] channelFolders;
     private String[][] lists; // c, t
     private String fileOrder;
+    private String fileType;
+
 
     public OpenStacksAsVirtualStack() {
     }
@@ -49,21 +51,17 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //IJ.register(Open_Stacks_As_VirtualStack.class);
 
         // does it contain a header file that we can use to open everything?
-        /*
-        File f = new File(directory+"TiffFileInfos.ser");
-        if(f.exists() && !f.isDirectory()) {
-            log("Found TiffFileInfos file.");
-            imp = null;
+        //File f = new File(directory+"TiffFileInfos.ser");
+        if(new File(directory+"ovs.ser").exists()) {
+            log("Found ovs file.");
+            imp = openFromInfoFile(directory+"ovs.ser");
         } else {
-            this.list = getFilesInFolder(directory);
-            if (!showDialog(list)) return;
-            // todo: add this to gui
-            this.openingMethod = "tiffUseIFDsFirstFile";
-            imp = openFromDirectory();
+            imp = openFromDirectory(directory, null);
         }
+
         if(imp!=null) {
             imp.show();
-        }*/
+        }
     }
 
     boolean showDialog(String[] list) {
@@ -99,7 +97,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         if(f.exists() && !f.isDirectory()) {
 
-            log("Loading TiffFileInfos file...");
+            log("Loading ovs info file...");
             FileInfoSer[][][] infos = readFileInfosSer(path);
 
             nC = infos.length;
@@ -122,13 +120,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
     }
 
-    public ImagePlus openFromDirectory(String directory, String filter, String fileType, String fileOrder) {
+    public ImagePlus openFromDirectory(String directory, String filter) {
 
         log("# openFromDirectory");
-        log("fileType : "+fileType);
 
         this.directory = directory;
         this.filter = filter;
+
+        String dataSet = "Data111";
 
         // todo: depending on the fileOrder do different things
         // todo: add the filter to the getFilesInFolder function
@@ -152,6 +151,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         // todo consistency check the list lengths
         this.nT = lists[0].length;
 
+        // figure out the filetype
+        if(lists[0][0].endsWith(".h5")) {
+            fileType = "h5";
+        } else if(lists[0][0].endsWith(".tif")) {
+            fileType = "tif";
+        } else {
+            IJ.showMessage("unsupported file type: "+lists[0][0]);
+        }
 
         FileInfo[] info = null;
         FileInfo fi = null;
@@ -169,7 +176,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     log("c" + c + "t" + t + ": " + lists[c][t]);
                     String ctPath = directory + channelFolders[c] + "/" + lists[c][t];
 
-                    if (fileType == "tiff") {
+                    if (fileType == "tif") {
 
                         info = Opener.getTiffFileInfo(ctPath);
 
@@ -203,6 +210,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         infoSer = new FileInfoSer[nZ];
                         for (int i = 0; i < nZ; i++) {
                             infoSer[i] = new FileInfoSer((FileInfo) info[i].clone());
+                            infoSer[i].fileTypeString = fileType;
                         }
 
                         stack.addStack(infoSer, t, c);
@@ -223,7 +231,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                         // first file
                         if (t == 0 && c == 0) {
-                            String dataSet = "Data444";
                             IHDF5Reader reader = HDF5Factory.openForReading(ctPath);
                             HDF5DataSetInformation dsInfo = reader.object().getDataSetInformation("/"+dataSet);
                             nZ = (int)dsInfo.getDimensions()[0];
@@ -245,6 +252,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             infoSer[i].width = nX;
                             infoSer[i].height = nY;
                             infoSer[i].bytesPerPixel = 2; // todo: how to get the bit-depth from the info?
+                            infoSer[i].h5DataSet = dataSet;
+                            infoSer[i].fileTypeString = fileType;
                         }
 
                         stack.addStack(infoSer, t, c);
@@ -265,7 +274,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         ImagePlus imp = null;
         if(stack!=null && stack.getSize()>0) {
             imp = makeImagePlus(stack, infoSer[0], nC, nT, nZ);
-            writeFileInfosSer(stack.getFileInfosSer(), directory+"TiffFileInfos.ser");
+            writeFileInfosSer(stack.getFileInfosSer(), directory+"ovs.ser");
         }
 
         IJ.showProgress(1.0);
@@ -573,7 +582,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-         //String directory = "/Users/tischi/Desktop/example-data/compressedMultiChannel/";
+        //String directory = "/Users/tischi/Desktop/example-data/compressedMultiChannel/";
         String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
         //String directory = "/Users/tischi/Desktop/example-data/compressed/";
@@ -582,23 +591,20 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
         //String filter = null;
 
-        int start = 1;
-        int increment = 1;
-        int n = -1;
-        int nC = 1;
         //String openingMethod = "tiffLoadAllIFDs";
-        String openingMethod = "h5";
-        String order = "tc";
 
         //OpenHDF5test oh5 = new OpenHDF5test();
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
-        ImagePlus imp = ovs.openFromDirectory(directory, filter, openingMethod, order);
+        ImagePlus imp = ovs.openFromDirectory(directory, null);
+        //ImagePlus imp = ovs.openFromInfoFile(directory+"ovs.ser");
         imp.show();
 
-        //Registration register = new Registration(imp);
-        //register.showDialog();
+        //ovs.run("");
+
+        Registration register = new Registration(imp);
+        register.showDialog();
 
         /*
         if (Mitosis_ome) {

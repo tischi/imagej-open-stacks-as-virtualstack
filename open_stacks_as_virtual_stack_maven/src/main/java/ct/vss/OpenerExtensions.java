@@ -228,7 +228,7 @@ class OpenerExtensions extends Opener {
         }
     }
 
-    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfoSer[] info, int dz, Point3D p, Point3D pr) {
+    public ImagePlus openCroppedStack(FileInfoSer[] info, int dz, Point3D p, Point3D pr) {
 
         // compute ranges to be loaded
         int xc = (int) (p.getX() + 0.5);
@@ -249,7 +249,14 @@ class OpenerExtensions extends Opener {
             nz = (int) (1.0 * nz / dz + 0.5);
         }
 
-        return (openCroppedTiffStackUsingIFDs(info, zs, ze, nz, dz, xs, xe, ys, ye));
+        ImagePlus imp = null;
+
+        if(info[0].fileTypeString == "tif")
+            imp = openCroppedTiffStackUsingIFDs(info, zs, ze, nz, dz, xs, xe, ys, ye);
+        else if(info[0].fileTypeString == "h5")
+            imp = openCroppedH5stack(info, zs, ze, nz, dz, xs, xe, ys, ye);
+
+        return(imp);
 
     }
 
@@ -326,7 +333,6 @@ class OpenerExtensions extends Opener {
         long threadInitTime = 0;
         long allocationTime = 0;
 
-        String dataSet = "Data444";
 
         if (info == null) return null;
         FileInfoSer fi = info[0];
@@ -350,17 +356,18 @@ class OpenerExtensions extends Opener {
         ImagePlus imp = new ImagePlus("cropped", stack);
         allocationTime += (System.currentTimeMillis() - startTime);
 
+
         // load everything in one go
         startTime = System.currentTimeMillis();
         IHDF5Reader reader = HDF5Factory.openForReading(fi.directory + fi.fileName);
-        final MDShortArray block = reader.uint16().readMDArrayBlockWithOffset(dataSet, new int[]{nz, ny, nx}, new long[]{zs, ys, xs});
+        final MDShortArray block = reader.uint16().readMDArrayBlockWithOffset(fi.h5DataSet, new int[]{nz, ny, nx}, new long[]{zs, ys, xs});
         final short[] asFlatArray = block.getAsFlatArray();
         readingTime += (System.currentTimeMillis() - startTime);
 
         // put into stack
         // todo: could be done in parallel threads
         int imShortSize = nx*ny;
-        
+
         for(int z=zs; z<=ze; z+=dz) {
             ImageProcessor ip = imp.getStack().getProcessor(imp.getStackIndex(1, (z-zs)+1, 1));
             System.arraycopy(asFlatArray, (z-zs)*imShortSize, (short[]) ip.getPixels(), 0, imShortSize);
@@ -485,7 +492,7 @@ class OpenerExtensions extends Opener {
         if(Globals.verbose) {
             int usefulBytesRead = nz*nx*ny*fi.bytesPerPixel;
             log("readingTime [ms]: " + readingTime);
-            log("Effective reading speed [MB/s]: " + usefulBytesRead/((readingTime+0.001)*1000));
+            log("effective reading speed [MB/s]: " + usefulBytesRead/((readingTime+0.001)*1000));
             log("allocationTime [ms]: "+allocationTime);
             log("threadInitTime [ms]: "+threadInitTime);
             log("additional threadRunningTime [ms]: "+threadRunningTime);
