@@ -592,8 +592,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-        //String directory = "/Users/tischi/Desktop/example-data/compressedMultiChannel/";
-        String directory = "/Users/tischi/Desktop/example-data/luxendo/";
+        String directory = "/Users/tischi/Desktop/example-data/compressedMultiChannel/";
+        //String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
         //String directory = "/Users/tischi/Desktop/example-data/compressed/";
         String filter = "lzw";
@@ -607,8 +607,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
-        ImagePlus imp = ovs.openFromDirectory(directory, null);
-        //ImagePlus imp = ovs.openFromInfoFile(directory+"ovs.ser");
+        //ImagePlus imp = ovs.openFromDirectory(directory, null);
+        ImagePlus imp = ovs.openFromInfoFile(directory+"ovs.ser");
         imp.show();
 
         //ovs.run("");

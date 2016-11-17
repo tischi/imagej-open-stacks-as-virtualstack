@@ -398,7 +398,7 @@ public class Registration implements PlugIn {
         }
 
         long startTime = System.currentTimeMillis();
-        ImageStack stack = vss.getCroppedFrameAsImagePlus(t, c, dz, p, pr).getStack();
+        ImageStack stack = vss.getCroppedFrameCenterRadii(t, c, dz, p, pr).getStack();
         long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime;
         //log("loaded stack in [ms]: " + elapsedTime);
         //imp.show();

@@ -1,6 +1,8 @@
 package ct.vss;
 
 import ij.io.FileInfo;
+import javafx.geometry.Point3D;
+
 import java.io.Serializable;
 
 /**
@@ -35,7 +37,9 @@ public class FileInfoSer implements Cloneable, Serializable {
     public int bytesPerPixel;
     public String h5DataSet;
     public String fileTypeString;
-    public int offsetX=0, offsetY=0, offsetZ=0;
+    public boolean isCropped;
+    public Point3D pCropOffset;
+    public Point3D pCropSize;
 
     public FileInfoSer() {
 

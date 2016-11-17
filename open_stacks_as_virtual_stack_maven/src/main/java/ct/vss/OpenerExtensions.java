@@ -173,38 +173,6 @@ class OpenerExtensions extends Opener {
         }
     }
 
-    public ImagePlus openCroppedStack(FileInfoSer[] info, int dz, Point3D p, Point3D pr) {
-
-        // compute ranges to be loaded
-        int xc = (int) (p.getX() + 0.5);
-        int yc = (int) (p.getY() + 0.5);
-        int zc = (int) (p.getZ() + 0.5);
-        int rx = (int) (pr.getX() + 0.5);
-        int ry = (int) (pr.getY() + 0.5);
-        int rz = (int) (pr.getZ() + 0.5);
-        int xs = xc - rx;
-        int ys = yc - ry;
-        int zs = zc - rz;
-        int xe = xc + rx;
-        int ye = yc + ry;
-        int ze = zc + rz;
-        int nz = ze - zs + 1;
-
-        if (dz > 1) {
-            nz = (int) (1.0 * nz / dz + 0.5);
-        }
-
-        ImagePlus imp = null;
-
-        if(info[0].fileTypeString == "tif")
-            imp = openCroppedTiffStackUsingIFDs(info, zs, ze, nz, dz, xs, xe, ys, ye);
-        else if(info[0].fileTypeString == "h5")
-            imp = openCroppedH5stack(info, zs, ze, nz, dz, xs, xe, ys, ye);
-
-        return(imp);
-
-    }
-
     private long readFromPlane(FileInfoSer fi, FileInputStream in, long pointer, byte[][] buffer, int z, int zs, int ys, int ye) {
         boolean hasStrips = false;
         int readLength;
@@ -262,6 +230,67 @@ class OpenerExtensions extends Opener {
 
     }
 
+    public ImagePlus openCroppedStackOffsetSize(FileInfoSer[] info, int dz, Point3D po, Point3D ps) {
+
+        // compute ranges to be loaded
+
+        int xs = (int) (po.getX() + 0.5);
+        int ys = (int) (po.getY() + 0.5);
+        int zs = (int) (po.getZ() + 0.5);
+        int xe = xs + (int) (ps.getX() + 0.5) - 1;
+        int ye = ys + (int) (ps.getY() + 0.5) - 1;
+        int ze = zs + (int) (ps.getZ() + 0.5) - 1;
+
+        int nz = (int) ps.getZ();
+
+        if (dz > 1) {
+            nz = (int) (1.0 * nz / dz + 0.5);
+        }
+
+        ImagePlus imp = null;
+
+        if(info[0].fileTypeString == "tif")
+            imp = openCroppedTiffStackUsingIFDs(info, zs, ze, nz, dz, xs, xe, ys, ye);
+        else if(info[0].fileTypeString == "h5")
+            imp = openCroppedH5stack(info, zs, ze, nz, dz, xs, xe, ys, ye);
+
+        return(imp);
+
+    }
+
+    public ImagePlus openCroppedStackCenterRadii(FileInfoSer[] info, int dz, Point3D pc, Point3D pr) {
+
+        // compute ranges to be loaded
+        int xc = (int) (pc.getX() + 0.5);
+        int yc = (int) (pc.getY() + 0.5);
+        int zc = (int) (pc.getZ() + 0.5);
+        int rx = (int) (pr.getX() + 0.5);
+        int ry = (int) (pr.getY() + 0.5);
+        int rz = (int) (pr.getZ() + 0.5);
+        int xs = xc - rx;
+        int ys = yc - ry;
+        int zs = zc - rz;
+        int xe = xc + rx;
+        int ye = yc + ry;
+        int ze = zc + rz;
+        int nz = ze - zs + 1;
+
+        if (dz > 1) {
+            nz = (int) (1.0 * nz / dz + 0.5);
+        }
+
+        ImagePlus imp = null;
+
+        if(info[0].fileTypeString == "tif")
+            imp = openCroppedTiffStackUsingIFDs(info, zs, ze, nz, dz, xs, xe, ys, ye);
+        else if(info[0].fileTypeString == "h5")
+            imp = openCroppedH5stack(info, zs, ze, nz, dz, xs, xe, ys, ye);
+
+        return(imp);
+
+    }
+
+    // todo make Points from the ints
     public ImagePlus openCroppedH5stack(FileInfoSer[] info, int zs, int ze, int nz, int dz, int xs, int xe, int ys, int ye) {
         long startTime;
         long readingTime = 0;
