@@ -44,8 +44,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         this.directory = IJ.getDirectory("Select a Directory");
         if (directory == null)
             return;
+
         log("Selected directory: "+directory);
         ImagePlus imp = null;
+
+        Globals.verbose = true;
 
         //Macro.setOptions(null); // Prevents later use of OpenDialog from reopening the same file
         //IJ.register(Open_Stacks_As_VirtualStack.class);
@@ -63,6 +66,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             imp.show();
         }
     }
+    // todo: make a non-modal dialog to:
+    // - change the verbosity
+    // - save VSS in different ways
 
     boolean showDialog(String[] list) {
         int fileCount = list.length;
@@ -173,8 +179,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 for (int t = 0; t < nT; t++) {
 
-                    log("c" + c + "t" + t + ": " + lists[c][t]);
                     String ctPath = directory + channelFolders[c] + "/" + lists[c][t];
+                    log(fileType+" c" + c + "t" + t + ": " + ctPath);
 
                     if (fileType == "tif") {
 
@@ -219,26 +225,23 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     if (fileType == "h5") {
 
-
-                        info = Opener.getTiffFileInfo(directory + channelFolders[c] + "/" + lists[c][t]);
-
-                        if (Globals.verbose) {
-                            //log("info.length " + info.length);
-                            //log("info[0].compression " + info[0].compression);
-                            //log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
-                            //log("info[0].width " + info[0].width);
-                        }
-
                         // first file
                         if (t == 0 && c == 0) {
                             IHDF5Reader reader = HDF5Factory.openForReading(ctPath);
                             HDF5DataSetInformation dsInfo = reader.object().getDataSetInformation("/"+dataSet);
+
                             nZ = (int)dsInfo.getDimensions()[0];
                             nY = (int)dsInfo.getDimensions()[1];
                             nX = (int)dsInfo.getDimensions()[2];
 
                             // init the VSS
                             stack = new VirtualStackOfStacks(new Point3D(nX, nY, nZ), nC, nT, fileType);
+                        }
+
+                        if (Globals.verbose) {
+                            log("nX " + nX);
+                            log("nY " + nY);
+                            log("nZ " + nZ);
                         }
 
                         // construct a FileInfoSer
@@ -266,9 +269,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 }
             }
-        } catch(OutOfMemoryError e) {
-            IJ.outOfMemory("FolderOpener");
-            if (stack != null) stack.trim();
+        } catch(Exception e) {
+            IJ.showMessage("Error: "+e.toString());
         }
 
         ImagePlus imp = null;
@@ -617,14 +619,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
-        ImagePlus imp = ovs.openFromDirectory(directory, null);
+        ovs.run("");
+
+        //ImagePlus imp = ovs.openFromDirectory(directory, null);
         //ImagePlus imp = ovs.openFromInfoFile(directory+"ovs.ser");
-        imp.show();
+        //imp.show();
 
         //ovs.run("");
 
-        Registration register = new Registration(imp);
-        register.showDialog();
+        //Registration register = new Registration(imp);
+        //register.showDialog();
 
         /*
         if (Mitosis_ome) {

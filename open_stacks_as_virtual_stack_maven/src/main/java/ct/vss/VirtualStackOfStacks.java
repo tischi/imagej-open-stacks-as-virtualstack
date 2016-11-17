@@ -156,7 +156,7 @@ public class VirtualStackOfStacks extends ImageStack {
             log("c [one-based]: "+ (c+1));
             log("z [one-based]: "+ (z+1));
             log("t [one-based]: "+ (t+1));
-            log("opening file: "+infos[c][t][0].fileName);
+            log("opening file: "+infos[c][t][0].directory+infos[c][t][0].fileName);
         }
 
         int dz = 1;

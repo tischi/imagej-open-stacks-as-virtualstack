@@ -248,11 +248,13 @@ class OpenerExtensions extends Opener {
         }
 
         ImagePlus imp = null;
-
-        if(info[0].fileTypeString == "tif")
+        if(info[0].fileTypeString.equals("tif")) {
             imp = openCroppedTiffStackUsingIFDs(info, zs, ze, nz, dz, xs, xe, ys, ye);
-        else if(info[0].fileTypeString == "h5")
+        } else if(info[0].fileTypeString.equals("h5")) {
             imp = openCroppedH5stack(info, zs, ze, nz, dz, xs, xe, ys, ye);
+        } else {
+            IJ.showMessage("unsupported file type: "+info[0].fileTypeString);
+        }
 
         return(imp);
 
@@ -298,7 +300,11 @@ class OpenerExtensions extends Opener {
         long threadInitTime = 0;
         long allocationTime = 0;
 
-        if (info == null) return null;
+        if (info == null) {
+            IJ.showMessage("FileInfo was empty; could not load data.");
+            return null;
+        }
+
         FileInfoSer fi = info[0];
 
         int nx = xe - xs + 1;
