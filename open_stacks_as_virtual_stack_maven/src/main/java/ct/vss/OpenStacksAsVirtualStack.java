@@ -10,7 +10,6 @@ import ij.gui.GenericDialog;
 import ij.gui.NonBlockingGenericDialog;
 import ij.gui.Roi;
 import ij.io.FileInfo;
-import ij.io.Opener;
 import ij.plugin.PlugIn;
 import javafx.geometry.Point3D;
 
@@ -334,14 +333,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     if (fileType == "tif") {
 
-                        info = Opener.getTiffFileInfo(ctPath);
+                        long startTime = System.currentTimeMillis();
+                        FastTiffDecoder ftd = new FastTiffDecoder(directory + channelFolders[c], lists[c][t]);
+                        info = ftd.getTiffInfo();
+                        log("IDF READING TIME: "+(System.currentTimeMillis()-startTime));
 
                         if (Globals.verbose) {
                             log("info.length " + info.length);
                             log("info[0].compression " + info[0].compression);
+                            log("info[0].stripLengths.length " + info[0].stripLengths.length);
                             log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
-                            log("info[0].width " + info[0].width);
-                            log("info[0].height " + info[0].height);
                         }
 
                         // first file
@@ -801,7 +802,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-        String directory = "/Users/tischi/Desktop/example-data/compressedMultiChannel/";
+        String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
         //String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
         //String directory = "/Users/tischi/Desktop/example-data/compressed/";
@@ -816,10 +817,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
-        ovs.run("");
+        //ovs.run("");
 
-        //ImagePlus imp = ovs.openFromDirectory(directory, null);
-        //ImagePlus imp = ovs.openFromInfoFile(directory+"ovs.ser");
+        ImagePlus imp = ovs.openFromDirectory(directory, null);
+        //ImagePlus imp = ovs.openFromInfoFile(directory, "ovs.ser");
         //imp.show();
 
         //ovs.run("");

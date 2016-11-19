@@ -11,9 +11,9 @@ import ij.io.Opener;
 import javafx.geometry.Point3D;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -173,7 +173,7 @@ class OpenerExtensions extends Opener {
         }
     }
 
-    private long readTiffOnePlaneCroppedRows(FileInfoSer fi, FileInputStream in, long pointer, byte[][] buffer, int z, int zs, int ys, int ye) {
+    private long readTiffOnePlaneCroppedRows(FileInfoSer fi, RandomAccessFile in, long pointer, byte[][] buffer, int z, int zs, int ys, int ye) {
         boolean hasStrips = false;
         int readLength;
         long readStart;
@@ -214,14 +214,20 @@ class OpenerExtensions extends Opener {
 
             // SKIP to first strip (row) that we need to read of this z-plane
             //startTime = System.currentTimeMillis();
-            pointer = skip(in, readStart - pointer, pointer);
+
+            //pointer = skip(in, readStart - pointer, pointer);
+            in.seek(readStart); // is this really slow??
+
             //skippingTime += (System.currentTimeMillis() - startTime);
 
             // READ data
             //startTime = System.currentTimeMillis();
             buffer[z-zs] = new byte[readLength];
-            pointer = read(in, buffer[z-zs], pointer);
+            //pointer = read(in, buffer[z-zs], pointer);
+            in.readFully(buffer[z-zs]);
             //readingTime += (System.currentTimeMillis() - startTime);
+
+
 
 
         } catch (Exception e) {
@@ -285,12 +291,15 @@ class OpenerExtensions extends Opener {
             nz = (int) (1.0 * nz / dz + 0.5);
         }
 
-        ImagePlus imp = null;
 
-        if(info[0].fileTypeString == "tif")
+        ImagePlus imp = null;
+        if(info[0].fileTypeString.equals("tif")) {
             imp = openCroppedTiffStackUsingIFDs(directory, info, zs, ze, nz, dz, xs, xe, ys, ye);
-        else if(info[0].fileTypeString == "h5")
+        } else if(info[0].fileTypeString.equals("h5")) {
             imp = openCroppedH5stack(directory, info, zs, ze, nz, dz, xs, xe, ys, ye);
+        } else {
+            IJ.showMessage("unsupported file type: "+info[0].fileTypeString);
+        }
 
         return(imp);
 
@@ -406,7 +415,9 @@ class OpenerExtensions extends Opener {
         try {
             // get input stream to file
             File f = new File(directory + fi.directory + fi.fileName);
-            FileInputStream in = new FileInputStream(f);
+            //FileInputStream in = new FileInputStream(f);
+            RandomAccessFile in = new RandomAccessFile(f, "r");
+
 
             if(in==null) {
                 IJ.showMessage("Could not open file: "+fi.directory+fi.fileName);
