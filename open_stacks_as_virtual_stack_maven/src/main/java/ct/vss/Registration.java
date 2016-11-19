@@ -248,39 +248,7 @@ public class Registration implements PlugIn {
 
     }
 
-    public void showTrackOnFrame() {
-        Point3D pCenter = pTracked[imp.getT() - 1];
-        if (pCenter != null) {
-            if(Globals.verbose) {
-                log("Registration.showTrackOnFrame pTracked: "+pCenter.toString());
-            }
-            //log("showTrackOnFrame: pCenter: "+pCenter.toString());
-            int rx = (int) gui_pStackRadii.getX();
-            int ry = (int) gui_pStackRadii.getY();
-            Roi r = new PointRoi(pCenter.getX(), pCenter.getY());
-            Overlay o = new Overlay();
-            Roi cropBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
-            //o.add(cropBounds);
-            rx = (int) gui_pCenterOfMassRadii.getX();
-            ry = (int) gui_pCenterOfMassRadii.getY();
-            Roi comBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
-            o.add(comBounds);
-            imp.setPosition(0, ((int) pCenter.getZ() + 1), imp.getT());
-            imp.deleteRoi();
-            imp.setRoi(r);
-            o.setLabelColor(Color.blue);
-            imp.setOverlay(o);
-        } else {
-            if(Globals.verbose) {
-                log("Registration.showTrackOnFrame: No track available for this time point");
-            }
-            Overlay o = new Overlay();
-            imp.setOverlay(o);
-        }
-    }
-
     public boolean updateGuiVariables() {
-
         Roi roi = imp.getRoi();
 
         if ((roi != null) && (roi.getPolygon().npoints == 1)) {
@@ -322,6 +290,37 @@ public class Registration implements PlugIn {
 
         }
 
+    }
+
+    public void showTrackOnFrame() {
+        Point3D pCenter = pTracked[imp.getT() - 1];
+        if (pCenter != null) {
+            if(Globals.verbose) {
+                log("Registration.showTrackOnFrame pTracked: "+pCenter.toString());
+            }
+            //log("showTrackOnFrame: pCenter: "+pCenter.toString());
+            int rx = (int) gui_pStackRadii.getX();
+            int ry = (int) gui_pStackRadii.getY();
+            Roi r = new PointRoi(pCenter.getX(), pCenter.getY());
+            Overlay o = new Overlay();
+            Roi cropBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
+            //o.add(cropBounds);
+            rx = (int) gui_pCenterOfMassRadii.getX();
+            ry = (int) gui_pCenterOfMassRadii.getY();
+            Roi comBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
+            o.add(comBounds);
+            imp.setPosition(0, ((int) pCenter.getZ() + 1), imp.getT());
+            imp.deleteRoi();
+            imp.setRoi(r);
+            o.setLabelColor(Color.blue);
+            imp.setOverlay(o);
+        } else {
+            if(Globals.verbose) {
+                log("Registration.showTrackOnFrame: No track available for this time point");
+            }
+            Overlay o = new Overlay();
+            imp.setOverlay(o);
+        }
     }
 
     public String getTextFieldTxt(GenericDialog gd, int i) {

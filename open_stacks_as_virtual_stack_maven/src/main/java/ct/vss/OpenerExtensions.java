@@ -173,9 +173,10 @@ class OpenerExtensions extends Opener {
         }
     }
 
-    private long readFromPlane(FileInfoSer fi, FileInputStream in, long pointer, byte[][] buffer, int z, int zs, int ys, int ye) {
+    private long readTiffOnePlaneCroppedRows(FileInfoSer fi, FileInputStream in, long pointer, byte[][] buffer, int z, int zs, int ys, int ye) {
         boolean hasStrips = false;
         int readLength;
+        long readStart;
 
         if ((fi.stripOffsets != null && fi.stripOffsets.length > 1)) {
             hasStrips = true;
@@ -192,34 +193,36 @@ class OpenerExtensions extends Opener {
 
             if (hasStrips) {
 
-                // check what we have to read
+                // convert rows to strips
                 int rps = fi.rowsPerStrip;
                 int ss = (int) ys / rps;
                 int se = (int) ye / rps;
+                readStart = fi.stripOffsets[ss];
 
-                // skip to first strip that we need to read of this z-plane
-                //startTime = System.currentTimeMillis();
-                pointer = skip(in, fi.stripOffsets[ss] - pointer, pointer);
-                //skippingTime += (System.currentTimeMillis() - startTime);
-
-                // compute read length
                 readLength = 0;
                 for (int s = ss; s <= se; s++) {
                     readLength += fi.stripLengths[s];
                 }
 
-                // read all data
-                //startTime = System.currentTimeMillis();
-                buffer[z-zs] = new byte[readLength];
-                pointer = read(in, buffer[z-zs], pointer);
-                //readingTime += (System.currentTimeMillis() - startTime);
+            } else {  // no strips
 
-                //log("# readFromPlane:");
-                //log("ss: " + ss);
-                //log("se: " + se);
-                //log("readLength: " + readLength);
+                // convert rows to bytes
+                readStart = fi.longOffset + ys * fi.width * fi.bytesPerPixel;
+                readLength =  (int) (fi.longOffset + ((ye-ys)+1) * fi.width * fi.bytesPerPixel - readStart);
 
             }
+
+            // SKIP to first strip (row) that we need to read of this z-plane
+            //startTime = System.currentTimeMillis();
+            pointer = skip(in, readStart - pointer, pointer);
+            //skippingTime += (System.currentTimeMillis() - startTime);
+
+            // READ data
+            //startTime = System.currentTimeMillis();
+            buffer[z-zs] = new byte[readLength];
+            pointer = read(in, buffer[z-zs], pointer);
+            //readingTime += (System.currentTimeMillis() - startTime);
+
 
         } catch (Exception e) {
             IJ.handleException(e);
@@ -373,9 +376,12 @@ class OpenerExtensions extends Opener {
 
         if(Globals.verbose) {
             log("# openCroppedTiffStackUsingIFDs");
-            log("directory: " + info[0].directory);
-            log("filename: " + info[0].fileName);
             log("info.length: " + info.length);
+            log("fi.directory: " + fi.directory);
+            log("fi.filename: " + fi.fileName);
+            log("fi.compression: " + fi.compression);
+            log("fi.intelByteOrder: " + fi.intelByteOrder);
+            log("fi.bytesPerPixel: " + fi.bytesPerPixel);
             log("zs,dz,ze,nz,xs,xe,ys,ye: " + zs + "," + dz + "," + ze + "," + nz + "," + xs + "," + xe + "," + ys + "," + ye);
         }
 
@@ -383,6 +389,7 @@ class OpenerExtensions extends Opener {
 
         // initialisation and allocation
         startTime = System.currentTimeMillis();
+
 
         int imByteWidth = fi.width*fi.bytesPerPixel;
         ImageStack stack = ImageStack.create(nx, ny, nz, fi.bytesPerPixel*8);
@@ -417,15 +424,15 @@ class OpenerExtensions extends Opener {
                 fi = info[z];
 
                 //
-                // Read data of z-slice
+                // Read y subset from current z-slice
                 //
 
                 startTime = System.currentTimeMillis();
-                pointer = readFromPlane(fi, in, pointer, buffer, z, zs, ys, ye) ;
+                pointer = readTiffOnePlaneCroppedRows(fi, in, pointer, buffer, z, zs, ys, ye) ;
                 readingTime += (System.currentTimeMillis() - startTime);
 
                 //
-                // Decompress Rearrange Crop And Put Into Stack
+                // Decompress Rearrange Crop X And Put Into Stack
                 //
 
                 startTime = System.currentTimeMillis();
@@ -540,6 +547,8 @@ class process2stack implements Runnable {
     private Thread t;
     private String threadName;
 
+    // todo: make the compression modes part of the fi object?
+
     // Compression modes
     public static final int COMPRESSION_UNKNOWN = 0;
     public static final int COMPRESSION_NONE = 1;
@@ -588,23 +597,27 @@ class process2stack implements Runnable {
 
     public void run() {
         //log("Running " +  threadName );
-        //try {
-            // check what we have read
-            int rps = fi.rowsPerStrip;
-            int ss = (int) ys / rps;
-            int se = (int) ye / rps;
 
-            //log(""+ss);
-            //log(""+se);
-            //log(""+fi.compression);
+        boolean hasStrips = false;
+        if ((fi.stripOffsets != null && fi.stripOffsets.length > 1)) {
+            hasStrips = true;
+        }
 
-            // deal with compression
-            final int LZW = 2;
+        // check what we have read
+        int rps = fi.rowsPerStrip;
+        int ss = ys / rps; // the int is doing a floor()
+        int se = ye / rps;
 
-            if(fi.compression==LZW) {
+        log("fi.compression: "+fi.compression);
+
+        if(hasStrips) {
+
+            if(fi.compression == COMPRESSION_NONE) {
+                // do nothing
+            } else if (fi.compression == LZW) {
 
                 // needs to hold all data present in the uncompressed strips
-                byte[] unCompressedBuffer = new byte[ (se-ss+1) * rps * imByteWidth];
+                byte[] unCompressedBuffer = new byte[(se - ss + 1) * rps * imByteWidth];
 
                 int pos = 0;
                 for (int s = ss; s <= se; s++) {
@@ -615,13 +628,13 @@ class process2stack implements Runnable {
                     try {
                         System.arraycopy(buffer[z - zs], pos, strip, 0, stripLength);
                     } catch (Exception e) {
-                        log(""+e.toString());
+                        log("" + e.toString());
                         log("------- s [#] : " + s);
                         log("stripLength [bytes] : " + strip.length);
-                        log("pos [bytes] : "+pos);
-                        log("pos + stripLength [bytes] : "+(pos+stripLength));
-                        log("z-zs : "+(z-zs));
-                        log("buffer[z-zs].length : "+buffer[z-zs].length);
+                        log("pos [bytes] : " + pos);
+                        log("pos + stripLength [bytes] : " + (pos + stripLength));
+                        log("z-zs : " + (z - zs));
+                        log("buffer[z-zs].length : " + buffer[z - zs].length);
                         log("imWidth [bytes] : " + imByteWidth);
                         log("rows per strip [#] : " + rps);
                         log("ny [#] : " + ny);
@@ -631,42 +644,30 @@ class process2stack implements Runnable {
 
                     //log("strip.length " + strip.length);
                     // uncompress strip
-                    strip = lzwUncompress(strip, imByteWidth*rps);
-
+                    strip = lzwUncompress(strip, imByteWidth * rps);
 
                     // put uncompressed strip into large array
                     System.arraycopy(strip, 0, unCompressedBuffer, (s - ss) * imByteWidth * rps, imByteWidth * rps);
                     pos += stripLength;
                 }
-
-                buffer[z-zs] = unCompressedBuffer;
-
-                //log("uncompressed buffer.length: " + buffer[z-zs].length);
+                buffer[z - zs] = unCompressedBuffer;
+            } else {
+                log("Unknown compression: "+fi.compression);
             }
 
-
             //
-            // Rearrange data into pixels, crop it and put into image stack
+            // copy the correct x and y subset into the image stack
             //
+            ys = ys % rps; // we might have to skip a few rows in the beginning because the strips can hold several rows
 
-            // convert pixels to 16bit gray values and store in pixels[z]
-            //log("buffer.length: " + buffer[z-zs].length);
-            //log("ny*imByteWidth " + (ny*imByteWidth));
+            setShortPixelsCropXY(fi, (short[]) stack.getPixels(z - zs + 1), ys, ny, xs, nx, imByteWidth, buffer[z - zs]);
 
-            // store strips in pixel array
+        } else { // no strips
 
-            ys=ys%rps; // we might have to skip a few rows in the beginning because the strips can hold several rows
-            setShortPixelsFromAllStrips(fi, pixels[z-zs], ys, ny, xs, nx, imByteWidth, buffer[z-zs]);
+            setShortPixelsCropXY(fi, (short[]) stack.getPixels(z - zs + 1), ys, ny, xs, nx, imByteWidth, buffer[z - zs]);
 
-            // add pixels to stack
-            //stack.setPixels(new ShortProcessor(nx, ny, pixels[z-zs], null), z-zs);
-            stack.setPixels(pixels[z-zs], z-zs+1);
+        }
 
-        //} catch (InterruptedException e) {
-        //    log("Thread " +  threadName + " interrupted.");
-       //}
-
-        //log("Thread " +  threadName + " exiting.");
     }
 
     public byte[] lzwUncompress(byte[] input, int byteCount) {
@@ -806,9 +807,12 @@ class process2stack implements Runnable {
         return out;
     }
 
-    public void setShortPixelsFromAllStrips(FileInfoSer fi, short[] pixels, int ys, int ny, int xs, int nx, int imByteWidth, byte[] buffer) {
+    public void setShortPixelsCropXY(FileInfoSer fi, short[] pixels, int ys, int ny, int xs, int nx, int imByteWidth, byte[] buffer) {
         int ip = 0;
         int bs, be;
+        if(fi.bytesPerPixel!=2) {
+            log("Unsupported bit depth: "+fi.bytesPerPixel*8);
+        }
 
         for (int y = ys; y < ys + ny; y++) {
 
@@ -834,12 +838,13 @@ class process2stack implements Runnable {
     }
 
     public void start () {
-        log("Starting " +  threadName );
+        //log("Starting " +  threadName );
         if (t == null) {
             t = new Thread (this, threadName);
             t.start ();
         }
     }
+
 }
 
 /** A growable array of bytes. */

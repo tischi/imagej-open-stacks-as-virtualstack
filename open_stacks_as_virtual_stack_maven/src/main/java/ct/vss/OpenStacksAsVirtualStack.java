@@ -7,14 +7,15 @@ import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
+import ij.gui.NonBlockingGenericDialog;
+import ij.gui.Roi;
 import ij.io.FileInfo;
 import ij.io.Opener;
 import ij.plugin.PlugIn;
 import javafx.geometry.Point3D;
 
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.TextEvent;
+import java.awt.event.*;
 import java.io.*;
 
 import static ij.IJ.log;
@@ -35,6 +36,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String[][] lists; // c, t
     private String fileOrder;
     private String fileType;
+    private static NonBlockingGenericDialog gd;
 
 
     public OpenStacksAsVirtualStack() {
@@ -48,7 +50,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         log("Selected directory: "+directory);
         ImagePlus imp = null;
 
-        Globals.verbose = true;
+        Globals.verbose = false;
 
         //Macro.setOptions(null); // Prevents later use of OpenDialog from reopening the same file
         //IJ.register(Open_Stacks_As_VirtualStack.class);
@@ -65,12 +67,160 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         if(imp!=null) {
             imp.show();
         }
+
+        showDialog();
+
     }
+
     // todo: make a non-modal dialog to:
     // - change the verbosity
     // - save VSS in different ways
+    public void showDialog() {
 
-    boolean showDialog(String[] list) {
+        gd = new NonBlockingGenericDialog("Virtual stack tools");
+
+        // set iconImage
+        ClassLoader classLoader = getClass().getClassLoader();
+        ImagePlus impIcon = IJ.openImage(classLoader.getResource("logo01-61x61.jpg").getFile());
+        if(impIcon!=null) gd.addImage(impIcon);
+
+        gd.addMessage("");
+
+        Button[] bts = new Button[1];
+
+        bts[0] = new Button("Crop");
+        bts[0].addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updateGuiVariables()) {
+                    ImagePlus imp = IJ.getImage();
+                    VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+                    if (vss == null) {
+                        IJ.showMessage("Wrong image type.");
+                    }
+                    Roi roi = imp.getRoi();
+                    if (roi != null && roi.isArea()) {
+
+                        int tMin = 0;
+                        int tMax = vss.nT - 1;
+                        int zMin = 0;
+
+                        Point3D[] po = new Point3D[vss.nT];
+                        for (int t = 0; t < vss.nT; t++) {
+                            po[t] = new Point3D(roi.getBounds().getX(), roi.getBounds().getY(), zMin);
+                        }
+                        Point3D ps = new Point3D(roi.getBounds().getWidth(), roi.getBounds().getHeight(), vss.nZ);
+
+                        ImagePlus impCropped = openCroppedOffsetSizeFromInfos(imp, vss.getFileInfosSer(), po, ps, tMin, tMax);
+                        impCropped.show();
+
+                    } else {
+                        IJ.showMessage("Please put a rectangular ROI on the image.");
+                    }
+                }
+            }
+        });
+
+        final Panel buttons = new Panel();
+        GridBagLayout bgbl = new GridBagLayout();
+        buttons.setLayout(bgbl);
+        GridBagConstraints bgbc = new GridBagConstraints();
+        bgbc.anchor = GridBagConstraints.EAST;
+
+        for(Button bt : bts) {
+            bgbc.insets = new Insets(0, 0, 0, 5);
+            bgbl.setConstraints(bt, bgbc);
+            buttons.add(bt);
+        }
+
+        gd.addPanel(buttons,GridBagConstraints.EAST,new Insets(5,5,5,5));
+        bgbl = (GridBagLayout)gd.getLayout();
+        bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 0;
+        bgbl.setConstraints(buttons,bgbc);
+
+
+        // gd location
+        ImagePlus imp = IJ.getImage();
+        int gdX = (int) imp.getWindow().getLocationOnScreen().getX() + imp.getWindow().getWidth() + 10;
+        int gdY = (int) imp.getWindow().getLocationOnScreen().getY() + 30;
+        gd.centerDialog(false);
+        gd.setLocation(gdX, gdY);
+        gd.getHeight();
+
+        // add logging checkbox
+        final Checkbox cbLogging = new Checkbox("Verbose logging", false);
+        cbLogging.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                Globals.verbose = cbLogging.getState();
+            }
+        });
+
+        final Panel panel0 = new Panel();
+        GridBagLayout gbl0 = new GridBagLayout();
+        GridBagConstraints gbc0 = new GridBagConstraints();
+        panel0.setLayout(gbl0);
+        gbc0.anchor = GridBagConstraints.EAST;
+
+        gbc0.insets = new Insets(0,0,0,5);
+        gbl0.setConstraints(cbLogging, gbc0);
+        panel0.add(cbLogging);
+
+        gd.addPanel(panel0,GridBagConstraints.EAST,new Insets(5,5,5,5));
+
+        gd.addHelp("https://github.com/tischi/imagej-open-stacks-as-virtualstack/blob/master/README.md");
+
+        gd.showDialog();
+
+    }
+
+    public boolean updateGuiVariables() {
+        /*
+        Roi roi = imp.getRoi();
+
+        if ((roi != null) && (roi.getPolygon().npoints == 1)) {
+
+            // get values
+            int x = roi.getPolygon().xpoints[0];
+            int y = roi.getPolygon().ypoints[0];
+            int z = imp.getZ() - 1;
+            gui_t = imp.getT() - 1;
+
+            int iTxt = 0, iChoice = 0;
+            int rx = new Integer(getTextFieldTxt(gd, iTxt++));
+            int ry = new Integer(getTextFieldTxt(gd, iTxt++));
+            int rz = new Integer(getTextFieldTxt(gd, iTxt++));
+            gui_dz = new Integer(getTextFieldTxt(gd, iTxt++));
+            gui_dt = new Integer(getTextFieldTxt(gd, iTxt++));
+            double marginFactor = new Double(getTextFieldTxt(gd, iTxt++));
+            gui_bg = new Integer(getTextFieldTxt(gd, iTxt++));
+            gui_iterations = new Integer(getTextFieldTxt(gd, iTxt++));
+            gui_tMax = (new Integer(getTextFieldTxt(gd, iTxt++))) - 1;
+            iTxt++; // frame slider
+            gui_c = (new Integer(getTextFieldTxt(gd, iTxt++))) - 1;
+            Choice centeringMethod = (Choice) gd.getChoices().get(iChoice++);
+            gui_centeringMethod = centeringMethod.getSelectedItem();
+
+            //double marginFactorCrop = new Double(getTextFieldTxt(gd, iTxt++));
+
+            gui_pCenterOfMassRadii = new Point3D(rx, ry, rz);
+            gui_pStackRadii = gui_pCenterOfMassRadii.multiply(marginFactor);
+            gui_pCropRadii = gui_pCenterOfMassRadii;
+            gui_pStackCenter = new Point3D(x, y, z);
+
+            return(true);
+
+        } else {
+
+            IJ.showMessage("Please use IJ's 'Point selection tool' to mark an object in your image.");
+            return(false);
+
+        }
+        */
+        return(true);
+    }
+
+    boolean showOpenDialog(String[] list) {
         int fileCount = list.length;
         VirtualOpenerDialog gd = new VirtualOpenerDialog("Sequence opening options", list);
         gd.addNumericField("Number of stacks:", fileCount, 0);
@@ -507,7 +657,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 }
 
-
+    // todo: call the OffsetSize method from this
 	public static ImagePlus openCroppedCenterRadiusFromInfos(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] pc, Point3D pr, int tMin, int tMax) {
 		int nC = infos.length;
         int nT = tMax-tMin+1;
@@ -533,10 +683,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     croppedInfos[c][t-tMin][z].isCropped = true;
                     croppedInfos[c][t-tMin][z].pCropOffset = pc[t].subtract(pr);
                     croppedInfos[c][t-tMin][z].pCropSize = pr.multiply(2).add(1, 1, 1);
-                    log("c "+c);
-                    log("t "+t);
-                    log("z "+z);
-                    log("offset "+croppedInfos[c][t-tMin][z].pCropOffset.toString());
+                    //log("c "+c);
+                    //log("t "+t);
+                    //log("z "+z);
+                    //log("offset "+croppedInfos[c][t-tMin][z].pCropOffset.toString());
 
                 }
 
@@ -550,8 +700,53 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     }
 
+    public static ImagePlus openCroppedOffsetSizeFromInfos(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] po, Point3D ps, int tMin, int tMax) {
+        int nC = infos.length;
+        int nT = tMax-tMin+1;
+        int nZ = infos[0][0].length;
 
-	private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfoSer fi) {
+        FileInfoSer[][][] croppedInfos = new FileInfoSer[nC][nT][nZ];
+
+        if(Globals.verbose){
+            log("# OpenStacksAsVirtualStack.openCroppedFromInfos");
+            log("tMin: "+tMin);
+            log("tMax: "+tMax);
+        }
+
+        OpenerExtensions oe = new OpenerExtensions();
+
+        for(int c=0; c<nC; c++) {
+
+            for(int t=tMin; t<=tMax; t++) {
+
+                for(int z=0; z<nZ; z++) {
+
+                    croppedInfos[c][t-tMin][z] = (FileInfoSer) infos[c][t][z].clone();
+                    if(croppedInfos[c][t-tMin][z].isCropped) {
+                        croppedInfos[c][t-tMin][z].pCropOffset = po[t].add(croppedInfos[c][t-tMin][z].pCropOffset);
+                    } else {
+                        croppedInfos[c][t - tMin][z].isCropped = true;
+                        croppedInfos[c][t - tMin][z].pCropOffset = po[t];
+                    }
+                    croppedInfos[c][t-tMin][z].pCropSize = ps;
+                    //log("c "+c);
+                    //log("t "+t);
+                    //log("z "+z);
+                    //log("offset "+croppedInfos[c][t-tMin][z].pCropOffset.toString());
+
+                }
+
+            }
+
+        }
+
+        VirtualStackOfStacks stack = new VirtualStackOfStacks(croppedInfos);
+
+        return(makeImagePlus(stack, croppedInfos[0][0][0]));
+
+    }
+
+    private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfoSer fi) {
         int nC=stack.nC;
         int nT=stack.nT;
         int nZ=stack.nZ;
@@ -604,8 +799,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-        //String directory = "/Users/tischi/Desktop/example-data/compressedMultiChannel/";
-        String directory = "/Users/tischi/Desktop/example-data/luxendo/";
+        String directory = "/Users/tischi/Desktop/example-data/compressedMultiChannel/";
+        //String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
         //String directory = "/Users/tischi/Desktop/example-data/compressed/";
         String filter = null;
