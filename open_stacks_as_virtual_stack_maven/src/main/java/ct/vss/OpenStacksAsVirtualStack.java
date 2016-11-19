@@ -59,7 +59,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //File f = new File(directory+"TiffFileInfos.ser");
         if(new File(directory+"ovs.ser").exists()) {
             log("Found ovs file.");
-            imp = openFromInfoFile(directory+"ovs.ser");
+            imp = openFromInfoFile(directory,"ovs.ser");
         } else {
             imp = openFromDirectory(directory, null);
         }
@@ -247,14 +247,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         return true;
     }
 
-    public ImagePlus openFromInfoFile(String path){
+    public ImagePlus openFromInfoFile(String directory, String fileName){
 
-        File f = new File(path);
+        File f = new File(directory+fileName);
 
         if(f.exists() && !f.isDirectory()) {
 
             log("Loading ovs info file...");
-            FileInfoSer[][][] infos = readFileInfosSer(path);
+            FileInfoSer[][][] infos = readFileInfosSer(directory+fileName);
 
             nC = infos.length;
             nT = infos[0].length;
@@ -267,7 +267,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             }
 
             // init the VSS
-            VirtualStackOfStacks stack = new VirtualStackOfStacks(infos);
+            VirtualStackOfStacks stack = new VirtualStackOfStacks(directory, infos);
             ImagePlus imp = makeImagePlus(stack, infos[0][0][0]);
             return(imp);
 
@@ -358,7 +358,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             nY = fi.height;
 
                             // init the VSS
-                            stack = new VirtualStackOfStacks(new Point3D(nX, nY, nZ), nC, nT, fileType);
+                            stack = new VirtualStackOfStacks(directory, new Point3D(nX, nY, nZ), nC, nT, fileType);
 
                         }
 
@@ -366,6 +366,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         infoSer = new FileInfoSer[nZ];
                         for (int i = 0; i < nZ; i++) {
                             infoSer[i] = new FileInfoSer((FileInfo) info[i].clone());
+                            infoSer[i].directory = channelFolders[c] + "/"; // relative path to main directory
                             infoSer[i].fileTypeString = fileType;
                         }
 
@@ -385,7 +386,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             nX = (int)dsInfo.getDimensions()[2];
 
                             // init the VSS
-                            stack = new VirtualStackOfStacks(new Point3D(nX, nY, nZ), nC, nT, fileType);
+                            stack = new VirtualStackOfStacks(directory, new Point3D(nX, nY, nZ), nC, nT, fileType);
                         }
 
                         if (Globals.verbose) {
@@ -401,7 +402,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         for (int i = 0; i < nZ; i++) {
                             infoSer[i] = new FileInfoSer();
                             infoSer[i].fileName = lists[c][t];
-                            infoSer[i].directory = directory + channelFolders[c] + "/";
+                            infoSer[i].directory = channelFolders[c] + "/";
                             infoSer[i].width = nX;
                             infoSer[i].height = nY;
                             infoSer[i].bytesPerPixel = 2; // todo: how to get the bit-depth from the info?
@@ -694,7 +695,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         }
 
-        VirtualStackOfStacks stack = new VirtualStackOfStacks(croppedInfos);
+        VirtualStackOfStacks parentStack = (VirtualStackOfStacks) imp.getStack();
+        VirtualStackOfStacks stack = new VirtualStackOfStacks(parentStack.getDirectory(), croppedInfos);
 
         return(makeImagePlus(stack, croppedInfos[0][0][0]));
 
@@ -740,8 +742,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         }
 
-        VirtualStackOfStacks stack = new VirtualStackOfStacks(croppedInfos);
-
+        VirtualStackOfStacks parentStack = (VirtualStackOfStacks) imp.getStack();
+        VirtualStackOfStacks stack = new VirtualStackOfStacks(parentStack.getDirectory(), croppedInfos);
         return(makeImagePlus(stack, croppedInfos[0][0][0]));
 
     }

@@ -19,10 +19,12 @@ public class VirtualStackOfStacks extends ImageStack {
     int nX, nY, nZ, nC, nT;
     protected FileInfoSer[][][] infos;  // c, t, z
     protected String fileType = "tiff"; // h5
+    protected String directory = "";
 
     /** Creates a new, empty virtual stack of required size */
-    public VirtualStackOfStacks(Point3D pSize, int nC, int nT, String fileType) {
+    public VirtualStackOfStacks(String directory, Point3D pSize, int nC, int nT, String fileType) {
         super();
+        this.directory = directory;
         this.nX = (int)pSize.getX();
         this.nY = (int)pSize.getY();
         this.nZ = (int)pSize.getZ();
@@ -38,10 +40,11 @@ public class VirtualStackOfStacks extends ImageStack {
 
     }
 
-    public VirtualStackOfStacks(FileInfoSer[][][] infos) {
+    public VirtualStackOfStacks(String directory, FileInfoSer[][][] infos) {
         super();
 
         this.infos = infos;
+        this.directory = directory;
         nC = infos.length;
         nT = infos[0].length;
 
@@ -82,13 +85,16 @@ public class VirtualStackOfStacks extends ImageStack {
         return(infos);
     }
 
+    public String getDirectory() {
+        return directory;
+    }
+
     /* Adds an image stack */
     public void setStack(FileInfoSer[] info, int t, int c) {
         if (info==null)
             throw new IllegalArgumentException("'info' is null!");
         infos[c][t] = info;
     }
-
 
     /** Does nothing. */
     public void addSlice(String sliceLabel, Object pixels) {
@@ -156,7 +162,7 @@ public class VirtualStackOfStacks extends ImageStack {
             log("c [one-based]: "+ (c+1));
             log("z [one-based]: "+ (z+1));
             log("t [one-based]: "+ (t+1));
-            log("opening file: "+infos[c][t][0].directory+infos[c][t][0].fileName);
+            log("opening file: "+directory+infos[c][t][0].directory+infos[c][t][0].fileName);
         }
 
         int dz = 1;
@@ -174,7 +180,7 @@ public class VirtualStackOfStacks extends ImageStack {
             ps = new Point3D(fi.width,fi.height,1);
         }
 
-        ImagePlus imp = new OpenerExtensions().openCroppedStackOffsetSize(infos[c][t], dz, po, ps);
+        ImagePlus imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);
 
         if (imp==null) {
             log("Error: loading failed!");
@@ -192,7 +198,7 @@ public class VirtualStackOfStacks extends ImageStack {
             log("c: "+c);
             }
 
-        ImagePlus imp = new OpenerExtensions().openCroppedStackCenterRadii(infos[c][t], dz, pc, pr);
+        ImagePlus imp = new OpenerExtensions().openCroppedStackCenterRadii(directory, infos[c][t], dz, pc, pr);
 
         if (imp==null) {
             log("Error: loading failed!");

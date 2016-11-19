@@ -233,7 +233,7 @@ class OpenerExtensions extends Opener {
 
     }
 
-    public ImagePlus openCroppedStackOffsetSize(FileInfoSer[] info, int dz, Point3D po, Point3D ps) {
+    public ImagePlus openCroppedStackOffsetSize(String directory, FileInfoSer[] info, int dz, Point3D po, Point3D ps) {
 
         // compute ranges to be loaded
 
@@ -252,9 +252,9 @@ class OpenerExtensions extends Opener {
 
         ImagePlus imp = null;
         if(info[0].fileTypeString.equals("tif")) {
-            imp = openCroppedTiffStackUsingIFDs(info, zs, ze, nz, dz, xs, xe, ys, ye);
+            imp = openCroppedTiffStackUsingIFDs(directory, info, zs, ze, nz, dz, xs, xe, ys, ye);
         } else if(info[0].fileTypeString.equals("h5")) {
-            imp = openCroppedH5stack(info, zs, ze, nz, dz, xs, xe, ys, ye);
+            imp = openCroppedH5stack(directory, info, zs, ze, nz, dz, xs, xe, ys, ye);
         } else {
             IJ.showMessage("unsupported file type: "+info[0].fileTypeString);
         }
@@ -263,9 +263,10 @@ class OpenerExtensions extends Opener {
 
     }
 
-    public ImagePlus openCroppedStackCenterRadii(FileInfoSer[] info, int dz, Point3D pc, Point3D pr) {
+    public ImagePlus openCroppedStackCenterRadii(String directory, FileInfoSer[] info, int dz, Point3D pc, Point3D pr) {
 
         // compute ranges to be loaded
+        // todo: make this Point3D based and move to extra function
         int xc = (int) (pc.getX() + 0.5);
         int yc = (int) (pc.getY() + 0.5);
         int zc = (int) (pc.getZ() + 0.5);
@@ -287,16 +288,16 @@ class OpenerExtensions extends Opener {
         ImagePlus imp = null;
 
         if(info[0].fileTypeString == "tif")
-            imp = openCroppedTiffStackUsingIFDs(info, zs, ze, nz, dz, xs, xe, ys, ye);
+            imp = openCroppedTiffStackUsingIFDs(directory, info, zs, ze, nz, dz, xs, xe, ys, ye);
         else if(info[0].fileTypeString == "h5")
-            imp = openCroppedH5stack(info, zs, ze, nz, dz, xs, xe, ys, ye);
+            imp = openCroppedH5stack(directory, info, zs, ze, nz, dz, xs, xe, ys, ye);
 
         return(imp);
 
     }
 
     // todo make Points from the ints
-    public ImagePlus openCroppedH5stack(FileInfoSer[] info, int zs, int ze, int nz, int dz, int xs, int xe, int ys, int ye) {
+    public ImagePlus openCroppedH5stack(String directory, FileInfoSer[] info, int zs, int ze, int nz, int dz, int xs, int xe, int ys, int ye) {
         long startTime;
         long readingTime = 0;
         long totalTime = 0;
@@ -315,8 +316,9 @@ class OpenerExtensions extends Opener {
 
         if(Globals.verbose) {
             log("# openCroppedH5stack");
-            log("directory: " + fi.directory);
-            log("filename: " + fi.fileName);
+            log("root directory: "+directory);
+            log("fi.directory: " + fi.directory);
+            log("fi.filename: " + fi.fileName);
             log("info.length: " + info.length);
             log("zs,dz,ze,nz,xs,xe,ys,ye: " + zs + "," + dz + "," + ze + "," + nz + "," + xs + "," + xe + "," + ys + "," + ye);
         }
@@ -331,7 +333,7 @@ class OpenerExtensions extends Opener {
 
         // load everything in one go
         startTime = System.currentTimeMillis();
-        IHDF5Reader reader = HDF5Factory.openForReading(fi.directory + fi.fileName);
+        IHDF5Reader reader = HDF5Factory.openForReading(directory + fi.directory + fi.fileName);
         final MDShortArray block = reader.uint16().readMDArrayBlockWithOffset(fi.h5DataSet, new int[]{nz, ny, nx}, new long[]{zs, ys, xs});
         final short[] asFlatArray = block.getAsFlatArray();
         readingTime += (System.currentTimeMillis() - startTime);
@@ -362,7 +364,7 @@ class OpenerExtensions extends Opener {
         return(imp);
     }
 
-    public ImagePlus openCroppedTiffStackUsingIFDs(FileInfoSer[] info, int zs, int ze, int nz, int dz, int xs, int xe, int ys, int ye) {
+    public ImagePlus openCroppedTiffStackUsingIFDs(String directory, FileInfoSer[] info, int zs, int ze, int nz, int dz, int xs, int xe, int ys, int ye) {
         long startTime;
         long readingTime = 0;
         long totalTime = 0;
@@ -376,6 +378,7 @@ class OpenerExtensions extends Opener {
 
         if(Globals.verbose) {
             log("# openCroppedTiffStackUsingIFDs");
+            log("root directory: " + directory);
             log("info.length: " + info.length);
             log("fi.directory: " + fi.directory);
             log("fi.filename: " + fi.fileName);
@@ -402,7 +405,7 @@ class OpenerExtensions extends Opener {
 
         try {
             // get input stream to file
-            File f = new File(fi.directory + fi.fileName);
+            File f = new File(directory + fi.directory + fi.fileName);
             FileInputStream in = new FileInputStream(f);
 
             if(in==null) {
@@ -512,8 +515,6 @@ class OpenerExtensions extends Opener {
         FileInfoSer[] croppedInfo = new FileInfoSer[nz];
         FileInfoSer fi = info[0];
 
-
-
         /*if(fi.fileTypeString == "tif") {
 
             for (int iz = z, jz = z; iz < (z + nz); iz++, jz += dz) {
@@ -607,8 +608,6 @@ class process2stack implements Runnable {
         int rps = fi.rowsPerStrip;
         int ss = ys / rps; // the int is doing a floor()
         int se = ye / rps;
-
-        log("fi.compression: "+fi.compression);
 
         if(hasStrips) {
 
