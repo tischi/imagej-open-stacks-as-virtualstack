@@ -821,7 +821,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         ImagePlus imp = ovs.openFromDirectory(directory, null);
         //ImagePlus imp = ovs.openFromInfoFile(directory, "ovs.ser");
-        //imp.show();
+        imp.show();
 
         //ovs.run("");
 

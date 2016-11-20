@@ -9,12 +9,11 @@ import ij.io.RandomAccessStream;
 import ij.util.Tools;
 
 import java.io.File;
-import java.io.RandomAccessFile;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 import static ij.IJ.log;
-
 /**
  Decodes single and multi-image TIFF files. The LZW decompression
  code was contributed by Curtis Rueden.
@@ -22,6 +21,7 @@ import static ij.IJ.log;
 
 public class FastTiffDecoder {
 
+    private boolean readingStrips;
     // tags
     public static final int NEW_SUBFILE_TYPE = 254;
     public static final int IMAGE_WIDTH = 256;
@@ -102,6 +102,13 @@ public class FastTiffDecoder {
         int b2 = in.read();
         int b3 = in.read();
         int b4 = in.read();
+        if(ifdCount == 1 && readingStrips) {
+            log(""+b1);
+            log(""+b2);
+            log(""+b3);
+            log(""+b4);
+            log("int: "+((b4 << 24) + (b3 << 16) + (b2 << 8) + (b1 << 0)));
+        }
         if (littleEndian)
             return ((b4 << 24) + (b3 << 16) + (b2 << 8) + (b1 << 0));
         else
@@ -111,11 +118,23 @@ public class FastTiffDecoder {
     final void convertToInt(int[] ints, byte[] bytes) {
         if (littleEndian) {
             for (int i = 0, j = 0; i < bytes.length; i += 4, j++) {
-                ints[j] = ((bytes[i+3] << 24) + (bytes[i+2] << 16) + (bytes[i+1] << 8) + (bytes[i] << 0));
+                ints[j] = (((bytes[i+3]&0xff) << 24) + ((bytes[i+2]&0xff) << 16) + ((bytes[i+1]&0xff) << 8) + ((bytes[i]&0xff) << 0));
             }
         } else {
             for (int i = 0, j = 0; i < bytes.length; i += 4, j++) {
-                ints[j] = ((bytes[i] << 24) + (bytes[i+1] << 16) + (bytes[i+2] << 8) + bytes[i+3]);
+                ints[j] = (((bytes[i]&0xff) << 24) + ((bytes[i+1]&0xff) << 16) + ((bytes[i+2]&0xff) << 8) + (bytes[i+3]&0xff));
+            }
+        }
+    }
+
+    final void convertToShort(int[] ints, byte[] bytes) {
+        if (littleEndian) {
+            for (int i = 0, j = 0; i < bytes.length; i += 2, j++) {
+                ints[j] = (((bytes[i+1]&0xff) << 8) + ((bytes[i]&0xff) << 0));
+            }
+        } else {
+            for (int i = 0, j = 0; i < bytes.length; i += 2, j++) {
+                ints[j] = (((bytes[i+2]&0xff) << 8) + (bytes[i+3]&0xff));
             }
 
         }
@@ -422,10 +441,16 @@ public class FastTiffDecoder {
                         fi.stripOffsets = new int[count];
                         byte[] buffer = new byte[count*4];
                         startTime = System.currentTimeMillis();
+                        //int pos = in.getFilePointer();
+                        //readingStrips = true;
                         in.readFully(buffer);
                         //for (int c=0; c<count; c++)
-                        //   fi.stripOffsets[c] =
+                        //    fi.stripOffsets[c] = getInt();
                         convertToInt(fi.stripOffsets, buffer);
+                        readingStrips = false;
+                        //if(ifdCount == 1) log("Strip offset 10:" + fi.stripOffsets[10]); //76728  //76427
+                        //log(""+(in.getFilePointer()-pos));
+                        //log(""+(count*4));
                         stripTime += (System.currentTimeMillis() - startTime);
                         in.seek(saveLoc);
                     }
@@ -444,14 +469,21 @@ public class FastTiffDecoder {
                         fi.stripLengths = new int[count];
                         //startTime = System.currentTimeMillis();
                         if (fieldType==SHORT) {
-                            // read all of them and then SystemArrayCopy
-
-                            for (int c = 0; c < count; c++)
-                                fi.stripLengths[c] = getShort();
+                            byte[] buffer = new byte[count*2];
+                            in.readFully(buffer);
+                            convertToShort(fi.stripLengths, buffer);
                         } else {
-                            for (int c = 0; c < count; c++)
-                                fi.stripLengths[c] = getInt();
+                            byte[] buffer = new byte[count*4];
+                            in.readFully(buffer);
+                            convertToInt(fi.stripLengths, buffer);
                         }
+                        /*for (int c=0; c<count; c++) {
+                            if (fieldType==SHORT)
+                                fi.stripLengths[c] = getShort();
+                            else
+                                fi.stripLengths[c] = getInt();
+                        }*/
+
                         //stripTime += (System.currentTimeMillis() - startTime);
                         in.seek(saveLoc);
                     }
@@ -630,7 +662,7 @@ public class FastTiffDecoder {
         if (url!=null)
             fi.url = url;
         totalTime += (System.currentTimeMillis() - startTimeTotal);
-        log("fraction spend with strips = " + (double)stripTime/(double)totalTime);
+        //log("fraction spend with strips = " + (double)stripTime/(double)totalTime);
         return fi;
     }
 
