@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="OpenStacksAsVirtualStack_Fiji">
+    <output-path>/Applications/Fiji.app/plugins/</output-path>
+    <root id="archive" name="OpenStacksAsVirtualStack_Fiji.jar">
+      <element id="module-output" name="OpenStacksAsVirtualStack" />
+    </root>
+  </artifact>
+</component>
