@@ -5,4 +5,5 @@ package ct.vss;
  */
 public class Globals {
     public static boolean verbose = false;
+    public static String version = "2016-Nov-21a";
 }

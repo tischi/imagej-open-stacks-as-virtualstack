@@ -37,7 +37,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String fileType;
     private static NonBlockingGenericDialog gd;
 
-
     public OpenStacksAsVirtualStack() {
     }
 
@@ -46,11 +45,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         if (directory == null)
             return;
 
+        log("# OpenStacksAsVirtualStack (version "+Globals.version+")");
         log("Selected directory: "+directory);
         ImagePlus imp = null;
 
-        Globals.verbose = false;
-
+        Globals.verbose = true;
         //Macro.setOptions(null); // Prevents later use of OpenDialog from reopening the same file
         //IJ.register(Open_Stacks_As_VirtualStack.class);
 
@@ -79,11 +78,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         gd = new NonBlockingGenericDialog("Virtual stack tools");
 
         // set iconImage
+        // todo: make a panel with logo and the other stuff next to each other
         ClassLoader classLoader = getClass().getClassLoader();
         ImagePlus impIcon = IJ.openImage(classLoader.getResource("logo01-61x61.jpg").getFile());
         if(impIcon!=null) gd.addImage(impIcon);
 
         gd.addMessage("");
+        gd.addMessage("Version: "+Globals.version);
+        gd.addMessage("Contact: tischer@embl.de");
 
         Button[] bts = new Button[1];
 
@@ -817,11 +819,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
-        //ovs.run("");
+        ovs.run("");
 
-        ImagePlus imp = ovs.openFromDirectory(directory, null);
+        //ImagePlus imp = ovs.openFromDirectory(directory, null);
         //ImagePlus imp = ovs.openFromInfoFile(directory, "ovs.ser");
-        imp.show();
+        //imp.show();
 
         //ovs.run("");
 

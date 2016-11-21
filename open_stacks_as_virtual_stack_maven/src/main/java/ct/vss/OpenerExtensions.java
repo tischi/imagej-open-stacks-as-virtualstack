@@ -359,12 +359,11 @@ class OpenerExtensions extends Opener {
         totalTime = (System.currentTimeMillis() - totalTime);
 
         if(Globals.verbose) {
-            int usefulBytesRead = nz*nx*ny*fi.bytesPerPixel;
             log("readingTime [ms]: " + readingTime);
             log("pixels read: "+asFlatArray.length);
-            log("effective reading speed [MB/s]: " + usefulBytesRead/((readingTime+0.001)*1000));
+            log("effective reading speed [MB/s]: " + (double)nz*nx*ny*fi.bytesPerPixel/((readingTime+0.001)*1000));
             log("allocationTime [ms]: "+allocationTime);
-            log("threadInitTime [ms]: "+threadInitTime);
+            //log("threadInitTime [ms]: "+threadInitTime);
             //log("additional threadRunningTime [ms]: "+threadRunningTime);
             log("totalTime [ms]: " + totalTime);
             //log("Processing [ms]: " + processTime);
