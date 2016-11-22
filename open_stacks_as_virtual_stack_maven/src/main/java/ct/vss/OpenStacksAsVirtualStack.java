@@ -49,18 +49,21 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         log("Selected directory: "+directory);
         ImagePlus imp = null;
 
-        Globals.verbose = true;
+        Globals.verbose = false;
         //Macro.setOptions(null); // Prevents later use of OpenDialog from reopening the same file
         //IJ.register(Open_Stacks_As_VirtualStack.class);
 
         // does it contain a header file that we can use to open everything?
-        //File f = new File(directory+"TiffFileInfos.ser");
+
+        /*
         if(new File(directory+"ovs.ser").exists()) {
             log("Found ovs file.");
             imp = openFromInfoFile(directory,"ovs.ser");
         } else {
             imp = openFromDirectory(directory, null);
-        }
+        }*/
+
+        imp = openFromDirectory(directory, null);
 
         if(imp!=null) {
             imp.show();
@@ -135,9 +138,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
 
         gd.addPanel(buttons,GridBagConstraints.EAST,new Insets(5,5,5,5));
-        bgbl = (GridBagLayout)gd.getLayout();
-        bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 0;
-        bgbl.setConstraints(buttons,bgbc);
+        //bgbl = (GridBagLayout)gd.getLayout();
+        //bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 0;
+        //bgbl.setConstraints(buttons,bgbc);
 
 
         // gd location
@@ -299,10 +302,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         for (int i = 0; i < nC; i++) {
             lists[i] = getFilesInFolder(directory + channelFolders[i]);
             if (lists[i] == null) {
-                log("No files found.");
+                log("No files found!");
                 return(null);
-            } else {
-                log("Number of files: " + lists[i].length);
             }
         }
         // todo consistency check the list lengths
@@ -311,10 +312,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         // figure out the filetype
         if(lists[0][0].endsWith(".h5")) {
             fileType = "h5";
+            log("File type: "+fileType);
         } else if(lists[0][0].endsWith(".tif")) {
             fileType = "tif";
+            log("File type: "+fileType);
         } else {
-            IJ.showMessage("unsupported file type: "+lists[0][0]);
+            IJ.showMessage("Unsupported file type: "+lists[0][0]);
+            return(null);
         }
 
         FileInfo[] info = null;
@@ -323,6 +327,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         String path = "";
         VirtualStackOfStacks stack = null;
 
+        log("Obtaining information from all files...");
         // loop through filtered list and add file-info
         try {
 
@@ -331,24 +336,22 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 for (int t = 0; t < nT; t++) {
 
                     String ctPath = directory + channelFolders[c] + "/" + lists[c][t];
-                    log(fileType+" c" + c + "t" + t + ": " + ctPath);
+                    log("c:" + c + "; t:" + t + "; file:" + lists[c][t]);
 
                     if (fileType == "tif") {
 
                         long startTime = System.currentTimeMillis();
                         FastTiffDecoder ftd = new FastTiffDecoder(directory + channelFolders[c], lists[c][t]);
                         info = ftd.getTiffInfo();
-                        log("IDF READING TIME: "+(System.currentTimeMillis()-startTime));
+                        log("IFD reading time [ms]: "+(System.currentTimeMillis()-startTime));
 
-                        if (Globals.verbose) {
+                        // first file
+                        if (t == 0 && c == 0) {
+
                             log("info.length " + info.length);
                             log("info[0].compression " + info[0].compression);
                             log("info[0].stripLengths.length " + info[0].stripLengths.length);
                             log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
-                        }
-
-                        // first file
-                        if (t == 0 && c == 0) {
 
                             fi = info[0];
                             if (fi.nImages > 1) {
@@ -362,6 +365,15 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                             // init the VSS
                             stack = new VirtualStackOfStacks(directory, new Point3D(nX, nY, nZ), nC, nT, fileType);
+
+                        } else {
+
+                            if (Globals.verbose) {
+                                log("info.length " + info.length);
+                                log("info[0].compression " + info[0].compression);
+                                log("info[0].stripLengths.length " + info[0].stripLengths.length);
+                                log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
+                            }
 
                         }
 
@@ -498,8 +510,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     String[] getFilesInFolder(String directory) {
-        log("");
-        log("# Finding files in folder: " + directory);
+        log("# getFilesInFolder: " + directory);
         // todo: can getting the file-list be faster?
         String[] list = new File(directory).list();
         if (list == null || list.length == 0)
@@ -513,8 +524,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     String[] getFoldersInFolder(String directory) {
-        log("");
-        log("# Finding folders in folder: " + directory);
+        log("# getFoldersInFolder: " + directory);
         String[] list = new File(directory).list(new FilenameFilter() {
             @Override
             public boolean accept(File current, String name) {

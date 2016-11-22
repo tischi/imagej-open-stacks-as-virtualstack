@@ -85,6 +85,14 @@ public class FastTiffDecoder {
     private String tiffMetadata;
     private int photoInterp;
 
+
+    //
+    long startTimeTotal = 0;
+    long startTimeStrips = 0;
+    long stripTime = 0;
+    long totalTime = 0;
+
+
     public FastTiffDecoder(String directory, String name) {
         this.directory = directory;
         this.name = name;
@@ -399,11 +407,7 @@ public class FastTiffDecoder {
     }
 
     FileInfo OpenIFD() throws IOException {
-        long startTime, startTimeTotal;
-        long stripTime = 0;
-        long totalTime = 0;
 
-        startTimeTotal = System.currentTimeMillis();
         // Get Image File Directory data
         int tag, fieldType, count, value;
         int nEntries = getShort();
@@ -440,18 +444,18 @@ public class FastTiffDecoder {
                         in.seek(lvalue);
                         fi.stripOffsets = new int[count];
                         byte[] buffer = new byte[count*4];
-                        startTime = System.currentTimeMillis();
+                        startTimeStrips = System.nanoTime();
                         //int pos = in.getFilePointer();
                         //readingStrips = true;
                         in.readFully(buffer);
                         //for (int c=0; c<count; c++)
                         //    fi.stripOffsets[c] = getInt();
                         convertToInt(fi.stripOffsets, buffer);
-                        readingStrips = false;
+                        //readingStrips = false;
                         //if(ifdCount == 1) log("Strip offset 10:" + fi.stripOffsets[10]); //76728  //76427
                         //log(""+(in.getFilePointer()-pos));
                         //log(""+(count*4));
-                        stripTime += (System.currentTimeMillis() - startTime);
+                        stripTime += (System.nanoTime() - startTimeStrips);
                         in.seek(saveLoc);
                     }
                     fi.offset = count>0?fi.stripOffsets[0]:value;
@@ -467,7 +471,7 @@ public class FastTiffDecoder {
                         long saveLoc = in.getLongFilePointer();
                         in.seek(lvalue);
                         fi.stripLengths = new int[count];
-                        //startTime = System.currentTimeMillis();
+                        startTimeStrips = System.nanoTime();
                         if (fieldType==SHORT) {
                             byte[] buffer = new byte[count*2];
                             in.readFully(buffer);
@@ -484,7 +488,7 @@ public class FastTiffDecoder {
                                 fi.stripLengths[c] = getInt();
                         }*/
 
-                        //stripTime += (System.currentTimeMillis() - startTime);
+                        stripTime += (System.nanoTime() - startTimeStrips);
                         in.seek(saveLoc);
                     }
 
@@ -661,7 +665,6 @@ public class FastTiffDecoder {
         fi.directory = directory;
         if (url!=null)
             fi.url = url;
-        totalTime += (System.currentTimeMillis() - startTimeTotal);
         //log("fraction spend with strips = " + (double)stripTime/(double)totalTime);
         return fi;
     }
@@ -830,6 +833,8 @@ public class FastTiffDecoder {
     }
 
     public FileInfo[] getTiffInfo() throws IOException {
+        startTimeTotal = System.currentTimeMillis();
+
         long ifdOffset;
         ArrayList list = new ArrayList();
         if (in==null) {
@@ -876,6 +881,10 @@ public class FastTiffDecoder {
                 fi.debugInfo += "gap between images: "+getGapInfo(info) + "\n";
                 fi.debugInfo += "little-endian byte order: "+fi.intelByteOrder + "\n";
             }
+
+            log("getTiffInfo.stripTime [ms]: "+ (int) (1.0*stripTime/1000000.0));
+            log("getTiffInfo.totalTime [ms]: "+ (System.currentTimeMillis() - startTimeTotal));
+
             return info;
         }
     }
