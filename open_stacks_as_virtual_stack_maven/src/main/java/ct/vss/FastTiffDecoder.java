@@ -406,24 +406,196 @@ public class FastTiffDecoder {
             return 0.0;
     }
 
-    FileInfo OpenIFD() throws IOException {
+    void getMetaData(int loc, FileInfo fi) throws IOException {
+        if (metaDataCounts==null || metaDataCounts.length==0)
+            return;
+        int maxTypes = 10;
+        long saveLoc = in.getLongFilePointer();
+        in.seek(loc);
+        int n = metaDataCounts.length;
+        int hdrSize = metaDataCounts[0];
+        if (hdrSize<12 || hdrSize>804)
+        {in.seek(saveLoc); return;}
+        int magicNumber = getInt();
+        if (magicNumber!=MAGIC_NUMBER)  // "IJIJ"
+        {in.seek(saveLoc); return;}
+        int nTypes = (hdrSize-4)/8;
+        int[] types = new int[nTypes];
+        int[] counts = new int[nTypes];
+
+        if (debugMode) dInfo += "Metadata:\n";
+        int extraMetaDataEntries = 0;
+        for (int i=0; i<nTypes; i++) {
+            types[i] = getInt();
+            counts[i] = getInt();
+            if (types[i]<0xffffff)
+                extraMetaDataEntries += counts[i];
+            if (debugMode) {
+                String id = "";
+                if (types[i]==INFO) id = " (Info property)";
+                if (types[i]==LABELS) id = " (slice labels)";
+                if (types[i]==RANGES) id = " (display ranges)";
+                if (types[i]==LUTS) id = " (luts)";
+                if (types[i]==ROI) id = " (roi)";
+                if (types[i]==OVERLAY) id = " (overlay)";
+                dInfo += "   "+i+" "+Integer.toHexString(types[i])+" "+counts[i]+id+"\n";
+            }
+        }
+        fi.metaDataTypes = new int[extraMetaDataEntries];
+        fi.metaData = new byte[extraMetaDataEntries][];
+        int start = 1;
+        int eMDindex = 0;
+        for (int i=0; i<nTypes; i++) {
+            if (types[i]==INFO)
+                getInfoProperty(start, fi);
+            else if (types[i]==LABELS)
+                getSliceLabels(start, start+counts[i]-1, fi);
+            else if (types[i]==RANGES)
+                getDisplayRanges(start, fi);
+            else if (types[i]==LUTS)
+                getLuts(start, start+counts[i]-1, fi);
+            else if (types[i]==ROI)
+                getRoi(start, fi);
+            else if (types[i]==OVERLAY)
+                getOverlay(start, start+counts[i]-1, fi);
+            else if (types[i]<0xffffff) {
+                for (int j=start; j<start+counts[i]; j++) {
+                    int len = metaDataCounts[j];
+                    fi.metaData[eMDindex] = new byte[len];
+                    in.readFully(fi.metaData[eMDindex], len);
+                    fi.metaDataTypes[eMDindex] = types[i];
+                    eMDindex++;
+                }
+            } else
+                skipUnknownType(start, start+counts[i]-1);
+            start += counts[i];
+        }
+        in.seek(saveLoc);
+    }
+
+    void getInfoProperty(int first, FileInfo fi) throws IOException {
+        int len = metaDataCounts[first];
+        byte[] buffer = new byte[len];
+        in.readFully(buffer, len);
+        len /= 2;
+        char[] chars = new char[len];
+        if (littleEndian) {
+            for (int j=0, k=0; j<len; j++)
+                chars[j] = (char)(buffer[k++]&255 + ((buffer[k++]&255)<<8));
+        } else {
+            for (int j=0, k=0; j<len; j++)
+                chars[j] = (char)(((buffer[k++]&255)<<8) + buffer[k++]&255);
+        }
+        fi.info = new String(chars);
+    }
+
+    void getSliceLabels(int first, int last, FileInfo fi) throws IOException {
+        fi.sliceLabels = new String[last-first+1];
+        int index = 0;
+        byte[] buffer = new byte[metaDataCounts[first]];
+        for (int i=first; i<=last; i++) {
+            int len = metaDataCounts[i];
+            if (len>0) {
+                if (len>buffer.length)
+                    buffer = new byte[len];
+                in.readFully(buffer, len);
+                len /= 2;
+                char[] chars = new char[len];
+                if (littleEndian) {
+                    for (int j=0, k=0; j<len; j++)
+                        chars[j] = (char)(buffer[k++]&255 + ((buffer[k++]&255)<<8));
+                } else {
+                    for (int j=0, k=0; j<len; j++)
+                        chars[j] = (char)(((buffer[k++]&255)<<8) + buffer[k++]&255);
+                }
+                fi.sliceLabels[index++] = new String(chars);
+                //ij.IJ.log(i+"  "+fi.sliceLabels[i-1]+"  "+len);
+            } else
+                fi.sliceLabels[index++] = null;
+        }
+    }
+
+    void getDisplayRanges(int first, FileInfo fi) throws IOException {
+        int n = metaDataCounts[first]/8;
+        fi.displayRanges = new double[n];
+        for (int i=0; i<n; i++)
+            fi.displayRanges[i] = readDouble();
+    }
+
+    void getLuts(int first, int last, FileInfo fi) throws IOException {
+        fi.channelLuts = new byte[last-first+1][];
+        int index = 0;
+        for (int i=first; i<=last; i++) {
+            int len = metaDataCounts[i];
+            fi.channelLuts[index] = new byte[len];
+            in.readFully(fi.channelLuts[index], len);
+            index++;
+        }
+    }
+
+    void getRoi(int first, FileInfo fi) throws IOException {
+        int len = metaDataCounts[first];
+        fi.roi = new byte[len];
+        in.readFully(fi.roi, len);
+    }
+
+    void getOverlay(int first, int last, FileInfo fi) throws IOException {
+        fi.overlay = new byte[last-first+1][];
+        int index = 0;
+        for (int i=first; i<=last; i++) {
+            int len = metaDataCounts[i];
+            fi.overlay[index] = new byte[len];
+            in.readFully(fi.overlay[index], len);
+            index++;
+        }
+    }
+
+    void error(String message) throws IOException {
+        if (in!=null) in.close();
+        throw new IOException(message);
+    }
+
+    void skipUnknownType(int first, int last) throws IOException {
+        byte[] buffer = new byte[metaDataCounts[first]];
+        for (int i=first; i<=last; i++) {
+            int len = metaDataCounts[i];
+            if (len>buffer.length)
+                buffer = new byte[len];
+            in.readFully(buffer, len);
+        }
+    }
+
+    public void enableDebugging() {
+        debugMode = true;
+    }
+
+    FileInfo OpenFirstIFD(long[] stripInfos) throws IOException {
+
+        long ifdLoc = in.getFilePointer();
 
         // Get Image File Directory data
         int tag, fieldType, count, value;
         int nEntries = getShort();
+
         if (nEntries<1 || nEntries>1000)
             return null;
+
         ifdCount++;
+
         if ((ifdCount%50)==0 && ifdCount>0)
             ij.IJ.showStatus("Opening IFDs: "+ifdCount);
         FileInfo fi = new FileInfo();
         fi.fileType = FileInfo.BITMAP;  //BitsPerSample defaults to 1
+
+
         for (int i=0; i<nEntries; i++) {
+
             tag = getShort();
             fieldType = getShort();
             count = getInt();
             value = getValue(fieldType, count);
             long lvalue = ((long)value)&0xffffffffL;
+
             if (debugMode && ifdCount<10) dumpTag(tag, count, value, fi);
             //ij.IJ.write(i+"/"+nEntries+" "+tag + ", count=" + count + ", value=" + value);
             //if (tag==0) return null;
@@ -436,15 +608,18 @@ public class FastTiffDecoder {
                     fi.height = value;
                     break;
                 case STRIP_OFFSETS:
-
+                    startTimeStrips = System.nanoTime();
+                    stripInfos[0] = count;
                     if (count==1)
                         fi.stripOffsets = new int[] {value};
                     else {
+                        stripInfos[1] = in.getFilePointer()-4-ifdLoc;
+                        //log("stripInfos[1]: "+(in.getFilePointer()-4));
+                        //log("lvalue "+lvalue);
                         long saveLoc = in.getLongFilePointer();
                         in.seek(lvalue);
                         fi.stripOffsets = new int[count];
                         byte[] buffer = new byte[count*4];
-                        startTimeStrips = System.nanoTime();
                         //int pos = in.getFilePointer();
                         //readingStrips = true;
                         in.readFully(buffer);
@@ -455,23 +630,25 @@ public class FastTiffDecoder {
                         //if(ifdCount == 1) log("Strip offset 10:" + fi.stripOffsets[10]); //76728  //76427
                         //log(""+(in.getFilePointer()-pos));
                         //log(""+(count*4));
-                        stripTime += (System.nanoTime() - startTimeStrips);
                         in.seek(saveLoc);
                     }
                     fi.offset = count>0?fi.stripOffsets[0]:value;
                     if (count>1 && (((long)fi.stripOffsets[count-1])&0xffffffffL)<(((long)fi.stripOffsets[0])&0xffffffffL))
                         fi.offset = fi.stripOffsets[count-1];
+                    log("fi.offset "+fi.offset);
+                    stripTime += (System.nanoTime() - startTimeStrips);
 
                     break;
                 case STRIP_BYTE_COUNT:
-
+                    startTimeStrips = System.nanoTime();
+                    stripInfos[2] = in.getFilePointer()-4-ifdLoc;
+                    stripInfos[3] = fieldType;
                     if (count==1)
                         fi.stripLengths = new int[] {value};
                     else {
                         long saveLoc = in.getLongFilePointer();
                         in.seek(lvalue);
                         fi.stripLengths = new int[count];
-                        startTimeStrips = System.nanoTime();
                         if (fieldType==SHORT) {
                             byte[] buffer = new byte[count*2];
                             in.readFully(buffer);
@@ -488,9 +665,9 @@ public class FastTiffDecoder {
                                 fi.stripLengths[c] = getInt();
                         }*/
 
-                        stripTime += (System.nanoTime() - startTimeStrips);
                         in.seek(saveLoc);
                     }
+                    stripTime += (System.nanoTime() - startTimeStrips);
 
                     break;
                 case PHOTO_INTERP:
@@ -666,177 +843,350 @@ public class FastTiffDecoder {
         if (url!=null)
             fi.url = url;
         //log("fraction spend with strips = " + (double)stripTime/(double)totalTime);
+        stripInfos[4] = in.getFilePointer() - ifdLoc;
         return fi;
     }
 
-    void getMetaData(int loc, FileInfo fi) throws IOException {
-        if (metaDataCounts==null || metaDataCounts.length==0)
-            return;
-        int maxTypes = 10;
-        long saveLoc = in.getLongFilePointer();
-        in.seek(loc);
-        int n = metaDataCounts.length;
-        int hdrSize = metaDataCounts[0];
-        if (hdrSize<12 || hdrSize>804)
-        {in.seek(saveLoc); return;}
-        int magicNumber = getInt();
-        if (magicNumber!=MAGIC_NUMBER)  // "IJIJ"
-        {in.seek(saveLoc); return;}
-        int nTypes = (hdrSize-4)/8;
-        int[] types = new int[nTypes];
-        int[] counts = new int[nTypes];
+    FileInfo OpenStripsFromIFD(long[] stripInfos) throws IOException {
+        FileInfo fi = new FileInfo();
+        long startLoc = in.getFilePointer();
 
-        if (debugMode) dInfo += "Metadata:\n";
-        int extraMetaDataEntries = 0;
-        for (int i=0; i<nTypes; i++) {
-            types[i] = getInt();
-            counts[i] = getInt();
-            if (types[i]<0xffffff)
-                extraMetaDataEntries += counts[i];
-            if (debugMode) {
-                String id = "";
-                if (types[i]==INFO) id = " (Info property)";
-                if (types[i]==LABELS) id = " (slice labels)";
-                if (types[i]==RANGES) id = " (display ranges)";
-                if (types[i]==LUTS) id = " (luts)";
-                if (types[i]==ROI) id = " (roi)";
-                if (types[i]==OVERLAY) id = " (overlay)";
-                dInfo += "   "+i+" "+Integer.toHexString(types[i])+" "+counts[i]+id+"\n";
+        //
+        // Initialise
+        //
+        int count = (int) stripInfos[0];
+        fi.stripOffsets = new int[count];
+        fi.stripLengths = new int[count];
+
+        //
+        // stripOffsets
+        //
+        // go to address where the pointer to the strips is stored
+        in.seek(stripInfos[1]+startLoc);
+        long stripLoc = ((long)getInt())&0xffffffffL;
+        // go to where the actual strips are stored
+        in.seek(stripLoc);
+        byte[] buffer = new byte[count*4];
+        in.readFully(buffer);
+        convertToInt(fi.stripOffsets, buffer);
+
+        //
+        // fi.offset
+        // - this seems to be the start of where the actual image data is stored
+        //
+        fi.offset = fi.stripOffsets[0];
+        if (count>1 && (((long)fi.stripOffsets[count-1])&0xffffffffL)<(((long)fi.stripOffsets[0])&0xffffffffL)) {
+            fi.offset = fi.stripOffsets[count - 1];
+            fi.longOffset = 0L;
+        }
+
+        //
+        // stripLengths
+        //
+        // go to address where the pointer to the strips is stored
+        in.seek(stripInfos[2]+startLoc);
+        stripLoc = ((long)getInt())&0xffffffffL;
+        // go to where the actual strips are stored
+        in.seek(stripLoc);
+        if (stripInfos[3]==SHORT) {
+            buffer = new byte[count*2];
+            in.readFully(buffer);
+            convertToShort(fi.stripLengths, buffer);
+        } else {
+            buffer = new byte[count*4];
+            in.readFully(buffer);
+            convertToInt(fi.stripLengths, buffer);
+        }
+
+        //
+        // go to end of this IFD
+        // - this is important since there is the address to the next IFD
+        //
+        in.seek(startLoc+stripInfos[4]);
+
+        return fi;
+    }
+
+    FileInfo OpenIFD() throws IOException {
+
+        long ps = in.getFilePointer();
+
+        // Get Image File Directory data
+        int tag, fieldType, count, value;
+        int nEntries = getShort();
+
+        if (nEntries<1 || nEntries>1000)
+            return null;
+
+        ifdCount++;
+
+        if ((ifdCount%50)==0 && ifdCount>0)
+            ij.IJ.showStatus("Opening IFDs: "+ifdCount);
+        FileInfo fi = new FileInfo();
+        fi.fileType = FileInfo.BITMAP;  //BitsPerSample defaults to 1
+
+
+        for (int i=0; i<nEntries; i++) {
+
+            tag = getShort();
+            fieldType = getShort();
+            count = getInt();
+            value = getValue(fieldType, count);
+
+            long lvalue = ((long)value)&0xffffffffL;
+            if (debugMode && ifdCount<10) dumpTag(tag, count, value, fi);
+            //ij.IJ.write(i+"/"+nEntries+" "+tag + ", count=" + count + ", value=" + value);
+            //if (tag==0) return null;
+            switch (tag) {
+                case IMAGE_WIDTH:
+                    fi.width = value;
+                    fi.intelByteOrder = littleEndian;
+                    break;
+                case IMAGE_LENGTH:
+                    fi.height = value;
+                    break;
+                case STRIP_OFFSETS:
+                    startTimeStrips = System.nanoTime();
+
+                    if (count==1)
+                        fi.stripOffsets = new int[] {value};
+                    else {
+                        long saveLoc = in.getLongFilePointer();
+                        in.seek(lvalue);
+                        fi.stripOffsets = new int[count];
+                        byte[] buffer = new byte[count*4];
+                        //int pos = in.getFilePointer();
+                        //readingStrips = true;
+                        in.readFully(buffer);
+                        //for (int c=0; c<count; c++)
+                        //    fi.stripOffsets[c] = getInt();
+                        convertToInt(fi.stripOffsets, buffer);
+                        //readingStrips = false;
+                        //if(ifdCount == 1) log("Strip offset 10:" + fi.stripOffsets[10]); //76728  //76427
+                        //log(""+(in.getFilePointer()-pos));
+                        //log(""+(count*4));
+                        in.seek(saveLoc);
+                    }
+                    fi.offset = count>0?fi.stripOffsets[0]:value;
+                    if (count>1 && (((long)fi.stripOffsets[count-1])&0xffffffffL)<(((long)fi.stripOffsets[0])&0xffffffffL))
+                        fi.offset = fi.stripOffsets[count-1];
+                    stripTime += (System.nanoTime() - startTimeStrips);
+
+                    break;
+                case STRIP_BYTE_COUNT:
+                    startTimeStrips = System.nanoTime();
+
+                    if (count==1)
+                        fi.stripLengths = new int[] {value};
+                    else {
+                        long saveLoc = in.getLongFilePointer();
+                        in.seek(lvalue);
+                        fi.stripLengths = new int[count];
+                        if (fieldType==SHORT) {
+                            byte[] buffer = new byte[count*2];
+                            in.readFully(buffer);
+                            convertToShort(fi.stripLengths, buffer);
+                        } else {
+                            byte[] buffer = new byte[count*4];
+                            in.readFully(buffer);
+                            convertToInt(fi.stripLengths, buffer);
+                        }
+                        /*for (int c=0; c<count; c++) {
+                            if (fieldType==SHORT)
+                                fi.stripLengths[c] = getShort();
+                            else
+                                fi.stripLengths[c] = getInt();
+                        }*/
+
+                        in.seek(saveLoc);
+                    }
+                    stripTime += (System.nanoTime() - startTimeStrips);
+
+                    break;
+                case PHOTO_INTERP:
+                    photoInterp = value;
+                    fi.whiteIsZero = value==0;
+                    break;
+                case BITS_PER_SAMPLE:
+                    if (count==1) {
+                        if (value==8)
+                            fi.fileType = FileInfo.GRAY8;
+                        else if (value==16)
+                            fi.fileType = FileInfo.GRAY16_UNSIGNED;
+                        else if (value==32)
+                            fi.fileType = FileInfo.GRAY32_INT;
+                        else if (value==12)
+                            fi.fileType = FileInfo.GRAY12_UNSIGNED;
+                        else if (value==1)
+                            fi.fileType = FileInfo.BITMAP;
+                        else
+                            error("Unsupported BitsPerSample: " + value);
+                    } else if (count>1) {
+                        long saveLoc = in.getLongFilePointer();
+                        in.seek(lvalue);
+                        int bitDepth = getShort();
+                        if (bitDepth==8)
+                            fi.fileType = FileInfo.GRAY8;
+                        else if (bitDepth==16)
+                            fi.fileType = FileInfo.GRAY16_UNSIGNED;
+                        else
+                            error("ImageJ can only open 8 and 16 bit/channel images ("+bitDepth+")");
+                        in.seek(saveLoc);
+                    }
+                    break;
+                case SAMPLES_PER_PIXEL:
+                    fi.samplesPerPixel = value;
+                    if (value==3 && fi.fileType==FileInfo.GRAY8)
+                        fi.fileType = FileInfo.RGB;
+                    else if (value==3 && fi.fileType==FileInfo.GRAY16_UNSIGNED)
+                        fi.fileType = FileInfo.RGB48;
+                    else if (value==4 && fi.fileType==FileInfo.GRAY8)
+                        fi.fileType = photoInterp==5?FileInfo.CMYK:FileInfo.ARGB;
+                    else if (value==4 && fi.fileType==FileInfo.GRAY16_UNSIGNED) {
+                        fi.fileType = FileInfo.RGB48;
+                        if (photoInterp==5)  //assume cmyk
+                            fi.whiteIsZero = true;
+                    }
+                    break;
+                case ROWS_PER_STRIP:
+                    fi.rowsPerStrip = value;
+                    break;
+                case X_RESOLUTION:
+                    double xScale = getRational(lvalue);
+                    if (xScale!=0.0) fi.pixelWidth = 1.0/xScale;
+                    break;
+                case Y_RESOLUTION:
+                    double yScale = getRational(lvalue);
+                    if (yScale!=0.0) fi.pixelHeight = 1.0/yScale;
+                    break;
+                case RESOLUTION_UNIT:
+                    if (value==1&&fi.unit==null)
+                        fi.unit = " ";
+                    else if (value==2) {
+                        if (fi.pixelWidth==1.0/72.0) {
+                            fi.pixelWidth = 1.0;
+                            fi.pixelHeight = 1.0;
+                        } else
+                            fi.unit = "inch";
+                    } else if (value==3)
+                        fi.unit = "cm";
+                    break;
+                case PLANAR_CONFIGURATION:  // 1=chunky, 2=planar
+                    if (value==2 && fi.fileType==FileInfo.RGB48)
+                        fi.fileType = FileInfo.RGB48_PLANAR;
+                    else if (value==2 && fi.fileType==FileInfo.RGB)
+                        fi.fileType = FileInfo.RGB_PLANAR;
+                    else if (value!=2 && !(fi.samplesPerPixel==1||fi.samplesPerPixel==3||fi.samplesPerPixel==4)) {
+                        String msg = "Unsupported SamplesPerPixel: " + fi.samplesPerPixel;
+                        error(msg);
+                    }
+                    break;
+                case COMPRESSION:
+                    if (value==5)  {// LZW compression
+                        fi.compression = FileInfo.LZW;
+                        if (fi.fileType==FileInfo.GRAY12_UNSIGNED)
+                            error("ImageJ cannot open 12-bit LZW-compressed TIFFs");
+                    } else if (value==32773)  // PackBits compression
+                        fi.compression = FileInfo.PACK_BITS;
+                    else if (value==32946 || value==8)
+                        fi.compression = FileInfo.ZIP;
+                    else if (value!=1 && value!=0 && !(value==7&&fi.width<500)) {
+                        // don't abort with Spot camera compressed (7) thumbnails
+                        // otherwise, this is an unknown compression type
+                        fi.compression = FileInfo.COMPRESSION_UNKNOWN;
+                        error("ImageJ cannot open TIFF files " +
+                                "compressed in this fashion ("+value+")");
+                    }
+                    break;
+                case SOFTWARE: case DATE_TIME: case HOST_COMPUTER: case ARTEST:
+                    if (ifdCount==1) {
+                        byte[] bytes = getString(count, lvalue);
+                        String s = bytes!=null?new String(bytes):null;
+                        saveMetadata(getName(tag), s);
+                    }
+                    break;
+                case PREDICTOR:
+                    if (value==2 && fi.compression==FileInfo.LZW)
+                        fi.compression = FileInfo.LZW_WITH_DIFFERENCING;
+                    break;
+                case COLOR_MAP:
+                    if (count==768)
+                        getColorMap(lvalue, fi);
+                    break;
+                case TILE_WIDTH:
+                    error("ImageJ cannot open tiled TIFFs.\nTry using the Bio-Formats plugin.");
+                    break;
+                case SAMPLE_FORMAT:
+                    if (fi.fileType==FileInfo.GRAY32_INT && value==FLOATING_POINT)
+                        fi.fileType = FileInfo.GRAY32_FLOAT;
+                    if (fi.fileType==FileInfo.GRAY16_UNSIGNED) {
+                        if (value==SIGNED)
+                            fi.fileType = FileInfo.GRAY16_SIGNED;
+                        if (value==FLOATING_POINT)
+                            error("ImageJ cannot open 16-bit float TIFFs");
+                    }
+                    break;
+                case JPEG_TABLES:
+                    if (fi.compression==FileInfo.JPEG)
+                        error("Cannot open JPEG-compressed TIFFs with separate tables");
+                    break;
+                case IMAGE_DESCRIPTION:
+                    if (ifdCount==1) {
+                        byte[] s = getString(count, lvalue);
+                        if (s!=null) saveImageDescription(s,fi);
+                    }
+                    break;
+                case ORIENTATION:
+                    fi.nImages = 0; // file not created by ImageJ so look at all the IFDs
+                    break;
+                case METAMORPH1: case METAMORPH2:
+                    if ((name.indexOf(".STK")>0||name.indexOf(".stk")>0) && fi.compression==FileInfo.COMPRESSION_NONE) {
+                        if (tag==METAMORPH2)
+                            fi.nImages=count;
+                        else
+                            fi.nImages=9999;
+                    }
+                    break;
+                case IPLAB:
+                    fi.nImages=value;
+                    break;
+                case NIH_IMAGE_HDR:
+                    if (count==256)
+                        decodeNIHImageHeader(value, fi);
+                    break;
+                case META_DATA_BYTE_COUNTS:
+                    long saveLoc = in.getLongFilePointer();
+                    in.seek(lvalue);
+                    metaDataCounts = new int[count];
+                    for (int c=0; c<count; c++)
+                        metaDataCounts[c] = getInt();
+                    in.seek(saveLoc);
+                    break;
+                case META_DATA:
+                    getMetaData(value, fi);
+                    break;
+                default:
+                    if (tag>10000 && tag<32768 && ifdCount>1)
+                        return null;
             }
         }
-        fi.metaDataTypes = new int[extraMetaDataEntries];
-        fi.metaData = new byte[extraMetaDataEntries][];
-        int start = 1;
-        int eMDindex = 0;
-        for (int i=0; i<nTypes; i++) {
-            if (types[i]==INFO)
-                getInfoProperty(start, fi);
-            else if (types[i]==LABELS)
-                getSliceLabels(start, start+counts[i]-1, fi);
-            else if (types[i]==RANGES)
-                getDisplayRanges(start, fi);
-            else if (types[i]==LUTS)
-                getLuts(start, start+counts[i]-1, fi);
-            else if (types[i]==ROI)
-                getRoi(start, fi);
-            else if (types[i]==OVERLAY)
-                getOverlay(start, start+counts[i]-1, fi);
-            else if (types[i]<0xffffff) {
-                for (int j=start; j<start+counts[i]; j++) {
-                    int len = metaDataCounts[j];
-                    fi.metaData[eMDindex] = new byte[len];
-                    in.readFully(fi.metaData[eMDindex], len);
-                    fi.metaDataTypes[eMDindex] = types[i];
-                    eMDindex++;
-                }
-            } else
-                skipUnknownType(start, start+counts[i]-1);
-            start += counts[i];
-        }
-        in.seek(saveLoc);
-    }
+        fi.fileFormat = fi.TIFF;
+        fi.fileName = name;
+        fi.directory = directory;
+        if (url!=null)
+            fi.url = url;
 
-    void getInfoProperty(int first, FileInfo fi) throws IOException {
-        int len = metaDataCounts[first];
-        byte[] buffer = new byte[len];
-        in.readFully(buffer, len);
-        len /= 2;
-        char[] chars = new char[len];
-        if (littleEndian) {
-            for (int j=0, k=0; j<len; j++)
-                chars[j] = (char)(buffer[k++]&255 + ((buffer[k++]&255)<<8));
-        } else {
-            for (int j=0, k=0; j<len; j++)
-                chars[j] = (char)(((buffer[k++]&255)<<8) + buffer[k++]&255);
-        }
-        fi.info = new String(chars);
-    }
-
-    void getSliceLabels(int first, int last, FileInfo fi) throws IOException {
-        fi.sliceLabels = new String[last-first+1];
-        int index = 0;
-        byte[] buffer = new byte[metaDataCounts[first]];
-        for (int i=first; i<=last; i++) {
-            int len = metaDataCounts[i];
-            if (len>0) {
-                if (len>buffer.length)
-                    buffer = new byte[len];
-                in.readFully(buffer, len);
-                len /= 2;
-                char[] chars = new char[len];
-                if (littleEndian) {
-                    for (int j=0, k=0; j<len; j++)
-                        chars[j] = (char)(buffer[k++]&255 + ((buffer[k++]&255)<<8));
-                } else {
-                    for (int j=0, k=0; j<len; j++)
-                        chars[j] = (char)(((buffer[k++]&255)<<8) + buffer[k++]&255);
-                }
-                fi.sliceLabels[index++] = new String(chars);
-                //ij.IJ.log(i+"  "+fi.sliceLabels[i-1]+"  "+len);
-            } else
-                fi.sliceLabels[index++] = null;
-        }
-    }
-
-    void getDisplayRanges(int first, FileInfo fi) throws IOException {
-        int n = metaDataCounts[first]/8;
-        fi.displayRanges = new double[n];
-        for (int i=0; i<n; i++)
-            fi.displayRanges[i] = readDouble();
-    }
-
-    void getLuts(int first, int last, FileInfo fi) throws IOException {
-        fi.channelLuts = new byte[last-first+1][];
-        int index = 0;
-        for (int i=first; i<=last; i++) {
-            int len = metaDataCounts[i];
-            fi.channelLuts[index] = new byte[len];
-            in.readFully(fi.channelLuts[index], len);
-            index++;
-        }
-    }
-
-    void getRoi(int first, FileInfo fi) throws IOException {
-        int len = metaDataCounts[first];
-        fi.roi = new byte[len];
-        in.readFully(fi.roi, len);
-    }
-
-    void getOverlay(int first, int last, FileInfo fi) throws IOException {
-        fi.overlay = new byte[last-first+1][];
-        int index = 0;
-        for (int i=first; i<=last; i++) {
-            int len = metaDataCounts[i];
-            fi.overlay[index] = new byte[len];
-            in.readFully(fi.overlay[index], len);
-            index++;
-        }
-    }
-
-    void error(String message) throws IOException {
-        if (in!=null) in.close();
-        throw new IOException(message);
-    }
-
-    void skipUnknownType(int first, int last) throws IOException {
-        byte[] buffer = new byte[metaDataCounts[first]];
-        for (int i=first; i<=last; i++) {
-            int len = metaDataCounts[i];
-            if (len>buffer.length)
-                buffer = new byte[len];
-            in.readFully(buffer, len);
-        }
-    }
-
-    public void enableDebugging() {
-        debugMode = true;
+        return fi;
     }
 
     public FileInfo[] getTiffInfo() throws IOException {
         startTimeTotal = System.currentTimeMillis();
 
+        long[] stripInfos = new long[5];
+
         long ifdOffset;
         ArrayList list = new ArrayList();
+        FileInfo fi = null;
         if (in==null) {
             in = new RandomAccessStream(new RandomAccessFile(new File(directory, name), "r"));
         }
@@ -847,8 +1197,20 @@ public class FastTiffDecoder {
         }
         if (debugMode) dInfo = "\n  " + name + ": opening\n";
         while (ifdOffset>0L) {
+            //log("ifdOffset "+ifdOffset);
             in.seek(ifdOffset);
-            FileInfo fi = OpenIFD();
+            if(list.size()==0) {
+                fi = OpenFirstIFD(stripInfos);
+                //log("stripOffsetsRelativeLoc " + stripInfos[0]);
+                //log("stripLengthsRelativeLoc " + stripInfos[1]);
+                //log("stripLengthFieldType " + stripInfos[2]);
+            } else {
+                //fi = OpenFirstIFD(stripInfos);
+                fi = OpenStripsFromIFD(stripInfos);
+                //log("stripOffsetsRelativeLoc " + stripInfos[0]);
+                //log("stripLengthsRelativeLoc " + stripInfos[1]);
+                //log("stripLengthFieldType " + stripInfos[2]);
+            }
             if (fi!=null) {
                 list.add(fi);
                 ifdOffset = ((long)getInt())&0xffffffffL;
@@ -871,7 +1233,7 @@ public class FastTiffDecoder {
                 in.close();
             if (info[0].info==null)
                 info[0].info = tiffMetadata;
-            FileInfo fi = info[0];
+            fi = info[0];
             if (fi.fileType==FileInfo.GRAY16_UNSIGNED && fi.description==null)
                 fi.lutSize = 0; // ignore troublesome non-ImageJ 16-bit LUTs
             if (debugMode) {
@@ -881,9 +1243,6 @@ public class FastTiffDecoder {
                 fi.debugInfo += "gap between images: "+getGapInfo(info) + "\n";
                 fi.debugInfo += "little-endian byte order: "+fi.intelByteOrder + "\n";
             }
-
-            log("getTiffInfo.stripTime [ms]: "+ (int) (1.0*stripTime/1000000.0));
-            log("getTiffInfo.totalTime [ms]: "+ (System.currentTimeMillis() - startTimeTotal));
 
             return info;
         }

@@ -55,7 +55,7 @@ public class FileInfoSer implements Cloneable, Serializable {
         this.url = info.url;
         this.width = info.width;
         this.height = info.height;
-        this.longOffset= info.getOffset();
+        this.longOffset = info.getOffset();
         this.intelByteOrder = info.intelByteOrder;
         this.compression = info.compression;
         this.stripOffsets = info.stripOffsets;

@@ -55,13 +55,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         // does it contain a header file that we can use to open everything?
 
-        /*
+
         if(new File(directory+"ovs.ser").exists()) {
             log("Found ovs file.");
             imp = openFromInfoFile(directory,"ovs.ser");
         } else {
             imp = openFromDirectory(directory, null);
-        }*/
+        }
 
         imp = openFromDirectory(directory, null);
 
@@ -814,10 +814,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-        String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
+        //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
         //String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        //String directory = "/Users/tischi/Desktop/example-data/compressed/";
+        String directory = "/Users/tischi/Desktop/example-data/compressedSingleStrip/";
         String filter = null;
 
         //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
@@ -829,16 +829,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
-        ovs.run("");
+        //ovs.run("");
 
-        //ImagePlus imp = ovs.openFromDirectory(directory, null);
+        ImagePlus imp = ovs.openFromDirectory(directory, null);
         //ImagePlus imp = ovs.openFromInfoFile(directory, "ovs.ser");
-        //imp.show();
+        imp.show();
 
         //ovs.run("");
 
-        //Registration register = new Registration(imp);
-        //register.showDialog();
+        Registration register = new Registration(imp);
+        register.showDialog();
 
         /*
         if (Mitosis_ome) {

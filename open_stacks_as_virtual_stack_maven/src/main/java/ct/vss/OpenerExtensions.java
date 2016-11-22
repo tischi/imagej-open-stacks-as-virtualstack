@@ -173,7 +173,7 @@ class OpenerExtensions extends Opener {
         }
     }
 
-    private long readTiffOnePlaneCroppedRows(FileInfoSer fi, RandomAccessFile in, long pointer, byte[][] buffer, int z, int zs, int ys, int ye) {
+    private long readTiffOnePlaneCroppedRows(FileInfoSer fi0, FileInfoSer fi, RandomAccessFile in, long pointer, byte[][] buffer, int z, int zs, int ys, int ye) {
         boolean hasStrips = false;
         int readLength;
         long readStart;
@@ -194,7 +194,7 @@ class OpenerExtensions extends Opener {
             if (hasStrips) {
 
                 // convert rows to strips
-                int rps = fi.rowsPerStrip;
+                int rps = fi0.rowsPerStrip;
                 int ss = (int) ys / rps;
                 int se = (int) ye / rps;
                 readStart = fi.stripOffsets[ss];
@@ -207,8 +207,8 @@ class OpenerExtensions extends Opener {
             } else {  // no strips
 
                 // convert rows to bytes
-                readStart = fi.longOffset + ys * fi.width * fi.bytesPerPixel;
-                readLength =  (int) (fi.longOffset + ((ye-ys)+1) * fi.width * fi.bytesPerPixel - readStart);
+                readStart = fi.longOffset + ys * fi0.width * fi0.bytesPerPixel;
+                readLength =  (int) (fi.longOffset + ((ye-ys)+1) * fi0.width * fi0.bytesPerPixel - readStart);
 
             }
 
@@ -441,7 +441,7 @@ class OpenerExtensions extends Opener {
                 //
 
                 startTime = System.currentTimeMillis();
-                pointer = readTiffOnePlaneCroppedRows(fi, in, pointer, buffer, z, zs, ys, ye) ;
+                pointer = readTiffOnePlaneCroppedRows(info[0], fi, in, pointer, buffer, z, zs, ys, ye) ;
                 readingTime += (System.currentTimeMillis() - startTime);
 
                 //
@@ -449,7 +449,7 @@ class OpenerExtensions extends Opener {
                 //
 
                 startTime = System.currentTimeMillis();
-                es.execute(new process2stack(fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth));
+                es.execute(new process2stack(info[0], fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth));
                 threadInitTime += (System.currentTimeMillis() - startTime);
 
                 //decompressRearrangeCropAndPutIntoStack(fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth);
@@ -585,10 +585,12 @@ class process2stack implements Runnable {
     short[][] pixels;
     byte[][] buffer;
     FileInfoSer fi;
+    FileInfoSer fi0;
     int z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth;
 
-    process2stack(FileInfoSer fi, ImageStack stack, short[][] pixels, byte[][] buffer, int z, int zs, int ze, int ys, int ye, int ny, int xs, int xe, int nx, int imByteWidth) {
+    process2stack(FileInfoSer fi0, FileInfoSer fi, ImageStack stack, short[][] pixels, byte[][] buffer, int z, int zs, int ze, int ys, int ye, int ny, int xs, int xe, int nx, int imByteWidth) {
         threadName = ""+z;
+        this.fi0 = fi0;
         this.fi = fi;
         this.stack = stack;
         this.buffer = buffer;
@@ -615,15 +617,15 @@ class process2stack implements Runnable {
         }
 
         // check what we have read
-        int rps = fi.rowsPerStrip;
+        int rps = fi0.rowsPerStrip;
         int ss = ys / rps; // the int is doing a floor()
         int se = ye / rps;
 
         if(hasStrips) {
 
-            if(fi.compression == COMPRESSION_NONE) {
+            if(fi0.compression == COMPRESSION_NONE) {
                 // do nothing
-            } else if (fi.compression == LZW) {
+            } else if (fi0.compression == LZW) {
 
                 // needs to hold all data present in the uncompressed strips
                 byte[] unCompressedBuffer = new byte[(se - ss + 1) * rps * imByteWidth];
@@ -661,7 +663,7 @@ class process2stack implements Runnable {
                 }
                 buffer[z - zs] = unCompressedBuffer;
             } else {
-                log("Unknown compression: "+fi.compression);
+                log("Unknown compression: "+fi0.compression);
             }
 
             //
@@ -669,11 +671,11 @@ class process2stack implements Runnable {
             //
             ys = ys % rps; // we might have to skip a few rows in the beginning because the strips can hold several rows
 
-            setShortPixelsCropXY(fi, (short[]) stack.getPixels(z - zs + 1), ys, ny, xs, nx, imByteWidth, buffer[z - zs]);
+            setShortPixelsCropXY((short[]) stack.getPixels(z - zs + 1), ys, ny, xs, nx, imByteWidth, buffer[z - zs]);
 
         } else { // no strips
 
-            setShortPixelsCropXY(fi, (short[]) stack.getPixels(z - zs + 1), ys, ny, xs, nx, imByteWidth, buffer[z - zs]);
+            setShortPixelsCropXY((short[]) stack.getPixels(z - zs + 1), ys, ny, xs, nx, imByteWidth, buffer[z - zs]);
 
         }
 
@@ -816,27 +818,27 @@ class process2stack implements Runnable {
         return out;
     }
 
-    public void setShortPixelsCropXY(FileInfoSer fi, short[] pixels, int ys, int ny, int xs, int nx, int imByteWidth, byte[] buffer) {
+    public void setShortPixelsCropXY(short[] pixels, int ys, int ny, int xs, int nx, int imByteWidth, byte[] buffer) {
         int ip = 0;
         int bs, be;
-        if(fi.bytesPerPixel!=2) {
-            log("Unsupported bit depth: "+fi.bytesPerPixel*8);
+        if(fi0.bytesPerPixel!=2) {
+            log("Unsupported bit depth: "+fi0.bytesPerPixel*8);
         }
 
         for (int y = ys; y < ys + ny; y++) {
 
-            bs = y * imByteWidth + xs * fi.bytesPerPixel;
-            be = bs + nx * fi.bytesPerPixel;
+            bs = y * imByteWidth + xs * fi0.bytesPerPixel;
+            be = bs + nx * fi0.bytesPerPixel;
 
-            if (fi.intelByteOrder) {
-                if (fi.fileType == GRAY16_SIGNED)
+            if (fi0.intelByteOrder) {
+                if (fi0.fileType == GRAY16_SIGNED)
                     for (int j = bs; j < be; j += 2)
                         pixels[ip++] = (short) ((((buffer[j + 1] & 0xff) << 8) | (buffer[j] & 0xff)) + 32768);
                 else
                     for (int j = bs; j < be; j += 2)
                         pixels[ip++] = (short) (((buffer[j + 1] & 0xff) << 8) | (buffer[j] & 0xff));
             } else {
-                if (fi.fileType == GRAY16_SIGNED)
+                if (fi0.fileType == GRAY16_SIGNED)
                     for (int j = bs; j < be; j += 2)
                         pixels[ip++] = (short) ((((buffer[j] & 0xff) << 8) | (buffer[j + 1] & 0xff)) + 32768);
                 else
