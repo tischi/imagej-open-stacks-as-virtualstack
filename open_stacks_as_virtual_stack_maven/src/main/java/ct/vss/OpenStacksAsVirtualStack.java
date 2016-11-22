@@ -19,7 +19,6 @@ import java.io.*;
 
 import static ij.IJ.log;
 
-// todo: implement a class for efficient saving of the cropped stacks
 
 /** Opens a folder of stacks as a virtual stack. */
 public class OpenStacksAsVirtualStack implements PlugIn {
@@ -41,59 +40,63 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     public void run(String arg) {
-        this.directory = IJ.getDirectory("Select a Directory");
-        if (directory == null)
-            return;
+        showDialog();
+    }
 
-        log("# OpenStacksAsVirtualStack (version "+Globals.version+")");
-        log("Selected directory: "+directory);
-        ImagePlus imp = null;
+    public void showDialog() {
 
-        Globals.verbose = false;
-        //Macro.setOptions(null); // Prevents later use of OpenDialog from reopening the same file
-        //IJ.register(Open_Stacks_As_VirtualStack.class);
+        gd = new NonBlockingGenericDialog("Stack Streaming Tools");
 
-        // does it contain a header file that we can use to open everything?
+        // set iconImage
+        // todo: make a panel with logo and the other stuff next to each other
+        //ClassLoader classLoader = getClass().getClassLoader();
+        //ImagePlus impIcon = IJ.openImage(classLoader.getResource("logo01-61x61.jpg").getFile());
+        //if(impIcon!=null) gd.addImage(impIcon);
 
+        //gd.addMessage("");
+        //gd.addMessage("Version: "+Globals.version);
+        //gd.addMessage("Contact: tischer@embl.de");
 
+        Button[] bts = new Button[4];
+
+        /*
         if(new File(directory+"ovs.ser").exists()) {
             log("Found ovs file.");
             imp = openFromInfoFile(directory,"ovs.ser");
         } else {
             imp = openFromDirectory(directory, null);
-        }
+        }*/
 
-        imp = openFromDirectory(directory, null);
-
-        if(imp!=null) {
-            imp.show();
-        }
-
-        showDialog();
-
-    }
-
-    // todo: make a non-modal dialog to:
-    // - change the verbosity
-    // - save VSS in different ways
-    public void showDialog() {
-
-        gd = new NonBlockingGenericDialog("Virtual stack tools");
-
-        // set iconImage
-        // todo: make a panel with logo and the other stuff next to each other
-        ClassLoader classLoader = getClass().getClassLoader();
-        ImagePlus impIcon = IJ.openImage(classLoader.getResource("logo01-61x61.jpg").getFile());
-        if(impIcon!=null) gd.addImage(impIcon);
-
-        gd.addMessage("");
-        gd.addMessage("Version: "+Globals.version);
-        gd.addMessage("Contact: tischer@embl.de");
-
-        Button[] bts = new Button[1];
-
-        bts[0] = new Button("Crop");
+        bts[0] = new Button("Open folder");
         bts[0].addActionListener(new ActionListener() {
+                                     @Override
+                                     public void actionPerformed(ActionEvent e) {
+                                         if (updateGuiVariables()) {
+                                             directory = IJ.getDirectory("Select a Directory");
+                                             if (directory == null)
+                                                 return;
+                                             ImagePlus imp = openFromDirectory(directory, null);
+                                             imp.show();
+                                         }
+                                     }
+                                 });
+        bts[1] = new Button("Open file");
+        bts[1].addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updateGuiVariables()) {
+                    String filePath = IJ.getFilePath("Select *.ser file");
+                    if (filePath == null)
+                        return;
+                    File file = new File(filePath);
+                    ImagePlus imp = openFromInfoFile(file.getParent()+"/", file.getName());
+                    imp.show();
+                }
+            }
+        });
+
+        bts[2] = new Button("Crop");
+        bts[2].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
@@ -124,6 +127,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 }
             }
         });
+        bts[3] = new Button("Duplicate to RAM");
+        bts[3].addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (updateGuiVariables()) {
+                    IJ.showMessage("Not yet implemented.");
+                }
+                }
+        });
+
 
         final Panel buttons = new Panel();
         GridBagLayout bgbl = new GridBagLayout();
@@ -132,11 +145,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         bgbc.anchor = GridBagConstraints.EAST;
 
         for(Button bt : bts) {
-            bgbc.insets = new Insets(0, 0, 0, 5);
+            bgbc.insets = new Insets(0, 0, 0, 0);
             bgbl.setConstraints(bt, bgbc);
             buttons.add(bt);
         }
-
         gd.addPanel(buttons,GridBagConstraints.EAST,new Insets(5,5,5,5));
         //bgbl = (GridBagLayout)gd.getLayout();
         //bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 0;
@@ -144,12 +156,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 
         // gd location
+        /*
         ImagePlus imp = IJ.getImage();
         int gdX = (int) imp.getWindow().getLocationOnScreen().getX() + imp.getWindow().getWidth() + 10;
         int gdY = (int) imp.getWindow().getLocationOnScreen().getY() + 30;
         gd.centerDialog(false);
         gd.setLocation(gdX, gdY);
         gd.getHeight();
+        */
 
         // add logging checkbox
         final Checkbox cbLogging = new Checkbox("Verbose logging", false);
@@ -827,18 +841,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //OpenHDF5test oh5 = new OpenHDF5test();
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
-        Globals.verbose = true;
+        //Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
-        //ovs.run("");
+        ovs.run("");
 
-        ImagePlus imp = ovs.openFromDirectory(directory, null);
+        //ImagePlus imp = ovs.openFromDirectory(directory, null);
         //ImagePlus imp = ovs.openFromInfoFile(directory, "ovs.ser");
-        imp.show();
+        //imp.show();
 
-        //ovs.run("");
-
-        Registration register = new Registration(imp);
-        register.showDialog();
+        //Registration register = new Registration(imp);
+        //register.showDialog();
 
         /*
         if (Mitosis_ome) {
