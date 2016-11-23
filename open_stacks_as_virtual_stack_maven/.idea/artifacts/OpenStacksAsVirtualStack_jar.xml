@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="OpenStacksAsVirtualStack:jar">
+  <artifact type="jar" build-on-make="true" name="OpenStacksAsVirtualStack:jar">
     <output-path>$PROJECT_DIR$/../</output-path>
     <root id="archive" name="OpenStacksAsVirtualStack_.jar">
       <element id="module-output" name="OpenStacksAsVirtualStack" />
