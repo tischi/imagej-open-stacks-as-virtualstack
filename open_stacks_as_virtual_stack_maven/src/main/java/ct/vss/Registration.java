@@ -99,9 +99,10 @@ public class Registration implements PlugIn {
                         public void run() {
                             try {
                                 track3D(gui_c, gui_t, gui_t, 1, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
-                            } finally {
                                 showTrackOnFrame();
-                                }
+                            } finally {
+                                //...
+                            }
                             }
                     });
                     t1.start();
@@ -123,8 +124,9 @@ public class Registration implements PlugIn {
                         public void run() {
                             try {
                                 track3D(gui_c, gui_t, gui_tMax, gui_dt, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
-                            } finally {
                                 showTrackOnFrame();
+                            } finally {
+                                //
                             }
                         }
                     });

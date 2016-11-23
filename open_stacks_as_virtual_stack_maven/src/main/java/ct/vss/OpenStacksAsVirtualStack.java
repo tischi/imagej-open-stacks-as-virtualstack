@@ -10,6 +10,7 @@ import ij.gui.GenericDialog;
 import ij.gui.NonBlockingGenericDialog;
 import ij.gui.Roi;
 import ij.io.FileInfo;
+import ij.plugin.Duplicator;
 import ij.plugin.PlugIn;
 import javafx.geometry.Point3D;
 
@@ -100,30 +101,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
-                    ImagePlus imp = IJ.getImage();
-                    VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-                    if (vss == null) {
-                        IJ.showMessage("Wrong image type.");
-                    }
-                    Roi roi = imp.getRoi();
-                    if (roi != null && roi.isArea()) {
-
-                        int tMin = 0;
-                        int tMax = vss.nT - 1;
-                        int zMin = 0;
-
-                        Point3D[] po = new Point3D[vss.nT];
-                        for (int t = 0; t < vss.nT; t++) {
-                            po[t] = new Point3D(roi.getBounds().getX(), roi.getBounds().getY(), zMin);
-                        }
-                        Point3D ps = new Point3D(roi.getBounds().getWidth(), roi.getBounds().getHeight(), vss.nZ);
-
-                        ImagePlus impCropped = openCroppedOffsetSizeFromInfos(imp, vss.getFileInfosSer(), po, ps, tMin, tMax);
+                    ImagePlus impCropped = crop(IJ.getImage());
+                    if(impCropped!=null)
                         impCropped.show();
-
-                    } else {
-                        IJ.showMessage("Please put a rectangular ROI on the image.");
-                    }
                 }
             }
         });
@@ -132,7 +112,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
-                    IJ.showMessage("Not yet implemented.");
+                    duplicateToRAM(IJ.getImage());
                 }
                 }
         });
@@ -802,6 +782,63 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		imp.resetDisplayRange();
 		return(imp);
 	}
+
+    public static ImagePlus crop(ImagePlus imp) {
+
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        if (vss == null) {
+            IJ.showMessage("Wrong image type.");
+        }
+        Roi roi = imp.getRoi();
+        if (roi != null && roi.isArea()) {
+
+            int tMin = 0;
+            int tMax = vss.nT - 1;
+            int zMin = 0;
+
+            Point3D[] po = new Point3D[vss.nT];
+            for (int t = 0; t < vss.nT; t++) {
+                po[t] = new Point3D(roi.getBounds().getX(), roi.getBounds().getY(), zMin);
+            }
+            Point3D ps = new Point3D(roi.getBounds().getWidth(), roi.getBounds().getHeight(), vss.nZ);
+
+            ImagePlus impCropped = openCroppedOffsetSizeFromInfos(imp, vss.getFileInfosSer(), po, ps, tMin, tMax);
+            return impCropped;
+
+        } else {
+            IJ.showMessage("Please put a rectangular ROI on the image.");
+            return null;
+        }
+    }
+
+    public void duplicateToRAM(ImagePlus imp) {
+        final ImagePlus impDup = null;
+
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        if (vss == null) {
+            IJ.showMessage("Wrong image type.");
+        }
+
+        Roi roi = imp.getRoi();
+        if (roi != null && roi.isArea()) {
+            imp = crop(imp);
+        }
+
+        final ImagePlus finalImp = imp;
+        // the thread just serves to make the IJ.progress show
+        Thread t1 = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    final ImagePlus impDup = new Duplicator().run(finalImp);
+                    impDup.show();
+                } finally {
+                    //...
+                }
+            }
+        });
+        t1.start();
+
+    }
 
 	// main method for debugging
     public static void main(String[] args) {
