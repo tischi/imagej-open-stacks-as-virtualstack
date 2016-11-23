@@ -6,12 +6,13 @@ import ch.systemsx.cisd.hdf5.IHDF5Reader;
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
+import ij.ImageStack;
 import ij.gui.GenericDialog;
 import ij.gui.NonBlockingGenericDialog;
 import ij.gui.Roi;
 import ij.io.FileInfo;
-import ij.plugin.Duplicator;
 import ij.plugin.PlugIn;
+import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
 
 import java.awt.*;
@@ -120,16 +121,30 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 }
             }
         });
+
         bts[3] = new Button("Duplicate to RAM");
         bts[3].addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
-                    duplicateToRAM(IJ.getImage());
-                }
-                }
-        });
+                    // do some dummy initialisation
+                    iProgress = 0;
+                    nProgress = 1000;
 
+                    Thread t1 = new Thread(new Runnable() {
+                        public void run() {
+                            ImagePlus impDup = duplicateToRAM(IJ.getImage());
+                            impDup.show();
+                        }}); t1.start();
+
+                    Thread t2 = new Thread(new Runnable() {
+                        public void run() {
+                            updateStatus();
+                        }}); t2.start();
+
+                }
+            }
+        });
 
         final Panel buttons = new Panel();
         GridBagLayout bgbl = new GridBagLayout();
@@ -143,6 +158,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             buttons.add(bt);
         }
         gd.addPanel(buttons,GridBagConstraints.EAST,new Insets(5,5,5,5));
+
         //bgbl = (GridBagLayout)gd.getLayout();
         //bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 0;
         //bgbl.setConstraints(buttons,bgbc);
@@ -294,7 +310,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         this.directory = directory;
         this.filter = filter;
 
-        String dataSet = "Data111";
+        String dataSet = "Data";
 
         // todo: depending on the fileOrder do different things
         // todo: add the filter to the getFilesInFolder function
@@ -842,32 +858,41 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
     }
 
-    public void duplicateToRAM(ImagePlus imp) {
-        final ImagePlus impDup = null;
+    public ImagePlus duplicateToRAM(ImagePlus imp) {
 
-        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-        if (vss == null) {
+        VirtualStackOfStacks stack = (VirtualStackOfStacks) imp.getStack();
+        if (stack == null) {
             IJ.showMessage("Wrong image type.");
         }
 
+        // crop if wanted
         Roi roi = imp.getRoi();
         if (roi != null && roi.isArea()) {
             imp = crop(imp);
+            stack = (VirtualStackOfStacks) imp.getStack();
         }
 
-        final ImagePlus finalImp = imp;
-        // the thread just serves to make the IJ.progress show
-        Thread t1 = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    final ImagePlus impDup = new Duplicator().run(finalImp);
-                    impDup.show();
-                } finally {
-                    //...
-                }
-            }
-        });
-        t1.start();
+        nProgress = stack.nSlices;
+
+        ImageStack stack2 = null;
+        int n = stack.nSlices;
+        for (int i=1; i<=n; i++) {
+            iProgress = i;
+            ImageProcessor ip2 = stack.getProcessor(i);
+            if (stack2==null)
+                stack2 = new ImageStack(ip2.getWidth(), ip2.getHeight(), imp.getProcessor().getColorModel());
+            stack2.addSlice(stack.getSliceLabel(i), ip2);
+        }
+        ImagePlus imp2 = imp.createImagePlus();
+        imp2.setStack("DUP_"+imp.getTitle(), stack2);
+        String info = (String)imp.getProperty("Info");
+        if (info!=null)
+            imp2.setProperty("Info", info);
+        int[] dim = imp.getDimensions();
+        imp2.setDimensions(dim[2], dim[3], dim[4]);
+        if (imp.isHyperStack())
+            imp2.setOpenAsHyperStack(true);
+        return(imp2);
 
     }
 
