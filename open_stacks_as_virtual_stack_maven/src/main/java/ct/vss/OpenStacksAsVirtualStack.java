@@ -15,6 +15,7 @@ import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -31,220 +32,19 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private int nC, nT, nZ, nX, nY;
     private String filter;
     private String info1;
-    private String directory;
     private String[] channelFolders;
     private String[][] lists; // c, t
     private String fileOrder;
     private String fileType;
     private static NonBlockingGenericDialog gd;
-    private int iProgress, nProgress;
+    private int iProgress=0, nProgress=100;
 
     public OpenStacksAsVirtualStack() {
     }
 
     public void run(String arg) {
-        showDialog();
-    }
-
-    public void showDialog() {
-
-        gd = new NonBlockingGenericDialog("Stack Streaming Tools");
-
-        // set iconImage
-        // todo: make a panel with logo and the other stuff next to each other
-        //ClassLoader classLoader = getClass().getClassLoader();
-        //ImagePlus impIcon = IJ.openImage(classLoader.getResource("logo01-61x61.jpg").getFile());
-        //if(impIcon!=null) gd.addImage(impIcon);
-
-        //gd.addMessage("");
-        //gd.addMessage("Version: "+Globals.version);
-        //gd.addMessage("Contact: tischer@embl.de");
-
-        Button[] bts = new Button[4];
-
-        /*
-        if(new File(directory+"ovs.ser").exists()) {
-            log("Found ovs file.");
-            imp = openFromInfoFile(directory,"ovs.ser");
-        } else {
-            imp = openFromDirectory(directory, null);
-        }*/
-
-        bts[0] = new Button("Open folder");
-        bts[0].addActionListener(new ActionListener() {
-                                     @Override
-                                     public void actionPerformed(ActionEvent e) {
-                 if (updateGuiVariables()) {
-                     directory = IJ.getDirectory("Select a Directory");
-                     if (directory == null)
-                         return;
-
-                     // do some dummy initialisation
-                     iProgress = 0;
-                     nProgress = 1000;
-                     Thread t1 = new Thread(new Runnable() {
-                         public void run() {
-                                 ImagePlus imp = openFromDirectory(directory, null);
-                                 imp.show();
-                         }}); t1.start();
-
-                     Thread t2 = new Thread(new Runnable() {
-                         public void run() {
-                             updateStatus();
-                         }}); t2.start();
-                 }
-             }
-         });
-        bts[1] = new Button("Open file");
-        bts[1].addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (updateGuiVariables()) {
-                    String filePath = IJ.getFilePath("Select *.ser file");
-                    if (filePath == null)
-                        return;
-                    File file = new File(filePath);
-                    ImagePlus imp = openFromInfoFile(file.getParent()+"/", file.getName());
-                    imp.show();
-                }
-            }
-        });
-
-        bts[2] = new Button("Crop");
-        bts[2].addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (updateGuiVariables()) {
-                    ImagePlus impCropped = crop(IJ.getImage());
-                    if(impCropped!=null)
-                        impCropped.show();
-                }
-            }
-        });
-
-        bts[3] = new Button("Duplicate to RAM");
-        bts[3].addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (updateGuiVariables()) {
-                    // do some dummy initialisation
-                    iProgress = 0;
-                    nProgress = 1000;
-
-                    Thread t1 = new Thread(new Runnable() {
-                        public void run() {
-                            ImagePlus impDup = duplicateToRAM(IJ.getImage());
-                            impDup.show();
-                        }}); t1.start();
-
-                    Thread t2 = new Thread(new Runnable() {
-                        public void run() {
-                            updateStatus();
-                        }}); t2.start();
-
-                }
-            }
-        });
-
-        final Panel buttons = new Panel();
-        GridBagLayout bgbl = new GridBagLayout();
-        buttons.setLayout(bgbl);
-        GridBagConstraints bgbc = new GridBagConstraints();
-        bgbc.anchor = GridBagConstraints.EAST;
-
-        for(Button bt : bts) {
-            bgbc.insets = new Insets(0, 0, 0, 0);
-            bgbl.setConstraints(bt, bgbc);
-            buttons.add(bt);
-        }
-        gd.addPanel(buttons,GridBagConstraints.EAST,new Insets(5,5,5,5));
-
-        //bgbl = (GridBagLayout)gd.getLayout();
-        //bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 0;
-        //bgbl.setConstraints(buttons,bgbc);
-
-
-        // gd location
-        /*
-        ImagePlus imp = IJ.getImage();
-        int gdX = (int) imp.getWindow().getLocationOnScreen().getX() + imp.getWindow().getWidth() + 10;
-        int gdY = (int) imp.getWindow().getLocationOnScreen().getY() + 30;
-        gd.centerDialog(false);
-        gd.setLocation(gdX, gdY);
-        gd.getHeight();
-        */
-
-        // add logging checkbox
-        final Checkbox cbLogging = new Checkbox("Verbose logging", false);
-        cbLogging.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                Globals.verbose = cbLogging.getState();
-            }
-        });
-
-        final Panel panel0 = new Panel();
-        GridBagLayout gbl0 = new GridBagLayout();
-        GridBagConstraints gbc0 = new GridBagConstraints();
-        panel0.setLayout(gbl0);
-        gbc0.anchor = GridBagConstraints.EAST;
-
-        gbc0.insets = new Insets(0,0,0,5);
-        gbl0.setConstraints(cbLogging, gbc0);
-        panel0.add(cbLogging);
-
-        gd.addPanel(panel0,GridBagConstraints.EAST,new Insets(5,5,5,5));
-
-        gd.addHelp("https://github.com/tischi/imagej-open-stacks-as-virtualstack/blob/master/README.md");
-
-        gd.showDialog();
-
-    }
-
-    public boolean updateGuiVariables() {
-        /*
-        Roi roi = imp.getRoi();
-
-        if ((roi != null) && (roi.getPolygon().npoints == 1)) {
-
-            // get values
-            int x = roi.getPolygon().xpoints[0];
-            int y = roi.getPolygon().ypoints[0];
-            int z = imp.getZ() - 1;
-            gui_t = imp.getT() - 1;
-
-            int iTxt = 0, iChoice = 0;
-            int rx = new Integer(getTextFieldTxt(gd, iTxt++));
-            int ry = new Integer(getTextFieldTxt(gd, iTxt++));
-            int rz = new Integer(getTextFieldTxt(gd, iTxt++));
-            gui_dz = new Integer(getTextFieldTxt(gd, iTxt++));
-            gui_dt = new Integer(getTextFieldTxt(gd, iTxt++));
-            double marginFactor = new Double(getTextFieldTxt(gd, iTxt++));
-            gui_bg = new Integer(getTextFieldTxt(gd, iTxt++));
-            gui_iterations = new Integer(getTextFieldTxt(gd, iTxt++));
-            gui_tMax = (new Integer(getTextFieldTxt(gd, iTxt++))) - 1;
-            iTxt++; // frame slider
-            gui_c = (new Integer(getTextFieldTxt(gd, iTxt++))) - 1;
-            Choice centeringMethod = (Choice) gd.getChoices().get(iChoice++);
-            gui_centeringMethod = centeringMethod.getSelectedItem();
-
-            //double marginFactorCrop = new Double(getTextFieldTxt(gd, iTxt++));
-
-            gui_pCenterOfMassRadii = new Point3D(rx, ry, rz);
-            gui_pStackRadii = gui_pCenterOfMassRadii.multiply(marginFactor);
-            gui_pCropRadii = gui_pCenterOfMassRadii;
-            gui_pStackCenter = new Point3D(x, y, z);
-
-            return(true);
-
-        } else {
-
-            IJ.showMessage("Please use IJ's 'Point selection tool' to mark an object in your image.");
-            return(false);
-
-        }
-        */
-        return(true);
+        StackStreamToolsGUI sstGUI = new StackStreamToolsGUI();
+        sstGUI.showDialog();
     }
 
     boolean showOpenDialog(String[] list) {
@@ -306,9 +106,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     public ImagePlus openFromDirectory(String directory, String filter) {
 
         //log("# openFromDirectory");
-
-        this.directory = directory;
-        this.filter = filter;
 
         String dataSet = "Data";
 
@@ -1023,6 +820,136 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 
 
+class StackStreamToolsGUI implements ActionListener {
+
+    String[] actions = {
+            "Open from stacks",
+            "Open from info file",
+            "Save as info file",
+            "Save as tiff stacks",
+            "Save as h5 stacks",
+            "Crop",
+            "Duplicate to RAM"};
+
+    public void StackStreamToolsGUI() {
+    }
+
+    public void showDialog() {
+        JFrame frame = new JFrame("Stack Streaming Tools");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Container c = frame.getContentPane();
+        c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+
+        JButton[] buttons = new JButton[actions.length];
+
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i] = new JButton(actions[i]);
+            buttons[i].setActionCommand(actions[i]);
+            buttons[i].addActionListener(this);
+        }
+
+        int i = 0, j = 0;
+
+        JPanel[] panels = new JPanel[3];
+
+        panels[j] = new JPanel();
+        panels[j].add(buttons[i++]);
+        panels[j].add(buttons[i++]);
+        c.add(panels[j++]);
+
+        panels[j] = new JPanel();
+        panels[j].add(buttons[i++]);
+        panels[j].add(buttons[i++]);
+        panels[j].add(buttons[i++]);
+        c.add(panels[j++]);
+
+        panels[j] = new JPanel();
+        panels[j].add(buttons[i++]);
+        panels[j].add(buttons[i++]);
+        c.add(panels[j++]);
+
+        //button.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        //Display the window.
+        frame.pack();
+        frame.setVisible(true);
+
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        int i = 0;
+        final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
+
+        if (e.getActionCommand().equals(actions[i++])) {
+            // Open from folder
+            final String directory = IJ.getDirectory("Select a Directory");
+            if (directory == null)
+                return;
+
+            Thread t1 = new Thread(new Runnable() {
+                public void run() {
+                    ImagePlus imp = osv.openFromDirectory(directory, null);
+                    imp.show();
+                }
+            });
+            t1.start();
+
+            Thread t2 = new Thread(new Runnable() {
+                public void run() {
+                    osv.updateStatus();
+                }
+            });
+            t2.start();
+
+        } else if (e.getActionCommand().equals(actions[i++])) {
+
+            // Open from file
+            String filePath = IJ.getFilePath("Select *.ser file");
+            if (filePath == null)
+                return;
+            File file = new File(filePath);
+            ImagePlus imp = osv.openFromInfoFile(file.getParent() + "/", file.getName());
+            imp.show();
+
+        } else if (e.getActionCommand().equals(actions[i++])) {
+            // "Save as info file"
+            IJ.showMessage("Not yet implemented.");
+        } else if (e.getActionCommand().equals(actions[i++])) {
+           // "Save as tiff stacks"
+            IJ.showMessage("Not yet implemented.");
+        } else if (e.getActionCommand().equals(actions[i++])) {
+            // "Save as h5 stacks"
+            IJ.showMessage("Not yet implemented.");
+        }  else if (e.getActionCommand().equals(actions[i++])) {
+            // crop
+            ImagePlus impCropped = osv.crop(IJ.getImage());
+            if (impCropped != null)
+                impCropped.show();
+
+        } else if (e.getActionCommand().equals(actions[i++])) {
+            // duplicate to RAM
+            Thread t1 = new Thread(new Runnable() {
+                public void run() {
+                    ImagePlus impDup = osv.duplicateToRAM(IJ.getImage());
+                    impDup.show();
+                }
+            });
+            t1.start();
+
+            Thread t2 = new Thread(new Runnable() {
+                public void run() {
+                    osv.updateStatus();
+                }
+            });
+            t2.start();
+
+        }
+    }
+}
+
+
+
+
 class VirtualOpenerDialog extends GenericDialog {
 	int fileCount;
 	boolean eightBits;
@@ -1038,11 +965,11 @@ class VirtualOpenerDialog extends GenericDialog {
 	protected void setup() {
 		setStackInfo();
 	}
-	
+
 	public void itemStateChanged(ItemEvent e) {
 		setStackInfo();
 	}
-	
+
 	public void textValueChanged(TextEvent e) {
 		setStackInfo();
 	}
@@ -1052,7 +979,7 @@ class VirtualOpenerDialog extends GenericDialog {
 		int n = getNumber(numberField.elementAt(0));
 		int start = getNumber(numberField.elementAt(1));
 		int inc = getNumber(numberField.elementAt(2));
-		 
+
 		if (n<1)
 			n = fileCount;
 		if (start<1 || start>fileCount)

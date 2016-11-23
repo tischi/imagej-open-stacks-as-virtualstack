@@ -25,37 +25,19 @@
       <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.7704918">
-              <caret line="324" column="38" selection-start-line="324" selection-start-column="38" selection-end-line="324" selection-end-column="38" />
+            <state vertical-scroll-proportion="0.29872495">
+              <caret line="915" column="16" selection-start-line="915" selection-start-column="16" selection-end-line="915" selection-end-column="16" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1168#1169#0" expanded="true" />
-                <element signature="e#1196#1197#0" expanded="true" />
-                <element signature="e#2113#3104#0" expanded="true" />
-                <element signature="e#2632#2851#0" expanded="true" />
-                <element signature="e#2850#2851#0" expanded="true" />
-                <element signature="e#2911#3045#0" expanded="true" />
-                <element signature="e#3044#3045#0" expanded="true" />
-                <element signature="e#3103#3104#0" expanded="true" />
-                <element signature="e#3182#3694#0" expanded="true" />
-                <element signature="e#3693#3694#0" expanded="true" />
-                <element signature="e#3768#4103#0" expanded="true" />
-                <element signature="e#4102#4103#0" expanded="true" />
-                <element signature="e#4189#4959#0" expanded="true" />
-                <element signature="e#4504#4712#0" expanded="true" />
-                <element signature="e#4711#4712#0" expanded="true" />
-                <element signature="e#4771#4902#0" expanded="true" />
-                <element signature="e#4901#4902#0" expanded="true" />
-                <element signature="e#4958#4959#0" expanded="true" />
-                <element signature="e#6088#6266#0" expanded="true" />
-                <element signature="e#6265#6266#0" expanded="true" />
+                <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="method#openFromDirectory#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#20160#20353#0" expanded="true" />
-                <element signature="e#20352#20353#0" expanded="true" />
+                <element signature="e#12736#12929#0" expanded="true" />
+                <element signature="e#12928#12929#0" expanded="true" />
                 <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -64,7 +46,23 @@
                 <element signature="method#openCroppedOffsetSizeFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#makeImagePlus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="method#setStackInfo#0;class#VirtualOpenerDialog#0" expanded="false" />
+                <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="method#main#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="e#31276#31468#0" expanded="true" />
+                <element signature="e#31467#31468#0" expanded="true" />
+                <element signature="e#31531#31655#0" expanded="true" />
+                <element signature="e#31654#31655#0" expanded="true" />
+                <element signature="e#32864#33057#0" expanded="true" />
+                <element signature="e#33056#33057#0" expanded="true" />
+                <element signature="e#33120#33244#0" expanded="true" />
+                <element signature="e#33243#33244#0" expanded="true" />
+                <element signature="class#VirtualOpenerDialog#0" expanded="false" />
+                <element signature="e#33577#33578#0" expanded="true" />
+                <element signature="e#33598#33599#0" expanded="true" />
+                <element signature="e#33644#33645#0" expanded="true" />
+                <element signature="e#33665#33666#0" expanded="true" />
+                <element signature="e#33711#33712#0" expanded="true" />
+                <element signature="e#33732#33733#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -227,8 +225,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="56" />
-    <option name="y" value="44" />
+    <option name="x" value="239" />
+    <option name="y" value="48" />
     <option name="width" value="1302" />
     <option name="height" value="829" />
   </component>
@@ -543,7 +541,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="56" y="44" width="1302" height="829" extended-state="1" />
+    <frame x="239" y="48" width="1302" height="829" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -553,16 +551,16 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3710145" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18046133" sideWeight="0.47857141" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18046133" sideWeight="0.48809522" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24287653" sideWeight="0.39126983" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24287653" sideWeight="0.37698412" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299373" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.14761905" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18046133" sideWeight="0.5214286" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.18046133" sideWeight="0.5119048" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -602,7 +600,7 @@
           <option name="timeStamp" value="40" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="49" />
+      <option name="time" value="50" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -617,33 +615,15 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1168#1169#0" expanded="true" />
-            <element signature="e#1196#1197#0" expanded="true" />
-            <element signature="e#2113#3104#0" expanded="true" />
-            <element signature="e#2632#2851#0" expanded="true" />
-            <element signature="e#2850#2851#0" expanded="true" />
-            <element signature="e#2911#3045#0" expanded="true" />
-            <element signature="e#3044#3045#0" expanded="true" />
-            <element signature="e#3103#3104#0" expanded="true" />
-            <element signature="e#3182#3694#0" expanded="true" />
-            <element signature="e#3693#3694#0" expanded="true" />
-            <element signature="e#3768#4103#0" expanded="true" />
-            <element signature="e#4102#4103#0" expanded="true" />
-            <element signature="e#4189#4959#0" expanded="true" />
-            <element signature="e#4504#4712#0" expanded="true" />
-            <element signature="e#4711#4712#0" expanded="true" />
-            <element signature="e#4771#4902#0" expanded="true" />
-            <element signature="e#4901#4902#0" expanded="true" />
-            <element signature="e#4958#4959#0" expanded="true" />
-            <element signature="e#6088#6266#0" expanded="true" />
-            <element signature="e#6265#6266#0" expanded="true" />
+            <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromDirectory#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#20160#20353#0" expanded="true" />
-            <element signature="e#20352#20353#0" expanded="true" />
+            <element signature="e#12736#12929#0" expanded="true" />
+            <element signature="e#12928#12929#0" expanded="true" />
             <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -652,7 +632,23 @@
             <element signature="method#openCroppedOffsetSizeFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#makeImagePlus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#setStackInfo#0;class#VirtualOpenerDialog#0" expanded="false" />
+            <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#main#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#31276#31468#0" expanded="true" />
+            <element signature="e#31467#31468#0" expanded="true" />
+            <element signature="e#31531#31655#0" expanded="true" />
+            <element signature="e#31654#31655#0" expanded="true" />
+            <element signature="e#32864#33057#0" expanded="true" />
+            <element signature="e#33056#33057#0" expanded="true" />
+            <element signature="e#33120#33244#0" expanded="true" />
+            <element signature="e#33243#33244#0" expanded="true" />
+            <element signature="class#VirtualOpenerDialog#0" expanded="false" />
+            <element signature="e#33577#33578#0" expanded="true" />
+            <element signature="e#33598#33599#0" expanded="true" />
+            <element signature="e#33644#33645#0" expanded="true" />
+            <element signature="e#33665#33666#0" expanded="true" />
+            <element signature="e#33711#33712#0" expanded="true" />
+            <element signature="e#33732#33733#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -837,37 +833,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7704918">
-          <caret line="324" column="38" selection-start-line="324" selection-start-column="38" selection-end-line="324" selection-end-column="38" />
+        <state vertical-scroll-proportion="0.29872495">
+          <caret line="915" column="16" selection-start-line="915" selection-start-column="16" selection-end-line="915" selection-end-column="16" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1168#1169#0" expanded="true" />
-            <element signature="e#1196#1197#0" expanded="true" />
-            <element signature="e#2113#3104#0" expanded="true" />
-            <element signature="e#2632#2851#0" expanded="true" />
-            <element signature="e#2850#2851#0" expanded="true" />
-            <element signature="e#2911#3045#0" expanded="true" />
-            <element signature="e#3044#3045#0" expanded="true" />
-            <element signature="e#3103#3104#0" expanded="true" />
-            <element signature="e#3182#3694#0" expanded="true" />
-            <element signature="e#3693#3694#0" expanded="true" />
-            <element signature="e#3768#4103#0" expanded="true" />
-            <element signature="e#4102#4103#0" expanded="true" />
-            <element signature="e#4189#4959#0" expanded="true" />
-            <element signature="e#4504#4712#0" expanded="true" />
-            <element signature="e#4711#4712#0" expanded="true" />
-            <element signature="e#4771#4902#0" expanded="true" />
-            <element signature="e#4901#4902#0" expanded="true" />
-            <element signature="e#4958#4959#0" expanded="true" />
-            <element signature="e#6088#6266#0" expanded="true" />
-            <element signature="e#6265#6266#0" expanded="true" />
+            <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromDirectory#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#20160#20353#0" expanded="true" />
-            <element signature="e#20352#20353#0" expanded="true" />
+            <element signature="e#12736#12929#0" expanded="true" />
+            <element signature="e#12928#12929#0" expanded="true" />
             <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -876,7 +854,23 @@
             <element signature="method#openCroppedOffsetSizeFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#makeImagePlus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#setStackInfo#0;class#VirtualOpenerDialog#0" expanded="false" />
+            <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#main#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#31276#31468#0" expanded="true" />
+            <element signature="e#31467#31468#0" expanded="true" />
+            <element signature="e#31531#31655#0" expanded="true" />
+            <element signature="e#31654#31655#0" expanded="true" />
+            <element signature="e#32864#33057#0" expanded="true" />
+            <element signature="e#33056#33057#0" expanded="true" />
+            <element signature="e#33120#33244#0" expanded="true" />
+            <element signature="e#33243#33244#0" expanded="true" />
+            <element signature="class#VirtualOpenerDialog#0" expanded="false" />
+            <element signature="e#33577#33578#0" expanded="true" />
+            <element signature="e#33598#33599#0" expanded="true" />
+            <element signature="e#33644#33645#0" expanded="true" />
+            <element signature="e#33665#33666#0" expanded="true" />
+            <element signature="e#33711#33712#0" expanded="true" />
+            <element signature="e#33732#33733#0" expanded="true" />
           </folding>
         </state>
       </provider>
