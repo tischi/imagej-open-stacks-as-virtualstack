@@ -12,8 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-
-import static ij.IJ.log;
 /**
  Decodes single and multi-image TIFF files. The LZW decompression
  code was contributed by Curtis Rueden.
@@ -110,13 +108,6 @@ public class FastTiffDecoder {
         int b2 = in.read();
         int b3 = in.read();
         int b4 = in.read();
-        if(ifdCount == 1 && readingStrips) {
-            log(""+b1);
-            log(""+b2);
-            log(""+b3);
-            log(""+b4);
-            log("int: "+((b4 << 24) + (b3 << 16) + (b2 << 8) + (b1 << 0)));
-        }
         if (littleEndian)
             return ((b4 << 24) + (b3 << 16) + (b2 << 8) + (b1 << 0));
         else
@@ -635,7 +626,7 @@ public class FastTiffDecoder {
                     fi.offset = count>0?fi.stripOffsets[0]:value;
                     if (count>1 && (((long)fi.stripOffsets[count-1])&0xffffffffL)<(((long)fi.stripOffsets[0])&0xffffffffL))
                         fi.offset = fi.stripOffsets[count-1];
-                    log("fi.offset "+fi.offset);
+                    //log("fi.offset "+fi.offset);
                     stripTime += (System.nanoTime() - startTimeStrips);
 
                     break;

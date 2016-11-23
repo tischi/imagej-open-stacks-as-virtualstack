@@ -72,15 +72,24 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         bts[0].addActionListener(new ActionListener() {
                                      @Override
                                      public void actionPerformed(ActionEvent e) {
-                                         if (updateGuiVariables()) {
-                                             directory = IJ.getDirectory("Select a Directory");
-                                             if (directory == null)
-                                                 return;
-                                             ImagePlus imp = openFromDirectory(directory, null);
-                                             imp.show();
-                                         }
-                                     }
-                                 });
+                 if (updateGuiVariables()) {
+                     directory = IJ.getDirectory("Select a Directory");
+                     if (directory == null)
+                         return;
+                     Thread t1 = new Thread(new Runnable() {
+                         public void run() {
+                                 try {
+                                     ImagePlus imp = openFromDirectory(directory, null);
+                                     imp.show();
+                                 } finally {
+                                     //...
+                                 }
+                         }
+                     });
+                     t1.start();
+                 }
+             }
+         });
         bts[1] = new Button("Open file");
         bts[1].addActionListener(new ActionListener() {
             @Override
@@ -330,18 +339,18 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 for (int t = 0; t < nT; t++) {
 
                     String ctPath = directory + channelFolders[c] + "/" + lists[c][t];
-                    log("c:" + c + "; t:" + t + "; file:" + lists[c][t]);
 
                     if (fileType == "tif") {
 
                         long startTime = System.currentTimeMillis();
                         FastTiffDecoder ftd = new FastTiffDecoder(directory + channelFolders[c], lists[c][t]);
                         info = ftd.getTiffInfo();
-                        log("IFD reading time [ms]: "+(System.currentTimeMillis()-startTime));
 
                         // first file
                         if (t == 0 && c == 0) {
 
+                            log("IFD reading time [ms]: "+(System.currentTimeMillis()-startTime));
+                            log("c:" + c + "; t:" + t + "; file:" + lists[c][t]);
                             log("info.length " + info.length);
                             log("info[0].compression " + info[0].compression);
                             log("info[0].stripLengths.length " + info[0].stripLengths.length);
@@ -363,6 +372,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         } else {
 
                             if (Globals.verbose) {
+                                log("IFD reading time [ms]: "+(System.currentTimeMillis()-startTime));
+                                log("c:" + c + "; t:" + t + "; file:" + lists[c][t]);
                                 log("info.length " + info.length);
                                 log("info[0].compression " + info[0].compression);
                                 log("info[0].stripLengths.length " + info[0].stripLengths.length);
@@ -423,23 +434,21 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     }
 
-                    if (t >= 0) {
-                        IJ.showProgress((double) (t + 1) / nT);
-                    }
-
+                    //IJ.showProgress(t+c*nT, nT*nC);
+                    IJ.showStatus(""+(t+c*nT)+"/"+nT*nC);
                 }
             }
         } catch(Exception e) {
             IJ.showMessage("Error: "+e.toString());
         }
 
+        IJ.showStatus(""+(nC*nT)+"/"+nC*nT);
+
         ImagePlus imp = null;
         if(stack!=null && stack.getSize()>0) {
             imp = makeImagePlus(stack, infoSer[0]);
             writeFileInfosSer(stack.getFileInfosSer(), directory+"ovs.ser");
         }
-
-        IJ.showProgress(1.0);
         return(imp);
 
     }
