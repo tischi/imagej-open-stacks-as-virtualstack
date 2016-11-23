@@ -36,6 +36,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String fileOrder;
     private String fileType;
     private static NonBlockingGenericDialog gd;
+    private int iProgress, nProgress;
 
     public OpenStacksAsVirtualStack() {
     }
@@ -76,17 +77,20 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                      directory = IJ.getDirectory("Select a Directory");
                      if (directory == null)
                          return;
+
+                     // do some dummy initialisation
+                     iProgress = 0;
+                     nProgress = 1000;
                      Thread t1 = new Thread(new Runnable() {
                          public void run() {
-                                 try {
-                                     ImagePlus imp = openFromDirectory(directory, null);
-                                     imp.show();
-                                 } finally {
-                                     //...
-                                 }
-                         }
-                     });
-                     t1.start();
+                                 ImagePlus imp = openFromDirectory(directory, null);
+                                 imp.show();
+                         }}); t1.start();
+
+                     Thread t2 = new Thread(new Runnable() {
+                         public void run() {
+                             updateStatus();
+                         }}); t2.start();
                  }
              }
          });
@@ -285,7 +289,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     public ImagePlus openFromDirectory(String directory, String filter) {
 
-        log("# openFromDirectory");
+        //log("# openFromDirectory");
 
         this.directory = directory;
         this.filter = filter;
@@ -294,14 +298,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         // todo: depending on the fileOrder do different things
         // todo: add the filter to the getFilesInFolder function
-        this.channelFolders = getFoldersInFolder(directory);
+        channelFolders = getFoldersInFolder(directory);
 
         if (channelFolders == null) {
             log("No channel sub-folders found.");
             return(null);
         }
-        this.nC = channelFolders.length;
-        this.lists = new String[nC][];
+        nC = channelFolders.length;
+        lists = new String[nC][];
         for (int i = 0; i < nC; i++) {
             lists[i] = getFilesInFolder(directory + channelFolders[i]);
             if (lists[i] == null) {
@@ -310,15 +314,17 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             }
         }
         // todo consistency check the list lengths
-        this.nT = lists[0].length;
+        nT = lists[0].length;
+
+        nProgress = nT*nC;
 
         // figure out the filetype
         if(lists[0][0].endsWith(".h5")) {
             fileType = "h5";
-            log("File type: "+fileType);
+            //log("File type: "+fileType);
         } else if(lists[0][0].endsWith(".tif")) {
             fileType = "tif";
-            log("File type: "+fileType);
+            //log("File type: "+fileType);
         } else {
             IJ.showMessage("Unsupported file type: "+lists[0][0]);
             return(null);
@@ -330,7 +336,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         String path = "";
         VirtualStackOfStacks stack = null;
 
-        log("Obtaining information from all files...");
+        //log("Obtaining information from all files...");
         // loop through filtered list and add file-info
         try {
 
@@ -349,13 +355,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         // first file
                         if (t == 0 && c == 0) {
 
-                            log("IFD reading time [ms]: "+(System.currentTimeMillis()-startTime));
-                            log("c:" + c + "; t:" + t + "; file:" + lists[c][t]);
-                            log("info.length " + info.length);
-                            log("info[0].compression " + info[0].compression);
-                            log("info[0].stripLengths.length " + info[0].stripLengths.length);
-                            log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
-
+                            if (Globals.verbose) {
+                                log("IFD reading time [ms]: " + (System.currentTimeMillis() - startTime));
+                                log("c:" + c + "; t:" + t + "; file:" + lists[c][t]);
+                                log("info.length " + info.length);
+                                log("info[0].compression " + info[0].compression);
+                                log("info[0].stripLengths.length " + info[0].stripLengths.length);
+                                log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
+                            }
                             fi = info[0];
                             if (fi.nImages > 1) {
                                 nZ = fi.nImages;
@@ -392,7 +399,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                         stack.setStack(infoSer, t, c);
 
-                    }
+                    } // tif
 
                     if (fileType == "h5") {
 
@@ -432,17 +439,19 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                         stack.setStack(infoSer, t, c);
 
-                    }
+                    } // h5
 
+                    iProgress = t+c*nT;
                     //IJ.showProgress(t+c*nT, nT*nC);
-                    IJ.showStatus(""+(t+c*nT)+"/"+nT*nC);
+                    //IJ.showStatus(""+(t+c*nT)+"/"+nT*nC);
+
                 }
             }
         } catch(Exception e) {
             IJ.showMessage("Error: "+e.toString());
         }
 
-        IJ.showStatus(""+(nC*nT)+"/"+nC*nT);
+        iProgress = nProgress;
 
         ImagePlus imp = null;
         if(stack!=null && stack.getSize()>0) {
@@ -513,21 +522,23 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     String[] getFilesInFolder(String directory) {
-        log("# getFilesInFolder: " + directory);
+        //log("# getFilesInFolder: " + directory);
         // todo: can getting the file-list be faster?
         String[] list = new File(directory).list();
         if (list == null || list.length == 0)
             return null;
         list = this.sortFileList(list);
-        log("Number of files: " + list.length);
-        log("Sorted files:");
-        for(String item : list) log("" + item);
+        //log("Number of files: " + list.length);
+        //log("Sorted files:");
+        for(String item : list) {
+            //log("" + item);
+        }
         if (list == null) return null;
         else return (list);
     }
 
     String[] getFoldersInFolder(String directory) {
-        log("# getFoldersInFolder: " + directory);
+        //log("# getFoldersInFolder: " + directory);
         String[] list = new File(directory).list(new FilenameFilter() {
             @Override
             public boolean accept(File current, String name) {
@@ -537,9 +548,20 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         if (list == null || list.length == 0)
             return null;
         list = this.sortFileList(list);
-        for(String item : list) log("" + item);
+        for(String item : list) {
+            //log("" + item);
+        }
         return (list);
 
+    }
+
+    public boolean updateStatus() {
+        while(iProgress<nProgress) {
+            IJ.wait(50);
+            IJ.showStatus("" + iProgress + "/" + nProgress);
+        }
+        IJ.showStatus(""+nProgress+"/"+nProgress);
+        return true;
     }
 
     public boolean writeFileInfosSer(FileInfoSer[][][] infos, String path) {
