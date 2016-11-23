@@ -39,12 +39,15 @@ This plugin only supports a few file formats. Currenty it should work for
 ## Installation in Fiji
 
 1. Download the jar: https://github.com/tischi/imagej-open-stacks-as-virtualstack/raw/master/OpenStacksAsVirtualStack_.jar
-
-2. Move **OpenStacksAsVirtualStack\_.jar** into your Fiji **plugins folder**.
+2. Move **OpenStacksAsVirtualStack\_.jar** into your **Fiji.app/plugins**.
 
 ## Installation in ImageJ
 
-You also need the hdf5 reader jar....
+1. Download https://github.com/tischi/imagej-open-stacks-as-virtualstack/raw/master/OpenStacksAsVirtualStack_.jar
+2. Download https://github.com/tischi/imagej-open-stacks-as-virtualstack/raw/master/jhdf5-14.12.0.jar
+3. Move both jars into your **ImageJ/plugins/jars** folder
+
+....
 
 ## Usage instructions
 
