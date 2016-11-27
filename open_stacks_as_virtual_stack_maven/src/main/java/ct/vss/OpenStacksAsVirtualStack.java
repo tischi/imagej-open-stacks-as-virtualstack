@@ -631,7 +631,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         if (vss == null) {
-            IJ.showMessage("Wrong image type.");
+            IJ.showMessage("Wrong image type." +
+                    " This method is only implemented for streamed (virtual) image stacks.");
+            return null;
         }
         Roi roi = imp.getRoi();
         if (roi != null && roi.isArea()) {
@@ -733,14 +735,15 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         //Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
-        ovs.run("");
+        //ovs.run("");
 
-        //ImagePlus imp = ovs.openFromDirectory(directory, null);
+        ImagePlus imp = ovs.openFromDirectory(directory, null);
         //ImagePlus imp = ovs.openFromInfoFile(directory, "ovs.ser");
-        //imp.show();
+        //ImagePlus imp = IJ.getImage();
+        imp.show();
 
-        //Registration register = new Registration(imp);
-        //register.showDialog();
+        Registration register = new Registration(imp);
+        register.showDialog();
 
         /*
         if (Mitosis_ome) {
@@ -922,16 +925,18 @@ class StackStreamToolsGUI implements ActionListener {
             IJ.showMessage("Not yet implemented.");
         }  else if (e.getActionCommand().equals(actions[i++])) {
             // crop
-            ImagePlus impCropped = osv.crop(IJ.getImage());
-            if (impCropped != null)
-                impCropped.show();
+            ImagePlus imp2 = osv.crop(IJ.getImage());
+            if (imp2 != null)
+                imp2.show();
 
         } else if (e.getActionCommand().equals(actions[i++])) {
             // duplicate to RAM
             Thread t1 = new Thread(new Runnable() {
                 public void run() {
-                    ImagePlus impDup = osv.duplicateToRAM(IJ.getImage());
-                    impDup.show();
+                    ImagePlus imp2 = osv.duplicateToRAM(IJ.getImage());
+                    if (imp2 != null)
+                        imp2.show();
+
                 }
             });
             t1.start();
@@ -944,9 +949,11 @@ class StackStreamToolsGUI implements ActionListener {
             t2.start();
 
         }
+
+
+
     }
 }
-
 
 
 

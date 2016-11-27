@@ -627,7 +627,7 @@ class process2stack implements Runnable {
                 // do nothing
             } else if (fi0.compression == LZW) {
 
-                // needs to hold all data present in the uncompressed strips
+                // init to hold all data present in the uncompressed strips
                 byte[] unCompressedBuffer = new byte[(se - ss + 1) * rps * imByteWidth];
 
                 int pos = 0;
@@ -661,7 +661,9 @@ class process2stack implements Runnable {
                     System.arraycopy(strip, 0, unCompressedBuffer, (s - ss) * imByteWidth * rps, imByteWidth * rps);
                     pos += stripLength;
                 }
+
                 buffer[z - zs] = unCompressedBuffer;
+
             } else {
                 log("Unknown compression: "+fi0.compression);
             }
@@ -795,6 +797,8 @@ class process2stack implements Runnable {
                 if (nextSymbol == 511) { bitsToRead = 10; }
                 if (nextSymbol == 1023) { bitsToRead = 11; }
                 if (nextSymbol == 2047) { bitsToRead = 12; }
+                if (nextSymbol == 4095) { IJ.showMessage("Symbol Table of LZW uncompression became too large. +" +
+                        "Please contact tischitischer@gmail.com"); return null; };
             }
 
         }

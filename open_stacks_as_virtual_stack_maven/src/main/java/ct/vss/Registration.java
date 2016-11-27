@@ -1,9 +1,6 @@
 package ct.vss;
 
-import ij.IJ;
-import ij.ImagePlus;
-import ij.ImageStack;
-import ij.WindowManager;
+import ij.*;
 import ij.gui.*;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
@@ -21,7 +18,7 @@ import static ij.IJ.log;
 
 // todo: how to behave when the track is leaving the image bounds?
 
-public class Registration implements PlugIn {
+public class Registration implements PlugIn, ImageListener {
 
     VirtualStackOfStacks vss;
     ImagePlus imp;
@@ -29,11 +26,17 @@ public class Registration implements PlugIn {
     private static NonBlockingGenericDialog gd;
     private final static Point3D pOnes = new Point3D(1,1,1);
     // gui variables
-    int gui_c, gui_t, gui_tMax, gui_bg, gui_iterations, gui_dt, gui_dz;
-    Point3D gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_pCropRadii;
+    int gui_c, gui_t, gui_tMax, gui_bg;
+    int gui_iterations = 6;
+    int gui_dz = 1;
+    int gui_dt = 1;
+    Point3D gui_pStackCenter = new Point3D(100,100,10);
+    Point3D gui_pStackRadii = new Point3D(100,100,10);
+    Point3D gui_pCenterOfMassRadii = new Point3D(100,100,10);
+    Point3D gui_pCropRadii = new Point3D(100,100,10);
     Point3D[] pTracked;
     int tMinTrack=-1, tMaxTrack=-1;
-    private String gui_centeringMethod;
+    private String gui_centeringMethod = "center of mass";
 
     public Registration(ImagePlus imp) {
         this.imp = imp;
@@ -44,12 +47,13 @@ public class Registration implements PlugIn {
         this.vss = vss;
         this.pTracked = new Point3D[imp.getNFrames()];
         log("pTracked.length "+pTracked.length);
-
+        ImagePlus.addImageListener(this);
     }
 
     public Registration() {
         // for run method
     }
+
     public void run(String arg) {
         this.imp = IJ.getImage();
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
@@ -58,7 +62,7 @@ public class Registration implements PlugIn {
         }
         this.vss = vss;
         this.pTracked = new Point3D[imp.getNFrames()];
-
+        ImagePlus.addImageListener(this);
         showDialog();
 
     }
@@ -77,18 +81,18 @@ public class Registration implements PlugIn {
         gd.addSlider("Object radius x [pix]", 0, (int) imp.getWidth() / 2, 30);
         gd.addSlider("Object radius y [pix]", 0, (int) imp.getHeight() / 2, 30);
         gd.addSlider("Object radius z [pix]", 0, (int) imp.getNSlices() / 2, 5);
-        gd.addSlider("Tracking dz [pix]", 1, (int) imp.getNSlices() / 2, 1);
-        gd.addSlider("Tracking dt [frames]", 1, Math.max(1, (int) imp.getNFrames()/5), 1);
-        gd.addNumericField("Tracking margin factor", 2, 1);
+        //gd.addSlider("Tracking dz [pix]", 1, (int) imp.getNSlices() / 2, 1);
+        //gd.addSlider("Tracking dt [frames]", 1, Math.max(1, (int) imp.getNFrames()/5), 1);
+        //gd.addNumericField("Tracking margin factor", 2, 1);
         gd.addNumericField("Image background value", 100, 0);
-        gd.addNumericField("Center computation iterations", 6, 0);
-        gd.addSlider("Track until [frame]:", 1, (int) imp.getNFrames(), imp.getNFrames());
-        gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
-        gd.addSlider("Channel for tracking", 1, (int) imp.getNChannels(), 1);
-        String [] centeringMethodChoices = {"centroid","center of mass"};
-        gd.addChoice("Centering method", centeringMethodChoices, "center of mass");
+        //gd.addNumericField("Center computation iterations", 6, 0);
+        gd.addSlider("Track until [frame]", 1, (int) imp.getNFrames(), imp.getNFrames());
+        //gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
+        gd.addSlider("Track channel", 1, (int) imp.getNChannels(), 1);
+        //String [] centeringMethodChoices = {"centroid","center of mass"};
+        //gd.addChoice("Centering method", centeringMethodChoices, "center of mass");
 
-        Button btCorrectCurrent = new Button("Locate");
+        /*Button btCorrectCurrent = new Button("Locate");
         btCorrectCurrent.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,7 +113,8 @@ public class Registration implements PlugIn {
                 }
 
             }
-        });
+        });*/
+
         Button btTrack = new Button("Track");
         btTrack.addActionListener(new ActionListener() {
             @Override
@@ -139,7 +144,7 @@ public class Registration implements PlugIn {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
-                    // save pTracked
+                    IJ.showMessage("Not yet implemented.\n Please contact tischitischer@gmail.com if you need this feature.");
                 }
             }
         });
@@ -162,15 +167,15 @@ public class Registration implements PlugIn {
         });
 
 
-        final Scrollbar sbCurrentFrame = (Scrollbar) gd.getSliders().get(6);
-        sbCurrentFrame.addAdjustmentListener(new AdjustmentListener() {
-            @Override
-            public void adjustmentValueChanged(AdjustmentEvent e) {
-                //log("Frame scrollbar:"+sbCurrentFrame.getValue());
-                imp.setPosition(imp.getC(), imp.getZ(), new Integer(sbCurrentFrame.getValue()));
-                showTrackOnFrame();
-            }
-        });
+        //final Scrollbar sbCurrentFrame = (Scrollbar) gd.getSliders().get(6);
+        //sbCurrentFrame.addAdjustmentListener(new AdjustmentListener() {
+        //    @Override
+        //    public void adjustmentValueChanged(AdjustmentEvent e) {
+        //        //log("Frame scrollbar:"+sbCurrentFrame.getValue());
+        //        imp.setPosition(imp.getC(), imp.getZ(), new Integer(sbCurrentFrame.getValue()));
+        //        showTrackOnFrame();
+        //    }
+        //});
 
         final Panel buttons = new Panel();
         GridBagLayout bgbl = new GridBagLayout();
@@ -190,9 +195,9 @@ public class Registration implements PlugIn {
         bgbl.setConstraints(btTrack,bgbc);
         buttons.add(btTrack);
 
-        bgbc.insets = new Insets(0,0,0,0);
-        bgbl.setConstraints(btCorrectCurrent,bgbc);
-        buttons.add(btCorrectCurrent);
+        //bgbc.insets = new Insets(0,0,0,0);
+        //bgbl.setConstraints(btCorrectCurrent,bgbc);
+        //buttons.add(btCorrectCurrent);
 
         gd.addPanel(buttons,GridBagConstraints.EAST,new Insets(5,5,5,5));
         bgbl = (GridBagLayout)gd.getLayout();
@@ -250,6 +255,22 @@ public class Registration implements PlugIn {
 
     }
 
+    public void imageClosed(ImagePlus imp) {
+        // currently we are not interested in this event
+    }
+
+    public void imageOpened(ImagePlus imp) {
+        // currently we are not interested in this event
+    }
+
+    public void imageUpdated(ImagePlus imp) {
+        // has the slice been changed?
+        if(imp == this.imp) {
+            showTrackOnFrame();
+        }
+    }
+
+
     public boolean updateGuiVariables() {
         Roi roi = imp.getRoi();
 
@@ -265,16 +286,15 @@ public class Registration implements PlugIn {
             int rx = new Integer(getTextFieldTxt(gd, iTxt++));
             int ry = new Integer(getTextFieldTxt(gd, iTxt++));
             int rz = new Integer(getTextFieldTxt(gd, iTxt++));
-            gui_dz = new Integer(getTextFieldTxt(gd, iTxt++));
-            gui_dt = new Integer(getTextFieldTxt(gd, iTxt++));
-            double marginFactor = new Double(getTextFieldTxt(gd, iTxt++));
+            //gui_dz = new Integer(getTextFieldTxt(gd, iTxt++));
+            //gui_dt = new Integer(getTextFieldTxt(gd, iTxt++));
+            double marginFactor = 2; //new Double(getTextFieldTxt(gd, iTxt++));
             gui_bg = new Integer(getTextFieldTxt(gd, iTxt++));
-            gui_iterations = new Integer(getTextFieldTxt(gd, iTxt++));
+            //gui_iterations = new Integer(getTextFieldTxt(gd, iTxt++));
             gui_tMax = (new Integer(getTextFieldTxt(gd, iTxt++))) - 1;
-            iTxt++; // frame slider
             gui_c = (new Integer(getTextFieldTxt(gd, iTxt++))) - 1;
-            Choice centeringMethod = (Choice) gd.getChoices().get(iChoice++);
-            gui_centeringMethod = centeringMethod.getSelectedItem();
+            //Choice centeringMethod = (Choice) gd.getChoices().get(iChoice++);
+            //gui_centeringMethod = centeringMethod.getSelectedItem();
 
             //double marginFactorCrop = new Double(getTextFieldTxt(gd, iTxt++));
 
@@ -311,7 +331,7 @@ public class Registration implements PlugIn {
             ry = (int) gui_pCenterOfMassRadii.getY();
             Roi comBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
             o.add(comBounds);
-            imp.setPosition(0, ((int) pCenter.getZ() + 1), imp.getT());
+            imp.setPosition(imp.getC(), ((int) pCenter.getZ() + 1), imp.getT());
             imp.deleteRoi();
             imp.setRoi(r);
             o.setLabelColor(Color.blue);
@@ -587,41 +607,162 @@ public class Registration implements PlugIn {
 // http://imagej.1557.x6.nabble.com/Getting-x-y-coordinates-of-the-multi-point-tool-td4490440.html
 
 
-class RegistrationDialog extends NonBlockingGenericDialog {
-    ImagePlus imp;
 
-    public RegistrationDialog(ImagePlus imp) {
-        super("Registration");
-        this.imp = imp;
+/*
+class TrackingGUI implements ActionListener, ImageListener {
+
+    String[] actions = {
+            "Open from stacks",
+            "Open from info file",
+            "Save as info file",
+            "Save as tiff stacks",
+            "Save as h5 stacks",
+            "Crop",
+            "Duplicate to RAM"};
+
+    public void TrackingGUI() {
     }
 
 
+    public void showDialog() {
 
-    protected void setup() {
-        //setPositionInfo();
+        ImagePlus.addImageListener(this);
+
+        JFrame frame = new JFrame("Tracking");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Container c = frame.getContentPane();
+        c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+
+        gd.addSlider("Object radius x [pix]", 0, (int) imp.getWidth() / 2, 30);
+        gd.addSlider("Object radius y [pix]", 0, (int) imp.getHeight() / 2, 30);
+        gd.addSlider("Object radius z [pix]", 0, (int) imp.getNSlices() / 2, 5);
+
+
+        JButton[] buttons = new JButton[actions.length];
+
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i] = new JButton(actions[i]);
+            buttons[i].setActionCommand(actions[i]);
+            buttons[i].addActionListener(this);
+        }
+
+        int i = 0, j = 0;
+
+        JPanel[] panels = new JPanel[3];
+
+        panels[j] = new JPanel();
+        panels[j].add(buttons[i++]);
+        panels[j].add(buttons[i++]);
+        c.add(panels[j++]);
+
+        panels[j] = new JPanel();
+        panels[j].add(buttons[i++]);
+        panels[j].add(buttons[i++]);
+        panels[j].add(buttons[i++]);
+        c.add(panels[j++]);
+
+        panels[j] = new JPanel();
+        panels[j].add(buttons[i++]);
+        panels[j].add(buttons[i++]);
+        c.add(panels[j++]);
+
+        //button.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        //Display the window.
+        frame.pack();
+        frame.setVisible(true);
+
     }
 
-    public void itemStateChanged(ItemEvent e) {
-        log(""+e);
+    public void imageClosed(ImagePlus imp) {
+        // currently we are not interested in this event
     }
 
-    public void keyTyped(KeyEvent e) {
-        log(""+e.getKeyChar());
+    public void imageOpened(ImagePlus imp) {
+        // currently we are not interested in this event
+    }
+
+    public void imageUpdated(ImagePlus imp) {
+        // has the slice been changed?
+        int slice = imp.getCurrentSlice();
+        log("current slice: "+slice);
     }
 
 
-    public void textValueChanged(TextEvent e) {
-        //setStackInfo();
+    public void actionPerformed(ActionEvent e) {
+        int i = 0;
+        final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
+
+        if (e.getActionCommand().equals(actions[i++])) {
+            // Open from folder
+            final String directory = IJ.getDirectory("Select a Directory");
+            if (directory == null)
+                return;
+
+            Thread t1 = new Thread(new Runnable() {
+                public void run() {
+                    ImagePlus imp = osv.openFromDirectory(directory, null);
+                    imp.show();
+                }
+            });
+            t1.start();
+
+            Thread t2 = new Thread(new Runnable() {
+                public void run() {
+                    osv.updateStatus();
+                }
+            });
+            t2.start();
+
+        } else if (e.getActionCommand().equals(actions[i++])) {
+
+            // Open from file
+            String filePath = IJ.getFilePath("Select *.ser file");
+            if (filePath == null)
+                return;
+            File file = new File(filePath);
+            ImagePlus imp = osv.openFromInfoFile(file.getParent() + "/", file.getName());
+            imp.show();
+
+        } else if (e.getActionCommand().equals(actions[i++])) {
+            // "Save as info file"
+            IJ.showMessage("Not yet implemented.");
+        } else if (e.getActionCommand().equals(actions[i++])) {
+            // "Save as tiff stacks"
+            IJ.showMessage("Not yet implemented.");
+        } else if (e.getActionCommand().equals(actions[i++])) {
+            // "Save as h5 stacks"
+            IJ.showMessage("Not yet implemented.");
+        }  else if (e.getActionCommand().equals(actions[i++])) {
+            // crop
+            ImagePlus imp2 = osv.crop(IJ.getImage());
+            if (imp2 != null)
+                imp2.show();
+
+        } else if (e.getActionCommand().equals(actions[i++])) {
+            // duplicate to RAM
+            Thread t1 = new Thread(new Runnable() {
+                public void run() {
+                    ImagePlus imp2 = osv.duplicateToRAM(IJ.getImage());
+                    if (imp2 != null)
+                        imp2.show();
+
+                }
+            });
+            t1.start();
+
+            Thread t2 = new Thread(new Runnable() {
+                public void run() {
+                    osv.updateStatus();
+                }
+            });
+            t2.start();
+
+        }
+
+
+
     }
-
-    //public void actionPerformed(java.awt.event.ActionEvent e){
-    //    log(""+e);
-    //}
-
-    //void setPositionInfo() {
-    //    ((Label)theLabel).setText(""+imp.getTitle());
-   // }
-
-
 }
 
+*/
