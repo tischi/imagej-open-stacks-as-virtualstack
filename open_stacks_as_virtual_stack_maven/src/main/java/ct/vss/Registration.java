@@ -22,6 +22,8 @@ public class Registration implements PlugIn, ImageListener {
 
     VirtualStackOfStacks vss;
     ImagePlus imp;
+    ImagePlus impTR; // track review
+    int tTR = 0;
     public final static int MEAN=10, MEDIAN=11, MIN=12, MAX=13, VAR=14, MAXLOCAL=15; // Filters3D
     private static NonBlockingGenericDialog gd;
     private final static Point3D pOnes = new Point3D(1,1,1);
@@ -103,7 +105,7 @@ public class Registration implements PlugIn, ImageListener {
                         public void run() {
                             try {
                                 track3D(gui_c, gui_t, gui_t, 1, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
-                                showTrackOnFrame(imp);
+                                showTrackOnFrame(imp, pTracked);
                             } finally {
                                 //...
                             }
@@ -128,7 +130,8 @@ public class Registration implements PlugIn, ImageListener {
                     Thread t1 = new Thread(new Runnable() {
                         public void run() {
                             track3D(gui_c, gui_t, gui_tMax, gui_dt, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
-                            showTrackOnFrame(imp);
+                            // todo: put review track here
+                            //showTrackOnFrame(imp, pTracked);
                         }
                     });
                     t1.start();
@@ -154,16 +157,16 @@ public class Registration implements PlugIn, ImageListener {
                     //Point3D[] pos = new Point3D[tMaxTrack-tMinTrack];
                     //System.arraycopy(pTracked, tMinTrack, pos, 0, tMaxTrack-tMinTrack);
 
-                    ImagePlus impCropped = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
+                    ImagePlus impC = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
+                    impC.show();
+                    impC.setPosition(0, (int) (impTR.getNSlices() / 2 + 0.5), 0);
+                    impC.resetDisplayRange();
 
-                    impCropped.show();
-                    impCropped.setPosition(0, (int)(impCropped.getNSlices()/2+0.5), 0);
-                    impCropped.resetDisplayRange();
                 }
             }
         });
 
-        /*Button btReviewTrack = new Button("Review track");
+        Button btReviewTrack = new Button("Review track");
         btReviewTrack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -176,14 +179,15 @@ public class Registration implements PlugIn, ImageListener {
                         pTrackCenters[i] = pTracked[(int) (tMinTrack + (tMaxTrack - tMinTrack) / 2)];
                         log(""+pTrackCenters[i].toString());
                     }
-                    ImagePlus impCropped = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, pTrackCenters, gui_pCropRadii, tMinTrack, tMaxTrack);
-
-                    impCropped.show();
-                    impCropped.setPosition(0, (int)(impCropped.getNSlices()/2+0.5), 0);
-                    impCropped.resetDisplayRange();
+                    Point3D reviewTrackRadii = gui_pCropRadii.multiply(2);
+                    impTR = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, pTrackCenters, reviewTrackRadii, tMinTrack, tMaxTrack);
+                    impTR.show();
+                    impTR.setPosition(0, (int) (impTR.getNSlices() / 2 + 0.5), 0);
+                    impTR.resetDisplayRange();
+                    tTR = -1; showTrackOnFrame(impTR, pTracked); // tTR=-1 forces update
                 }
             }
-        });*/
+        });
 
 
         //final Scrollbar sbCurrentFrame = (Scrollbar) gd.getSliders().get(6);
@@ -206,11 +210,6 @@ public class Registration implements PlugIn, ImageListener {
         //bgbl.setConstraints(btSaveTrack, bgbc);
         //buttons.add(btSaveTrack);
 
-        //bgbc.insets = new Insets(0,0,0,5);
-        //bgbl.setConstraints(btReviewTrack, bgbc);
-        //buttons.add(btReviewTrack);
-
-
         bgbc.insets = new Insets(0,0,0,0);
         bgbl.setConstraints(btCorrectCurrent,bgbc);
         buttons.add(btCorrectCurrent);
@@ -220,10 +219,12 @@ public class Registration implements PlugIn, ImageListener {
         buttons.add(btTrack);
 
         bgbc.insets = new Insets(0,0,0,5);
+        bgbl.setConstraints(btReviewTrack, bgbc);
+        buttons.add(btReviewTrack);
+
+        bgbc.insets = new Insets(0,0,0,5);
         bgbl.setConstraints(btCropTrack, bgbc);
         buttons.add(btCropTrack);
-
-
 
         gd.addPanel(buttons,GridBagConstraints.EAST,new Insets(5,5,5,5));
         bgbl = (GridBagLayout)gd.getLayout();
@@ -291,8 +292,8 @@ public class Registration implements PlugIn, ImageListener {
 
     public void imageUpdated(ImagePlus imp) {
         // has the slice been changed?
-        if(imp == this.imp) {
-            showTrackOnFrame(imp);
+        if(imp == this.impTR) {
+            showTrackOnFrame(impTR, pTracked);
         } else {
             //
         }
@@ -341,9 +342,18 @@ public class Registration implements PlugIn, ImageListener {
 
     }
 
-    public void showTrackOnFrame(ImagePlus imp) {
-        Point3D pCenter = pTracked[imp.getT() - 1];
+    public void showTrackOnFrame(ImagePlus imp, Point3D[] pTracked) {
+
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        if(vss==null) return;
+        if((imp.getT()-1) == tTR) return; // no new frame selected
+        tTR = imp.getT()-1;
+
+        Point3D pCenter = pTracked[tTR];
         if (pCenter != null) {
+            if(vss.isCropped()) {
+                pCenter = pCenter.subtract(vss.getCropOffset());
+            }
             if(Globals.verbose) {
                 log("Registration.showTrackOnFrame pTracked: "+pCenter.toString());
             }

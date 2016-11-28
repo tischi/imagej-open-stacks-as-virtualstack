@@ -190,6 +190,19 @@ public class VirtualStackOfStacks extends ImageStack {
         return imp.getProcessor();
     }
 
+    public boolean isCropped() {
+        return(infos[0][0][0].isCropped);
+    }
+
+    public Point3D getCropOffset() {
+        return(infos[0][0][0].pCropOffset);
+    }
+
+    public Point3D getCropSize() {
+        return(infos[0][0][0].pCropSize);
+    }
+
+
     public ImagePlus getCroppedFrameCenterRadii(int t, int c, int dz, Point3D pc, Point3D pr) {
 
         if(Globals.verbose) {
