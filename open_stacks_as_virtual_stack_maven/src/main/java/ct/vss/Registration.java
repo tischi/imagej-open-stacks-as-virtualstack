@@ -105,7 +105,7 @@ public class Registration implements PlugIn, ImageListener {
                         public void run() {
                             try {
                                 track3D(gui_c, gui_t, gui_t, 1, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
-                                showTrackOnFrame(imp, pTracked);
+                                tTR = -1; showTrackOnFrame(imp, pTracked);
                             } finally {
                                 //...
                             }
@@ -130,15 +130,16 @@ public class Registration implements PlugIn, ImageListener {
                     Thread t1 = new Thread(new Runnable() {
                         public void run() {
                             track3D(gui_c, gui_t, gui_tMax, gui_dt, gui_dz, gui_pStackCenter, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations);
-                            // todo: put review track here
-                            //showTrackOnFrame(imp, pTracked);
+                            showCropAlongTrack(imp, pTracked);
+                            showTrackReview(imp, pTracked);
                         }
                     });
                     t1.start();
                 }
             }
         });
-        /*
+
+
         Button btSaveTrack = new Button("Save coordinates");
         btSaveTrack.addActionListener(new ActionListener() {
             @Override
@@ -146,22 +147,15 @@ public class Registration implements PlugIn, ImageListener {
                 if (updateGuiVariables()) {
                     IJ.showMessage("Not yet implemented.\n Please contact tischitischer@gmail.com if you need this feature.");
                 }
-            }s
-        });*/
+            }
+        });
+
         Button btCropTrack = new Button("Crop along Track");
         btCropTrack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
-                    FileInfoSer[][][] infos = vss.getFileInfosSer();
-                    //Point3D[] pos = new Point3D[tMaxTrack-tMinTrack];
-                    //System.arraycopy(pTracked, tMinTrack, pos, 0, tMaxTrack-tMinTrack);
-
-                    ImagePlus impC = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, pTracked, gui_pCropRadii, tMinTrack, tMaxTrack);
-                    impC.show();
-                    impC.setPosition(0, (int) (impTR.getNSlices() / 2 + 0.5), 0);
-                    impC.resetDisplayRange();
-
+                  //
                 }
             }
         });
@@ -171,20 +165,7 @@ public class Registration implements PlugIn, ImageListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (updateGuiVariables()) {
-                    FileInfoSer[][][] infos = vss.getFileInfosSer();
-                    //Point3D[] pos = new Point3D[tMaxTrack-tMinTrack];
-                    //System.arraycopy(pTracked, tMinTrack, pos, 0, tMaxTrack-tMinTrack);
-                    Point3D[] pTrackCenters = new Point3D[imp.getNFrames()];
-                    for(int i=0; i<pTrackCenters.length; i++) {
-                        pTrackCenters[i] = pTracked[(int) (tMinTrack + (tMaxTrack - tMinTrack) / 2)];
-                        log(""+pTrackCenters[i].toString());
-                    }
-                    Point3D reviewTrackRadii = gui_pCropRadii.multiply(2);
-                    impTR = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, pTrackCenters, reviewTrackRadii, tMinTrack, tMaxTrack);
-                    impTR.show();
-                    impTR.setPosition(0, (int) (impTR.getNSlices() / 2 + 0.5), 0);
-                    impTR.resetDisplayRange();
-                    tTR = -1; showTrackOnFrame(impTR, pTracked); // tTR=-1 forces update
+                   //
                 }
             }
         });
@@ -211,20 +192,20 @@ public class Registration implements PlugIn, ImageListener {
         //buttons.add(btSaveTrack);
 
         bgbc.insets = new Insets(0,0,0,0);
-        bgbl.setConstraints(btCorrectCurrent,bgbc);
+        bgbl.setConstraints(btCorrectCurrent, bgbc);
         buttons.add(btCorrectCurrent);
 
         bgbc.insets = new Insets(0,0,0,5);
-        bgbl.setConstraints(btTrack,bgbc);
+        bgbl.setConstraints(btTrack, bgbc);
         buttons.add(btTrack);
 
-        bgbc.insets = new Insets(0,0,0,5);
-        bgbl.setConstraints(btReviewTrack, bgbc);
-        buttons.add(btReviewTrack);
+        //bgbc.insets = new Insets(0,0,0,5);
+        //bgbl.setConstraints(btReviewTrack, bgbc);
+        //buttons.add(btReviewTrack);
 
-        bgbc.insets = new Insets(0,0,0,5);
-        bgbl.setConstraints(btCropTrack, bgbc);
-        buttons.add(btCropTrack);
+        //bgbc.insets = new Insets(0,0,0,5);
+        //bgbl.setConstraints(btCropTrack, bgbc);
+        //buttons.add(btCropTrack);
 
         gd.addPanel(buttons,GridBagConstraints.EAST,new Insets(5,5,5,5));
         bgbl = (GridBagLayout)gd.getLayout();
@@ -281,6 +262,44 @@ public class Registration implements PlugIn, ImageListener {
         gd.showDialog();
 
     }
+
+    public void showCropAlongTrack(ImagePlus imp, Point3D[] pTracked) {
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        FileInfoSer[][][] infos = vss.getFileInfosSer();
+        Point3D cropTrackRadii = gui_pCropRadii.multiply(2);
+        ImagePlus impC = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, pTracked, cropTrackRadii, tMinTrack, tMaxTrack);
+        impC.setTitle("Crop");
+        impC.show();
+        impC.setPosition(0, (int) (impC.getNSlices() / 2 + 0.5), 0);
+        impC.resetDisplayRange();
+    }
+
+    public void showTrackReview(ImagePlus imp, Point3D[] pTracked) {
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        FileInfoSer[][][] infos = vss.getFileInfosSer();
+        //Point3D[] pos = new Point3D[tMaxTrack-tMinTrack];
+        //System.arraycopy(pTracked, tMinTrack, pos, 0, tMaxTrack-tMinTrack);
+        Point3D[] pTrackCenters = new Point3D[imp.getNFrames()];
+        Point3D pTrackMin = new Point3D(0,0,0);
+        Point3D pTrackMax = new Point3D(99999,99999,99999);
+        for (int i = 0; i < pTrackCenters.length; i++) {
+            pTrackCenters[i] = pTracked[(int) (tMinTrack + (tMaxTrack - tMinTrack) / 2)];
+            // make a Point3D min function
+            if(pTracked[i].getX() < pTrackMin.getX()) {
+                pTrackMin = new Point3D(pTracked[i].getX(), pTrackMin.getY(), pTrackMin.getZ());
+            }
+            log("" + pTrackCenters[i].toString());
+        }
+        Point3D reviewTrackRadii = gui_pCropRadii.multiply(2);
+        impTR = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, pTrackCenters, reviewTrackRadii, tMinTrack, tMaxTrack);
+        impTR.show();
+        impTR.setPosition(0, (int) (impTR.getNSlices() / 2 + 0.5), 0);
+        impTR.resetDisplayRange();
+        impTR.setTitle("Review");
+        tTR = -1; showTrackOnFrame(impTR, pTracked); // tTR=-1 forces update
+
+    }
+
 
     public void imageClosed(ImagePlus imp) {
         // currently we are not interested in this event
