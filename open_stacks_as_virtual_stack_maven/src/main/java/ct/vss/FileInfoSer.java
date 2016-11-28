@@ -38,8 +38,8 @@ public class FileInfoSer implements Cloneable, Serializable {
     public String h5DataSet;
     public String fileTypeString;
     public boolean isCropped = false;
-    public Point3D pCropOffset;
-    public Point3D pCropSize;
+    public int[] pCropOffset = new int[3];
+    public int[] pCropSize = new int[3];
 
     // todo: there is a lot of duplicated information that would only be needed once
 
@@ -95,5 +95,27 @@ public class FileInfoSer implements Cloneable, Serializable {
         try {return super.clone();}
         catch (CloneNotSupportedException e) {return null;}
     }
+
+    public void setCropOffset(Point3D p) {
+        pCropOffset[0] = (int) p.getX();
+        pCropOffset[1] = (int) p.getY();
+        pCropOffset[2] = (int) p.getZ();
+    }
+
+    public void setCropSize(Point3D p) {
+        pCropSize[0] = (int) p.getX();
+        pCropSize[1] = (int) p.getY();
+        pCropSize[2] = (int) p.getZ();
+    }
+
+    public Point3D getCropOffset() {
+        return(new Point3D(pCropOffset[0], pCropOffset[1], pCropOffset[2]));
+    }
+
+    public Point3D getCropSize() {
+        return(new Point3D(pCropSize[0], pCropSize[1], pCropSize[2]));
+    }
+
+
 
 }

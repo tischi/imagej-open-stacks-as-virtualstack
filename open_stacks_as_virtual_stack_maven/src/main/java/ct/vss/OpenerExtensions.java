@@ -325,7 +325,7 @@ class OpenerExtensions extends Opener {
 
         if(Globals.verbose) {
             log("# openCroppedH5stack");
-            log("root directory: "+directory);
+            log("root directory: " + directory);
             log("fi.directory: " + fi.directory);
             log("fi.filename: " + fi.fileName);
             log("info.length: " + info.length);

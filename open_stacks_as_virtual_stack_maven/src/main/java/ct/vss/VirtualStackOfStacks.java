@@ -49,9 +49,9 @@ public class VirtualStackOfStacks extends ImageStack {
         nT = infos[0].length;
 
         if(infos[0][0][0].isCropped) {
-            nX = (int) infos[0][0][0].pCropSize.getX();
-            nY = (int) infos[0][0][0].pCropSize.getY();
-            nZ = (int) infos[0][0][0].pCropSize.getZ();
+            nX = (int) infos[0][0][0].pCropSize[0];
+            nY = (int) infos[0][0][0].pCropSize[1];
+            nZ = (int) infos[0][0][0].pCropSize[2];
         } else {
             nX = (int) infos[0][0][0].width;
             nY = (int) infos[0][0][0].height;
@@ -171,8 +171,8 @@ public class VirtualStackOfStacks extends ImageStack {
 
         if(fi.isCropped) {
             // load cropped slice
-            po = new Point3D(fi.pCropOffset.getX(),fi.pCropOffset.getY(),fi.pCropOffset.getZ()+z);;
-            ps = new Point3D(fi.pCropSize.getX(),fi.pCropSize.getY(),1);
+            po = new Point3D(fi.pCropOffset[0],fi.pCropOffset[1],fi.pCropOffset[2]+z);;
+            ps = new Point3D(fi.pCropSize[0],fi.pCropSize[1],1);
 
         } else {
             // load full slice
@@ -195,11 +195,11 @@ public class VirtualStackOfStacks extends ImageStack {
     }
 
     public Point3D getCropOffset() {
-        return(infos[0][0][0].pCropOffset);
+        return(new Point3D(infos[0][0][0].pCropOffset[0], infos[0][0][0].pCropOffset[1], infos[0][0][0].pCropOffset[2]));
     }
 
     public Point3D getCropSize() {
-        return(infos[0][0][0].pCropSize);
+        return(new Point3D(infos[0][0][0].pCropSize[0], infos[0][0][0].pCropSize[1], infos[0][0][0].pCropSize[2]));
     }
 
 

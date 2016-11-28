@@ -38,6 +38,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String fileType;
     private static NonBlockingGenericDialog gd;
     private int iProgress=0, nProgress=100;
+    public String h5DataSet = "Data111";
 
     public OpenStacksAsVirtualStack() {
     }
@@ -80,7 +81,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         if(f.exists() && !f.isDirectory()) {
 
-            log("Loading ovs info file...");
+            log("Loading: "+directory+fileName);
             FileInfoSer[][][] infos = readFileInfosSer(directory+fileName);
 
             nC = infos.length;
@@ -106,8 +107,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     public ImagePlus openFromDirectory(String directory, String filter) {
 
         //log("# openFromDirectory");
-
-        String dataSet = "Data";
 
         // todo: depending on the fileOrder do different things
         // todo: add the filter to the getFilesInFolder function
@@ -219,7 +218,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         // first file
                         if (t == 0 && c == 0) {
                             IHDF5Reader reader = HDF5Factory.openForReading(ctPath);
-                            HDF5DataSetInformation dsInfo = reader.object().getDataSetInformation("/"+dataSet);
+                            HDF5DataSetInformation dsInfo = reader.object().getDataSetInformation("/"+h5DataSet);
 
                             nZ = (int)dsInfo.getDimensions()[0];
                             nY = (int)dsInfo.getDimensions()[1];
@@ -246,7 +245,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             infoSer[i].width = nX;
                             infoSer[i].height = nY;
                             infoSer[i].bytesPerPixel = 2; // todo: how to get the bit-depth from the info?
-                            infoSer[i].h5DataSet = dataSet;
+                            infoSer[i].h5DataSet = h5DataSet;
                             infoSer[i].fileTypeString = fileType;
                         }
 
@@ -533,8 +532,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     croppedInfos[c][t-tMin][z] = (FileInfoSer) infos[c][t][z].clone();
                     croppedInfos[c][t-tMin][z].isCropped = true;
-                    croppedInfos[c][t-tMin][z].pCropOffset = pc[t].subtract(pr);
-                    croppedInfos[c][t-tMin][z].pCropSize = pr.multiply(2).add(1, 1, 1);
+                    croppedInfos[c][t-tMin][z].setCropOffset(pc[t].subtract(pr));
+                    croppedInfos[c][t-tMin][z].setCropSize(pr.multiply(2).add(1, 1, 1));
                     //log("c "+c);
                     //log("t "+t);
                     //log("z "+z);
@@ -576,12 +575,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     croppedInfos[c][t-tMin][z] = (FileInfoSer) infos[c][t][z].clone();
                     if(croppedInfos[c][t-tMin][z].isCropped) {
-                        croppedInfos[c][t-tMin][z].pCropOffset = po[t].add(croppedInfos[c][t-tMin][z].pCropOffset);
+                        croppedInfos[c][t-tMin][z].setCropOffset(po[t].add(croppedInfos[c][t - tMin][z].getCropOffset()));
                     } else {
                         croppedInfos[c][t - tMin][z].isCropped = true;
-                        croppedInfos[c][t - tMin][z].pCropOffset = po[t];
+                        croppedInfos[c][t - tMin][z].setCropOffset(po[t]);
                     }
-                    croppedInfos[c][t-tMin][z].pCropSize = ps;
+                    croppedInfos[c][t-tMin][z].setCropSize(ps);
                     //log("c "+c);
                     //log("t "+t);
                     //log("z "+z);
@@ -735,15 +734,15 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         //Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
-        //ovs.run("");
+        ovs.run("");
 
-        ImagePlus imp = ovs.openFromDirectory(directory, null);
+        //ImagePlus imp = ovs.openFromDirectory(directory, null);
         //ImagePlus imp = ovs.openFromInfoFile(directory, "ovs.ser");
         //ImagePlus imp = IJ.getImage();
-        imp.show();
+        //imp.show();
 
-        Registration register = new Registration(imp);
-        register.showDialog();
+        //Registration register = new Registration(imp);
+        //register.showDialog();
 
         /*
         if (Mitosis_ome) {
@@ -823,16 +822,20 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 
 
-class StackStreamToolsGUI implements ActionListener {
+class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener {
 
     String[] actions = {
-            "Open from stacks",
-            "Open from info file",
-            "Save as info file",
-            "Save as tiff stacks",
-            "Save as h5 stacks",
+            "Open Stacks",
+            "Open Info File",
+            "Save as Info File",
+            "Save as Tiff Stacks",
+            "Save as H5 Stacks",
             "Crop",
             "Duplicate to RAM"};
+
+    JCheckBox cbLog = new JCheckBox("Verbose logging");
+    JTextField tfH5DataSet = new JTextField("Data111", 10);
+    JFileChooser fc;
 
     public void StackStreamToolsGUI() {
     }
@@ -853,7 +856,7 @@ class StackStreamToolsGUI implements ActionListener {
 
         int i = 0, j = 0;
 
-        JPanel[] panels = new JPanel[3];
+        JPanel[] panels = new JPanel[4];
 
         panels[j] = new JPanel();
         panels[j].add(buttons[i++]);
@@ -869,6 +872,14 @@ class StackStreamToolsGUI implements ActionListener {
         panels[j] = new JPanel();
         panels[j].add(buttons[i++]);
         panels[j].add(buttons[i++]);
+        c.add(panels[j++]);
+
+        cbLog.setSelected(false);
+        cbLog.addItemListener(this);
+
+        panels[j] = new JPanel();
+        panels[j].add(cbLog);
+        panels[j].add(tfH5DataSet);
         c.add(panels[j++]);
 
         //button.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -879,9 +890,23 @@ class StackStreamToolsGUI implements ActionListener {
 
     }
 
+    public void itemStateChanged(ItemEvent e) {
+        Object source = e.getItemSelectable();
+
+        if (source == cbLog) {
+            if (e.getStateChange() == ItemEvent.DESELECTED) {
+                Globals.verbose = false;
+            } else {
+                Globals.verbose = true;
+            }
+        }
+    }
+
     public void actionPerformed(ActionEvent e) {
         int i = 0;
         final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
+
+        osv.h5DataSet = tfH5DataSet.getText();
 
         if (e.getActionCommand().equals(actions[i++])) {
             // Open from folder
@@ -916,7 +941,22 @@ class StackStreamToolsGUI implements ActionListener {
 
         } else if (e.getActionCommand().equals(actions[i++])) {
             // "Save as info file"
-            IJ.showMessage("Not yet implemented.");
+            ImagePlus imp = IJ.getImage();
+            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+            if(vss==null) {
+                IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
+                return;
+            }
+            fc = new JFileChooser(vss.getDirectory());
+            int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                //This is where a real application would save the file.
+                log("Saving: " + file.getAbsolutePath());
+                osv.writeFileInfosSer(vss.getFileInfosSer(), file.getAbsolutePath());
+            } else {
+                log("Save command cancelled by user.");
+            }
         } else if (e.getActionCommand().equals(actions[i++])) {
            // "Save as tiff stacks"
             IJ.showMessage("Not yet implemented.");
@@ -949,6 +989,7 @@ class StackStreamToolsGUI implements ActionListener {
             t2.start();
 
         }
+
 
 
 
