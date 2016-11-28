@@ -41,17 +41,17 @@ This plugin only supports a few file formats. Currenty it should work for
 1. Download the jar: https://github.com/tischi/imagej-open-stacks-as-virtualstack/raw/master/OpenStacksAsVirtualStack_.jar
 2. Move **OpenStacksAsVirtualStack\_.jar** into your **Fiji.app/plugins**.
 
+
 ## Installation in ImageJ
 
 1. Download https://github.com/tischi/imagej-open-stacks-as-virtualstack/raw/master/OpenStacksAsVirtualStack_.jar
 2. Download https://github.com/tischi/imagej-open-stacks-as-virtualstack/raw/master/jhdf5-14.12.0.jar
 3. Move both jars into your **ImageJ/plugins/jars** folder
 
-....
 
 ## Usage instructions
 
-1. In the Fiji GUI run: [Plugins > ALMF_EMBL > Open Stacks as Virtual Stack]
+1. In the Fiji GUI run: **[Plugins > ALMF SPIM > Stack Streaming Tools]**
 2. Select the main_folder containing your data
 
 Now you can browse your data.
