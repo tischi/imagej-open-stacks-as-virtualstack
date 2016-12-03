@@ -11,6 +11,7 @@ import ij.gui.GenericDialog;
 import ij.gui.NonBlockingGenericDialog;
 import ij.gui.Roi;
 import ij.io.FileInfo;
+import ij.io.FileSaver;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
@@ -37,7 +38,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String fileOrder;
     private String fileType;
     private static NonBlockingGenericDialog gd;
-    private int iProgress=0, nProgress=100;
+    public int iProgress=0, nProgress=100;
     public String h5DataSet = "Data111";
 
     public OpenStacksAsVirtualStack() {
@@ -271,6 +272,30 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             writeFileInfosSer(stack.getFileInfosSer(), directory+"ovs.ser");
         }
         return(imp);
+
+    }
+
+    public void saveAsTiffStacks(ImagePlus imp, String path) {
+
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        FileSaver fs;
+
+        nProgress = nT*nC;
+
+        for (int c = 0; c < imp.getNChannels(); c++) {
+
+            for (int t = 0; t < imp.getNFrames(); t++) {
+
+                ImagePlus impCT = vss.getFullFrame(t, c);
+                fs = new FileSaver(impCT);
+                String pathCT = path + "--C"+c+"--T"+t+".tif";
+                fs.saveAsTiffStack(pathCT);
+                iProgress = t+c*nT;
+
+            }
+        }
+
+        iProgress = nProgress;
 
     }
 
@@ -508,8 +533,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 }
 
+    // opens a new (info-based) view on the data
     // todo: call the OffsetSize method from this
-	public static ImagePlus openCroppedCenterRadiusFromInfos(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] pc, Point3D pr, int tMin, int tMax) {
+    public static ImagePlus openCroppedCenterRadiusFromInfos(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] pc, Point3D pr, int tMin, int tMax) {
 		int nC = infos.length;
         int nT = tMax-tMin+1;
         int nZ = infos[0][0].length;
@@ -552,6 +578,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     }
 
+    // opens a new (info-based) view on the data
     public static ImagePlus openCroppedOffsetSizeFromInfos(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] po, Point3D ps, int tMin, int tMax) {
         int nC = infos.length;
         int nT = tMax-tMin+1;
@@ -722,7 +749,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
         //String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        String directory = "/Users/tischi/Desktop/example-data/compressedSingleStrip/";
+        String directory = "/Users/tischi/Desktop/example-data/luxendo/";
         String filter = null;
 
         //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
@@ -734,15 +761,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         //Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
-        ovs.run("");
+        //ovs.run("");
 
-        //ImagePlus imp = ovs.openFromDirectory(directory, null);
+        ImagePlus imp = ovs.openFromDirectory(directory, null);
         //ImagePlus imp = ovs.openFromInfoFile(directory, "ovs.ser");
         //ImagePlus imp = IJ.getImage();
-        //imp.show();
 
-        //Registration register = new Registration(imp);
-        //register.showDialog();
+        imp.show(); Registration register = new Registration(imp);
+        register.showDialog();
 
         /*
         if (Mitosis_ome) {
@@ -825,12 +851,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener {
 
     String[] actions = {
-            "Open Stacks",
-            "Open Info File",
+            "Stream from Folder",
+            "Stream from Info File",
             "Save as Info File",
             "Save as Tiff Stacks",
-            "Save as H5 Stacks",
-            "Crop",
+            //"Save as H5 Stacks",
+            "Crop as new Stream",
             "Duplicate to RAM"};
 
     JCheckBox cbLog = new JCheckBox("Verbose logging");
@@ -866,7 +892,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
         panels[j] = new JPanel();
         panels[j].add(buttons[i++]);
         panels[j].add(buttons[i++]);
-        panels[j].add(buttons[i++]);
+        //panels[j].add(buttons[i++]);
         c.add(panels[j++]);
 
         panels[j] = new JPanel();
@@ -924,7 +950,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
 
             Thread t2 = new Thread(new Runnable() {
                 public void run() {
-                    osv.updateStatus();
+                    osv.iProgress=0;osv.nProgress=100;osv.updateStatus();
                 }
             });
             t2.start();
@@ -958,11 +984,43 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
                 log("Save command cancelled by user.");
             }
         } else if (e.getActionCommand().equals(actions[i++])) {
-           // "Save as tiff stacks"
-            IJ.showMessage("Not yet implemented.");
-        } else if (e.getActionCommand().equals(actions[i++])) {
+            // "Save as tiff stacks"
+            //    IJ.showMessage("Not yet implemented.");
+            final ImagePlus imp = IJ.getImage();
+            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+            if(vss==null) {
+                IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
+                return;
+            }
+            fc = new JFileChooser(vss.getDirectory());
+            int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                final File file = fc.getSelectedFile();
+                log("Saving to: " + file.getAbsolutePath() + "...");
+
+                // do the job
+                Thread t1 = new Thread(new Runnable() {
+                    public void run() {
+                        osv.saveAsTiffStacks(imp, file.getAbsolutePath());
+                    }
+                }); t1.start();
+
+                // update progress status
+                Thread t2 = new Thread(new Runnable() {
+                    public void run() {
+                        osv.iProgress=0;osv.nProgress=100;osv.updateStatus();
+                    }
+                }); t2.start();
+
+            } else {
+                log("Save command cancelled by user.");
+                return;
+            }
+
+
+            //} else if (e.getActionCommand().equals(actions[i++])) {
             // "Save as h5 stacks"
-            IJ.showMessage("Not yet implemented.");
+        //    IJ.showMessage("Not yet implemented.");
         }  else if (e.getActionCommand().equals(actions[i++])) {
             // crop
             ImagePlus imp2 = osv.crop(IJ.getImage());

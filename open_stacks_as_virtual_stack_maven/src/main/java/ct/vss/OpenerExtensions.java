@@ -449,6 +449,7 @@ class OpenerExtensions extends Opener {
                 //
 
                 startTime = System.currentTimeMillis();
+                // todo: strip loop
                 es.execute(new process2stack(info[0], fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth));
                 threadInitTime += (System.currentTimeMillis() - startTime);
 
@@ -632,6 +633,9 @@ class process2stack implements Runnable {
 
                 int pos = 0;
                 for (int s = ss; s <= se; s++) {
+
+                    // todo: multithreading here
+
                     int stripLength = fi.stripLengths[s];
                     byte[] strip = new byte[stripLength];
 
@@ -655,10 +659,12 @@ class process2stack implements Runnable {
 
                     //log("strip.length " + strip.length);
                     // uncompress strip
+
                     strip = lzwUncompress(strip, imByteWidth * rps);
 
                     // put uncompressed strip into large array
                     System.arraycopy(strip, 0, unCompressedBuffer, (s - ss) * imByteWidth * rps, imByteWidth * rps);
+
                     pos += stripLength;
                 }
 

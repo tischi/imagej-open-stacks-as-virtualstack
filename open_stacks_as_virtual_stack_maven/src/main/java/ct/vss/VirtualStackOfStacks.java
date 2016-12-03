@@ -202,7 +202,6 @@ public class VirtualStackOfStacks extends ImageStack {
         return(new Point3D(infos[0][0][0].pCropSize[0], infos[0][0][0].pCropSize[1], infos[0][0][0].pCropSize[2]));
     }
 
-
     public ImagePlus getCroppedFrameCenterRadii(int t, int c, int dz, Point3D pc, Point3D pr) {
 
         if(Globals.verbose) {
@@ -212,6 +211,30 @@ public class VirtualStackOfStacks extends ImageStack {
             }
 
         ImagePlus imp = new OpenerExtensions().openCroppedStackCenterRadii(directory, infos[c][t], dz, pc, pr);
+
+        if (imp==null) {
+            log("Error: loading failed!");
+            return null;
+        } else {
+            return imp;
+        }
+    }
+
+    public ImagePlus getFullFrame(int t, int c) {
+        Point3D po = new Point3D(0,0,0);
+        Point3D ps = new Point3D(nX,nY,nZ);
+        return(getCroppedFrameOffsetSize(t, c, 1, po, ps));
+    }
+
+    public ImagePlus getCroppedFrameOffsetSize(int t, int c, int dz, Point3D po, Point3D ps) {
+
+        if(Globals.verbose) {
+            log("# VirtualStackOfStacks.getCroppedFrameOffsetSize");
+            log("t: "+t);
+            log("c: "+c);
+        }
+
+        ImagePlus imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);
 
         if (imp==null) {
             log("Error: loading failed!");
