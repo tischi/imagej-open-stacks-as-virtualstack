@@ -40,11 +40,10 @@ public class Registration implements PlugIn, ImageListener {
     Point3D gui_pStackRadii = new Point3D(100,100,10);
     Point3D gui_pCenterOfMassRadii = new Point3D(100,100,10);
     Point3D gui_pCropRadii = new Point3D(100,100,10);
-    Track[] pTrackedA;
+    Track[] Tracks;
     Roi[] rTrackStarts = new Roi[100];
     int gui_selectedTrack;
-    int nTrackStarts = 0;
-    int nCompletedTracks = 0;
+    int nTracks = 0;
     int tMinTrack=-1, tMaxTrack=-1;
     private String gui_centeringMethod = "center of mass";
 
@@ -57,7 +56,7 @@ public class Registration implements PlugIn, ImageListener {
             throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
         }
         this.vss = vss;
-        this.pTrackedA = new Track[100];
+        this.Tracks = new Track[100];
         ImagePlus.addImageListener(this);
     }
 
@@ -72,7 +71,7 @@ public class Registration implements PlugIn, ImageListener {
             throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
         }
         this.vss = vss;
-        this.pTrackedA = new Track[100];
+        this.Tracks = new Track[100];
         ImagePlus.addImageListener(this);
         showDialog();
 
@@ -142,22 +141,18 @@ public class Registration implements PlugIn, ImageListener {
 
                 if (updateGuiVariables()) {
 
-                    // todo: handle the old tracks somehow..
-                    if(nTrackStarts==0) {
-                        IJ.showMessage("Please add some track starts");
-                        return;
-                    }
                     // launch tracking
                     ExecutorService es = Executors.newCachedThreadPool();
-                    for(int iTrack=0; iTrack<nTrackStarts; iTrack++) {
-                        es.execute(new track3D(iTrack, gui_ntTracking, 1, gui_dz, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
+                    for(int iTrack=0; iTrack<nTracks; iTrack++) {
+                        if(!Tracks[iTrack].completed) {
+                            es.execute(new track3D(iTrack, gui_ntTracking, 1, gui_dz, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
+                        }
                     }
 
                     // wait until finished
                     try {
                         es.shutdown();
                         while(!es.awaitTermination(1, TimeUnit.MINUTES));
-                        nTrackStarts = 0;
                     } catch (InterruptedException ex) {
                         System.err.println("tasks interrupted");
                     }
@@ -165,7 +160,7 @@ public class Registration implements PlugIn, ImageListener {
                     // todo: just add them as overlays
                     // - square overlays throughout z; cross where z is right
                     //
-                    //showTracksOnFrame(imp, pTrackedA);
+                    //showTracksOnFrame(imp, Tracks);
                 }
             }
         });
@@ -308,9 +303,14 @@ public class Registration implements PlugIn, ImageListener {
         x = r.getPolygon().xpoints[0];
         y = r.getPolygon().ypoints[0];
 
-        rTrackStarts[nTrackStarts] = new Roi(x,y,10,10);
-        rTrackStarts[nTrackStarts].setIsCursor(true);
-        rTrackStarts[nTrackStarts].setPosition(imp.getC(),imp.getZ(),imp.getT());
+        Tracks[nTracks] = new Track(gui_ntTracking);
+        Tracks[nTracks].addLocation(new Point3D(x,y,imp.getZ()), imp.getT(), imp.getC());
+
+        int rx = (int) gui_pCenterOfMassRadii.getX();
+        int ry = (int) gui_pCenterOfMassRadii.getY();
+
+        rTrackStarts[nTracks] = new Roi(x-rx,y-ry,2*rx+1,2*ry+1);
+        rTrackStarts[nTracks].setPosition(imp.getC(),imp.getZ(),imp.getT());
 
         Overlay o = imp.getOverlay();
         if(o==null) {
@@ -318,28 +318,30 @@ public class Registration implements PlugIn, ImageListener {
         } else {
             o.clear();
         }
-        for(int i=0; i<=nTrackStarts; i++) {
+        for(int i=0; i<=nTracks; i++) {
             o.add(rTrackStarts[i]);
         }
         imp.setOverlay(o);
-        nTrackStarts++;
-        log("added new track start; total number of track starts: "+nTrackStarts);
+        nTracks++;
+        log("added new track start; total number of track starts: "+nTracks);
 
     }
 
     public void showCroppedTracks() {
-        ImagePlus[] impA = new ImagePlus[nCompletedTracks];
+        ImagePlus[] impA = new ImagePlus[nTracks];
 
-        for(int i=0; i<nCompletedTracks; i++) {
-            log("# showCroppedTracks: id="+i);
-            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-            FileInfoSer[][][] infos = vss.getFileInfosSer();
-            Point3D cropTrackRadii = gui_pCropRadii.multiply(2);
-            impA[i] = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, pTrackedA[i].getPoints3D(), cropTrackRadii, pTrackedA[i].getTmin(), pTrackedA[i].getTmax());
-            impA[i].setTitle("Track"+i);
-            impA[i].show();
-            impA[i].setPosition(0, (int) (impA[i].getNSlices() / 2 + 0.5), 0);
-            impA[i].resetDisplayRange();
+        for(int i=0; i<nTracks; i++) {
+            if(Tracks[i].completed) {
+                log("# showCroppedTracks: id=" + i);
+                VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+                FileInfoSer[][][] infos = vss.getFileInfosSer();
+                Point3D cropTrackRadii = gui_pCropRadii.multiply(2);
+                impA[i] = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, Tracks[i].getPoints3D(), cropTrackRadii, Tracks[i].getTmin(), Tracks[i].getTmax());
+                impA[i].setTitle("Track" + i);
+                impA[i].show();
+                impA[i].setPosition(0, (int) (impA[i].getNSlices() / 2 + 0.5), 0);
+                impA[i].resetDisplayRange();
+            }
         }
     }
 
@@ -382,7 +384,7 @@ public class Registration implements PlugIn, ImageListener {
     public void imageUpdated(ImagePlus imp) {
         // has the slice been changed?
         if(imp == this.impTR) {
-            //showTracksOnFrame(impTR, pTrackedA);
+            //showTracksOnFrame(impTR, Tracks);
         } else {
             //
         }
@@ -422,7 +424,7 @@ public class Registration implements PlugIn, ImageListener {
     // todo: maybe one could set all tracks as overlays using r.setPosition?!
     // this would avoid the updating
 
-    /*public void showTracksOnFrame(ImagePlus imp, Track[] pTrackedA) {
+    /*public void showTracksOnFrame(ImagePlus imp, Track[] Tracks) {
 
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         if(vss==null) return;
@@ -432,7 +434,7 @@ public class Registration implements PlugIn, ImageListener {
         Overlay o = new Overlay();
 
         for(int i=0; i<nCompletedTracks; i++) {
-            Point3D pCenter = pTrackedA[i][tTR];
+            Point3D pCenter = Tracks[i][tTR];
             if (pCenter != null) {
                 if (vss.isCropped()) {
                     pCenter = pCenter.subtract(vss.getCropOffset());
@@ -498,7 +500,7 @@ public class Registration implements PlugIn, ImageListener {
             int xStart = rTrackStarts[iTrack].getPolygon().xpoints[0];
             int yStart = rTrackStarts[iTrack].getPolygon().ypoints[0];
 
-            pTrackedA[iTrack] = new Track(nt);
+            Tracks[iTrack] = new Track(nt);
 
             Point3D pStackCenter = new Point3D(xStart,yStart,zStart);
 
@@ -535,7 +537,7 @@ public class Registration implements PlugIn, ImageListener {
                 for (int j = 0; j < dt; j++) {
                     if ((it + j) < imp.getNFrames()) {
                         Point3D p = pStackCenter.add(pOffset.multiply((j + 1.0) / dt));
-                        pTrackedA[iTrack].addLocation(p, it + j, channel);
+                        Tracks[iTrack].addLocation(p, it + j, channel);
                     }
                 }
 
@@ -558,12 +560,11 @@ public class Registration implements PlugIn, ImageListener {
                 //IJ.showProgress((double) (it - t) / (tMax - t));
 
             }
-            //log("Tracking done.");
             //IJ.showStatus("" + tMax + "/" + tMax);
             //IJ.showProgress(1.0);
 
-            nCompletedTracks++;
-            log("nCompletedTracks: "+nCompletedTracks);
+            log("Tracking done; track ID:"+iTrack);
+            Tracks[iTrack].completed = true;
             return;
         }
     }

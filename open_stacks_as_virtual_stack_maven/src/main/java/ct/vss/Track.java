@@ -10,6 +10,7 @@ public class Track {
     int[] c;
     Point3D[] p;
     int n;
+    boolean completed = false;
 
     Track(int n) {
         this.t = new int[n];
