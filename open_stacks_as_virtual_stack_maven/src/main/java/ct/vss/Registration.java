@@ -104,6 +104,12 @@ public class Registration implements PlugIn, ImageListener {
         btAddTrackStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                updateGuiVariables();
+                Roi r = imp.getRoi();
+                if (!r.getTypeAsString().equals("Point")) {
+                    IJ.showMessage("Please use IJ's 'Point selection tool' to mark objects.");
+                    return;
+                }
                 addTrackStart(imp);
             }
         });
@@ -139,29 +145,28 @@ public class Registration implements PlugIn, ImageListener {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                if (updateGuiVariables()) {
+                updateGuiVariables();
 
-                    // launch tracking
-                    ExecutorService es = Executors.newCachedThreadPool();
-                    for(int iTrack=0; iTrack<nTracks; iTrack++) {
-                        if(!Tracks[iTrack].completed) {
-                            es.execute(new track3D(iTrack, gui_ntTracking, 1, gui_dz, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
-                        }
+                // launch tracking
+                ExecutorService es = Executors.newCachedThreadPool();
+                for(int iTrack=0; iTrack<nTracks; iTrack++) {
+                    if(!Tracks[iTrack].completed) {
+                        es.execute(new track3D(iTrack, gui_ntTracking, 1, gui_dz, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
                     }
-
-                    // wait until finished
-                    try {
-                        es.shutdown();
-                        while(!es.awaitTermination(1, TimeUnit.MINUTES));
-                    } catch (InterruptedException ex) {
-                        System.err.println("tasks interrupted");
-                    }
-
-                    // todo: just add them as overlays
-                    // - square overlays throughout z; cross where z is right
-                    //
-                    //showTracksOnFrame(imp, Tracks);
                 }
+
+                // wait until finished
+                try {
+                    es.shutdown();
+                    while(!es.awaitTermination(1, TimeUnit.MINUTES));
+                } catch (InterruptedException ex) {
+                    System.err.println("tasks interrupted");
+                }
+
+                // todo: just add them as overlays
+                // - square overlays throughout z; cross where z is right
+                //
+                //showTracksOnFrame(imp, Tracks);
             }
         });
 
@@ -170,9 +175,8 @@ public class Registration implements PlugIn, ImageListener {
         btSaveTrack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (updateGuiVariables()) {
-                    IJ.showMessage("Not yet implemented.\n Please contact tischitischer@gmail.com if you need this feature.");
-                }
+                updateGuiVariables();
+                IJ.showMessage("Not yet implemented.\n Please contact tischitischer@gmail.com if you need this feature.");
             }
         });
 
@@ -181,9 +185,7 @@ public class Registration implements PlugIn, ImageListener {
         btReviewTrack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (updateGuiVariables()) {
-                    //
-                }
+                updateGuiVariables();
             }
         });
 
@@ -191,9 +193,8 @@ public class Registration implements PlugIn, ImageListener {
         btCropTrack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (updateGuiVariables()) {
-                  showCroppedTracks();
-                }
+                updateGuiVariables();
+                showCroppedTracks();
             }
         });
 
@@ -304,7 +305,7 @@ public class Registration implements PlugIn, ImageListener {
         y = r.getPolygon().ypoints[0];
 
         Tracks[nTracks] = new Track(gui_ntTracking);
-        Tracks[nTracks].addLocation(new Point3D(x,y,imp.getZ()), imp.getT(), imp.getC());
+        Tracks[nTracks].addLocation(new Point3D(x, y, imp.getZ()-1), imp.getT()-1, imp.getC()-1);
 
         int rx = (int) gui_pCenterOfMassRadii.getX();
         int ry = (int) gui_pCenterOfMassRadii.getY();
@@ -411,12 +412,7 @@ public class Registration implements PlugIn, ImageListener {
         tf = (TextField) gd.getStringFields().get(iTxt++);
         gui_bg = new Integer(tf.getText());
 
-        Roi r = imp.getRoi();
 
-        if (!r.getTypeAsString().equals("Point")) {
-            IJ.showMessage("Please use IJ's 'Point selection tool' to mark objects.");
-            return false;
-        }
         return true;
 
     }
@@ -493,16 +489,13 @@ public class Registration implements PlugIn, ImageListener {
 
         public void run() {
 
-            int tStart = rTrackStarts[iTrack].getTPosition()-1;
-            int zStart = rTrackStarts[iTrack].getZPosition()-1;
-            int channel = rTrackStarts[iTrack].getCPosition()-1;
             // todo: is there some nicer way than the Polygons?
-            int xStart = rTrackStarts[iTrack].getPolygon().xpoints[0];
-            int yStart = rTrackStarts[iTrack].getPolygon().ypoints[0];
 
-            Tracks[iTrack] = new Track(nt);
+            int tStart = Tracks[iTrack].getTmin();
+            int channel = Tracks[iTrack].getChannelbyIndex(0);
+            Point3D pStackCenter = Tracks[iTrack].getXYZbyIndex(0);
+            Tracks[iTrack].reset();
 
-            Point3D pStackCenter = new Point3D(xStart,yStart,zStart);
 
             if (Globals.verbose) {
                 log("# Registration.track3D:");
@@ -563,7 +556,7 @@ public class Registration implements PlugIn, ImageListener {
             //IJ.showStatus("" + tMax + "/" + tMax);
             //IJ.showProgress(1.0);
 
-            log("Tracking done; track ID:"+iTrack);
+            log("Tracking done; track id="+iTrack);
             Tracks[iTrack].completed = true;
             return;
         }

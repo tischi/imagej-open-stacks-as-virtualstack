@@ -45,6 +45,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     public void run(String arg) {
+        showDialog();
+    }
+
+    public void showDialog() {
         StackStreamToolsGUI sstGUI = new StackStreamToolsGUI();
         sstGUI.showDialog();
     }
@@ -592,8 +596,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             log("tMax: "+tMax);
         }
 
-        OpenerExtensions oe = new OpenerExtensions();
-
         for(int c=0; c<nC; c++) {
 
             for(int t=tMin; t<=tMax; t++) {
@@ -749,7 +751,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
         //String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        String directory = "/Users/tischi/Desktop/example-data/luxendo/";
+        String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
         String filter = null;
 
         //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
@@ -761,14 +763,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         //Globals.verbose = true;
         ovs = new OpenStacksAsVirtualStack();
-        //ovs.run("");
 
         ImagePlus imp = ovs.openFromDirectory(directory, null);
+        ovs.showDialog();
+
         //ImagePlus imp = ovs.openFromInfoFile(directory, "ovs.ser");
         //ImagePlus imp = IJ.getImage();
 
         imp.show(); Registration register = new Registration(imp);
         register.showDialog();
+
 
         /*
         if (Mitosis_ome) {
@@ -986,7 +990,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
         } else if (e.getActionCommand().equals(actions[i++])) {
             // "Save as tiff stacks"
             //    IJ.showMessage("Not yet implemented.");
-            final ImagePlus imp = IJ.getImage();
+            ImagePlus imp = IJ.getImage();
             VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
             if(vss==null) {
                 IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
@@ -997,14 +1001,12 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 final File file = fc.getSelectedFile();
                 log("Saving to: " + file.getAbsolutePath() + "...");
-
                 // do the job
                 Thread t1 = new Thread(new Runnable() {
                     public void run() {
-                        osv.saveAsTiffStacks(imp, file.getAbsolutePath());
+                        osv.saveAsTiffStacks(IJ.getImage(), file.getAbsolutePath());
                     }
                 }); t1.start();
-
                 // update progress status
                 Thread t2 = new Thread(new Runnable() {
                     public void run() {

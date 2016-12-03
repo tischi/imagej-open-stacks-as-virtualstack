@@ -210,6 +210,13 @@ public class VirtualStackOfStacks extends ImageStack {
             log("c: "+c);
             }
 
+        FileInfoSer fi = infos[0][0][0];
+
+        if(fi.isCropped) {
+            // load cropped slice
+            pc = pc.add(fi.getCropOffset());
+        }
+
         ImagePlus imp = new OpenerExtensions().openCroppedStackCenterRadii(directory, infos[c][t], dz, pc, pr);
 
         if (imp==null) {
@@ -221,9 +228,17 @@ public class VirtualStackOfStacks extends ImageStack {
     }
 
     public ImagePlus getFullFrame(int t, int c) {
-        Point3D po = new Point3D(0,0,0);
-        Point3D ps = new Point3D(nX,nY,nZ);
+        Point3D po, ps;
+
+        po = new Point3D(0, 0, 0);
+        if(infos[0][0][0].isCropped) {
+            ps = infos[0][0][0].getCropSize();
+        } else {
+            ps = new Point3D(nX, nY, nZ);
+        }
+
         return(getCroppedFrameOffsetSize(t, c, 1, po, ps));
+
     }
 
     public ImagePlus getCroppedFrameOffsetSize(int t, int c, int dz, Point3D po, Point3D ps) {
@@ -232,6 +247,12 @@ public class VirtualStackOfStacks extends ImageStack {
             log("# VirtualStackOfStacks.getCroppedFrameOffsetSize");
             log("t: "+t);
             log("c: "+c);
+        }
+
+        FileInfoSer fi = infos[0][0][0];
+
+        if(fi.isCropped) {
+            po = po.add(fi.getCropOffset());
         }
 
         ImagePlus imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);

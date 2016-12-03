@@ -242,7 +242,6 @@ class OpenerExtensions extends Opener {
     public ImagePlus openCroppedStackOffsetSize(String directory, FileInfoSer[] info, int dz, Point3D po, Point3D ps) {
 
         // compute ranges to be loaded
-
         int xs = (int) (po.getX() + 0.5);
         int ys = (int) (po.getY() + 0.5);
         int zs = (int) (po.getZ() + 0.5);

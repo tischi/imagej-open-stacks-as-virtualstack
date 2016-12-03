@@ -25,7 +25,9 @@ public class Track {
         this.c[n] = c;
         n++;
     }
-
+    public void reset() {
+        this.n = 0;
+    }
     public Point3D[] getPoints3D() {
         return(p);
     }
@@ -33,6 +35,11 @@ public class Track {
     public Point3D getXYZbyIndex(int i) {
         return(p[i]);
     }
+
+    public int getChannelbyIndex(int i) {
+        return(c[i]);
+    }
+
     public int getTmin() {
         return(t[0]);
     }
