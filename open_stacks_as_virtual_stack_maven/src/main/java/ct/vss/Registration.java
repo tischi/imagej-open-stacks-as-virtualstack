@@ -333,25 +333,47 @@ public class Registration implements PlugIn, ImageListener {
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         FileInfoSer[][][] infos = vss.getFileInfosSer();
 
-        for(int i=0; i<nTracks; i++) {
-            if(Tracks[i].completed) {
-                log("# showCroppedTracks: id=" + i);
+        //for(int i=0; i<nTracks; i++) {
+            //if(Tracks[i].completed) {
+        ImagePlus imp0, imp1;
+
+                /*log("# showCroppedTracks: id=" + i);
                 impA[i] = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, Tracks[i].getPoints3D(), gui_pCropRadii, Tracks[i].getTmin(), Tracks[i].getTmax());
                 impA[i].setTitle("Track" + i);
                 impA[i].show();
                 impA[i].setPosition(0, (int) (impA[i].getNSlices() / 2 + 0.5), 0);
                 impA[i].resetDisplayRange();
-                log("" + impA[i].hashCode());
-            }
-            if(i==0) {
-                ImagePlus imp0 = (ImagePlus) impA[0].clone();
-                imp0.show();
-            }
-            if(i==1) {
-                ImagePlus imp1 = (ImagePlus) impA[1].clone();
-                imp1.show();
-            }
-        }
+                log("" + impA[i].hashCode());*/
+        int i=0;
+        log("# showCroppedTracks: id=" + i);
+        imp0 = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, Tracks[i].getPoints3D(), gui_pCropRadii, Tracks[i].getTmin(), Tracks[i].getTmax());
+        imp0.setTitle("Track" + i);
+        imp0.show();
+        imp0.setPosition(0, (int) (imp0.getNSlices() / 2 + 0.5), 0);
+        imp0.resetDisplayRange();
+
+        VirtualStackOfStacks vss3 = (VirtualStackOfStacks) imp0.getStack();
+        log("" + vss3.getCropOffset().toString());
+
+        i=1;
+        log("# showCroppedTracks: id=" + i);
+        imp1 = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, Tracks[i].getPoints3D(), gui_pCropRadii, Tracks[i].getTmin(), Tracks[i].getTmax());
+        imp1.setTitle("Track" + i);
+        imp1.show();
+        imp1.setPosition(0, (int) (imp1.getNSlices() / 2 + 0.5), 0);
+        imp1.resetDisplayRange();
+
+        VirtualStackOfStacks vss0 = (VirtualStackOfStacks) imp0.getStack();
+        log("" + vss0.getCropOffset().toString());
+
+        VirtualStackOfStacks vss1 = (VirtualStackOfStacks) imp1.getStack();
+        log(""+vss1.getCropOffset().toString());
+
+
+
+
+        //    }
+       // }
 
     }
 

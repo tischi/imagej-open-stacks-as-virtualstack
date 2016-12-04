@@ -68,6 +68,34 @@ public class FileInfoSer implements Cloneable, Serializable {
         this.bytesPerPixel = info.getBytesPerPixel();
     }
 
+    public FileInfoSer(FileInfoSer info) {
+        this.fileFormat = info.fileFormat;
+        this.fileName = info.fileName;
+        this.directory = info.directory;
+        this.fileType = info.fileType;
+        this.url = info.url;
+        this.width = info.width;
+        this.height = info.height;
+        this.longOffset = info.longOffset;
+        this.intelByteOrder = info.intelByteOrder;
+        this.compression = info.compression;
+        this.stripOffsets = info.stripOffsets;
+        this.stripLengths = info.stripLengths;
+        this.rowsPerStrip = info.rowsPerStrip;
+        this.pixelWidth = info.pixelWidth;
+        this.pixelHeight = info.pixelHeight;
+        this.pixelDepth = info.pixelDepth;
+        this.frameInterval = info.frameInterval;
+        this.bytesPerPixel = info.bytesPerPixel;
+
+        this.h5DataSet = info.h5DataSet;
+        this.fileTypeString = info.fileTypeString;
+        this.isCropped = info.isCropped;
+        this.pCropOffset = info.pCropOffset.clone();
+        this.pCropSize = info.pCropSize.clone();
+    }
+
+
     public FileInfo getFileInfo() {
         FileInfo fi = new FileInfo();
         fi.fileName = this.fileName;

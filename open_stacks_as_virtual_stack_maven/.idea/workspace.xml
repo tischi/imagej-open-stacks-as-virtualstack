@@ -22,11 +22,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-141.11111">
-              <caret line="627" column="43" selection-start-line="627" selection-start-column="43" selection-end-line="627" selection-end-column="43" />
+            <state vertical-scroll-proportion="0.67356324">
+              <caret line="565" column="34" selection-start-line="565" selection-start-column="34" selection-end-line="565" selection-end-column="34" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1230#1231#0" expanded="true" />
@@ -39,20 +39,20 @@
                 <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#makeImagePlus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#33143#33301#0" expanded="true" />
-                <element signature="e#33300#33301#0" expanded="true" />
-                <element signature="e#35447#35628#0" expanded="true" />
-                <element signature="e#35627#35628#0" expanded="true" />
+                <element signature="e#33138#33296#0" expanded="true" />
+                <element signature="e#33295#33296#0" expanded="true" />
+                <element signature="e#35442#35623#0" expanded="true" />
+                <element signature="e#35622#35623#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.37931034">
-              <caret line="343" column="40" selection-start-line="343" selection-start-column="40" selection-end-line="343" selection-end-column="40" />
+            <state vertical-scroll-proportion="-5.6296296">
+              <caret line="348" column="72" selection-start-line="348" selection-start-column="40" selection-end-line="348" selection-end-column="72" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#3561#3999#0" expanded="true" />
@@ -102,8 +102,8 @@
       <file leaf-file-name="VirtualStackOfStacks.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-85.92593">
-              <caret line="151" column="32" selection-start-line="151" selection-start-column="26" selection-end-line="151" selection-end-column="32" />
+            <state vertical-scroll-proportion="-8.148149">
+              <caret line="196" column="32" selection-start-line="196" selection-start-column="19" selection-end-line="196" selection-end-column="32" />
               <folding>
                 <element signature="e#2210#2211#0" expanded="true" />
                 <element signature="e#2239#2240#0" expanded="true" />
@@ -134,7 +134,7 @@
       <file leaf-file-name="OpenerExtensions.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-44.037037">
+            <state vertical-scroll-proportion="-35.37037">
               <caret line="398" column="0" selection-start-line="398" selection-start-column="0" selection-end-line="398" selection-end-column="0" />
               <folding>
                 <element signature="method#read#0;class#OpenerExtensions#0" expanded="false" />
@@ -150,13 +150,13 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/FileInfoSer.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="105" column="38" selection-start-line="105" selection-start-column="38" selection-end-line="105" selection-end-column="38" />
+              <caret line="70" column="22" selection-start-line="70" selection-start-column="11" selection-end-line="70" selection-end-column="22" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#3328#3329#0" expanded="true" />
-                <element signature="e#3411#3412#0" expanded="true" />
-                <element signature="e#3447#3448#0" expanded="true" />
-                <element signature="e#3524#3525#0" expanded="true" />
+                <element signature="e#4383#4384#0" expanded="true" />
+                <element signature="e#4466#4467#0" expanded="true" />
+                <element signature="e#4502#4503#0" expanded="true" />
+                <element signature="e#4579#4580#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -198,13 +198,13 @@
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Globals.java" />
         <option value="$PROJECT_DIR$/src/main/resources/plugins.config" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/FastTiffDecoder.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ct/vss/FileInfoSer.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Point5D.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Track.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ct/vss/FileInfoSer.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
       </list>
     </option>
   </component>
@@ -232,8 +232,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="922" />
-    <option name="y" value="111" />
+    <option name="x" value="793" />
+    <option name="y" value="110" />
     <option name="width" value="1349" />
     <option name="height" value="766" />
   </component>
@@ -578,7 +578,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="922" y="111" width="1349" height="766" extended-state="0" />
+    <frame x="793" y="110" width="1349" height="766" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -589,16 +589,16 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3249258" sideWeight="0.69548583" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3710145" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27299702" sideWeight="0.32593727" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27299702" sideWeight="0.32976282" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24183977" sideWeight="0.3848508" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24183977" sideWeight="0.38255548" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299373" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20734507" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27299702" sideWeight="0.6740627" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27299702" sideWeight="0.6702372" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -654,10 +654,10 @@
             <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#makeImagePlus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#33143#33301#0" expanded="true" />
-            <element signature="e#33300#33301#0" expanded="true" />
-            <element signature="e#35447#35628#0" expanded="true" />
-            <element signature="e#35627#35628#0" expanded="true" />
+            <element signature="e#33138#33296#0" expanded="true" />
+            <element signature="e#33295#33296#0" expanded="true" />
+            <element signature="e#35442#35623#0" expanded="true" />
+            <element signature="e#35622#35623#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -733,10 +733,10 @@
           <caret line="113" column="0" selection-start-line="113" selection-start-column="0" selection-end-line="113" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3328#3329#0" expanded="true" />
-            <element signature="e#3411#3412#0" expanded="true" />
-            <element signature="e#3447#3448#0" expanded="true" />
-            <element signature="e#3524#3525#0" expanded="true" />
+            <element signature="e#4383#4384#0" expanded="true" />
+            <element signature="e#4466#4467#0" expanded="true" />
+            <element signature="e#4502#4503#0" expanded="true" />
+            <element signature="e#4579#4580#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -757,10 +757,10 @@
             <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#makeImagePlus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#33143#33301#0" expanded="true" />
-            <element signature="e#33300#33301#0" expanded="true" />
-            <element signature="e#35447#35628#0" expanded="true" />
-            <element signature="e#35627#35628#0" expanded="true" />
+            <element signature="e#33138#33296#0" expanded="true" />
+            <element signature="e#33295#33296#0" expanded="true" />
+            <element signature="e#35442#35623#0" expanded="true" />
+            <element signature="e#35622#35623#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -855,10 +855,10 @@
           <caret line="58" column="26" selection-start-line="58" selection-start-column="26" selection-end-line="58" selection-end-column="26" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3328#3329#0" expanded="true" />
-            <element signature="e#3411#3412#0" expanded="true" />
-            <element signature="e#3447#3448#0" expanded="true" />
-            <element signature="e#3524#3525#0" expanded="true" />
+            <element signature="e#4383#4384#0" expanded="true" />
+            <element signature="e#4466#4467#0" expanded="true" />
+            <element signature="e#4502#4503#0" expanded="true" />
+            <element signature="e#4579#4580#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -879,10 +879,10 @@
             <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#makeImagePlus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#33143#33301#0" expanded="true" />
-            <element signature="e#33300#33301#0" expanded="true" />
-            <element signature="e#35447#35628#0" expanded="true" />
-            <element signature="e#35627#35628#0" expanded="true" />
+            <element signature="e#33138#33296#0" expanded="true" />
+            <element signature="e#33295#33296#0" expanded="true" />
+            <element signature="e#35442#35623#0" expanded="true" />
+            <element signature="e#35622#35623#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -977,10 +977,10 @@
           <caret line="58" column="26" selection-start-line="58" selection-start-column="26" selection-end-line="58" selection-end-column="26" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3328#3329#0" expanded="true" />
-            <element signature="e#3411#3412#0" expanded="true" />
-            <element signature="e#3447#3448#0" expanded="true" />
-            <element signature="e#3524#3525#0" expanded="true" />
+            <element signature="e#4383#4384#0" expanded="true" />
+            <element signature="e#4466#4467#0" expanded="true" />
+            <element signature="e#4502#4503#0" expanded="true" />
+            <element signature="e#4579#4580#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1001,10 +1001,10 @@
             <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#makeImagePlus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#33143#33301#0" expanded="true" />
-            <element signature="e#33300#33301#0" expanded="true" />
-            <element signature="e#35447#35628#0" expanded="true" />
-            <element signature="e#35627#35628#0" expanded="true" />
+            <element signature="e#33138#33296#0" expanded="true" />
+            <element signature="e#33295#33296#0" expanded="true" />
+            <element signature="e#35442#35623#0" expanded="true" />
+            <element signature="e#35622#35623#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1099,10 +1099,10 @@
           <caret line="57" column="26" selection-start-line="57" selection-start-column="26" selection-end-line="57" selection-end-column="26" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3328#3329#0" expanded="true" />
-            <element signature="e#3411#3412#0" expanded="true" />
-            <element signature="e#3447#3448#0" expanded="true" />
-            <element signature="e#3524#3525#0" expanded="true" />
+            <element signature="e#4383#4384#0" expanded="true" />
+            <element signature="e#4466#4467#0" expanded="true" />
+            <element signature="e#4502#4503#0" expanded="true" />
+            <element signature="e#4579#4580#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1185,33 +1185,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/FileInfoSer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="105" column="38" selection-start-line="105" selection-start-column="38" selection-end-line="105" selection-end-column="38" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#3328#3329#0" expanded="true" />
-            <element signature="e#3411#3412#0" expanded="true" />
-            <element signature="e#3447#3448#0" expanded="true" />
-            <element signature="e#3524#3525#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-44.037037">
-          <caret line="398" column="0" selection-start-line="398" selection-start-column="0" selection-end-line="398" selection-end-column="0" />
-          <folding>
-            <element signature="method#read#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#setShortPixelsFromAllStrips#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#readTiffOnePlaneCroppedRows#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#start#0;class#process2stack#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Track.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1237,8 +1210,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-85.92593">
-          <caret line="151" column="32" selection-start-line="151" selection-start-column="26" selection-end-line="151" selection-end-column="32" />
+        <state vertical-scroll-proportion="-8.148149">
+          <caret line="196" column="32" selection-start-line="196" selection-start-column="19" selection-end-line="196" selection-end-column="32" />
           <folding>
             <element signature="e#2210#2211#0" expanded="true" />
             <element signature="e#2239#2240#0" expanded="true" />
@@ -1255,34 +1228,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-141.11111">
-          <caret line="627" column="43" selection-start-line="627" selection-start-column="43" selection-end-line="627" selection-end-column="43" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1230#1231#0" expanded="true" />
-            <element signature="e#1258#1259#0" expanded="true" />
-            <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#makeImagePlus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#33143#33301#0" expanded="true" />
-            <element signature="e#33300#33301#0" expanded="true" />
-            <element signature="e#35447#35628#0" expanded="true" />
-            <element signature="e#35627#35628#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.37931034">
-          <caret line="343" column="40" selection-start-line="343" selection-start-column="40" selection-end-line="343" selection-end-column="40" />
+        <state vertical-scroll-proportion="-5.6296296">
+          <caret line="348" column="72" selection-start-line="348" selection-start-column="40" selection-end-line="348" selection-end-column="72" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#3561#3999#0" expanded="true" />
@@ -1299,6 +1248,57 @@
             <element signature="e#7048#7049#0" expanded="true" />
             <element signature="e#9306#9484#0" expanded="true" />
             <element signature="e#9483#9484#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/FileInfoSer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="70" column="22" selection-start-line="70" selection-start-column="11" selection-end-line="70" selection-end-column="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#4383#4384#0" expanded="true" />
+            <element signature="e#4466#4467#0" expanded="true" />
+            <element signature="e#4502#4503#0" expanded="true" />
+            <element signature="e#4579#4580#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-35.37037">
+          <caret line="398" column="0" selection-start-line="398" selection-start-column="0" selection-end-line="398" selection-end-column="0" />
+          <folding>
+            <element signature="method#read#0;class#OpenerExtensions#0" expanded="false" />
+            <element signature="method#setShortPixelsFromAllStrips#0;class#OpenerExtensions#0" expanded="false" />
+            <element signature="method#readTiffOnePlaneCroppedRows#0;class#OpenerExtensions#0" expanded="false" />
+            <element signature="method#start#0;class#process2stack#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.67356324">
+          <caret line="565" column="34" selection-start-line="565" selection-start-column="34" selection-end-line="565" selection-end-column="34" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1230#1231#0" expanded="true" />
+            <element signature="e#1258#1259#0" expanded="true" />
+            <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#makeImagePlus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#33138#33296#0" expanded="true" />
+            <element signature="e#33295#33296#0" expanded="true" />
+            <element signature="e#35442#35623#0" expanded="true" />
+            <element signature="e#35622#35623#0" expanded="true" />
           </folding>
         </state>
       </provider>
