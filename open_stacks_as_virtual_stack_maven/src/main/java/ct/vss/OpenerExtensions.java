@@ -195,11 +195,20 @@ class OpenerExtensions extends Opener {
 
                 // convert rows to strips
                 int rps = fi0.rowsPerStrip;
-                int ss = (int) ys / rps;
-                int se = (int) ye / rps;
+                int ss = (int) (1.0*ys/rps);
+                int se = (int) (1.0*ye/rps);
                 readStart = fi.stripOffsets[ss];
-
+                // 3rps 012,345,678   8/3
+                if(Globals.verbose) {
+                    log("number of strips: "+fi.stripLengths.length);
+                    log("rows per strip: "+rps);
+                    log("min strip read: "+ss);
+                    log("max strip read: "+se);
+                }
                 readLength = 0;
+                if(se>=fi.stripLengths.length) {
+                    log("!!!! strip is out of bounds");
+                }
                 for (int s = ss; s <= se; s++) {
                     readLength += fi.stripLengths[s];
                 }
@@ -429,8 +438,8 @@ class OpenerExtensions extends Opener {
             for(int z=zs; z<=ze; z+=dz) {
 
                 if (z<0 || z>=info.length) {
-                    IJ.showMessage("z=" + z + " is out of range. Please reduce your z-radius.");
-                    throw new IllegalArgumentException("z=" + z + " is out of range");
+                    IJ.showMessage("z=" + z + " is out of range. Please reduce your cropping z-radius.");
+                    return null;
                 }
 
                 fi = info[z];

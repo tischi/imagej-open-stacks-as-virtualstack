@@ -540,48 +540,55 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     // opens a new (info-based) view on the data
     // todo: call the OffsetSize method from this
     public static ImagePlus openCroppedCenterRadiusFromInfos(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] pc, Point3D pr, int tMin, int tMax) {
-		int nC = infos.length;
-        int nT = tMax-tMin+1;
-        int nZ = infos[0][0].length;
+		int nT = tMax-tMin+1;
 
-        FileInfoSer[][][] croppedInfos = new FileInfoSer[nC][nT][nZ];
+        Point3D[] po = new Point3D[nT];
+        Point3D ps = pr.multiply(2).add(1, 1, 1);
+        Point3D pcCurate;
 
-        if(Globals.verbose){
-            log("# OpenStacksAsVirtualStack.openCroppedFromInfos");
-            log("tMin: "+tMin);
-            log("tMax: "+tMax);
+        for(int t=tMin; t<=tMax; t++) {
+            pcCurate = OpenStacksAsVirtualStack.curatePosition(imp, pc[t-tMin], pr);
+            po[t-tMin] = pcCurate.subtract(pr);
         }
 
-        for(int c=0; c<nC; c++) {
+        return(openCroppedOffsetSizeFromInfos(imp, infos, po, ps, tMin, tMax));
 
-            for(int t=tMin; t<=tMax; t++) {
+    }
 
-                for(int z=0; z<nZ; z++) {
+    public static Point3D curatePosition(ImagePlus imp, Point3D p, Point3D pr) {
 
-                    croppedInfos[c][t-tMin][z] = new FileInfoSer(infos[c][t][z]);
-                    croppedInfos[c][t-tMin][z].isCropped = true;
-                    //log(""+c);
-                    //log(""+t);
-                    //log(""+(t-tMin));
-                    //log(""+z);
-                    croppedInfos[c][t-tMin][z].setCropOffset(pc[t-tMin].subtract(pr));
-                    croppedInfos[c][t-tMin][z].setCropSize(pr.multiply(2).add(1, 1, 1));
-                    //log("c "+c);
-                    //log("t "+t);
-                    //log("z "+z);
-                    //log("offset "+croppedInfos[c][t-tMin][z].pCropOffset.toString());
+        // round the values
+        int x = (int) (p.getX()+0.5);
+        int y = (int) (p.getY()+0.5);
+        int z = (int) (p.getZ()+0.5);
+        int rx = (int) (pr.getX()+0.5);
+        int ry = (int) (pr.getY()+0.5);
+        int rz = (int) (pr.getZ()+0.5);
 
-                }
+        // make sure that the ROI stays within the image bounds
+        if (x-rx < 0) x = rx;
+        if (y-ry < 0) y = ry;
+        if (z-rz < 0) z = rz;
 
-            }
+        if (x+rx > imp.getWidth()-1) x = imp.getWidth()-rx-1;
+        if (y+ry > imp.getHeight()-1) y = imp.getHeight()-ry-1;
+        if (z+rz > imp.getNSlices()-1) z = imp.getNSlices()-rz-1;
 
+        // check if it is ok now, otherwise the chose radius is simply too large
+        if (x-rx < 0)  {
+            IJ.showMessage("x_radius*margin_factor is too large; please reduce!");
+            throw new IllegalArgumentException("out of range");
+        }
+        if (y-ry < 0){
+            IJ.showMessage("y_radius*margin_factor is too large; please reduce!");
+            throw new IllegalArgumentException("out of range");
+        }
+        if (z-rz < 0) {
+            IJ.showMessage("z_radius*margin_factor is too large; please reduce!");
+            throw new IllegalArgumentException("out of range");
         }
 
-        VirtualStackOfStacks parentStack = (VirtualStackOfStacks) imp.getStack();
-        VirtualStackOfStacks stack = new VirtualStackOfStacks(parentStack.getDirectory(), croppedInfos);
-
-        return(makeImagePlus(stack, croppedInfos[0][0][0]));
-
+        return(new Point3D(x,y,z));
     }
 
     // opens a new (info-based) view on the data
@@ -604,7 +611,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 for(int z=0; z<nZ; z++) {
 
-                    croppedInfos[c][t-tMin][z] = (FileInfoSer) infos[c][t][z].clone();
+                    croppedInfos[c][t-tMin][z] = new FileInfoSer(infos[c][t][z]);
                     if(croppedInfos[c][t-tMin][z].isCropped) {
                         croppedInfos[c][t-tMin][z].setCropOffset(po[t].add(croppedInfos[c][t - tMin][z].getCropOffset()));
                     } else {

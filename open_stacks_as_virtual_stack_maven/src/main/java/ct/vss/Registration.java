@@ -2,6 +2,7 @@ package ct.vss;
 
 import ij.*;
 import ij.gui.*;
+import ij.io.Opener;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
@@ -342,48 +343,20 @@ public class Registration implements PlugIn, ImageListener {
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         FileInfoSer[][][] infos = vss.getFileInfosSer();
 
-        //for(int i=0; i<nTracks; i++) {
-            //if(Tracks[i].completed) {
-        ImagePlus imp0, imp1;
-
-                /*log("# showCroppedTracks: id=" + i);
+        for(int i=0; i<nTracks; i++) {
+            if (Tracks[i].completed) {
+                log("# showCroppedTracks: id=" + i);
                 impA[i] = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, Tracks[i].getPoints3D(), gui_pCropRadii, Tracks[i].getTmin(), Tracks[i].getTmax());
-                impA[i].setTitle("Track" + i);
-                impA[i].show();
-                impA[i].setPosition(0, (int) (impA[i].getNSlices() / 2 + 0.5), 0);
-                impA[i].resetDisplayRange();
-                log("" + impA[i].hashCode());*/
-        int i=0;
-        log("# showCroppedTracks: id=" + i);
-        imp0 = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, Tracks[i].getPoints3D(), gui_pCropRadii, Tracks[i].getTmin(), Tracks[i].getTmax());
-        imp0.setTitle("Track" + i);
-        imp0.show();
-        imp0.setPosition(0, (int) (imp0.getNSlices() / 2 + 0.5), 0);
-        imp0.resetDisplayRange();
-
-        VirtualStackOfStacks vss3 = (VirtualStackOfStacks) imp0.getStack();
-        log("" + vss3.getCropOffset().toString());
-
-        i=1;
-        log("# showCroppedTracks: id=" + i);
-        imp1 = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, Tracks[i].getPoints3D(), gui_pCropRadii, Tracks[i].getTmin(), Tracks[i].getTmax());
-        imp1.setTitle("Track" + i);
-        imp1.show();
-        imp1.setPosition(0, (int) (imp1.getNSlices() / 2 + 0.5), 0);
-        imp1.resetDisplayRange();
-
-        VirtualStackOfStacks vss0 = (VirtualStackOfStacks) imp0.getStack();
-        log("" + vss0.getCropOffset().toString());
-
-        VirtualStackOfStacks vss1 = (VirtualStackOfStacks) imp1.getStack();
-        log(""+vss1.getCropOffset().toString());
-
-
-
-
-        //    }
-       // }
-
+                if (impA[i] == null) {
+                    log("..cropping failed.");
+                } else {
+                    impA[i].setTitle("Track" + i);
+                    impA[i].show();
+                    impA[i].setPosition(0, (int) (impA[i].getNSlices() / 2 + 0.5), 0);
+                    impA[i].resetDisplayRange();
+                }
+            }
+        }
     }
 
     /*
@@ -547,7 +520,7 @@ public class Registration implements PlugIn, ImageListener {
             for (int it = tStart; it < tStart+nt; it = it + dt) {
 
                 // get stack, ensuring that extracted stack is still within bounds
-                pStackCenter = curatePosition(pStackCenter, pStackRadii);
+                pStackCenter = OpenStacksAsVirtualStack.curatePosition(imp, pStackCenter, pStackRadii);
                 startTime = System.currentTimeMillis();
                 stack = getImageStack(it, channel, dz, pStackCenter, pStackRadii);
                 stopTime = System.currentTimeMillis();
@@ -617,42 +590,6 @@ public class Registration implements PlugIn, ImageListener {
         //log("loaded stack in [ms]: " + elapsedTime);
         //imp.show();
         return(stack);
-    }
-
-    public Point3D curatePosition(Point3D p, Point3D pr) {
-
-        // round the values
-        int x = (int) (p.getX()+0.5);
-        int y = (int) (p.getY()+0.5);
-        int z = (int) (p.getZ()+0.5);
-        int rx = (int) (pr.getX()+0.5);
-        int ry = (int) (pr.getY()+0.5);
-        int rz = (int) (pr.getZ()+0.5);
-
-        // make sure that the ROI stays within the image bounds
-        if (x-rx < 0) x = rx;
-        if (y-ry < 0) y = ry;
-        if (z-rz < 0) z = rz;
-
-        if (x+rx > imp.getWidth()-1) x = imp.getWidth()-rx;
-        if (y+ry > imp.getHeight()-1) y = imp.getHeight()-ry;
-        if (z+rz > imp.getNSlices()-1) z = imp.getNSlices()-rz;
-
-        // check if it is ok now, otherwise the chose radius is simply too large
-        if (x-rx < 0)  {
-            IJ.showMessage("x_radius*margin_factor is too large; please reduce!");
-            throw new IllegalArgumentException("out of range");
-        }
-        if (y-ry < 0){
-            IJ.showMessage("y_radius*margin_factor is too large; please reduce!");
-            throw new IllegalArgumentException("out of range");
-        }
-        if (z-rz < 0) {
-            IJ.showMessage("z_radius*margin_factor is too large; please reduce!");
-            throw new IllegalArgumentException("out of range");
-        }
-
-        return(new Point3D(x,y,z));
     }
 
     public Point3D iterativeCenterOfMass16bit(ImageStack stack, int bg, Point3D radii, int iterations) {
