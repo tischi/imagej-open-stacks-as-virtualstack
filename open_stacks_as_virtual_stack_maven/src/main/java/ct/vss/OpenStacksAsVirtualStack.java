@@ -560,7 +560,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     croppedInfos[c][t-tMin][z] = new FileInfoSer(infos[c][t][z]);
                     croppedInfos[c][t-tMin][z].isCropped = true;
-                    croppedInfos[c][t-tMin][z].setCropOffset(pc[t].subtract(pr));
+                    //log(""+c);
+                    //log(""+t);
+                    //log(""+(t-tMin));
+                    //log(""+z);
+                    croppedInfos[c][t-tMin][z].setCropOffset(pc[t-tMin].subtract(pr));
                     croppedInfos[c][t-tMin][z].setCropSize(pr.multiply(2).add(1, 1, 1));
                     //log("c "+c);
                     //log("t "+t);

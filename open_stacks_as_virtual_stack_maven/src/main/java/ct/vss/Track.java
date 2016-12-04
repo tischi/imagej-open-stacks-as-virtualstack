@@ -1,5 +1,6 @@
 package ct.vss;
 
+import ij.IJ;
 import javafx.geometry.Point3D;
 
 /**
@@ -9,6 +10,7 @@ public class Track {
     int[] t;
     int[] c;
     Point3D[] p;
+    int i;
     int n;
     boolean completed = false;
 
@@ -16,17 +18,22 @@ public class Track {
         this.t = new int[n];
         this.c = new int[n];
         this.p = new Point3D[n];
-        this.n = 0;
+        this.n = n;
+        this.i = 0;
     }
 
     public void addLocation(Point3D p, int t, int c) {
-        this.p[n] = p;
-        this.t[n] = t;
-        this.c[n] = c;
-        n++;
+        if(i>n-1) {
+            IJ.showMessage("Error: track got longer than initialised.");
+            return;
+        }
+        this.p[i] = p;
+        this.t[i] = t;
+        this.c[i] = c;
+        i++;
     }
     public void reset() {
-        this.n = 0;
+        this.i = 0;
     }
     public Point3D[] getPoints3D() {
         return(p);

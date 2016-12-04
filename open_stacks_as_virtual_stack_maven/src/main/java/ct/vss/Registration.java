@@ -123,7 +123,7 @@ public class Registration implements PlugIn, ImageListener {
 
                     // launch tracking
                     ExecutorService es = Executors.newCachedThreadPool();
-                    es.execute(new track3D(gui_selectedTrack, gui_t, 1, gui_dz, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
+                    es.execute(new track3D(gui_selectedTrack, 1, gui_dz, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
 
                     // wait until finished
                     try {
@@ -151,7 +151,7 @@ public class Registration implements PlugIn, ImageListener {
                 ExecutorService es = Executors.newCachedThreadPool();
                 for(int iTrack=0; iTrack<nTracks; iTrack++) {
                     if(!Tracks[iTrack].completed) {
-                        es.execute(new track3D(iTrack, gui_ntTracking, 1, gui_dz, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
+                        es.execute(new track3D(iTrack, 1, gui_dz, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
                     }
                 }
 
@@ -304,8 +304,17 @@ public class Registration implements PlugIn, ImageListener {
         x = r.getPolygon().xpoints[0];
         y = r.getPolygon().ypoints[0];
 
-        Tracks[nTracks] = new Track(gui_ntTracking);
-        Tracks[nTracks].addLocation(new Point3D(x, y, imp.getZ()-1), imp.getT()-1, imp.getC()-1);
+        int ntTracking = gui_ntTracking;
+        t = imp.getT()-1;
+        if(t+gui_ntTracking > imp.getNFrames()) {
+            IJ.showMessage("Your Track would be longer than the movie; " +
+                    "please reduce 'Track length'.");
+            return;
+        }
+
+        log("adding new track start, id="+nTracks+"; tStart="+t+"; nt="+ntTracking);
+        Tracks[nTracks] = new Track(ntTracking);
+        Tracks[nTracks].addLocation(new Point3D(x, y, imp.getZ()-1), t, imp.getC()-1);
 
         int rx = (int) gui_pCenterOfMassRadii.getX();
         int ry = (int) gui_pCenterOfMassRadii.getY();
@@ -324,7 +333,7 @@ public class Registration implements PlugIn, ImageListener {
         }
         imp.setOverlay(o);
         nTracks++;
-        log("added new track start; total number of track starts: "+nTracks);
+
 
     }
 
@@ -507,9 +516,8 @@ public class Registration implements PlugIn, ImageListener {
         Point3D pOffset, pLocalCenter;
         long startTime, stopTime, elapsedTime;
 
-        track3D(int iTrack, int nt, int dt, int dz, Point3D pStackRadii, Point3D pCenterOfMassRadii, int bg, int iterations) {
+        track3D(int iTrack, int dt, int dz, Point3D pStackRadii, Point3D pCenterOfMassRadii, int bg, int iterations) {
             this.iTrack = iTrack;
-            this.nt = nt;
             this.dt = dt;
             this.dz = dz;
             this.iterations = iterations;
@@ -524,6 +532,7 @@ public class Registration implements PlugIn, ImageListener {
 
             int tStart = Tracks[iTrack].getTmin();
             int channel = Tracks[iTrack].getChannelbyIndex(0);
+            int nt = Tracks[iTrack].getLength();
             Point3D pStackCenter = Tracks[iTrack].getXYZbyIndex(0);
             Tracks[iTrack].reset();
 
@@ -570,7 +579,7 @@ public class Registration implements PlugIn, ImageListener {
                 // - also have a linear motion model for the update, i.e. add pOffset*2
                 pStackCenter = pStackCenter.add(pOffset);
 
-                log("track3D: id=" + iTrack + "; t=" + it); // + "," + pStackCenter.toString());
+                log("track id=" + iTrack + "; tracking t=" + it); // + "," + pStackCenter.toString());
                 if(Globals.verbose) {
                     log("Read data [ms]: " + elapsedTime);
                     log("Reading speed [MB/s]: " + stack.getHeight() * stack.getWidth() * stack.getSize() * 2 / ((elapsedTime + 0.001) * 1000));
@@ -587,7 +596,7 @@ public class Registration implements PlugIn, ImageListener {
             //IJ.showStatus("" + tMax + "/" + tMax);
             //IJ.showProgress(1.0);
 
-            log("Tracking done; track id="+iTrack);
+            log("track id="+iTrack+"; tracking of "+nt+" frames completed!");
             Tracks[iTrack].completed = true;
             return;
         }
