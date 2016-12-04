@@ -556,6 +556,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     public static Point3D curatePosition(ImagePlus imp, Point3D p, Point3D pr) {
+        boolean shifted = false;
 
         // round the values
         int x = (int) (p.getX()+0.5);
@@ -566,13 +567,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         int rz = (int) (pr.getZ()+0.5);
 
         // make sure that the ROI stays within the image bounds
-        if (x-rx < 0) x = rx;
-        if (y-ry < 0) y = ry;
-        if (z-rz < 0) z = rz;
+        if (x-rx < 0) {x = rx; shifted = true;}
+        if (y-ry < 0) {y = ry; shifted = true;}
+        if (z-rz < 0) {z = rz; shifted = true;}
 
-        if (x+rx > imp.getWidth()-1) x = imp.getWidth()-rx-1;
-        if (y+ry > imp.getHeight()-1) y = imp.getHeight()-ry-1;
-        if (z+rz > imp.getNSlices()-1) z = imp.getNSlices()-rz-1;
+        if (x+rx > imp.getWidth()-1) {x = imp.getWidth()-rx-1; shifted = true;}
+        if (y+ry > imp.getHeight()-1) {y = imp.getHeight()-ry-1; shifted = true;}
+        if (z+rz > imp.getNSlices()-1) {z = imp.getNSlices()-rz-1; shifted = true;}
 
         // check if it is ok now, otherwise the chose radius is simply too large
         if (x-rx < 0)  {
@@ -587,7 +588,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             IJ.showMessage("z_radius*margin_factor is too large; please reduce!");
             throw new IllegalArgumentException("out of range");
         }
-
+        if(shifted) {
+            log("!! image: "+imp.getTitle()+": cropping region needed to be shifted to stay within image bounds.");
+        }
         return(new Point3D(x,y,z));
     }
 
@@ -616,7 +619,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         croppedInfos[c][t-tMin][z].setCropOffset(po[t].add(croppedInfos[c][t - tMin][z].getCropOffset()));
                     } else {
                         croppedInfos[c][t - tMin][z].isCropped = true;
-                        croppedInfos[c][t - tMin][z].setCropOffset(po[t]);
+                        croppedInfos[c][t - tMin][z].setCropOffset(po[t-tMin]);
                     }
                     croppedInfos[c][t-tMin][z].setCropSize(ps);
                     //log("c "+c);
