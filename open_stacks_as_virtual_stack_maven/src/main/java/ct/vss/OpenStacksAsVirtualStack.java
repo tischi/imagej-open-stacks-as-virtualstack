@@ -552,8 +552,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             log("tMax: "+tMax);
         }
 
-        OpenerExtensions oe = new OpenerExtensions();
-
         for(int c=0; c<nC; c++) {
 
             for(int t=tMin; t<=tMax; t++) {

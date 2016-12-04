@@ -330,20 +330,29 @@ public class Registration implements PlugIn, ImageListener {
 
     public void showCroppedTracks() {
         ImagePlus[] impA = new ImagePlus[nTracks];
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        FileInfoSer[][][] infos = vss.getFileInfosSer();
 
         for(int i=0; i<nTracks; i++) {
             if(Tracks[i].completed) {
                 log("# showCroppedTracks: id=" + i);
-                VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-                FileInfoSer[][][] infos = vss.getFileInfosSer();
-                Point3D cropTrackRadii = gui_pCropRadii.multiply(2);
-                impA[i] = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, Tracks[i].getPoints3D(), cropTrackRadii, Tracks[i].getTmin(), Tracks[i].getTmax());
+                impA[i] = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, Tracks[i].getPoints3D(), gui_pCropRadii, Tracks[i].getTmin(), Tracks[i].getTmax());
                 impA[i].setTitle("Track" + i);
                 impA[i].show();
                 impA[i].setPosition(0, (int) (impA[i].getNSlices() / 2 + 0.5), 0);
                 impA[i].resetDisplayRange();
+                log("" + impA[i].hashCode());
+            }
+            if(i==0) {
+                ImagePlus imp0 = (ImagePlus) impA[0].clone();
+                imp0.show();
+            }
+            if(i==1) {
+                ImagePlus imp1 = (ImagePlus) impA[1].clone();
+                imp1.show();
             }
         }
+
     }
 
     /*
