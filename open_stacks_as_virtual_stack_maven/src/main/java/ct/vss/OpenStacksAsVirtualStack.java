@@ -275,6 +275,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             imp = makeImagePlus(stack, infoSer[0]);
             writeFileInfosSer(stack.getFileInfosSer(), directory+"ovs.ser");
         }
+        String[] folders = directory.split("/");
+        imp.setTitle(folders[folders.length-1]);
         return(imp);
 
     }
@@ -689,6 +691,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             Point3D ps = new Point3D(roi.getBounds().getWidth(), roi.getBounds().getHeight(), vss.nZ);
 
             ImagePlus impCropped = openCroppedOffsetSizeFromInfos(imp, vss.getFileInfosSer(), po, ps, tMin, tMax);
+            impCropped.setTitle(imp.getTitle()+"-crop");
             return impCropped;
 
         } else {

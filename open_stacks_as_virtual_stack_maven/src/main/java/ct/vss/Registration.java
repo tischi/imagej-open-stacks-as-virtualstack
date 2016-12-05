@@ -7,6 +7,7 @@ import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.concurrent.ExecutorService;
@@ -78,8 +79,164 @@ public class Registration implements PlugIn, ImageListener {
 
     }
 
+
+    class TrackingGUI implements ActionListener {
+
+        String[] actions = {
+                "Add track start",
+                "Track",
+                "View tracks"
+        };
+
+        String[] texts = {
+                "Tracking radii xy,z [pix]",
+                "Cropping radii xy,z [pix]",
+                "Track length [frames]",
+                "Image background",
+
+        };
+        String[] defaults = {
+                "30,5",
+                "90,10",
+                String.valueOf(imp.getNFrames()),
+                "100"
+        };
+
+        public void TrackingGUI() {
+        }
+
+        public void showDialog() {
+
+            JFrame frame = new JFrame("Tracking");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            Container c = frame.getContentPane();
+            c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+
+            JButton[] buttons = new JButton[actions.length];
+
+            for (int i = 0; i < buttons.length; i++) {
+                buttons[i] = new JButton(actions[i]);
+                buttons[i].setActionCommand(actions[i]);
+                buttons[i].addActionListener(this);
+            }
+
+            JTextField[] textFields = new JTextField[texts.length];
+            JLabel[] labels = new JLabel[texts.length];
+
+            for (int i = 0; i < textFields.length; i++) {
+                textFields[i] = new JTextField(6);
+                textFields[i].setActionCommand(texts[i]);
+                textFields[i].addActionListener(this);
+                textFields[i].setText(defaults[i]);
+                labels[i] = new JLabel(texts[i] + ": ");
+                labels[i].setLabelFor(textFields[i]);
+            }
+
+            int i = 0, j = 0;
+
+            JPanel[] panels = new JPanel[5];
+
+            for(int k=0; k<textFields.length; k++) {
+                panels[j] = new JPanel();
+                panels[j].add(labels[k]);
+                panels[j].add(textFields[k]);
+                c.add(panels[j++]);
+            }
+
+            panels[j] = new JPanel();
+            panels[j].add(buttons[i++]);
+            panels[j].add(buttons[i++]);
+            panels[j].add(buttons[i++]);
+            c.add(panels[j++]);
+
+            frame.pack();
+            frame.setVisible(true);
+
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            int i = 0;
+            int k = 0;
+            String[] sA;
+            final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
+
+            if (e.getActionCommand().equals(actions[i++])) {
+                //
+                // Add track
+                //
+                log("add track start");
+                Roi r = imp.getRoi();
+                if (r==null || !r.getTypeAsString().equals("Point")) {
+                    IJ.showMessage("Please use IJ's 'Point selection tool' on: "+imp.getTitle());
+                    return;
+                }
+                addTrackStart(imp);
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+                //
+                // Track
+                //
+                // launch tracking
+                ExecutorService es = Executors.newCachedThreadPool();
+                for(int iTrack=0; iTrack<nTracks; iTrack++) {
+                    if(!Tracks[iTrack].completed) {
+                        es.execute(new Registration.track3D(iTrack, 1, gui_dz, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
+                    }
+                }
+                // wait until finished
+                try {
+                    es.shutdown();
+                    while(!es.awaitTermination(1, TimeUnit.MINUTES));
+                } catch (InterruptedException ex) {
+                    System.err.println("tasks interrupted");
+                }
+            } else if (e.getActionCommand().equals(actions[i++])) {
+                //
+                // View Tracks
+                //
+                showCroppedTracks();
+
+            } else if (e.getActionCommand().equals(texts[k++])) {
+                //
+                // Tracking radii
+                //
+                JTextField source = (JTextField)e.getSource();
+                log(texts[k-1]+": "+source.getText());
+                sA = source.getText().split(",");
+                gui_pCenterOfMassRadii = new Point3D(new Integer(sA[0]), new Integer(sA[0]), new Integer(sA[1]));
+
+            } else if (e.getActionCommand().equals(texts[k++])) {
+                //
+                // Cropping radii
+                //
+                JTextField source = (JTextField)e.getSource();
+                log(texts[k-1]+": "+source.getText());
+                sA = source.getText().split(",");
+                gui_pCropRadii = new Point3D(new Integer(sA[0]), new Integer(sA[0]), new Integer(sA[1]));
+
+            } else if (e.getActionCommand().equals(texts[k++])) {
+                //
+                // nt
+                //
+                JTextField source = (JTextField)e.getSource();
+                log(texts[k-1]+": "+source.getText());
+                gui_ntTracking = new Integer(source.getText());
+            } else if (e.getActionCommand().equals(texts[k++])) {
+                //
+                // bg
+                //
+                JTextField source = (JTextField)e.getSource();
+                log(texts[k-1]+": "+source.getText());
+                gui_bg = new Integer(source.getText());
+            }
+        }
+    }
+
     // todo: button: Show ROI
     public void showDialog() {
+
+        TrackingGUI gt = new TrackingGUI();
+        gt.showDialog();
 
         gd = new NonBlockingGenericDialog("Track & Crop");
 
@@ -108,7 +265,7 @@ public class Registration implements PlugIn, ImageListener {
                 updateGuiVariables();
                 Roi r = imp.getRoi();
                 if (!r.getTypeAsString().equals("Point")) {
-                    IJ.showMessage("Please use IJ's 'Point selection tool' to mark objects.");
+                    IJ.showMessage("Please use IJ's 'Point selection tool' on: "+imp.getTitle());
                     return;
                 }
                 addTrackStart(imp);
@@ -168,16 +325,6 @@ public class Registration implements PlugIn, ImageListener {
                 // - square overlays throughout z; cross where z is right
                 //
                 //showTracksOnFrame(imp, Tracks);
-            }
-        });
-
-
-        Button btSaveTrack = new Button("Save coordinates");
-        btSaveTrack.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateGuiVariables();
-                IJ.showMessage("Not yet implemented.\n Please contact tischitischer@gmail.com if you need this feature.");
             }
         });
 
@@ -738,161 +885,3 @@ public class Registration implements PlugIn, ImageListener {
 
 
 
-/*
-class TrackingGUI implements ActionListener, ImageListener {
-
-    String[] actions = {
-            "Open from stacks",
-            "Open from info file",
-            "Save as info file",
-            "Save as tiff stacks",
-            "Save as h5 stacks",
-            "Crop",
-            "Duplicate to RAM"};
-
-    public void TrackingGUI() {
-    }
-
-
-    public void showDialog() {
-
-        ImagePlus.addImageListener(this);
-
-        JFrame frame = new JFrame("Tracking");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Container c = frame.getContentPane();
-        c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
-
-        gd.addSlider("Object radius x [pix]", 0, (int) imp.getWidth() / 2, 30);
-        gd.addSlider("Object radius y [pix]", 0, (int) imp.getHeight() / 2, 30);
-        gd.addSlider("Object radius z [pix]", 0, (int) imp.getNSlices() / 2, 5);
-
-
-        JButton[] buttons = new JButton[actions.length];
-
-        for (int i = 0; i < buttons.length; i++) {
-            buttons[i] = new JButton(actions[i]);
-            buttons[i].setActionCommand(actions[i]);
-            buttons[i].addActionListener(this);
-        }
-
-        int i = 0, j = 0;
-
-        JPanel[] panels = new JPanel[3];
-
-        panels[j] = new JPanel();
-        panels[j].add(buttons[i++]);
-        panels[j].add(buttons[i++]);
-        c.add(panels[j++]);
-
-        panels[j] = new JPanel();
-        panels[j].add(buttons[i++]);
-        panels[j].add(buttons[i++]);
-        panels[j].add(buttons[i++]);
-        c.add(panels[j++]);
-
-        panels[j] = new JPanel();
-        panels[j].add(buttons[i++]);
-        panels[j].add(buttons[i++]);
-        c.add(panels[j++]);
-
-        //button.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        //Display the window.
-        frame.pack();
-        frame.setVisible(true);
-
-    }
-
-    public void imageClosed(ImagePlus imp) {
-        // currently we are not interested in this event
-    }
-
-    public void imageOpened(ImagePlus imp) {
-        // currently we are not interested in this event
-    }
-
-    public void imageUpdated(ImagePlus imp) {
-        // has the slice been changed?
-        int slice = imp.getCurrentSlice();
-        log("current slice: "+slice);
-    }
-
-
-    public void actionPerformed(ActionEvent e) {
-        int i = 0;
-        final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
-
-        if (e.getActionCommand().equals(actions[i++])) {
-            // Open from folder
-            final String directory = IJ.getDirectory("Select a Directory");
-            if (directory == null)
-                return;
-
-            Thread t1 = new Thread(new Runnable() {
-                public void run() {
-                    ImagePlus imp = osv.openFromDirectory(directory, null);
-                    imp.show();
-                }
-            });
-            t1.start();
-
-            Thread t2 = new Thread(new Runnable() {
-                public void run() {
-                    osv.updateStatus();
-                }
-            });
-            t2.start();
-
-        } else if (e.getActionCommand().equals(actions[i++])) {
-
-            // Open from file
-            String filePath = IJ.getFilePath("Select *.ser file");
-            if (filePath == null)
-                return;
-            File file = new File(filePath);
-            ImagePlus imp = osv.openFromInfoFile(file.getParent() + "/", file.getName());
-            imp.show();
-
-        } else if (e.getActionCommand().equals(actions[i++])) {
-            // "Save as info file"
-            IJ.showMessage("Not yet implemented.");
-        } else if (e.getActionCommand().equals(actions[i++])) {
-            // "Save as tiff stacks"
-            IJ.showMessage("Not yet implemented.");
-        } else if (e.getActionCommand().equals(actions[i++])) {
-            // "Save as h5 stacks"
-            IJ.showMessage("Not yet implemented.");
-        }  else if (e.getActionCommand().equals(actions[i++])) {
-            // crop
-            ImagePlus imp2 = osv.crop(IJ.getImage());
-            if (imp2 != null)
-                imp2.show();
-
-        } else if (e.getActionCommand().equals(actions[i++])) {
-            // duplicate to RAM
-            Thread t1 = new Thread(new Runnable() {
-                public void run() {
-                    ImagePlus imp2 = osv.duplicateToRAM(IJ.getImage());
-                    if (imp2 != null)
-                        imp2.show();
-
-                }
-            });
-            t1.start();
-
-            Thread t2 = new Thread(new Runnable() {
-                public void run() {
-                    osv.updateStatus();
-                }
-            });
-            t2.start();
-
-        }
-
-
-
-    }
-}
-
-*/
