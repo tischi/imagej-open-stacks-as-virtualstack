@@ -29,7 +29,6 @@ public class Registration implements PlugIn, ImageListener {
     VirtualStackOfStacks vss;
     ImagePlus imp;
     ImagePlus impTR; // track review
-    int tTR = 0;
     public final static int MEAN=10, MEDIAN=11, MIN=12, MAX=13, VAR=14, MAXLOCAL=15; // Filters3D
     private static NonBlockingGenericDialog gd;
     private final static Point3D pOnes = new Point3D(1,1,1);
@@ -38,54 +37,53 @@ public class Registration implements PlugIn, ImageListener {
     int gui_iterations = 6;
     int gui_dz = 1;
     int gui_dt = 1;
-    Point3D gui_pStackCenter = new Point3D(100,100,10);
-    Point3D gui_pStackRadii = new Point3D(100,100,10);
-    Point3D gui_pCenterOfMassRadii = new Point3D(100,100,10);
-    Point3D gui_pCropRadii = new Point3D(100,100,10);
+    Point3D gui_pCenterOfMassRadii;
+    Point3D gui_pCropRadii;
     Track[] Tracks;
     Roi[] rTrackStarts = new Roi[100];
     int gui_selectedTrack;
     int nTracks = 0;
-    int tMinTrack=-1, tMaxTrack=-1;
     private String gui_centeringMethod = "center of mass";
 
 
     // todo: deal with the 100 as max number of tracks
     public Registration(ImagePlus imp) {
         this.imp = imp;
-        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-        if(vss==null) {
-            throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
-        }
-        this.vss = vss;
-        this.Tracks = new Track[100];
-        ImagePlus.addImageListener(this);
-    }
-
-    public Registration() {
-        // for run method
+        initialize();
     }
 
     public void run(String arg) {
         this.imp = IJ.getImage();
+        initialize();
+        showDialog();
+    }
+
+    public void showDialog(){
+        TrackingGUI gt = new TrackingGUI();
+        gt.showDialog();
+    }
+
+    private void initialize() {
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         if(vss==null) {
             throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
         }
         this.vss = vss;
         this.Tracks = new Track[100];
+        gui_pCenterOfMassRadii = new Point3D(30,30,5);
+        gui_pCropRadii = new Point3D(60,60,10);
+        gui_ntTracking = imp.getNFrames();
+        gui_bg = 100; // todo: put minimum of central frame
         ImagePlus.addImageListener(this);
-        showDialog();
-
     }
 
 
-    class TrackingGUI implements ActionListener {
+    class TrackingGUI implements ActionListener, FocusListener {
 
         String[] actions = {
                 "Add track start",
                 "Track",
-                "View tracks"
+                "View cropped tracks"
         };
 
         String[] texts = {
@@ -95,9 +93,10 @@ public class Registration implements PlugIn, ImageListener {
                 "Image background",
 
         };
+
         String[] defaults = {
-                "30,5",
-                "90,10",
+                String.valueOf((int)gui_pCenterOfMassRadii.getX())+","+String.valueOf((int)gui_pCenterOfMassRadii.getZ()),
+                String.valueOf((int)gui_pCropRadii.getX())+","+String.valueOf((int)gui_pCropRadii.getZ()),
                 String.valueOf(imp.getNFrames()),
                 "100"
         };
@@ -127,6 +126,7 @@ public class Registration implements PlugIn, ImageListener {
                 textFields[i] = new JTextField(6);
                 textFields[i].setActionCommand(texts[i]);
                 textFields[i].addActionListener(this);
+                textFields[i].addFocusListener(this);
                 textFields[i].setText(defaults[i]);
                 labels[i] = new JLabel(texts[i] + ": ");
                 labels[i].setLabelFor(textFields[i]);
@@ -152,6 +152,17 @@ public class Registration implements PlugIn, ImageListener {
             frame.pack();
             frame.setVisible(true);
 
+        }
+
+        public void focusGained(FocusEvent e){
+            //
+        }
+
+        public void focusLost(FocusEvent e){
+            JTextField tf = (JTextField)e.getSource();
+            if(!(tf==null)){
+                tf.postActionEvent();
+            }
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -180,7 +191,7 @@ public class Registration implements PlugIn, ImageListener {
                 ExecutorService es = Executors.newCachedThreadPool();
                 for(int iTrack=0; iTrack<nTracks; iTrack++) {
                     if(!Tracks[iTrack].completed) {
-                        es.execute(new Registration.track3D(iTrack, 1, gui_dz, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
+                        es.execute(new Registration.track3D(iTrack, 1, gui_dz, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
                     }
                 }
                 // wait until finished
@@ -201,7 +212,6 @@ public class Registration implements PlugIn, ImageListener {
                 // Tracking radii
                 //
                 JTextField source = (JTextField)e.getSource();
-                log(texts[k-1]+": "+source.getText());
                 sA = source.getText().split(",");
                 gui_pCenterOfMassRadii = new Point3D(new Integer(sA[0]), new Integer(sA[0]), new Integer(sA[1]));
 
@@ -210,7 +220,6 @@ public class Registration implements PlugIn, ImageListener {
                 // Cropping radii
                 //
                 JTextField source = (JTextField)e.getSource();
-                log(texts[k-1]+": "+source.getText());
                 sA = source.getText().split(",");
                 gui_pCropRadii = new Point3D(new Integer(sA[0]), new Integer(sA[0]), new Integer(sA[1]));
 
@@ -230,214 +239,6 @@ public class Registration implements PlugIn, ImageListener {
                 gui_bg = new Integer(source.getText());
             }
         }
-    }
-
-    // todo: button: Show ROI
-    public void showDialog() {
-
-        TrackingGUI gt = new TrackingGUI();
-        gt.showDialog();
-
-        gd = new NonBlockingGenericDialog("Track & Crop");
-
-        // set iconImage
-        //ClassLoader classLoader = getClass().getClassLoader();
-        //ImagePlus impIcon = IJ.openImage(classLoader.getResource("logo01-61x61.jpg").getFile());
-        //if(impIcon!=null) gd.addImage(impIcon);
-
-        //gd.addMessage("");
-        gd.addStringField("Tracking radii xy,z [pix]", "30,5");
-        gd.addStringField("Cropping radii xy,z [pix]", "90,10");
-        gd.addStringField("Track length [frames]", String.valueOf(imp.getNFrames()));
-        gd.addStringField("Image background value", "100");
-
-        //gd.addNumericField("Center computation iterations", 6, 0);
-        //gd.addSlider("Track length [frames]", 1, (int) imp.getNFrames(), imp.getNFrames());
-        //gd.addSlider("Browse track", 1, (int) imp.getNFrames(), 1);
-        //gd.addSlider("Track channel", 1, (int) imp.getNChannels(), 1);
-        //String [] centeringMethodChoices = {"centroid","center of mass"};
-        //gd.addChoice("Centering method", centeringMethodChoices, "center of mass");
-
-        Button btAddTrackStart = new Button("Add track start");
-        btAddTrackStart.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateGuiVariables();
-                Roi r = imp.getRoi();
-                if (!r.getTypeAsString().equals("Point")) {
-                    IJ.showMessage("Please use IJ's 'Point selection tool' on: "+imp.getTitle());
-                    return;
-                }
-                addTrackStart(imp);
-            }
-        });
-
-        Button btCorrectCurrent = new Button("Locate");
-        btCorrectCurrent.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                if (updateGuiVariables()) {
-
-                    // launch tracking
-                    ExecutorService es = Executors.newCachedThreadPool();
-                    es.execute(new track3D(gui_selectedTrack, 1, gui_dz, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
-
-                    // wait until finished
-                    try {
-                        es.shutdown();
-                        while(!es.awaitTermination(1, TimeUnit.MINUTES));
-                    } catch (InterruptedException ex) {
-                        System.err.println("tasks interrupted");
-                    }
-
-                    //showTrackOnFrame(imp, pTracked);
-
-                }
-
-            }
-        });
-
-        Button btTrack = new Button("Track");
-        btTrack.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                updateGuiVariables();
-
-                // launch tracking
-                ExecutorService es = Executors.newCachedThreadPool();
-                for(int iTrack=0; iTrack<nTracks; iTrack++) {
-                    if(!Tracks[iTrack].completed) {
-                        es.execute(new track3D(iTrack, 1, gui_dz, gui_pStackRadii, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
-                    }
-                }
-
-                // wait until finished
-                try {
-                    es.shutdown();
-                    while(!es.awaitTermination(1, TimeUnit.MINUTES));
-                } catch (InterruptedException ex) {
-                    System.err.println("tasks interrupted");
-                }
-
-                // todo: just add them as overlays
-                // - square overlays throughout z; cross where z is right
-                //
-                //showTracksOnFrame(imp, Tracks);
-            }
-        });
-
-
-        Button btReviewTrack = new Button("Review tracks");
-        btReviewTrack.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateGuiVariables();
-            }
-        });
-
-        Button btCropTrack = new Button("View cropped tracks");
-        btCropTrack.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateGuiVariables();
-                showCroppedTracks();
-            }
-        });
-
-
-
-        //final Scrollbar sbCurrentFrame = (Scrollbar) gd.getSliders().get(6);
-        //sbCurrentFrame.addAdjustmentListener(new AdjustmentListener() {
-        //    @Override
-        //    public void adjustmentValueChanged(AdjustmentEvent e) {
-        //        //log("Frame scrollbar:"+sbCurrentFrame.getValue());
-        //        imp.setPosition(imp.getC(), imp.getZ(), new Integer(sbCurrentFrame.getValue()));
-        //        showTrackOnFrame();
-        //    }
-        //});
-
-        final Panel buttons = new Panel();
-        GridBagLayout bgbl = new GridBagLayout();
-        buttons.setLayout(bgbl);
-        GridBagConstraints bgbc = new GridBagConstraints();
-        bgbc.anchor = GridBagConstraints.EAST;
-
-        bgbc.insets = new Insets(0,0,0,5);
-        bgbl.setConstraints(btAddTrackStart, bgbc);
-        buttons.add(btAddTrackStart);
-
-        bgbc.insets = new Insets(0,0,0,5);
-        bgbl.setConstraints(btTrack, bgbc);
-        buttons.add(btTrack);
-
-        bgbc.insets = new Insets(0,0,0,0);
-        bgbl.setConstraints(btCropTrack, bgbc);
-        buttons.add(btCropTrack);
-
-        //bgbc.insets = new Insets(0,0,0,5);
-        //bgbl.setConstraints(btReviewTrack, bgbc);
-        //buttons.add(btReviewTrack);
-
-        //bgbc.insets = new Insets(0,0,0,5);
-        //bgbl.setConstraints(btCropTrack, bgbc);
-        //buttons.add(btCropTrack);
-
-        gd.addPanel(buttons,GridBagConstraints.EAST,new Insets(5,5,5,5));
-        bgbl = (GridBagLayout)gd.getLayout();
-        bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 0;
-        bgbl.setConstraints(buttons,bgbc);
-
-
-        // gd location
-        int gdX = (int) imp.getWindow().getLocationOnScreen().getX() + imp.getWindow().getWidth() + 10;
-        int gdY = (int) imp.getWindow().getLocationOnScreen().getY() + 30;
-        gd.centerDialog(false);
-        gd.setLocation(gdX, gdY);
-
-        gd.getHeight();
-
-        // log window location
-        log("# Registration");
-        Window lw = WindowManager.getFrame("Log");
-        if (lw!=null) {
-            lw.setLocation(gdX, gdY+450);
-            lw.setSize(600, 300);
-        }
-
-        // add logging checkbox
-        final Checkbox cbLogging = new Checkbox("Verbose logging", false);
-        cbLogging.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                Globals.verbose = cbLogging.getState();
-            }
-        });
-
-        final Panel panel0 = new Panel();
-        GridBagLayout gbl0 = new GridBagLayout();
-        GridBagConstraints gbc0 = new GridBagConstraints();
-        panel0.setLayout(gbl0);
-        gbc0.anchor = GridBagConstraints.EAST;
-
-        gbc0.insets = new Insets(0,0,0,5);
-        gbl0.setConstraints(cbLogging, gbc0);
-        panel0.add(cbLogging);
-
-        gd.addPanel(panel0,GridBagConstraints.EAST,new Insets(5,5,5,5));
-        //bgbl = (GridBagLayout)gd.getLayout();
-        //bgbc = bgbl.getConstraints(buttons); bgbc.gridx = 0;
-        //bgbl.setConstraints(buttons,bgbc);
-
-        //gd.add(cbLogging);
-
-        gd.addHelp("https://github.com/tischi/imagej-open-stacks-as-virtualstack/blob/master/README.md");
-
-
-        //gd.setForeground(Color.white);
-        gd.showDialog();
-
     }
 
     public void addTrackStart(ImagePlus imp) {
@@ -636,12 +437,11 @@ public class Registration implements PlugIn, ImageListener {
         Point3D pOffset, pLocalCenter;
         long startTime, stopTime, elapsedTime;
 
-        track3D(int iTrack, int dt, int dz, Point3D pStackRadii, Point3D pCenterOfMassRadii, int bg, int iterations) {
+        track3D(int iTrack, int dt, int dz, Point3D pCenterOfMassRadii, int bg, int iterations) {
             this.iTrack = iTrack;
             this.dt = dt;
             this.dz = dz;
             this.iterations = iterations;
-            this.pStackRadii = pStackRadii;
             this.pCenterOfMassRadii = pCenterOfMassRadii;
             this.bg = bg;
         }
@@ -655,7 +455,7 @@ public class Registration implements PlugIn, ImageListener {
             int nt = Tracks[iTrack].getLength();
             Point3D pStackCenter = Tracks[iTrack].getXYZbyIndex(0);
             Tracks[iTrack].reset();
-
+            Point3D pStackRadii = pCenterOfMassRadii.multiply(2.0);
 
             if (Globals.verbose) {
                 log("# Registration.track3D:");
