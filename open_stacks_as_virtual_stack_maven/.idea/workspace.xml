@@ -34,8 +34,8 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-289">
-              <caret line="288" column="0" selection-start-line="288" selection-start-column="0" selection-end-line="288" selection-end-column="0" />
+            <state relative-caret-position="110">
+              <caret line="299" column="71" selection-start-line="299" selection-start-column="71" selection-end-line="299" selection-end-column="71" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
@@ -183,8 +183,8 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="622" />
-    <option name="y" value="75" />
+    <option name="x" value="913" />
+    <option name="y" value="23" />
     <option name="width" value="1432" />
     <option name="height" value="789" />
   </component>
@@ -574,7 +574,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="622" y="75" width="1432" height="789" extended-state="0" />
+    <frame x="913" y="23" width="1432" height="789" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1103,8 +1103,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-289">
-          <caret line="288" column="0" selection-start-line="288" selection-start-column="0" selection-end-line="288" selection-end-column="0" />
+        <state relative-caret-position="110">
+          <caret line="299" column="71" selection-start-line="299" selection-start-column="71" selection-end-line="299" selection-end-column="71" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />

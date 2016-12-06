@@ -43,6 +43,7 @@ public class Registration implements PlugIn, ImageListener {
     Roi[] rTrackStarts = new Roi[100];
     int gui_selectedTrack;
     int nTracks = 0;
+    int nTrackStarts = 0;
     private String gui_centeringMethod = "center of mass";
 
 
@@ -268,7 +269,7 @@ public class Registration implements PlugIn, ImageListener {
     }
 
     public void addTrackStart(ImagePlus imp) {
-        int x,y,z,t;
+        int x,y,t;
         Roi r = imp.getRoi();
 
         if(!r.getTypeAsString().equals("Point")) {
@@ -293,9 +294,13 @@ public class Registration implements PlugIn, ImageListener {
 
         int rx = (int) gui_pCenterOfMassRadii.getX();
         int ry = (int) gui_pCenterOfMassRadii.getY();
+        int rz = (int) gui_pCenterOfMassRadii.getZ();
 
-        rTrackStarts[nTracks] = new Roi(x-rx,y-ry,2*rx+1,2*ry+1);
-        rTrackStarts[nTracks].setPosition(imp.getC(),imp.getZ(),imp.getT());
+        for(int z=imp.getZ()-rz; z<=imp.getZ()+rz; z++) {
+            rTrackStarts[nTrackStarts] = new Roi(x - rx, y - ry, 2 * rx + 1, 2 * ry + 1);
+            rTrackStarts[nTrackStarts].setPosition(imp.getC(), z, imp.getT());
+            nTrackStarts++;
+        }
 
         Overlay o = imp.getOverlay();
         if(o==null) {
@@ -303,7 +308,7 @@ public class Registration implements PlugIn, ImageListener {
         } else {
             o.clear();
         }
-        for(int i=0; i<=nTracks; i++) {
+        for(int i=0; i<=nTrackStarts; i++) {
             o.add(rTrackStarts[i]);
         }
         imp.setOverlay(o);
