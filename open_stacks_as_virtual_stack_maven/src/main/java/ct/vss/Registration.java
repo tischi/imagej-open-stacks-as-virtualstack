@@ -73,17 +73,32 @@ public class Registration implements PlugIn, ImageListener {
         gui_pCenterOfMassRadii = new Point3D(30,30,5);
         gui_pCropRadii = new Point3D(60,60,10);
         gui_ntTracking = imp.getNFrames();
-        gui_bg = 100; // todo: put minimum of central frame
+        gui_bg = (int) imp.getProcessor().getMin();
         ImagePlus.addImageListener(this);
     }
 
+    public void logStatus() {
+        log("# Current track status:");
+        if(nTracks==0) {
+            log("no tracks yet");
+            return;
+        }
+        for(int iTrack=0; iTrack<nTracks; iTrack++) {
+            if(!Tracks[iTrack].completed) {
+                log("track "+iTrack+": not completed");
+            } else {
+                log("track "+iTrack+": completed; length="+Tracks[iTrack].getLength());
+            }
+        }
+    }
 
     class TrackingGUI implements ActionListener, FocusListener {
 
         String[] actions = {
                 "Add track start",
-                "Track",
-                "View cropped tracks"
+                "Track all",
+                "View cropped tracks",
+                "Log status"
         };
 
         String[] texts = {
@@ -98,7 +113,7 @@ public class Registration implements PlugIn, ImageListener {
                 String.valueOf((int)gui_pCenterOfMassRadii.getX())+","+String.valueOf((int)gui_pCenterOfMassRadii.getZ()),
                 String.valueOf((int)gui_pCropRadii.getX())+","+String.valueOf((int)gui_pCropRadii.getZ()),
                 String.valueOf(imp.getNFrames()),
-                "100"
+                String.valueOf(gui_bg),
         };
 
         public void TrackingGUI() {
@@ -134,7 +149,8 @@ public class Registration implements PlugIn, ImageListener {
 
             int i = 0, j = 0;
 
-            JPanel[] panels = new JPanel[5];
+            // todo; replace by arraylist
+            JPanel[] panels = new JPanel[6];
 
             for(int k=0; k<textFields.length; k++) {
                 panels[j] = new JPanel();
@@ -148,6 +164,11 @@ public class Registration implements PlugIn, ImageListener {
             panels[j].add(buttons[i++]);
             panels[j].add(buttons[i++]);
             c.add(panels[j++]);
+
+            panels[j] = new JPanel();
+            panels[j].add(buttons[i++]);
+            c.add(panels[j++]);
+
 
             frame.pack();
             frame.setVisible(true);
@@ -178,7 +199,7 @@ public class Registration implements PlugIn, ImageListener {
                 log("add track start");
                 Roi r = imp.getRoi();
                 if (r==null || !r.getTypeAsString().equals("Point")) {
-                    IJ.showMessage("Please use IJ's 'Point selection tool' on: "+imp.getTitle());
+                    IJ.showMessage("Please use IJ's 'Point selection tool' on image "+imp.getTitle());
                     return;
                 }
                 addTrackStart(imp);
@@ -206,6 +227,11 @@ public class Registration implements PlugIn, ImageListener {
                 // View Tracks
                 //
                 showCroppedTracks();
+            } else if (e.getActionCommand().equals(actions[i++])) {
+                //
+                // Log Status
+                //
+                logStatus();
 
             } else if (e.getActionCommand().equals(texts[k++])) {
                 //
@@ -261,7 +287,7 @@ public class Registration implements PlugIn, ImageListener {
             return;
         }
 
-        log("adding new track start, id="+nTracks+"; tStart="+t+"; nt="+ntTracking);
+        log("added new track start, id="+nTracks+"; tStart="+t+"; nt="+ntTracking);
         Tracks[nTracks] = new Track(ntTracking);
         Tracks[nTracks].addLocation(new Point3D(x, y, imp.getZ()-1), t, imp.getC()-1);
 
