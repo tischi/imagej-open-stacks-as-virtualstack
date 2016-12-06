@@ -766,7 +766,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
         //String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
+        String directory = "/Users/tischi/Desktop/example-data/compressed/";
         String filter = null;
 
         //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";

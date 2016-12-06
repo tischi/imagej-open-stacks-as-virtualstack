@@ -200,7 +200,6 @@ public class Registration implements PlugIn, ImageListener {
                 //
                 // Add track
                 //
-                log("add track start");
                 Roi r = imp.getRoi();
                 if (r==null || !r.getTypeAsString().equals("Point")) {
                     IJ.showMessage("Please use IJ's 'Point selection tool' on image "+imp.getTitle());
@@ -300,7 +299,7 @@ public class Registration implements PlugIn, ImageListener {
             return;
         }
 
-        log("added new track start, id="+nTracks+"; tStart="+t+"; nt="+ntTracking);
+        log("added new track start; id = "+nTracks+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
         Tracks[nTracks] = new Track(ntTracking);
         Tracks[nTracks].addLocation(new Point3D(x, y, imp.getZ()-1), t, imp.getC()-1);
 
@@ -537,9 +536,9 @@ public class Registration implements PlugIn, ImageListener {
                 // - also have a linear motion model for the update, i.e. add pOffset*2
                 pStackCenter = pStackCenter.add(pOffset);
 
-                logs[iProgress++]=("track id=" + iTrack + "; t=" + it +
-                        "; reading time="+elapsedReadingTime+
-                        "; processing time="+elapsedProcessingTime);
+                logs[iProgress++]=("track id = " + iTrack + "; t [frame] = " + it +
+                        "; reading time [ms] = "+elapsedReadingTime+
+                        "; processing time [ms] = "+elapsedProcessingTime);
 
                 if(Globals.verbose) {
                     log("Read data [ms]: " + elapsedReadingTime);
@@ -557,7 +556,7 @@ public class Registration implements PlugIn, ImageListener {
             //IJ.showStatus("" + tMax + "/" + tMax);
             //IJ.showProgress(1.0);
 
-            logs[iProgress++] = ("track id="+iTrack+"; tracking of "+nt+" frames completed!");
+            logs[iProgress++] = ("track id="+iTrack+"; tracking of "+nt+" frames completed");
             Tracks[iTrack].completed = true;
             return;
         }
