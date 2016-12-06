@@ -24,9 +24,18 @@
       <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="312">
-              <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="21" />
-              <folding />
+            <state relative-caret-position="216">
+              <caret line="975" column="0" selection-start-line="969" selection-start-column="12" selection-end-line="975" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -34,11 +43,22 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="110">
-              <caret line="299" column="71" selection-start-line="299" selection-start-column="71" selection-end-line="299" selection-end-column="71" />
+            <state relative-caret-position="129">
+              <caret line="396" column="0" selection-start-line="396" selection-start-column="0" selection-end-line="396" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#run#0;class#Registration#0" expanded="false" />
+                <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
+                <element signature="method#initialize#0;class#Registration#0" expanded="false" />
+                <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
+                <element signature="e#7045#7189#0" expanded="true" />
+                <element signature="e#7188#7189#0" expanded="true" />
+                <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
                 <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
+                <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
+                <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
+                <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
+                <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -183,8 +203,8 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="913" />
-    <option name="y" value="23" />
+    <option name="x" value="845" />
+    <option name="y" value="118" />
     <option name="width" value="1432" />
     <option name="height" value="789" />
   </component>
@@ -574,7 +594,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="913" y="23" width="1432" height="789" extended-state="0" />
+    <frame x="845" y="118" width="1432" height="789" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -625,7 +645,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="51" />
+      <option name="time" value="52" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -638,7 +658,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -648,7 +677,18 @@
           <caret line="348" column="72" selection-start-line="348" selection-start-column="40" selection-end-line="348" selection-end-column="72" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#run#0;class#Registration#0" expanded="false" />
+            <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
+            <element signature="method#initialize#0;class#Registration#0" expanded="false" />
+            <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
+            <element signature="e#7045#7189#0" expanded="true" />
+            <element signature="e#7188#7189#0" expanded="true" />
+            <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
+            <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
+            <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -695,7 +735,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -705,7 +754,18 @@
           <caret line="224" column="30" selection-start-line="224" selection-start-column="30" selection-end-line="224" selection-end-column="30" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#run#0;class#Registration#0" expanded="false" />
+            <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
+            <element signature="method#initialize#0;class#Registration#0" expanded="false" />
+            <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
+            <element signature="e#7045#7189#0" expanded="true" />
+            <element signature="e#7188#7189#0" expanded="true" />
+            <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
+            <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
+            <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -752,7 +812,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="727" column="0" selection-start-line="727" selection-start-column="0" selection-end-line="727" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -770,7 +839,18 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#run#0;class#Registration#0" expanded="false" />
+            <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
+            <element signature="method#initialize#0;class#Registration#0" expanded="false" />
+            <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
+            <element signature="e#7045#7189#0" expanded="true" />
+            <element signature="e#7188#7189#0" expanded="true" />
+            <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
+            <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
+            <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -828,7 +908,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -846,7 +935,18 @@
           <caret line="128" column="34" selection-start-line="128" selection-start-column="34" selection-end-line="128" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#run#0;class#Registration#0" expanded="false" />
+            <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
+            <element signature="method#initialize#0;class#Registration#0" expanded="false" />
+            <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
+            <element signature="e#7045#7189#0" expanded="true" />
+            <element signature="e#7188#7189#0" expanded="true" />
+            <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
+            <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
+            <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -904,7 +1004,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -922,7 +1031,18 @@
           <caret line="27" column="13" selection-start-line="27" selection-start-column="11" selection-end-line="27" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#run#0;class#Registration#0" expanded="false" />
+            <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
+            <element signature="method#initialize#0;class#Registration#0" expanded="false" />
+            <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
+            <element signature="e#7045#7189#0" expanded="true" />
+            <element signature="e#7188#7189#0" expanded="true" />
+            <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
+            <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
+            <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1095,19 +1215,39 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="21" />
-          <folding />
+        <state relative-caret-position="216">
+          <caret line="975" column="0" selection-start-line="969" selection-start-column="12" selection-end-line="975" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="110">
-          <caret line="299" column="71" selection-start-line="299" selection-start-column="71" selection-end-line="299" selection-end-column="71" />
+        <state relative-caret-position="129">
+          <caret line="396" column="0" selection-start-line="396" selection-start-column="0" selection-end-line="396" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#run#0;class#Registration#0" expanded="false" />
+            <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
+            <element signature="method#initialize#0;class#Registration#0" expanded="false" />
+            <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
+            <element signature="e#7045#7189#0" expanded="true" />
+            <element signature="e#7188#7189#0" expanded="true" />
+            <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
+            <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
+            <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
       </provider>

@@ -45,6 +45,9 @@ public class Registration implements PlugIn, ImageListener {
     int nTracks = 0;
     int nTrackStarts = 0;
     private String gui_centeringMethod = "center of mass";
+    int iProgressLogged;
+    int iProgress;
+    String[] logs = new String[1000];
 
 
     // todo: deal with the 100 as max number of tracks
@@ -209,6 +212,8 @@ public class Registration implements PlugIn, ImageListener {
                 //
                 // Track
                 //
+                iProgressLogged = 0;
+                iProgress = 0;
                 // launch tracking
                 ExecutorService es = Executors.newCachedThreadPool();
                 for(int iTrack=0; iTrack<nTracks; iTrack++) {
@@ -217,6 +222,13 @@ public class Registration implements PlugIn, ImageListener {
                     }
                 }
                 // wait until finished
+                Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        updateTrackingStatus();
+                    }
+                });
+                t.start();
+
                 try {
                     es.shutdown();
                     while(!es.awaitTermination(1, TimeUnit.MINUTES));
@@ -383,30 +395,25 @@ public class Registration implements PlugIn, ImageListener {
         }
     }
 
-    public boolean updateGuiVariables() {
-        int x, y, z;
-        String[] sA;
-        TextField tf;
+    public int getNumberOfUncompletedTracks() {
+        int uncomplete = 0;
+        for(int iTrack=0; iTrack<nTracks; iTrack++) {
+            if(!Tracks[iTrack].completed)
+                uncomplete++;
+        }
+        return uncomplete;
+    }
 
-        int iTxt = 0, iChoice = 0;
-
-        tf = (TextField) gd.getStringFields().get(iTxt++);
-        sA = tf.getText().split(",");
-        gui_pCenterOfMassRadii = new Point3D(new Integer(sA[0]), new Integer(sA[0]), new Integer(sA[1]));
-
-        tf = (TextField) gd.getStringFields().get(iTxt++);
-        sA = tf.getText().split(",");
-        gui_pCropRadii = new Point3D(new Integer(sA[0]), new Integer(sA[0]), new Integer(sA[1]));
-
-        tf = (TextField) gd.getStringFields().get(iTxt++);
-        gui_ntTracking = new Integer(tf.getText());
-
-        tf = (TextField) gd.getStringFields().get(iTxt++);
-        gui_bg = new Integer(tf.getText());
-
-
+    public boolean updateTrackingStatus() {
+        while(getNumberOfUncompletedTracks()!=0) {
+            IJ.wait(10);
+            if(iProgress>iProgressLogged) {
+                for (int i = iProgressLogged; i < iProgress; i++)
+                    log(logs[i]);
+                iProgressLogged = iProgress;
+            }
+        }
         return true;
-
     }
 
     // todo: maybe one could set all tracks as overlays using r.setPosition?!
@@ -466,7 +473,6 @@ public class Registration implements PlugIn, ImageListener {
 
         ImageStack stack;
         Point3D pOffset, pLocalCenter;
-        long startTime, stopTime, elapsedTime;
 
         track3D(int iTrack, int dt, int dz, Point3D pCenterOfMassRadii, int bg, int iterations) {
             this.iTrack = iTrack;
@@ -478,6 +484,7 @@ public class Registration implements PlugIn, ImageListener {
         }
 
         public void run() {
+            long startTime, stopTime, elapsedReadingTime, elapsedProcessingTime;
 
             // todo: is there some nicer way than the Polygons?
 
@@ -502,7 +509,7 @@ public class Registration implements PlugIn, ImageListener {
                 startTime = System.currentTimeMillis();
                 stack = getImageStack(it, channel, dz, pStackCenter, pStackRadii);
                 stopTime = System.currentTimeMillis();
-                elapsedTime = stopTime - startTime;
+                elapsedReadingTime = stopTime - startTime;
 
                 // compute center of mass (in zero-based local stack coordinates)
                 startTime = System.currentTimeMillis();
@@ -510,7 +517,7 @@ public class Registration implements PlugIn, ImageListener {
                 // correct for the sub-sampling in z
                 pLocalCenter = new Point3D(pLocalCenter.getX(), pLocalCenter.getY(), dz * pLocalCenter.getZ());
                 stopTime = System.currentTimeMillis();
-                elapsedTime = stopTime - startTime;
+                elapsedProcessingTime = stopTime - startTime;
                 //log("Computed center of mass [ms]: " + elapsedTime);
 
                 // compute offset to zero-based center of stack
@@ -530,10 +537,13 @@ public class Registration implements PlugIn, ImageListener {
                 // - also have a linear motion model for the update, i.e. add pOffset*2
                 pStackCenter = pStackCenter.add(pOffset);
 
-                log("track id=" + iTrack + "; tracking t=" + it); // + "," + pStackCenter.toString());
+                logs[iProgress++]=("track id=" + iTrack + "; t=" + it +
+                        "; reading time="+elapsedReadingTime+
+                        "; processing time="+elapsedProcessingTime);
+
                 if(Globals.verbose) {
-                    log("Read data [ms]: " + elapsedTime);
-                    log("Reading speed [MB/s]: " + stack.getHeight() * stack.getWidth() * stack.getSize() * 2 / ((elapsedTime + 0.001) * 1000));
+                    log("Read data [ms]: " + elapsedReadingTime);
+                    log("Reading speed [MB/s]: " + stack.getHeight() * stack.getWidth() * stack.getSize() * 2 / ((elapsedReadingTime + 0.001) * 1000));
                     log("Detected shift [pixel]:" +
                             " x:" + String.format("%.2g", pOffset.getX()) +
                             " y:" + String.format("%.2g", pOffset.getY()) +
@@ -547,7 +557,7 @@ public class Registration implements PlugIn, ImageListener {
             //IJ.showStatus("" + tMax + "/" + tMax);
             //IJ.showProgress(1.0);
 
-            log("track id="+iTrack+"; tracking of "+nt+" frames completed!");
+            logs[iProgress++] = ("track id="+iTrack+"; tracking of "+nt+" frames completed!");
             Tracks[iTrack].completed = true;
             return;
         }
