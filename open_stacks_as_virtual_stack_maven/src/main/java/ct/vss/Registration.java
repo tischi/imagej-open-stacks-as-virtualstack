@@ -5,6 +5,8 @@ import ij.gui.*;
 import ij.io.Opener;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
 import javafx.geometry.Point3D;
 
 import javax.swing.*;
@@ -173,8 +175,9 @@ public class Registration implements PlugIn, ImageListener {
             panels[j].add(buttons[i++]);
             c.add(panels[j++]);
 
-
             frame.pack();
+            frame.setLocationRelativeTo(imp.getWindow());
+            frame.setAlwaysOnTop(true);
             frame.setVisible(true);
 
         }
@@ -215,25 +218,27 @@ public class Registration implements PlugIn, ImageListener {
                 iProgress = 0;
                 // launch tracking
                 ExecutorService es = Executors.newCachedThreadPool();
+                es.execute(new Thread(new Runnable() {
+                    public void run() {
+                        updateTrackingStatus();
+                    }
+                }));
+
                 for(int iTrack=0; iTrack<nTracks; iTrack++) {
                     if(!Tracks[iTrack].completed) {
                         es.execute(new Registration.track3D(iTrack, 1, gui_dz, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
                     }
                 }
-                // wait until finished
-                Thread t = new Thread(new Runnable() {
-                    public void run() {
-                        updateTrackingStatus();
-                    }
-                });
-                t.start();
 
-                try {
+                // wait until finished
+                /*try {
                     es.shutdown();
-                    while(!es.awaitTermination(1, TimeUnit.MINUTES));
+                    while(!es.awaitTermination(1, TimeUnit.MINUTES)){
+                        IJ.wait(10);
+                    };
                 } catch (InterruptedException ex) {
                     System.err.println("tasks interrupted");
-                }
+                }*/
             } else if (e.getActionCommand().equals(actions[i++])) {
                 //
                 // View Tracks
@@ -405,7 +410,7 @@ public class Registration implements PlugIn, ImageListener {
 
     public boolean updateTrackingStatus() {
         while(getNumberOfUncompletedTracks()!=0) {
-            IJ.wait(10);
+            IJ.wait(100);
             if(iProgress>iProgressLogged) {
                 for (int i = iProgressLogged; i < iProgress; i++)
                     log(logs[i]);
@@ -555,8 +560,7 @@ public class Registration implements PlugIn, ImageListener {
             }
             //IJ.showStatus("" + tMax + "/" + tMax);
             //IJ.showProgress(1.0);
-
-            logs[iProgress++] = ("track id="+iTrack+"; tracking of "+nt+" frames completed");
+            logs[iProgress++] = ("track id = "+iTrack+"; tracking of "+nt+" frames completed");
             Tracks[iTrack].completed = true;
             return;
         }

@@ -931,6 +931,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
 
         //Display the window.
         frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
     }
