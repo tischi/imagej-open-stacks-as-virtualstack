@@ -12,6 +12,7 @@ import javafx.geometry.Point3D;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +42,7 @@ public class Registration implements PlugIn, ImageListener {
     int gui_dt = 1;
     Point3D gui_pCenterOfMassRadii;
     Point3D gui_pCropRadii;
-    Track[] Tracks;
+    ArrayList<Track> Tracks = new ArrayList<Track>();
     Roi[] rTrackStarts = new Roi[100];
     int gui_selectedTrack;
     int nTracks = 0;
@@ -75,7 +76,6 @@ public class Registration implements PlugIn, ImageListener {
             throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
         }
         this.vss = vss;
-        this.Tracks = new Track[100];
         gui_pCenterOfMassRadii = new Point3D(30,30,5);
         gui_pCropRadii = new Point3D(60,60,10);
         gui_ntTracking = imp.getNFrames();
@@ -85,15 +85,15 @@ public class Registration implements PlugIn, ImageListener {
 
     public void logStatus() {
         log("# Current track status:");
-        if(nTracks==0) {
+        if(Tracks.size()==0) {
             log("no tracks yet");
             return;
         }
-        for(int iTrack=0; iTrack<nTracks; iTrack++) {
-            if(!Tracks[iTrack].completed) {
+        for(int iTrack=0; iTrack<Tracks.size(); iTrack++) {
+            if(!Tracks.get(iTrack).completed) {
                 log("track "+iTrack+": not completed");
             } else {
-                log("track "+iTrack+": completed; length="+Tracks[iTrack].getLength());
+                log("track "+iTrack+": completed; length="+Tracks.get(iTrack).getLength());
             }
         }
     }
@@ -224,8 +224,8 @@ public class Registration implements PlugIn, ImageListener {
                     }
                 }));
 
-                for(int iTrack=0; iTrack<nTracks; iTrack++) {
-                    if(!Tracks[iTrack].completed) {
+                for(int iTrack=0; iTrack<Tracks.size(); iTrack++) {
+                    if(!Tracks.get(iTrack).completed) {
                         es.execute(new Registration.track3D(iTrack, 1, gui_dz, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
                     }
                 }
@@ -304,9 +304,11 @@ public class Registration implements PlugIn, ImageListener {
             return;
         }
 
-        log("added new track start; id = "+nTracks+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
-        Tracks[nTracks] = new Track(ntTracking);
-        Tracks[nTracks].addLocation(new Point3D(x, y, imp.getZ()-1), t, imp.getC()-1);
+
+        int newTrackID = Tracks.size();
+        log("added new track start; id = "+newTrackID+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
+        Tracks.add(new Track(ntTracking));
+        Tracks.get(newTrackID).addLocation(new Point3D(x, y, imp.getZ()-1), t, imp.getC()-1);
 
         int rx = (int) gui_pCenterOfMassRadii.getX();
         int ry = (int) gui_pCenterOfMassRadii.getY();
@@ -334,14 +336,15 @@ public class Registration implements PlugIn, ImageListener {
     }
 
     public void showCroppedTracks() {
-        ImagePlus[] impA = new ImagePlus[nTracks];
+        ImagePlus[] impA = new ImagePlus[Tracks.size()];
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         FileInfoSer[][][] infos = vss.getFileInfosSer();
 
-        for(int i=0; i<nTracks; i++) {
-            if (Tracks[i].completed) {
+        for(int i=0; i<Tracks.size(); i++) {
+            Track track = Tracks.get(i);
+            if (track.completed) {
                 log("# showCroppedTracks: id=" + i);
-                impA[i] = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, Tracks[i].getPoints3D(), gui_pCropRadii, Tracks[i].getTmin(), Tracks[i].getTmax());
+                impA[i] = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, track.getPoints3D(), gui_pCropRadii, track.getTmin(), track.getTmax());
                 if (impA[i] == null) {
                     log("..cropping failed.");
                 } else {
@@ -401,8 +404,8 @@ public class Registration implements PlugIn, ImageListener {
 
     public int getNumberOfUncompletedTracks() {
         int uncomplete = 0;
-        for(int iTrack=0; iTrack<nTracks; iTrack++) {
-            if(!Tracks[iTrack].completed)
+        for(Track t:Tracks) {
+            if(!t.completed)
                 uncomplete++;
         }
         return uncomplete;
@@ -491,12 +494,13 @@ public class Registration implements PlugIn, ImageListener {
             long startTime, stopTime, elapsedReadingTime, elapsedProcessingTime;
 
             // todo: is there some nicer way than the Polygons?
+            Track track = Tracks.get(iTrack);
 
-            int tStart = Tracks[iTrack].getTmin();
-            int channel = Tracks[iTrack].getChannelbyIndex(0);
-            int nt = Tracks[iTrack].getLength();
-            Point3D pStackCenter = Tracks[iTrack].getXYZbyIndex(0);
-            Tracks[iTrack].reset();
+            int tStart = track.getTmin();
+            int channel = track.getChannelbyIndex(0);
+            int nt = track.getLength();
+            Point3D pStackCenter = track.getXYZbyIndex(0);
+            track.reset();
             Point3D pStackRadii = pCenterOfMassRadii.multiply(2.0);
 
             if (Globals.verbose) {
@@ -532,7 +536,7 @@ public class Registration implements PlugIn, ImageListener {
                 for (int j = 0; j < dt; j++) {
                     if ((it + j) < imp.getNFrames()) {
                         Point3D p = pStackCenter.add(pOffset.multiply((j + 1.0) / dt));
-                        Tracks[iTrack].addLocation(p, it + j, channel);
+                        track.addLocation(p, it + j, channel);
                     }
                 }
 
@@ -561,7 +565,7 @@ public class Registration implements PlugIn, ImageListener {
             //IJ.showStatus("" + tMax + "/" + tMax);
             //IJ.showProgress(1.0);
             logs[iProgress++] = ("track id = "+iTrack+"; tracking of "+nt+" frames completed");
-            Tracks[iTrack].completed = true;
+            track.completed = true;
             return;
         }
     }
