@@ -2,35 +2,28 @@
 
 ## Functionality
 
-This plugin constructs a virtual stack (data stream) from a folder of image stacks. The folder structure currently must consist of one main folder containing subfolders for each channel, where each of the channel subfolders contains the image stacks representing the time-points. The names of the folders and files are arbitrary, they are only used the sort the channels and time-points (the sorted file lists will be printed in the IJ log window; please check that the order is correct!).
+This ImageJ plugin suite constructs a virtual stack (data stream) from a folder of image stacks. This is useful for large (~1TB) data sets as typically acquired with light-sheet microscopy. In addition to viewing the data it also allows you to track objects in the data set in an efficient and fast manner; it is efficient, because it only loads the data around the tracked objects and it is fast, because the code is optimised for speed and uses multi-threading. 
 
-- main_folder _**<- this is the folder you have to select!**_
-  - folder_with_channel_0_stacks _**<- you need one folder like this, even if you only have one channel!**_
+## Usage notes
+
+The folder structure of your input data currently must consist of one main folder containing subfolders for each channel, where each of the channel subfolders contains the image stacks representing the time-points. The names of the folders and files are arbitrary, they are only used to sort the channels and time-points (the sorted file lists will be printed in the IJ log window; please check that the order is correct!).
+
+- main_folder **<- this is the folder you have to select**
+  - channel_0_folder **<- you need one folder like this, even if you only have one channel!**
     - xyz_stack_timepoint01
     - xyz_stack_timepoint02
     - ... 
-  - folder_with_channel_1_stacks
+  - channel_1_folder
     - xyz_stack_timepoint01
     - xyz_stack_timepoint02
     - ... 
   - ...
 
-When you open the main folder the first time, the plugin will analyse all files. This can take a lot of time, especially when the folder contains tif stacks. Thus the plugin will save the results of this file analysis in a file, called ovs.ser:
+When you stream from the main folder the first time, the plugin will analyse all files. This can take some time, especially when the image data is saved as tif stacks.
 
-- main_folder
-  - folder_with_channel_0_stacks
-  - folder_with_channel_1_stacks
-  - ...
-  - **ovs.ser**
-  
+## Supported file formats
 
-The second time you select the main folder it will only read the ovs.ser file, which is much faster than analyzing all the files again.
-
-**IMPORTANT NOTE**: If you changed something in your main folder, e.g. added or renamed files or folders you must remove the **ovs.ser** file such that the plugin will reanalyse your folder. 
-
-## Tested file formats
-
-This plugin only supports a few file formats. Currenty it should work for
+This plugin currently only supports a few file formats; it was tested for
 
 - Luxendo h5 files (opening "/Data111")
 - Uncompressed tif files saved with MATLAB
@@ -41,24 +34,21 @@ This plugin only supports a few file formats. Currenty it should work for
 1. Download the jar: https://github.com/tischi/imagej-open-stacks-as-virtualstack/raw/master/OpenStacksAsVirtualStack_.jar
 2. Move **OpenStacksAsVirtualStack\_.jar** into your **Fiji.app/plugins**.
 
-
 ## Installation in ImageJ
 
 1. Download https://github.com/tischi/imagej-open-stacks-as-virtualstack/raw/master/OpenStacksAsVirtualStack_.jar
 2. Download https://github.com/tischi/imagej-open-stacks-as-virtualstack/raw/master/jhdf5-14.12.0.jar
 3. Move both jars into your **ImageJ/plugins/jars** folder
 
-
 ## Usage instructions
 
-1. In the Fiji GUI run: **[Plugins > ALMF SPIM > Stack Streaming Tools]**
-2. Select the main_folder containing your data
+### Data streaming
 
-Now you can browse your data.
+1. Run: **[Plugins > ALMF SPIM > Stack Streaming Tools]**
+2. [Stream from folder]: Streams the image data from the folder into IJ's hyperstack viewer  
+3. [Crop as new stream]: ...
 
-## Additional functionality
+### Tracking
 
-### [Crop]
-
-The crop button will crop you data in xy; you need to place a rectangular ROI on your image for this to work. The cropping gives you only a different "view" on the data; no data will be duplicated as it is still streamed from the orginal data; the main benefits of the cropping are:
-- it will load less data and thus be faster  
+1. Run: **[Plugins > ALMF SPIM > Track and Crop]**
+2. [Track selected point]: ... 
