@@ -242,7 +242,6 @@ public class Registration implements PlugIn, ImageListener {
                 //"Add Track Start",
                 "Track Selected Point",
                 "Crop Along Tracks",
-                "Log Track Status",
                 "Show Track Table"
         };
 
@@ -316,7 +315,6 @@ public class Registration implements PlugIn, ImageListener {
 
             panels.add(new JPanel());
             panels.get(iPanel).add(buttons[i++]);
-            panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
             frame.pack();
@@ -349,7 +347,7 @@ public class Registration implements PlugIn, ImageListener {
                 //
                 Roi r = imp.getRoi();
                 if (r == null || !r.getTypeAsString().equals("Point")) {
-                    IJ.showMessage("Please use IJ's 'Point selection tool' on image " + imp.getTitle());
+                    IJ.showMessage("Please use IJ's 'Point selection tool' on image: '" + imp.getTitle()+"'");
                     return;
                 }
                 // add track start ...
@@ -394,12 +392,7 @@ public class Registration implements PlugIn, ImageListener {
                 showCroppedTracks();
             } else if (e.getActionCommand().equals(actions[i++])) {
                 //
-                // Log Status
-                //
-                logStatus();
-            } else if (e.getActionCommand().equals(actions[i++])) {
-                //
-                // Log Status
+                // Show Table
                 //
                 showTrackTable();
             } else if (e.getActionCommand().equals(texts[k++])) {
@@ -468,7 +461,7 @@ public class Registration implements PlugIn, ImageListener {
 
         totalTimePointsToBeTracked += ntTracking;
         int newTrackID = Tracks.size();
-        log("added new track start; id = "+newTrackID+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
+        //log("added new track start; id = "+newTrackID+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
         Tracks.add(new Track(ntTracking));
         Tracks.get(newTrackID).addLocation(new Point3D(x, y, imp.getZ()-1), t, imp.getC()-1);
 
@@ -554,8 +547,6 @@ public class Registration implements PlugIn, ImageListener {
 
 
     public void addTrackToOverlay(Track track, int i) {
-
-        log(""+i);
 
         int rx = (int) gui_pCenterOfMassRadii.getX();
         int ry = (int) gui_pCenterOfMassRadii.getY();

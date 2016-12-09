@@ -44,8 +44,8 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="470" column="22" selection-start-line="470" selection-start-column="22" selection-end-line="470" selection-end-column="22" />
+            <state relative-caret-position="236">
+              <caret line="467" column="27" selection-start-line="467" selection-start-column="27" selection-end-line="467" selection-end-column="27" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1230#1237#0" expanded="true" />
@@ -69,7 +69,7 @@
                 <element signature="e#6898#6899#0" expanded="true" />
                 <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-                <element signature="e#9178#9186#0" expanded="true" />
+                <element signature="e#9142#9150#0" expanded="true" />
                 <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
                 <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
@@ -204,8 +204,8 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="250" />
-    <option name="y" value="46" />
+    <option name="x" value="274" />
+    <option name="y" value="45" />
     <option name="width" value="1403" />
     <option name="height" value="789" />
   </component>
@@ -621,7 +621,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="250" y="46" width="1403" height="789" extended-state="0" />
+    <frame x="274" y="45" width="1403" height="789" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -726,7 +726,7 @@
             <element signature="e#6898#6899#0" expanded="true" />
             <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#9178#9186#0" expanded="true" />
+            <element signature="e#9142#9150#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
@@ -834,7 +834,7 @@
             <element signature="e#6898#6899#0" expanded="true" />
             <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#9178#9186#0" expanded="true" />
+            <element signature="e#9142#9150#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
@@ -950,7 +950,7 @@
             <element signature="e#6898#6899#0" expanded="true" />
             <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#9178#9186#0" expanded="true" />
+            <element signature="e#9142#9150#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
@@ -1077,7 +1077,7 @@
             <element signature="e#6898#6899#0" expanded="true" />
             <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#9178#9186#0" expanded="true" />
+            <element signature="e#9142#9150#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
@@ -1204,7 +1204,7 @@
             <element signature="e#6898#6899#0" expanded="true" />
             <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#9178#9186#0" expanded="true" />
+            <element signature="e#9142#9150#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
@@ -1424,8 +1424,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="470" column="22" selection-start-line="470" selection-start-column="22" selection-end-line="470" selection-end-column="22" />
+        <state relative-caret-position="236">
+          <caret line="467" column="27" selection-start-line="467" selection-start-column="27" selection-end-line="467" selection-end-column="27" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1230#1237#0" expanded="true" />
@@ -1449,7 +1449,7 @@
             <element signature="e#6898#6899#0" expanded="true" />
             <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#9178#9186#0" expanded="true" />
+            <element signature="e#9142#9150#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
