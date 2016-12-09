@@ -193,7 +193,7 @@ public class Registration implements PlugIn, ImageListener {
             frame.setVisible(true);
         }
 
-        public void setImpPosition() {
+        public void highlightSelectedTrack() {
             int r = table.getSelectedRow();
             float x = new Float(table.getModel().getValueAt(r, 1).toString());
             float y = new Float(table.getModel().getValueAt(r, 2).toString());
@@ -208,7 +208,7 @@ public class Registration implements PlugIn, ImageListener {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            setImpPosition();
+            highlightSelectedTrack();
         }
 
         @Override
@@ -243,7 +243,7 @@ public class Registration implements PlugIn, ImageListener {
 
         @Override
         public void keyReleased(KeyEvent e) {
-            setImpPosition();
+            highlightSelectedTrack();
         }
     }
 

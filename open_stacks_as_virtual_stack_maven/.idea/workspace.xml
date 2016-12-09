@@ -44,8 +44,8 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="177">
-              <caret line="197" column="48" selection-start-line="197" selection-start-column="48" selection-end-line="197" selection-end-column="48" />
+            <state relative-caret-position="694">
+              <caret line="242" column="0" selection-start-line="242" selection-start-column="0" selection-end-line="242" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1316#1323#0" expanded="true" />
@@ -62,13 +62,15 @@
                 <element signature="e#4665#4666#0" expanded="true" />
                 <element signature="e#4701#4702#0" expanded="true" />
                 <element signature="method#showTable#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+                <element signature="method#highlightSelectedTrack#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#mouseEntered#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-                <element signature="e#7453#7454#0" expanded="true" />
-                <element signature="e#7493#7494#0" expanded="true" />
+                <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+                <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+                <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-                <element signature="e#9780#9788#0" expanded="true" />
+                <element signature="e#9804#9812#0" expanded="true" />
                 <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
@@ -216,8 +218,8 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="62" />
-    <option name="y" value="125" />
+    <option name="x" value="460" />
+    <option name="y" value="156" />
     <option name="width" value="1403" />
     <option name="height" value="789" />
   </component>
@@ -637,8 +639,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="62" y="125" width="1403" height="789" extended-state="0" />
-    <editor active="false" />
+    <frame x="460" y="156" width="1403" height="789" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -647,7 +649,7 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30313015" sideWeight="0.33741394" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299373" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24677187" sideWeight="0.6625861" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24677187" sideWeight="0.6625861" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -735,13 +737,15 @@
             <element signature="e#4665#4666#0" expanded="true" />
             <element signature="e#4701#4702#0" expanded="true" />
             <element signature="method#showTable#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#highlightSelectedTrack#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseEntered#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="e#7453#7454#0" expanded="true" />
-            <element signature="e#7493#7494#0" expanded="true" />
+            <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#9780#9788#0" expanded="true" />
+            <element signature="e#9804#9812#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
@@ -845,13 +849,15 @@
             <element signature="e#4665#4666#0" expanded="true" />
             <element signature="e#4701#4702#0" expanded="true" />
             <element signature="method#showTable#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#highlightSelectedTrack#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseEntered#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="e#7453#7454#0" expanded="true" />
-            <element signature="e#7493#7494#0" expanded="true" />
+            <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#9780#9788#0" expanded="true" />
+            <element signature="e#9804#9812#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
@@ -963,13 +969,15 @@
             <element signature="e#4665#4666#0" expanded="true" />
             <element signature="e#4701#4702#0" expanded="true" />
             <element signature="method#showTable#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#highlightSelectedTrack#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseEntered#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="e#7453#7454#0" expanded="true" />
-            <element signature="e#7493#7494#0" expanded="true" />
+            <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#9780#9788#0" expanded="true" />
+            <element signature="e#9804#9812#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
@@ -1092,13 +1100,15 @@
             <element signature="e#4665#4666#0" expanded="true" />
             <element signature="e#4701#4702#0" expanded="true" />
             <element signature="method#showTable#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#highlightSelectedTrack#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseEntered#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="e#7453#7454#0" expanded="true" />
-            <element signature="e#7493#7494#0" expanded="true" />
+            <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#9780#9788#0" expanded="true" />
+            <element signature="e#9804#9812#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
@@ -1221,13 +1231,15 @@
             <element signature="e#4665#4666#0" expanded="true" />
             <element signature="e#4701#4702#0" expanded="true" />
             <element signature="method#showTable#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#highlightSelectedTrack#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseEntered#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="e#7453#7454#0" expanded="true" />
-            <element signature="e#7493#7494#0" expanded="true" />
+            <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#9780#9788#0" expanded="true" />
+            <element signature="e#9804#9812#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
@@ -1450,8 +1462,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="177">
-          <caret line="197" column="48" selection-start-line="197" selection-start-column="48" selection-end-line="197" selection-end-column="48" />
+        <state relative-caret-position="694">
+          <caret line="242" column="0" selection-start-line="242" selection-start-column="0" selection-end-line="242" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1316#1323#0" expanded="true" />
@@ -1468,13 +1480,15 @@
             <element signature="e#4665#4666#0" expanded="true" />
             <element signature="e#4701#4702#0" expanded="true" />
             <element signature="method#showTable#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#highlightSelectedTrack#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseEntered#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="e#7453#7454#0" expanded="true" />
-            <element signature="e#7493#7494#0" expanded="true" />
+            <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#9780#9788#0" expanded="true" />
+            <element signature="e#9804#9812#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
