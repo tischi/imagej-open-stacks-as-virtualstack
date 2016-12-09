@@ -39,11 +39,27 @@ public class Track {
         return(p);
     }
 
-    public Point3D getXYZbyIndex(int i) {
+    public Point3D getXYZ(int i) {
         return(p[i]);
     }
 
-    public int getChannelbyIndex(int i) {
+    public double getX(int i) {
+        return(p[i].getX());
+    }
+
+    public double getY(int i) {
+        return(p[i].getY());
+    }
+
+    public double getZ(int i) {
+        return(p[i].getZ());
+    }
+
+    public int getT(int i) {
+        return(t[i]);
+    }
+
+    public int getC(int i) {
         return(c[i]);
     }
 

@@ -294,7 +294,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 ImagePlus impCT = vss.getFullFrame(t, c);
                 fs = new FileSaver(impCT);
-                String pathCT = path + "--C"+c+"--T"+t+".tif";
+                String sC = String.format("%1$02d",c);
+                String sT = String.format("%1$05d",t);
+                String pathCT = path + "--C"+sC+"--T"+sT+".tif";
                 fs.saveAsTiffStack(pathCT);
                 iProgress = t+c*nT;
 

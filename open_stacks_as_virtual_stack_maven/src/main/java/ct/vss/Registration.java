@@ -10,6 +10,8 @@ import javafx.embed.swing.JFXPanel;
 import javafx.geometry.Point3D;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.lang.String;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static ij.IJ.log;
 
@@ -32,26 +35,27 @@ public class Registration implements PlugIn, ImageListener {
     VirtualStackOfStacks vss;
     ImagePlus imp;
     ImagePlus impTR; // track review
-    public final static int MEAN=10, MEDIAN=11, MIN=12, MAX=13, VAR=14, MAXLOCAL=15; // Filters3D
     private static NonBlockingGenericDialog gd;
     private final static Point3D pOnes = new Point3D(1,1,1);
     // gui variables
-    int gui_c, gui_t, gui_ntTracking, gui_bg;
+    int gui_ntTracking, gui_bg;
     int gui_iterations = 6;
     int gui_dz = 1;
     int gui_dt = 1;
     Point3D gui_pCenterOfMassRadii;
     Point3D gui_pCropRadii;
     ArrayList<Track> Tracks = new ArrayList<Track>();
-    Roi[] rTrackStarts = new Roi[100];
-    int gui_selectedTrack;
-    int nTracks = 0;
-    int nTrackStarts = 0;
+    ArrayList<Roi> rTrackStarts = new ArrayList<Roi>();
     private String gui_centeringMethod = "center of mass";
-    int iProgressLogged;
-    int iProgress;
-    String[] logs = new String[1000];
-
+    TrackTable trackTable;
+    long trackStatsStartTime;
+    long trackStatsReportDelay = 200;
+    long trackStatsLastReport = System.currentTimeMillis();
+    int totalTimePointsToBeTracked = 0;
+    AtomicInteger totalTimePointsTracked = new AtomicInteger(0);
+    AtomicInteger totalTimeSpentTracking = new AtomicInteger(0);
+    long trackStatsLastTrackStarted;
+    int trackStatsTotalPointsTrackedAtLastStart;
 
     // todo: deal with the 100 as max number of tracks
     public Registration(ImagePlus imp) {
@@ -66,11 +70,17 @@ public class Registration implements PlugIn, ImageListener {
     }
 
     public void showDialog(){
-        TrackingGUI gt = new TrackingGUI();
-        gt.showDialog();
+
+        SwingUtilities.invokeLater(new Runnable() {
+                                       public void run() {
+                                           TrackingGUI gt = new TrackingGUI();
+                                           gt.showDialog();
+                                       }
+                                   });
     }
 
     private void initialize() {
+
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         if(vss==null) {
             throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
@@ -80,6 +90,7 @@ public class Registration implements PlugIn, ImageListener {
         gui_pCropRadii = new Point3D(60,60,10);
         gui_ntTracking = imp.getNFrames();
         gui_bg = (int) imp.getProcessor().getMin();
+        trackTable = new TrackTable();
         ImagePlus.addImageListener(this);
     }
 
@@ -98,37 +109,166 @@ public class Registration implements PlugIn, ImageListener {
         }
     }
 
+    class TrackTable  {
+        JTable table;
+
+        public TrackTable() {
+            String[] columnNames = {"ID_T",
+                    "X",
+                    "Y",
+                    "Z",
+                    "T",
+                    "ID"
+                    //,
+                    //"t_TotalSum",
+                    //"t_ReadThis",
+                    //"t_ProcessThis"
+            };
+
+            DefaultTableModel model = new DefaultTableModel(columnNames,0);
+            table = new JTable(model);
+            table.setPreferredScrollableViewportSize(new Dimension(500, 200));
+            table.setFillsViewportHeight(true);
+            table.setAutoCreateRowSorter(true);
+        }
+
+        public void addRow(final Object[] row) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    DefaultTableModel model = (DefaultTableModel) table.getModel();
+                    model.addRow(row);
+                }
+            });
+        }
+
+        public JTable getTable() {
+            return table;
+        }
+
+    }
+
+    class TrackTablePanel extends JPanel implements MouseListener, KeyListener {
+        private boolean DEBUG = false;
+        JTable table;
+        JFrame frame;
+        JScrollPane scrollPane;
+
+        public TrackTablePanel() {
+            super(new GridLayout(1, 0));
+
+            //DefaultTableModel model = new DefaultTableModel(columnNames,);
+            table = trackTable.getTable();
+            table.setPreferredScrollableViewportSize(new Dimension(500, 200));
+            table.setFillsViewportHeight(true);
+            table.setAutoCreateRowSorter(true);
+            table.setRowSelectionAllowed(true);
+            table.addMouseListener(this);
+            table.addKeyListener(this);
+
+            //Create the scroll pane and add the table to it.
+            scrollPane = new JScrollPane(table);
+
+            //Add the scroll pane to this panel.
+            add(scrollPane);
+        }
+
+        public void showTable() {
+            //Create and set up the window.
+            frame = new JFrame("Tracks");
+            //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            //Create and set up the content pane.
+            this.setOpaque(true); //content panes must be opaque
+            frame.setContentPane(this);
+
+            //Display the window.
+            frame.pack();
+            frame.setVisible(true);
+        }
+
+        public void setImpPosition() {
+            int r = table.getSelectedRow();
+            float z = new Float(table.getModel().getValueAt(r, 3).toString());
+            int t = new Integer(table.getModel().getValueAt(r, 4).toString());
+
+            imp.setPosition(0,(int)z+1,t+1);
+            //log("t="+table.getModel().getValueAt(r, 5));
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            setImpPosition();
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            setImpPosition();
+        }
+    }
+
     class TrackingGUI implements ActionListener, FocusListener {
 
         String[] actions = {
-                "Add track start",
-                "Track all",
-                "View cropped tracks",
-                "Log status"
+                //"Add Track Start",
+                "Track Selected Point",
+                "Crop Along Tracks",
+                "Log Track Status",
+                "Show Track Table"
         };
 
         String[] texts = {
-                "Tracking radii xy,z [pix]",
-                "Cropping radii xy,z [pix]",
+                "Tracking center of mass radii; xy,z [pix]",
+                "Cropping radii; xy,z [pix]",
                 "Track length [frames]",
-                "Image background",
-
+                "Image background"
         };
 
         String[] defaults = {
-                String.valueOf((int)gui_pCenterOfMassRadii.getX())+","+String.valueOf((int)gui_pCenterOfMassRadii.getZ()),
-                String.valueOf((int)gui_pCropRadii.getX())+","+String.valueOf((int)gui_pCropRadii.getZ()),
+                String.valueOf((int) gui_pCenterOfMassRadii.getX()) + "," + String.valueOf((int) gui_pCenterOfMassRadii.getZ()),
+                String.valueOf((int) gui_pCropRadii.getX()) + "," + String.valueOf((int) gui_pCropRadii.getZ()),
                 String.valueOf(imp.getNFrames()),
-                String.valueOf(gui_bg),
+                String.valueOf(gui_bg)
         };
+
+        ExecutorService es = Executors.newCachedThreadPool();
 
         public void TrackingGUI() {
         }
 
         public void showDialog() {
 
-            JFrame frame = new JFrame("Tracking");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            JFrame frame = new JFrame("Big Data Tracker");
+            //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             Container c = frame.getContentPane();
             c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
 
@@ -156,24 +296,28 @@ public class Registration implements PlugIn, ImageListener {
             int i = 0, j = 0;
 
             // todo; replace by arraylist
-            JPanel[] panels = new JPanel[6];
+            ArrayList<JPanel> panels = new ArrayList<JPanel>();
+            int iPanel = 0;
 
-            for(int k=0; k<textFields.length; k++) {
-                panels[j] = new JPanel();
-                panels[j].add(labels[k]);
-                panels[j].add(textFields[k]);
-                c.add(panels[j++]);
+            for (int k = 0; k < textFields.length; k++) {
+                panels.add(new JPanel());
+                panels.get(iPanel).add(labels[k]);
+                panels.get(iPanel).add(textFields[k]);
+                c.add(panels.get(iPanel++));
             }
 
-            panels[j] = new JPanel();
-            panels[j].add(buttons[i++]);
-            panels[j].add(buttons[i++]);
-            panels[j].add(buttons[i++]);
-            c.add(panels[j++]);
+            panels.add(new JPanel());
+            panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
 
-            panels[j] = new JPanel();
-            panels[j].add(buttons[i++]);
-            c.add(panels[j++]);
+            panels.add(new JPanel());
+            panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
+
+            panels.add(new JPanel());
+            panels.get(iPanel).add(buttons[i++]);
+            panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
 
             frame.pack();
             frame.setLocationRelativeTo(imp.getWindow());
@@ -182,13 +326,13 @@ public class Registration implements PlugIn, ImageListener {
 
         }
 
-        public void focusGained(FocusEvent e){
+        public void focusGained(FocusEvent e) {
             //
         }
 
-        public void focusLost(FocusEvent e){
-            JTextField tf = (JTextField)e.getSource();
-            if(!(tf==null)){
+        public void focusLost(FocusEvent e) {
+            JTextField tf = (JTextField) e.getSource();
+            if (!(tf == null)) {
                 tf.postActionEvent();
             }
         }
@@ -204,28 +348,32 @@ public class Registration implements PlugIn, ImageListener {
                 // Add track
                 //
                 Roi r = imp.getRoi();
-                if (r==null || !r.getTypeAsString().equals("Point")) {
-                    IJ.showMessage("Please use IJ's 'Point selection tool' on image "+imp.getTitle());
+                if (r == null || !r.getTypeAsString().equals("Point")) {
+                    IJ.showMessage("Please use IJ's 'Point selection tool' on image " + imp.getTitle());
                     return;
                 }
-                addTrackStart(imp);
+                // add track start ...
+                int iNewTrack = addTrackStart(imp);
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
+                // ... and start tracking immediately
+                if( iNewTrack >= 0 ) {
+                    trackStatsLastTrackStarted = System.currentTimeMillis();
+                    trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
+                    es.execute(new Registration.track3D(iNewTrack, 1, gui_dz, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
+                }
+
+            }
+
+            /*else if (e.getActionCommand().equals(actions[i++])) {
                 //
                 // Track
                 //
-                iProgressLogged = 0;
-                iProgress = 0;
                 // launch tracking
-                ExecutorService es = Executors.newCachedThreadPool();
-                es.execute(new Thread(new Runnable() {
-                    public void run() {
-                        updateTrackingStatus();
-                    }
-                }));
 
-                for(int iTrack=0; iTrack<Tracks.size(); iTrack++) {
-                    if(!Tracks.get(iTrack).completed) {
+                trackStatsStartTime = System.currentTimeMillis();
+                trackStatsLastReport = 0;
+                for (int iTrack = 0; iTrack < Tracks.size(); iTrack++) {
+                    if (!Tracks.get(iTrack).completed) {
                         es.execute(new Registration.track3D(iTrack, 1, gui_dz, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
                     }
                 }
@@ -239,7 +387,7 @@ public class Registration implements PlugIn, ImageListener {
                 } catch (InterruptedException ex) {
                     System.err.println("tasks interrupted");
                 }*/
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            else if (e.getActionCommand().equals(actions[i++])) {
                 //
                 // View Tracks
                 //
@@ -249,48 +397,62 @@ public class Registration implements PlugIn, ImageListener {
                 // Log Status
                 //
                 logStatus();
-
+            } else if (e.getActionCommand().equals(actions[i++])) {
+                //
+                // Log Status
+                //
+                showTrackTable();
             } else if (e.getActionCommand().equals(texts[k++])) {
                 //
                 // Tracking radii
                 //
-                JTextField source = (JTextField)e.getSource();
+                JTextField source = (JTextField) e.getSource();
                 sA = source.getText().split(",");
+                log(texts[k-1] + ": " + source.getText());
                 gui_pCenterOfMassRadii = new Point3D(new Integer(sA[0]), new Integer(sA[0]), new Integer(sA[1]));
-
             } else if (e.getActionCommand().equals(texts[k++])) {
                 //
                 // Cropping radii
                 //
-                JTextField source = (JTextField)e.getSource();
+                JTextField source = (JTextField) e.getSource();
                 sA = source.getText().split(",");
+                log(texts[k-1] + ": " + source.getText());
                 gui_pCropRadii = new Point3D(new Integer(sA[0]), new Integer(sA[0]), new Integer(sA[1]));
-
             } else if (e.getActionCommand().equals(texts[k++])) {
                 //
                 // nt
                 //
-                JTextField source = (JTextField)e.getSource();
-                log(texts[k-1]+": "+source.getText());
+                JTextField source = (JTextField) e.getSource();
+                log(texts[k-1] + ": " + source.getText());
                 gui_ntTracking = new Integer(source.getText());
             } else if (e.getActionCommand().equals(texts[k++])) {
                 //
                 // bg
                 //
-                JTextField source = (JTextField)e.getSource();
-                log(texts[k-1]+": "+source.getText());
+                JTextField source = (JTextField) e.getSource();
+                log(texts[k-1] + ": " + source.getText());
                 gui_bg = new Integer(source.getText());
             }
         }
+
     }
 
-    public void addTrackStart(ImagePlus imp) {
+    public void showTrackTable(){
+        if(trackTable==null) {
+            IJ.showMessage("There are no tracks to show yet.");
+            return;
+        }
+        TrackTablePanel ttp = new TrackTablePanel();
+        ttp.showTable();
+    }
+
+    public int addTrackStart(ImagePlus imp) {
         int x,y,t;
         Roi r = imp.getRoi();
 
         if(!r.getTypeAsString().equals("Point")) {
             IJ.showMessage("Please use IJ's 'Point selection tool' to mark objects.");
-            return;
+            return(-1);
         }
 
         x = r.getPolygon().xpoints[0];
@@ -300,38 +462,17 @@ public class Registration implements PlugIn, ImageListener {
         t = imp.getT()-1;
         if(t+gui_ntTracking > imp.getNFrames()) {
             IJ.showMessage("Your Track would be longer than the movie; " +
-                    "please reduce 'Track length'.");
-            return;
+                    "please reduce 'Track length' or start tracking from an earlier time point.");
+            return(-1);
         }
 
-
+        totalTimePointsToBeTracked += ntTracking;
         int newTrackID = Tracks.size();
         log("added new track start; id = "+newTrackID+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
         Tracks.add(new Track(ntTracking));
         Tracks.get(newTrackID).addLocation(new Point3D(x, y, imp.getZ()-1), t, imp.getC()-1);
 
-        int rx = (int) gui_pCenterOfMassRadii.getX();
-        int ry = (int) gui_pCenterOfMassRadii.getY();
-        int rz = (int) gui_pCenterOfMassRadii.getZ();
-
-        for(int z=imp.getZ()-rz; z<=imp.getZ()+rz; z++) {
-            rTrackStarts[nTrackStarts] = new Roi(x - rx, y - ry, 2 * rx + 1, 2 * ry + 1);
-            rTrackStarts[nTrackStarts].setPosition(imp.getC(), z, imp.getT());
-            nTrackStarts++;
-        }
-
-        Overlay o = imp.getOverlay();
-        if(o==null) {
-            o = new Overlay();
-        } else {
-            o.clear();
-        }
-        for(int i=0; i<=nTrackStarts; i++) {
-            o.add(rTrackStarts[i]);
-        }
-        imp.setOverlay(o);
-        nTracks++;
-
+        return(newTrackID);
 
     }
 
@@ -411,72 +552,44 @@ public class Registration implements PlugIn, ImageListener {
         return uncomplete;
     }
 
-    public boolean updateTrackingStatus() {
-        while(getNumberOfUncompletedTracks()!=0) {
-            IJ.wait(100);
-            if(iProgress>iProgressLogged) {
-                for (int i = iProgressLogged; i < iProgress; i++)
-                    log(logs[i]);
-                iProgressLogged = iProgress;
-            }
+
+    public void addTrackToOverlay(Track track, int i) {
+
+        log(""+i);
+
+        int rx = (int) gui_pCenterOfMassRadii.getX();
+        int ry = (int) gui_pCenterOfMassRadii.getY();
+        int rz = (int) gui_pCenterOfMassRadii.getZ();
+
+        Roi roi;
+        Overlay o = imp.getOverlay();
+        if(o==null) {
+            o = new Overlay();
+            imp.setOverlay(o);
         }
-        return true;
+
+        int x = (int) track.getX(i);
+        int y = (int) track.getY(i);
+        int z = (int) track.getZ(i);
+        int c = (int) track.getC(i);
+        int t = (int) track.getT(i);
+
+        int rrx, rry;
+        for(int iz=0; iz<imp.getNSlices(); iz++) {
+            rrx = Math.max(rx/(Math.abs(iz-z)+1),1);
+            rry = Math.max(ry/(Math.abs(iz-z)+1),1);
+            roi = new Roi(x - rrx, y - rry, 2 * rrx + 1, 2 * rry + 1);
+            roi.setPosition(c+1, iz+1, t+1);
+            o.add(roi);
+        }
+
     }
-
-    // todo: maybe one could set all tracks as overlays using r.setPosition?!
-    // this would avoid the updating
-
-    /*public void showTracksOnFrame(ImagePlus imp, Track[] Tracks) {
-
-        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-        if(vss==null) return;
-        if((imp.getT()-1) == tTR) return; // no new frame selected
-        tTR = imp.getT()-1;
-
-        Overlay o = new Overlay();
-
-        for(int i=0; i<nCompletedTracks; i++) {
-            Point3D pCenter = Tracks[i][tTR];
-            if (pCenter != null) {
-                if (vss.isCropped()) {
-                    pCenter = pCenter.subtract(vss.getCropOffset());
-                }
-                if (Globals.verbose) {
-                    log("Registration.showTrackOnFrame pTracked: " + pCenter.toString());
-                }
-                //log("showTrackOnFrame: pCenter: "+pCenter.toString());
-                int rx = (int) gui_pStackRadii.getX();
-                int ry = (int) gui_pStackRadii.getY();
-                Roi r = new PointRoi(pCenter.getX(), pCenter.getY());
-                r.setPosition(gui_c, (int) pCenter.getZ(), tTR);
-
-                Roi cropBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
-                //o.add(cropBounds);
-                rx = (int) gui_pCenterOfMassRadii.getX();
-                ry = (int) gui_pCenterOfMassRadii.getY();
-                Roi comBounds = new Roi(pCenter.getX() - rx, pCenter.getY() - ry, 2 * rx + 1, 2 * ry + 1);
-
-                o.add(comBounds);
-                o.add(r);
-                //imp.setPosition(imp.getC(), ((int) pCenter.getZ() + 1), imp.getT());
-                //imp.deleteRoi();
-                //imp.setRoi(r);
-                o.setLabelColor(Color.blue);
-            } else {
-                if (Globals.verbose) {
-                    log("Registration.showTrackOnFrame: No track available for this time point");
-                }
-                //Overlay o = new Overlay();
-                //imp.setOverlay(o);
-            }
-        } // iTrack
-
-    }*/
 
 
     class track3D implements Runnable {
         int iTrack, c, nt, dt, dz, bg, iterations;
         Point3D pStackRadii, pCenterOfMassRadii;
+        String log;
 
         ImageStack stack;
         Point3D pOffset, pLocalCenter;
@@ -491,15 +604,15 @@ public class Registration implements PlugIn, ImageListener {
         }
 
         public void run() {
-            long startTime, stopTime, elapsedReadingTime, elapsedProcessingTime;
+            long startTime = 0, stopTime, elapsedReadingTime, elapsedProcessingTime;
+            long startTimePerTimePoint, totalElapsedTime = 0;
 
-            // todo: is there some nicer way than the Polygons?
             Track track = Tracks.get(iTrack);
 
             int tStart = track.getTmin();
-            int channel = track.getChannelbyIndex(0);
+            int channel = track.getC(0);
             int nt = track.getLength();
-            Point3D pStackCenter = track.getXYZbyIndex(0);
+            Point3D pStackCenter = track.getXYZ(0);
             track.reset();
             Point3D pStackRadii = pCenterOfMassRadii.multiply(2.0);
 
@@ -536,7 +649,16 @@ public class Registration implements PlugIn, ImageListener {
                 for (int j = 0; j < dt; j++) {
                     if ((it + j) < imp.getNFrames()) {
                         Point3D p = pStackCenter.add(pOffset.multiply((j + 1.0) / dt));
+                        // store as track
                         track.addLocation(p, it + j, channel);
+                        // update also in table
+                        trackTable.addRow(new Object[]{
+                                String.format("%1$04d",iTrack)+"_"+String.format("%1$05d",it),
+                                (float)p.getX(), (float)p.getY(), (float)p.getZ(), it, iTrack
+                                //totalElapsedTime, elapsedReadingTime, elapsedProcessingTime
+                        });
+                        // add as overlay on the image
+                        addTrackToOverlay(track, it + j - tStart);
                     }
                 }
 
@@ -545,11 +667,31 @@ public class Registration implements PlugIn, ImageListener {
                 // - also have a linear motion model for the update, i.e. add pOffset*2
                 pStackCenter = pStackCenter.add(pOffset);
 
-                logs[iProgress++]=("track id = " + iTrack + "; t [frame] = " + it +
-                        "; reading time [ms] = "+elapsedReadingTime+
-                        "; processing time [ms] = "+elapsedProcessingTime);
+
+                // show progress
+                int n = totalTimePointsTracked.addAndGet(1);
+                if( (System.currentTimeMillis() > trackStatsReportDelay+trackStatsLastReport)
+                        || (n==totalTimePointsToBeTracked))
+                    {
+                    trackStatsLastReport = System.currentTimeMillis();
+
+                    long dt = System.currentTimeMillis()-trackStatsLastTrackStarted;
+                    int dn = n - trackStatsTotalPointsTrackedAtLastStart;
+                    int nToGo = totalTimePointsToBeTracked - n;
+                    float speed = (float)1.0*dn/dt*1000;
+                    float remainingTime = (float)1.0*nToGo/speed;
+
+                    Globals.threadlog(
+                            "progress = "+n+"/"+totalTimePointsToBeTracked+
+                            "; speed [n/s] = "+String.format("%.2g",speed)+
+                            "; remaining [s] = "+String.format("%.2g",remainingTime)+
+                            "; reading [ms] = "+elapsedReadingTime+
+                            "; processing [ms] = "+elapsedProcessingTime
+                    );
+                }
 
                 if(Globals.verbose) {
+                    log("Read data [ms]: " + elapsedReadingTime);
                     log("Read data [ms]: " + elapsedReadingTime);
                     log("Reading speed [MB/s]: " + stack.getHeight() * stack.getWidth() * stack.getSize() * 2 / ((elapsedReadingTime + 0.001) * 1000));
                     log("Detected shift [pixel]:" +
@@ -558,13 +700,9 @@ public class Registration implements PlugIn, ImageListener {
                             " z:" + String.format("%.2g", pOffset.getZ()));
                 }
 
-                //IJ.showStatus("" + it + "/" + tMax);
-                //IJ.showProgress((double) (it - t) / (tMax - t));
-
             }
-            //IJ.showStatus("" + tMax + "/" + tMax);
-            //IJ.showProgress(1.0);
-            logs[iProgress++] = ("track id = "+iTrack+"; tracking of "+nt+" frames completed");
+
+            //Globals.threadlog("track id = "+iTrack+"; nt [frames] = "+nt+"; completed.");
             track.completed = true;
             return;
         }
