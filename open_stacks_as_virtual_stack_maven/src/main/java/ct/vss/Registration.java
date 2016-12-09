@@ -8,6 +8,7 @@ import ij.process.ImageProcessor;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.geometry.Point3D;
+import oracle.jrockit.jfr.JFR;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -58,6 +59,7 @@ public class Registration implements PlugIn, ImageListener {
     AtomicInteger totalTimeSpentTracking = new AtomicInteger(0);
     long trackStatsLastTrackStarted;
     int trackStatsTotalPointsTrackedAtLastStart;
+    TrackingGUI trackingGUI;
 
     private JFileChooser myJFileChooser = new JFileChooser(new File("."));
 
@@ -77,8 +79,8 @@ public class Registration implements PlugIn, ImageListener {
 
         SwingUtilities.invokeLater(new Runnable() {
                                        public void run() {
-                                           TrackingGUI gt = new TrackingGUI();
-                                           gt.showDialog();
+                                           trackingGUI = new TrackingGUI();
+                                           trackingGUI.showDialog();
                                        }
                                    });
     }
@@ -187,15 +189,20 @@ public class Registration implements PlugIn, ImageListener {
 
             //Display the window.
             frame.pack();
+            frame.setLocation(trackingGUI.getFrame().getX() + trackingGUI.getFrame().getWidth(), trackingGUI.getFrame().getY());
             frame.setVisible(true);
         }
 
         public void setImpPosition() {
             int r = table.getSelectedRow();
+            float x = new Float(table.getModel().getValueAt(r, 1).toString());
+            float y = new Float(table.getModel().getValueAt(r, 2).toString());
             float z = new Float(table.getModel().getValueAt(r, 3).toString());
             int t = new Integer(table.getModel().getValueAt(r, 4).toString());
-
             imp.setPosition(0,(int)z+1,t+1);
+            Roi pr = new PointRoi(x,y);
+            pr.setPosition(0,(int)z+1,t+1);
+            imp.setRoi(pr);
             //log("t="+table.getModel().getValueAt(r, 5));
         }
 
@@ -246,8 +253,8 @@ public class Registration implements PlugIn, ImageListener {
 
         String[] actions = {
                 //"Add Track Start",
-                "Track Selected Point",
-                "Crop Along Tracks",
+                "Track selected Object",
+                "Crop Image along Tracks",
                 "Show Track Table", "Save Track Table"
         };
 
@@ -305,7 +312,7 @@ public class Registration implements PlugIn, ImageListener {
             int iPanel = 0;
 
             for (int k = 0; k < textFields.length; k++) {
-                panels.add(new JPanel());
+                panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
                 panels.get(iPanel).add(labels[k]);
                 panels.get(iPanel).add(textFields[k]);
                 c.add(panels.get(iPanel++));
@@ -325,8 +332,7 @@ public class Registration implements PlugIn, ImageListener {
             c.add(panels.get(iPanel++));
 
             frame.pack();
-            frame.setLocationRelativeTo(imp.getWindow());
-            frame.setAlwaysOnTop(true);
+            frame.setLocation(imp.getWindow().getX() + imp.getWindow().getWidth(), imp.getWindow().getY());
             frame.setVisible(true);
 
         }
@@ -425,6 +431,9 @@ public class Registration implements PlugIn, ImageListener {
             }
         }
 
+        public JFrame getFrame() {
+            return frame;
+        }
     }
 
     public void showTrackTable(){
