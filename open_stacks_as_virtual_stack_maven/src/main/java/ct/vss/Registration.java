@@ -12,8 +12,10 @@ import javafx.geometry.Point3D;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -56,6 +58,8 @@ public class Registration implements PlugIn, ImageListener {
     AtomicInteger totalTimeSpentTracking = new AtomicInteger(0);
     long trackStatsLastTrackStarted;
     int trackStatsTotalPointsTrackedAtLastStart;
+
+    private JFileChooser myJFileChooser = new JFileChooser(new File("."));
 
     // todo: deal with the 100 as max number of tracks
     public Registration(ImagePlus imp) {
@@ -238,11 +242,13 @@ public class Registration implements PlugIn, ImageListener {
 
     class TrackingGUI implements ActionListener, FocusListener {
 
+        JFrame frame;
+
         String[] actions = {
                 //"Add Track Start",
                 "Track Selected Point",
                 "Crop Along Tracks",
-                "Show Track Table"
+                "Show Track Table", "Save Track Table"
         };
 
         String[] texts = {
@@ -266,7 +272,7 @@ public class Registration implements PlugIn, ImageListener {
 
         public void showDialog() {
 
-            JFrame frame = new JFrame("Big Data Tracker");
+            frame = new JFrame("Big Data Tracker");
             //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             Container c = frame.getContentPane();
             c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
@@ -315,6 +321,7 @@ public class Registration implements PlugIn, ImageListener {
 
             panels.add(new JPanel());
             panels.get(iPanel).add(buttons[i++]);
+            panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
             frame.pack();
@@ -339,6 +346,7 @@ public class Registration implements PlugIn, ImageListener {
             int i = 0;
             int k = 0;
             String[] sA;
+            JFileChooser fc;
             final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
 
             if (e.getActionCommand().equals(actions[i++])) {
@@ -360,32 +368,7 @@ public class Registration implements PlugIn, ImageListener {
                     es.execute(new Registration.track3D(iNewTrack, 1, gui_dz, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
                 }
 
-            }
-
-            /*else if (e.getActionCommand().equals(actions[i++])) {
-                //
-                // Track
-                //
-                // launch tracking
-
-                trackStatsStartTime = System.currentTimeMillis();
-                trackStatsLastReport = 0;
-                for (int iTrack = 0; iTrack < Tracks.size(); iTrack++) {
-                    if (!Tracks.get(iTrack).completed) {
-                        es.execute(new Registration.track3D(iTrack, 1, gui_dz, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
-                    }
-                }
-
-                // wait until finished
-                /*try {
-                    es.shutdown();
-                    while(!es.awaitTermination(1, TimeUnit.MINUTES)){
-                        IJ.wait(10);
-                    };
-                } catch (InterruptedException ex) {
-                    System.err.println("tasks interrupted");
-                }*/
-            else if (e.getActionCommand().equals(actions[i++])) {
+            } else if (e.getActionCommand().equals(actions[i++])) {
                 //
                 // View Tracks
                 //
@@ -395,6 +378,20 @@ public class Registration implements PlugIn, ImageListener {
                 // Show Table
                 //
                 showTrackTable();
+            } else if (e.getActionCommand().equals(actions[i++])) {
+                //
+                // Save Table
+                //
+                TableModel model = trackTable.getTable().getModel();
+                if(model == null) {
+                    IJ.showMessage("There are no tracks yet.");
+                    return;
+                }
+                fc = new JFileChooser(vss.getDirectory());
+                if (fc.showSaveDialog(this.frame) == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    saveTrackTable(file);
+                }
             } else if (e.getActionCommand().equals(texts[k++])) {
                 //
                 // Tracking radii
@@ -438,6 +435,28 @@ public class Registration implements PlugIn, ImageListener {
         TrackTablePanel ttp = new TrackTablePanel();
         ttp.showTable();
     }
+
+    public void saveTrackTable(File file) {
+        try{
+            TableModel model = trackTable.getTable().getModel();
+            FileWriter excel = new FileWriter(file);
+
+            for(int i = 0; i < model.getColumnCount(); i++){
+                excel.write(model.getColumnName(i) + "\t");
+            }
+            excel.write("\n");
+
+            for(int i=0; i< model.getRowCount(); i++) {
+                for(int j=0; j < model.getColumnCount(); j++) {
+                    excel.write(model.getValueAt(i,j).toString()+"\t");
+                }
+                excel.write("\n");
+            }
+            excel.close();
+
+        } catch(IOException e) { IJ.showMessage(e.toString()); }
+    }
+
 
     public int addTrackStart(ImagePlus imp) {
         int x,y,t;
