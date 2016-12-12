@@ -787,8 +787,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //ImagePlus imp = ovs.openFromInfoFile(directory, "ovs.ser");
         //ImagePlus imp = IJ.getImage();
 
-        imp.show(); Registration register = new Registration(imp);
-        register.showDialog();
+        imp.show();
+        Registration register = new Registration(imp);
+        register.run("");
 
 
         /*

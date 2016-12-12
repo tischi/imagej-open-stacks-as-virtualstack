@@ -8,7 +8,6 @@ import ij.process.ImageProcessor;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.geometry.Point3D;
-import oracle.jrockit.jfr.JFR;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -63,7 +62,10 @@ public class Registration implements PlugIn, ImageListener {
 
     private JFileChooser myJFileChooser = new JFileChooser(new File("."));
 
-    // todo: deal with the 100 as max number of tracks
+
+    public Registration() {
+    }
+
     public Registration(ImagePlus imp) {
         this.imp = imp;
         initialize();
