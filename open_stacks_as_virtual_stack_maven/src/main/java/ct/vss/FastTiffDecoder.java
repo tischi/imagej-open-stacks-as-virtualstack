@@ -96,6 +96,15 @@ public class FastTiffDecoder {
         this.name = name;
     }
 
+
+    // FileReader
+
+    // IFD parser
+
+    // class IFD:
+    // input bytearrray
+    // getMethods for getting the info
+
     /*public FastTiffDecoder(InputStream in, String name) {
         directory = "";
         this.name = name;

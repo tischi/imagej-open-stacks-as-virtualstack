@@ -87,7 +87,6 @@ public class FileInfoSer implements Cloneable, Serializable {
         this.pixelDepth = info.pixelDepth;
         this.frameInterval = info.frameInterval;
         this.bytesPerPixel = info.bytesPerPixel;
-
         this.h5DataSet = info.h5DataSet;
         this.fileTypeString = info.fileTypeString;
         this.isCropped = info.isCropped;

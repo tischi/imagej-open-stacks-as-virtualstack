@@ -60,6 +60,8 @@ public class Registration implements PlugIn, ImageListener {
     int trackStatsTotalPointsTrackedAtLastStart;
     TrackingGUI trackingGUI;
 
+    // todo: put actual tracking into different class
+
     private JFileChooser myJFileChooser = new JFileChooser(new File("."));
 
 
@@ -468,7 +470,6 @@ public class Registration implements PlugIn, ImageListener {
         } catch(IOException e) { IJ.showMessage(e.toString()); }
     }
 
-
     public int addTrackStart(ImagePlus imp) {
         int x,y,t;
         Roi r = imp.getRoi();
@@ -575,7 +576,6 @@ public class Registration implements PlugIn, ImageListener {
         return uncomplete;
     }
 
-
     public void addTrackToOverlay(Track track, int i) {
 
         int rx = (int) gui_pCenterOfMassRadii.getX();
@@ -606,6 +606,7 @@ public class Registration implements PlugIn, ImageListener {
 
     }
 
+    // todo: maybe reload more data if necessary
 
     class track3D implements Runnable {
         int iTrack, c, nt, dt, dz, bg, iterations;
@@ -739,6 +740,7 @@ public class Registration implements PlugIn, ImageListener {
         }
 
         long startTime = System.currentTimeMillis();
+        // todo: getCubeByTimeCenterAndRadii
         ImageStack stack = vss.getCroppedFrameCenterRadii(t, c, dz, p, pr).getStack();
         long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime;
         //log("loaded stack in [ms]: " + elapsedTime);

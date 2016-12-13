@@ -8,7 +8,7 @@ import javafx.geometry.Point3D;
  */
 public class Track {
     int[] t;
-    int[] c;
+    int[] c; // todo: why c? change from array to index
     Point3D[] p;
     int i;
     int n;
@@ -32,9 +32,11 @@ public class Track {
         this.c[i] = c;
         i++;
     }
+
     public void reset() {
         this.i = 0;
     }
+
     public Point3D[] getPoints3D() {
         return(p);
     }
@@ -68,7 +70,7 @@ public class Track {
     }
 
     public int getTmax() {
-        return(t[n-1]);
+        return(t[n-1]); // todo replace with i?!
     }
 
     public int getLength() {

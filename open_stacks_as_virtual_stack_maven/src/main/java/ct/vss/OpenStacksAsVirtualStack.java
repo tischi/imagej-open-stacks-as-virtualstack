@@ -101,7 +101,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             // init the VSS
             VirtualStackOfStacks stack = new VirtualStackOfStacks(directory, infos);
-            ImagePlus imp = makeImagePlus(stack, infos[0][0][0]);
+            ImagePlus imp = makeImagePlus(stack, infos[0][0][0], nT);
             return(imp);
 
         } else {
@@ -112,6 +112,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     public ImagePlus openFromDirectory(String directory, String filter) {
 
         //log("# openFromDirectory");
+        ImagePlus imp = null;
 
         // todo: depending on the fileOrder do different things
         // todo: add the filter to the getFilesInFolder function
@@ -157,9 +158,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         // loop through filtered list and add file-info
         try {
 
-            for (int c = 0; c < nC; c++) {
+            for (int t = 0; t < nT; t++) {
 
-                for (int t = 0; t < nT; t++) {
+                for (int c = 0; c < nC; c++) {
 
                     String ctPath = directory + channelFolders[c] + "/" + lists[c][t];
 
@@ -258,25 +259,55 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     } // h5
 
-                    iProgress = t+c*nT;
+                    iProgress = t+c*nT+1;
                     //IJ.showProgress(t+c*nT, nT*nC);
                     //IJ.showStatus(""+(t+c*nT)+"/"+nT*nC);
 
+                } // c-loop
+
+                // show at 1st time-point
+                if (t == 0) {
+
+                    if (stack != null && stack.getSize() > 0) {
+                        imp = makeImagePlus(stack, infoSer[0], nT);
+                    }
+                    String[] folders = directory.split("/");
+                    imp.setTitle(folders[folders.length - 1]);
+                    imp.show();
+
                 }
-            }
+
+                /*
+                if(t >= 1) {
+
+                    int selectedC = imp.getC();
+                    int selectedZ = imp.getZ();
+                    int selectedT = imp.getT();
+                    imp.setStack(stack, nC, nZ, t+1);
+                    imp.setDimensions(nC, nZ, t+1);
+                    imp.setPosition(selectedC, selectedZ, selectedT);
+                    imp.updateAndDraw();
+                    imp.repaintWindow();
+                    //imp.setOpenAsHyperStack(true);
+                    //log("number of frames: "+imp.getNFrames());
+
+                }*/
+
+
+            } // t-loop
+
         } catch(Exception e) {
             IJ.showMessage("Error: "+e.toString());
         }
 
         iProgress = nProgress;
 
-        ImagePlus imp = null;
+        /*ImagePlus imp = null;
         if(stack!=null && stack.getSize()>0) {
             imp = makeImagePlus(stack, infoSer[0]);
-            writeFileInfosSer(stack.getFileInfosSer(), directory+"ovs.ser");
         }
         String[] folders = directory.split("/");
-        imp.setTitle(folders[folders.length-1]);
+        imp.setTitle(folders[folders.length-1]);*/
         return(imp);
 
     }
@@ -298,7 +329,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 String sT = String.format("%1$05d",t);
                 String pathCT = path + "--C"+sC+"--T"+sT+".tif";
                 fs.saveAsTiffStack(pathCT);
-                iProgress = t+c*nT;
+                iProgress = t+c*nT+1;
 
             }
         }
@@ -400,10 +431,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     }
 
-    public boolean updateStatus() {
+    public boolean updateStatus(String message) {
         while(iProgress<nProgress) {
             IJ.wait(50);
-            IJ.showStatus("" + iProgress + "/" + nProgress);
+            IJ.showStatus(message+" " + iProgress + "/" + nProgress);
         }
         IJ.showStatus(""+nProgress+"/"+nProgress);
         return true;
@@ -639,13 +670,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         VirtualStackOfStacks parentStack = (VirtualStackOfStacks) imp.getStack();
         VirtualStackOfStacks stack = new VirtualStackOfStacks(parentStack.getDirectory(), croppedInfos);
-        return(makeImagePlus(stack, croppedInfos[0][0][0]));
+        return(makeImagePlus(stack, croppedInfos[0][0][0], stack.nT));
 
     }
 
-    private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfoSer fi) {
+    private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfoSer fi, int nT) {
         int nC=stack.nC;
-        int nT=stack.nT;
         int nZ=stack.nZ;
 
         double min = Double.MAX_VALUE;
@@ -660,12 +690,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             log("# OpenStacksAsVirtualStack.makeImagePlus");
             log("nC: "+nC);
             log("nZ: "+nZ);
-            log("nT: " + nT);
+            log("nT: "+nT);
         }
 
         imp.setDimensions(nC, nZ, nT);
         imp.setOpenAsHyperStack(true);
-        if(nC>1) imp.setDisplayMode(IJ.COMPOSITE);
+        //if(nC>1) imp.setDisplayMode(IJ.COMPOSITE);
         imp.setPosition(1, (int) nZ/2, 1);
 		imp.resetDisplayRange();
 		return(imp);
@@ -787,7 +817,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //ImagePlus imp = ovs.openFromInfoFile(directory, "ovs.ser");
         //ImagePlus imp = IJ.getImage();
 
-        imp.show();
+        //imp.show();
         Registration register = new Registration(imp);
         register.run("");
 
@@ -966,17 +996,21 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             Thread t1 = new Thread(new Runnable() {
                 public void run() {
                     ImagePlus imp = osv.openFromDirectory(directory, null);
-                    imp.show();
+                    //imp.show();
                 }
             });
             t1.start();
 
             Thread t2 = new Thread(new Runnable() {
                 public void run() {
-                    osv.iProgress=0;osv.nProgress=100;osv.updateStatus();
+                    osv.iProgress=0;osv.nProgress=100;osv.updateStatus("Analyzed file");
                 }
             });
             t2.start();
+
+            IJ.showMessage("The images are being analyzed and successively added.\n" +
+                    "Please check ImageJ's status to see the overall progress.");
+
 
         } else if (e.getActionCommand().equals(actions[i++])) {
 
@@ -1029,7 +1063,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
                 // update progress status
                 Thread t2 = new Thread(new Runnable() {
                     public void run() {
-                        osv.iProgress=0;osv.nProgress=100;osv.updateStatus();
+                        osv.iProgress=0;osv.nProgress=100;osv.updateStatus("Saving file");
                     }
                 }); t2.start();
 
@@ -1062,7 +1096,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
 
             Thread t2 = new Thread(new Runnable() {
                 public void run() {
-                    osv.updateStatus();
+                    osv.updateStatus("Duplicated time point");
                 }
             });
             t2.start();

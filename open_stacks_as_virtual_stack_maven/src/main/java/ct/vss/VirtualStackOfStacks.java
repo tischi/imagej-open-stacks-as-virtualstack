@@ -4,12 +4,18 @@ package ct.vss;
  * Created by tischi on 27/10/16.
  */
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
 
 import static ij.IJ.log;
+
+
+
+
+// todo: replace all == with "equals"
 
 /**
  This class represents an array of disk-resident image stacks.
@@ -94,6 +100,7 @@ public class VirtualStackOfStacks extends ImageStack {
         if (info==null)
             throw new IllegalArgumentException("'info' is null!");
         infos[c][t] = info;
+        //nSlices += nZ;
     }
 
     /** Does nothing. */
@@ -156,6 +163,8 @@ public class VirtualStackOfStacks extends ImageStack {
         int z = ((n-c)%(nZ*nC))/nC;
         int t = (n-c-z*nC)/(nZ*nC);
 
+        ImagePlus imp;
+
         if(Globals.verbose) {
             log("# VirtualStackOfStacks.getProcessor");
             log("requested slice [one-based]: "+(n+1));
@@ -167,6 +176,18 @@ public class VirtualStackOfStacks extends ImageStack {
 
         int dz = 1;
         Point3D po, ps;
+        if(infos[c][t] == null) {
+            //ImagePlus imp0 = IJ.getImage();
+            //imp0.setPosition(1,(int)imp0.getNSlices()/2,1);
+            //imp0.updateAndDraw();
+            IJ.showMessage("This time point is not loaded yet.\n" +
+                    "Please check the status bar (and select an earlier time point).");
+            imp = IJ.createImage("",nX,nY,1,infos[0][0][0].bytesPerPixel*8);
+            ImageProcessor ip = imp.getProcessor();
+            ip.set(0);
+            return(ip);
+        }
+
         FileInfoSer fi = infos[c][t][0];
 
         if(fi.isCropped) {
@@ -180,7 +201,7 @@ public class VirtualStackOfStacks extends ImageStack {
             ps = new Point3D(fi.width,fi.height,1);
         }
 
-        ImagePlus imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);
+        imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);
 
         if (imp==null) {
             log("Error: loading failed!");
