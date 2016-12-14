@@ -4,9 +4,13 @@ package ct.vss;
  * Created by tischi on 27/10/16.
  */
 
+import ch.systemsx.cisd.hdf5.HDF5DataSetInformation;
+import ch.systemsx.cisd.hdf5.HDF5Factory;
+import ch.systemsx.cisd.hdf5.IHDF5Reader;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.io.FileInfo;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
 
@@ -23,22 +27,25 @@ import static ij.IJ.log;
 public class VirtualStackOfStacks extends ImageStack {
     int nSlices;
     int nX, nY, nZ, nC, nT;
-    protected FileInfoSer[][][] infos;  // c, t, z
-    protected String fileType = "tiff"; // h5
-    protected String directory = "";
+    FileInfoSer[][][] infos;  // c, t, z
+    String fileType = "tiff"; // h5
+    String directory = "";
+    String[] channelFolders;
+    String[][] fileList;
+    String h5DataSet;
 
     /** Creates a new, empty virtual stack of required size */
-    public VirtualStackOfStacks(String directory, Point3D pSize, int nC, int nT, String fileType) {
+    public VirtualStackOfStacks(String directory, String[] channelFolders, String[][] fileList, int nC, int nT, String fileType, String h5DataSet) {
         super();
+
         this.directory = directory;
-        this.nX = (int)pSize.getX();
-        this.nY = (int)pSize.getY();
-        this.nZ = (int)pSize.getZ();
+        this.channelFolders = channelFolders;
+        this.fileList = fileList;
         this.nC = nC;
         this.nT = nT;
         this.fileType = fileType;
         this.infos = new FileInfoSer[nC][nT][];
-        nSlices = nC*nT*nZ;
+        this.h5DataSet = h5DataSet;
 
         if(Globals.verbose) {
             logStatus();
@@ -95,12 +102,112 @@ public class VirtualStackOfStacks extends ImageStack {
         return directory;
     }
 
-    /* Adds an image stack */
-    public void setStack(FileInfoSer[] info, int t, int c) {
-        if (info==null)
-            throw new IllegalArgumentException("'info' is null!");
-        infos[c][t] = info;
-        //nSlices += nZ;
+
+    /** Adds an image stack from file infos */
+    public void setStackFromFile(int t, int c) {
+        FileInfo[] info = null;
+        FileInfo fi = null;
+        FileInfoSer[] infoSer = null;
+
+        String ctPath = directory + channelFolders[c] + "/" + fileList[c][t];
+        try {
+            if (fileType == "tif") {
+
+                long startTime = System.currentTimeMillis();
+                FastTiffDecoder ftd = new FastTiffDecoder(directory + channelFolders[c], fileList[c][t]);
+                info = ftd.getTiffInfo();
+
+                // first file
+                if (t == 0 && c == 0) {
+
+                    if (Globals.verbose) {
+                        log("IFD reading time [ms]: " + (System.currentTimeMillis() - startTime));
+                        log("directory: "+directory);
+                        log("channelFolders[c]: "+channelFolders[c]);
+                        log("c: " + c + "; t: " + t + "; file: " + fileList[c][t]);
+                        log("info.length " + info.length);
+                        log("info[0].compression " + info[0].compression);
+                        log("info[0].stripLengths.length " + info[0].stripLengths.length);
+                        log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
+                    }
+                    fi = info[0];
+                    if (fi.nImages > 1) {
+                        nZ = fi.nImages;
+                        fi.nImages = 1;
+                    } else {
+                        nZ = info.length;
+                    }
+                    nX = fi.width;
+                    nY = fi.height;
+                    nSlices = nC*nT*nZ;
+
+
+                } else {
+
+                    if (Globals.verbose) {
+                        log("IFD reading time [ms]: " + (System.currentTimeMillis() - startTime));
+                        log("c:" + c + "; t:" + t + "; file:" + fileList[c][t]);
+                        log("info.length " + info.length);
+                        log("info[0].compression " + info[0].compression);
+                        log("info[0].stripLengths.length " + info[0].stripLengths.length);
+                        log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
+                    }
+
+                }
+
+                // convert ij.io.FileInfo[] to FileInfoSer[]
+                infoSer = new FileInfoSer[nZ];
+                for (int i = 0; i < nZ; i++) {
+                    infoSer[i] = new FileInfoSer(info[i]);
+                    infoSer[i].directory = channelFolders[c] + "/"; // relative path to main directory
+                    infoSer[i].fileTypeString = fileType;
+                }
+
+            } // tif
+
+            if (fileType == "h5") {
+
+                // first file
+                if (t == 0 && c == 0) {
+                    IHDF5Reader reader = HDF5Factory.openForReading(ctPath);
+                    HDF5DataSetInformation dsInfo = reader.object().getDataSetInformation("/" + h5DataSet);
+
+                    nZ = (int) dsInfo.getDimensions()[0];
+                    nY = (int) dsInfo.getDimensions()[1];
+                    nX = (int) dsInfo.getDimensions()[2];
+                    nSlices = nC*nT*nZ;
+
+                }
+
+                if (Globals.verbose) {
+                    log("nX " + nX);
+                    log("nY " + nY);
+                    log("nZ " + nZ);
+                }
+
+                // construct a FileInfoSer
+                // todo: this could be much leaner
+                // e.g. the nX, nY and bit depth
+                infoSer = new FileInfoSer[nZ];
+                for (int i = 0; i < nZ; i++) {
+                    infoSer[i] = new FileInfoSer();
+                    infoSer[i].fileName = fileList[c][t];
+                    infoSer[i].directory = channelFolders[c] + "/";
+                    infoSer[i].width = nX;
+                    infoSer[i].height = nY;
+                    infoSer[i].bytesPerPixel = 2; // todo: how to get the bit-depth from the info?
+                    infoSer[i].h5DataSet = h5DataSet;
+                    infoSer[i].fileTypeString = fileType;
+                }
+
+            } // h5
+
+        } catch(Exception e) {
+            IJ.showMessage("Error: "+e.toString());
+
+        }
+
+        this.infos[c][t] = infoSer;
     }
 
     /** Does nothing. */
@@ -180,12 +287,9 @@ public class VirtualStackOfStacks extends ImageStack {
             //ImagePlus imp0 = IJ.getImage();
             //imp0.setPosition(1,(int)imp0.getNSlices()/2,1);
             //imp0.updateAndDraw();
-            IJ.showMessage("This time point is not loaded yet.\n" +
-                    "Please check the status bar (and select an earlier time point).");
-            imp = IJ.createImage("",nX,nY,1,infos[0][0][0].bytesPerPixel*8);
-            ImageProcessor ip = imp.getProcessor();
-            ip.set(0);
-            return(ip);
+            //IJ.showMessage("The file corresponding to this time point has not been analyzed yet.\n" +
+            //        "Please wait...");
+            setStackFromFile(t, c);
         }
 
         FileInfoSer fi = infos[c][t][0];

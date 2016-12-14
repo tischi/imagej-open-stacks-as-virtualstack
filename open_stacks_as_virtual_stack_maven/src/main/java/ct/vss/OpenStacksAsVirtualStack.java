@@ -101,7 +101,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             // init the VSS
             VirtualStackOfStacks stack = new VirtualStackOfStacks(directory, infos);
-            ImagePlus imp = makeImagePlus(stack, infos[0][0][0], nT);
+            ImagePlus imp = makeImagePlus(stack);
             return(imp);
 
         } else {
@@ -148,131 +148,38 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             return(null);
         }
 
-        FileInfo[] info = null;
-        FileInfo fi = null;
-        FileInfoSer[] infoSer = null;
+
         String path = "";
         VirtualStackOfStacks stack = null;
 
         //log("Obtaining information from all files...");
         // loop through filtered list and add file-info
+
+        // init the VSS
+        stack = new VirtualStackOfStacks(directory, channelFolders, lists, nC, nT, fileType, h5DataSet);
+
         try {
 
             for (int t = 0; t < nT; t++) {
 
                 for (int c = 0; c < nC; c++) {
 
-                    String ctPath = directory + channelFolders[c] + "/" + lists[c][t];
-
-                    if (fileType == "tif") {
-
-                        long startTime = System.currentTimeMillis();
-                        FastTiffDecoder ftd = new FastTiffDecoder(directory + channelFolders[c], lists[c][t]);
-                        info = ftd.getTiffInfo();
-
-                        // first file
-                        if (t == 0 && c == 0) {
-
-                            if (Globals.verbose) {
-                                log("IFD reading time [ms]: " + (System.currentTimeMillis() - startTime));
-                                log("c:" + c + "; t:" + t + "; file:" + lists[c][t]);
-                                log("info.length " + info.length);
-                                log("info[0].compression " + info[0].compression);
-                                log("info[0].stripLengths.length " + info[0].stripLengths.length);
-                                log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
-                            }
-                            fi = info[0];
-                            if (fi.nImages > 1) {
-                                nZ = fi.nImages;
-                                fi.nImages = 1;
-                            } else {
-                                nZ = info.length;
-                            }
-                            nX = fi.width;
-                            nY = fi.height;
-
-                            // init the VSS
-                            stack = new VirtualStackOfStacks(directory, new Point3D(nX, nY, nZ), nC, nT, fileType);
-
-                        } else {
-
-                            if (Globals.verbose) {
-                                log("IFD reading time [ms]: "+(System.currentTimeMillis()-startTime));
-                                log("c:" + c + "; t:" + t + "; file:" + lists[c][t]);
-                                log("info.length " + info.length);
-                                log("info[0].compression " + info[0].compression);
-                                log("info[0].stripLengths.length " + info[0].stripLengths.length);
-                                log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
-                            }
-
-                        }
-
-                        // convert ij.io.FileInfo[] to FileInfoSer[]
-                        infoSer = new FileInfoSer[nZ];
-                        for (int i = 0; i < nZ; i++) {
-                            infoSer[i] = new FileInfoSer((FileInfo) info[i].clone());
-                            infoSer[i].directory = channelFolders[c] + "/"; // relative path to main directory
-                            infoSer[i].fileTypeString = fileType;
-                        }
-
-                        stack.setStack(infoSer, t, c);
-
-                    } // tif
-
-                    if (fileType == "h5") {
-
-                        // first file
-                        if (t == 0 && c == 0) {
-                            IHDF5Reader reader = HDF5Factory.openForReading(ctPath);
-                            HDF5DataSetInformation dsInfo = reader.object().getDataSetInformation("/"+h5DataSet);
-
-                            nZ = (int)dsInfo.getDimensions()[0];
-                            nY = (int)dsInfo.getDimensions()[1];
-                            nX = (int)dsInfo.getDimensions()[2];
-
-                            // init the VSS
-                            stack = new VirtualStackOfStacks(directory, new Point3D(nX, nY, nZ), nC, nT, fileType);
-                        }
-
-                        if (Globals.verbose) {
-                            log("nX " + nX);
-                            log("nY " + nY);
-                            log("nZ " + nZ);
-                        }
-
-                        // construct a FileInfoSer
-                        // todo: this could be much leaner
-                        // e.g. the nX, nY and bit depth
-                        infoSer = new FileInfoSer[nZ];
-                        for (int i = 0; i < nZ; i++) {
-                            infoSer[i] = new FileInfoSer();
-                            infoSer[i].fileName = lists[c][t];
-                            infoSer[i].directory = channelFolders[c] + "/";
-                            infoSer[i].width = nX;
-                            infoSer[i].height = nY;
-                            infoSer[i].bytesPerPixel = 2; // todo: how to get the bit-depth from the info?
-                            infoSer[i].h5DataSet = h5DataSet;
-                            infoSer[i].fileTypeString = fileType;
-                        }
-
-                        stack.setStack(infoSer, t, c);
-
-                    } // h5
+                    stack.setStackFromFile(t, c);
 
                     iProgress = t+c*nT+1;
-                    //IJ.showProgress(t+c*nT, nT*nC);
-                    //IJ.showStatus(""+(t+c*nT)+"/"+nT*nC);
 
                 } // c-loop
 
-                // show at 1st time-point
+                // show window at 1st time-point
                 if (t == 0) {
 
                     if (stack != null && stack.getSize() > 0) {
-                        imp = makeImagePlus(stack, infoSer[0], nT);
+                        imp = makeImagePlus(stack);
+                        imp.show();
+                    } else {
+                        IJ.showMessage("Something went wrong loading the first image stack!");
+                        return(null);
                     }
-                    String[] folders = directory.split("/");
-                    imp.setTitle(folders[folders.length - 1]);
                     imp.show();
 
                 }
@@ -670,17 +577,22 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         VirtualStackOfStacks parentStack = (VirtualStackOfStacks) imp.getStack();
         VirtualStackOfStacks stack = new VirtualStackOfStacks(parentStack.getDirectory(), croppedInfos);
-        return(makeImagePlus(stack, croppedInfos[0][0][0], stack.nT));
+        return(makeImagePlus(stack));
 
     }
 
-    private static ImagePlus makeImagePlus(VirtualStackOfStacks stack, FileInfoSer fi, int nT) {
+    private static ImagePlus makeImagePlus(VirtualStackOfStacks stack) {
         int nC=stack.nC;
         int nZ=stack.nZ;
-
+        int nT=stack.nT;
         double min = Double.MAX_VALUE;
-		double max = -Double.MAX_VALUE;
-		ImagePlus imp = new ImagePlus(fi.directory, stack);
+        double max = -Double.MAX_VALUE;
+
+        FileInfoSer[][][] infos = stack.getFileInfosSer();
+        FileInfoSer fi = infos[0][0][0];
+
+        ImagePlus imp = new ImagePlus(fi.directory, stack);
+        imp.setTitle(fi.directory);
 
         if (imp.getType()==ImagePlus.GRAY16 || imp.getType()==ImagePlus.GRAY32)
 			imp.getProcessor().setMinAndMax(min, max);
@@ -1007,10 +919,6 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
                 }
             });
             t2.start();
-
-            IJ.showMessage("The images are being analyzed and successively added.\n" +
-                    "Please check ImageJ's status to see the overall progress.");
-
 
         } else if (e.getActionCommand().equals(actions[i++])) {
 
