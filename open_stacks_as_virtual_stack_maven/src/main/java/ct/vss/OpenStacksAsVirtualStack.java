@@ -41,6 +41,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     public int iProgress=0, nProgress=100;
     public String h5DataSet = "Data111";
 
+    // todo: stop loading thread upon closing of image
+
     public OpenStacksAsVirtualStack() {
     }
 
@@ -120,9 +122,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         if (channelFolders == null) {
             log("No channel sub-folders found.");
-            return(null);
+            nC = 1;
+            channelFolders = new String[] {""};
+            //return(null);
+        } else {
+            nC = channelFolders.length;
         }
-        nC = channelFolders.length;
+
         lists = new String[nC][];
         for (int i = 0; i < nC; i++) {
             lists[i] = getFilesInFolder(directory + channelFolders[i]);

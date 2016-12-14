@@ -342,6 +342,11 @@ public class VirtualStackOfStacks extends ImageStack {
             pc = pc.add(fi.getCropOffset());
         }
 
+        if(infos[c][t] == null) {
+            // file info not yet loaded => get it!
+            setStackFromFile(t, c);
+        }
+
         ImagePlus imp = new OpenerExtensions().openCroppedStackCenterRadii(directory, infos[c][t], dz, pc, pr);
 
         if (imp==null) {
@@ -378,6 +383,11 @@ public class VirtualStackOfStacks extends ImageStack {
 
         if(fi.isCropped) {
             po = po.add(fi.getCropOffset());
+        }
+
+        if(infos[c][t] == null) {
+            // file info not yet loaded => get it!
+            setStackFromFile(t, c);
         }
 
         ImagePlus imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);

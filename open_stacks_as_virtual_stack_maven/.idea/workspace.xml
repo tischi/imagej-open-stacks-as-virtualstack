@@ -24,13 +24,14 @@
       <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="208">
-              <caret line="927" column="23" selection-start-line="927" selection-start-column="23" selection-end-line="927" selection-end-column="23" />
+            <state relative-caret-position="161">
+              <caret line="126" column="27" selection-start-line="126" selection-start-column="27" selection-end-line="126" selection-end-column="27" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -39,10 +40,10 @@
                 <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#30692#30865#0" expanded="true" />
-                <element signature="e#30864#30865#0" expanded="true" />
-                <element signature="e#34392#34539#0" expanded="true" />
-                <element signature="e#34538#34539#0" expanded="true" />
+                <element signature="e#30840#31013#0" expanded="true" />
+                <element signature="e#31012#31013#0" expanded="true" />
+                <element signature="e#34540#34687#0" expanded="true" />
+                <element signature="e#34686#34687#0" expanded="true" />
                 <element signature="class#VirtualOpenerDialog#0" expanded="false" />
               </folding>
             </state>
@@ -52,8 +53,8 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="138">
-              <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
+            <state relative-caret-position="-1">
+              <caret line="121" column="22" selection-start-line="121" selection-start-column="22" selection-end-line="121" selection-end-column="22" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#Registration#0;class#Registration#0" expanded="false" />
@@ -70,7 +71,6 @@
                 <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-                <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
@@ -120,8 +120,8 @@
       <file leaf-file-name="VirtualStackOfStacks.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="161">
-              <caret line="294" column="29" selection-start-line="294" selection-start-column="29" selection-end-line="294" selection-end-column="29" />
+            <state relative-caret-position="4475">
+              <caret line="355" column="23" selection-start-line="355" selection-start-column="23" selection-end-line="355" selection-end-column="23" />
               <folding>
                 <element signature="method#VirtualStackOfStacks#1;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#logStatus#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -132,9 +132,9 @@
                 <element signature="method#deleteLastSlice#0;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#getPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#setPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
+                <element signature="method#getProcessor#0;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#getCropOffset#0;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#getCropSize#0;class#VirtualStackOfStacks#0" expanded="false" />
-                <element signature="method#getCroppedFrameCenterRadii#0;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#getFullFrame#0;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#getCroppedFrameOffsetSize#0;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -294,10 +294,10 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="196" />
-    <option name="y" value="78" />
-    <option name="width" value="1403" />
-    <option name="height" value="804" />
+    <option name="x" value="273" />
+    <option name="y" value="63" />
+    <option name="width" value="1201" />
+    <option name="height" value="798" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -733,22 +733,22 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="196" y="78" width="1403" height="804" extended-state="0" />
-    <editor active="true" />
+    <frame x="273" y="63" width="1201" height="798" extended-state="1" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3294423" sideWeight="0.36884645" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.43117976" sideWeight="0.3519471" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20254958" sideWeight="0.35289043" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299373" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.43117976" sideWeight="0.64805293" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20254958" sideWeight="0.64710957" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.014695077" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.017256256" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.0" sideWeight="0.69548583" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -792,7 +792,7 @@
           <option name="timeStamp" value="57" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="59" />
+      <option name="time" value="60" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -815,9 +815,9 @@
             <element signature="method#deleteLastSlice#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#setPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getProcessor#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCropOffset#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCropSize#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getCroppedFrameCenterRadii#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getFullFrame#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCroppedFrameOffsetSize#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -874,6 +874,7 @@
             <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -882,10 +883,10 @@
             <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#30692#30865#0" expanded="true" />
-            <element signature="e#30864#30865#0" expanded="true" />
-            <element signature="e#34392#34539#0" expanded="true" />
-            <element signature="e#34538#34539#0" expanded="true" />
+            <element signature="e#30840#31013#0" expanded="true" />
+            <element signature="e#31012#31013#0" expanded="true" />
+            <element signature="e#34540#34687#0" expanded="true" />
+            <element signature="e#34686#34687#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
         </state>
@@ -911,7 +912,6 @@
             <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
@@ -943,9 +943,9 @@
             <element signature="method#deleteLastSlice#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#setPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getProcessor#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCropOffset#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCropSize#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getCroppedFrameCenterRadii#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getFullFrame#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCroppedFrameOffsetSize#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -1002,6 +1002,7 @@
             <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -1010,10 +1011,10 @@
             <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#30692#30865#0" expanded="true" />
-            <element signature="e#30864#30865#0" expanded="true" />
-            <element signature="e#34392#34539#0" expanded="true" />
-            <element signature="e#34538#34539#0" expanded="true" />
+            <element signature="e#30840#31013#0" expanded="true" />
+            <element signature="e#31012#31013#0" expanded="true" />
+            <element signature="e#34540#34687#0" expanded="true" />
+            <element signature="e#34686#34687#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
         </state>
@@ -1047,7 +1048,6 @@
             <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
@@ -1117,9 +1117,9 @@
             <element signature="method#deleteLastSlice#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#setPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getProcessor#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCropOffset#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCropSize#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getCroppedFrameCenterRadii#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getFullFrame#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCroppedFrameOffsetSize#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -1176,6 +1176,7 @@
             <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -1184,10 +1185,10 @@
             <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#30692#30865#0" expanded="true" />
-            <element signature="e#30864#30865#0" expanded="true" />
-            <element signature="e#34392#34539#0" expanded="true" />
-            <element signature="e#34538#34539#0" expanded="true" />
+            <element signature="e#30840#31013#0" expanded="true" />
+            <element signature="e#31012#31013#0" expanded="true" />
+            <element signature="e#34540#34687#0" expanded="true" />
+            <element signature="e#34686#34687#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
         </state>
@@ -1221,7 +1222,6 @@
             <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
@@ -1291,9 +1291,9 @@
             <element signature="method#deleteLastSlice#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#setPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getProcessor#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCropOffset#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCropSize#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getCroppedFrameCenterRadii#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getFullFrame#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCroppedFrameOffsetSize#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -1350,6 +1350,7 @@
             <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -1358,10 +1359,10 @@
             <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#30692#30865#0" expanded="true" />
-            <element signature="e#30864#30865#0" expanded="true" />
-            <element signature="e#34392#34539#0" expanded="true" />
-            <element signature="e#34538#34539#0" expanded="true" />
+            <element signature="e#30840#31013#0" expanded="true" />
+            <element signature="e#31012#31013#0" expanded="true" />
+            <element signature="e#34540#34687#0" expanded="true" />
+            <element signature="e#34686#34687#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
         </state>
@@ -1395,7 +1396,6 @@
             <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
@@ -1465,9 +1465,9 @@
             <element signature="method#deleteLastSlice#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#setPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getProcessor#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCropOffset#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCropSize#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getCroppedFrameCenterRadii#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getFullFrame#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getCroppedFrameOffsetSize#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -1667,10 +1667,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4475">
+          <caret line="355" column="23" selection-start-line="355" selection-start-column="23" selection-end-line="355" selection-end-column="23" />
+          <folding>
+            <element signature="method#VirtualStackOfStacks#1;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#logStatus#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#addSlice#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#addSlice#1;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#addSlice#2;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#deleteSlice#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#deleteLastSlice#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#setPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getProcessor#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getCropOffset#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getCropSize#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getFullFrame#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getCroppedFrameOffsetSize#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
+        <state relative-caret-position="-1">
+          <caret line="121" column="22" selection-start-line="121" selection-start-column="22" selection-end-line="121" selection-end-column="22" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />
@@ -1687,7 +1711,6 @@
             <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
@@ -1705,39 +1728,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="294" column="29" selection-start-line="294" selection-start-column="29" selection-end-line="294" selection-end-column="29" />
-          <folding>
-            <element signature="method#VirtualStackOfStacks#1;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#logStatus#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#addSlice#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#addSlice#1;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#addSlice#2;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#deleteSlice#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#deleteLastSlice#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#setPixels#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getCropOffset#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getCropSize#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getCroppedFrameCenterRadii#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getFullFrame#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getCroppedFrameOffsetSize#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="927" column="23" selection-start-line="927" selection-start-column="23" selection-end-line="927" selection-end-column="23" />
+        <state relative-caret-position="161">
+          <caret line="126" column="27" selection-start-line="126" selection-start-column="27" selection-end-line="126" selection-end-column="27" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showOpenDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -1746,10 +1746,10 @@
             <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#30692#30865#0" expanded="true" />
-            <element signature="e#30864#30865#0" expanded="true" />
-            <element signature="e#34392#34539#0" expanded="true" />
-            <element signature="e#34538#34539#0" expanded="true" />
+            <element signature="e#30840#31013#0" expanded="true" />
+            <element signature="e#31012#31013#0" expanded="true" />
+            <element signature="e#34540#34687#0" expanded="true" />
+            <element signature="e#34686#34687#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
         </state>
