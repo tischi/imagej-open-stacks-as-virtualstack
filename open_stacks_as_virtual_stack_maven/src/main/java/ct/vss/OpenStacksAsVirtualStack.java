@@ -701,7 +701,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //IJ.run("Memory & Threads...", "maximum=3000 parallel=4 run");
 
 
-        OpenStacksAsVirtualStack ovs = null;
+
 
         // todo: remove the initialisation from the constructor and put it into openFromDirectory
 
@@ -716,7 +716,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
         //String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        String directory = "/Users/tischi/Desktop/example-data/compressed/";
+        //String directory = "/Users/tischi/Desktop/example-data/compressed/";
+        final String directory = "/Volumes/My Passport/Res_13/";
+
         String filter = null;
 
         //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
@@ -727,16 +729,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //OpenHDF5test oh5 = new OpenHDF5test();
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         //Globals.verbose = true;
-        ovs = new OpenStacksAsVirtualStack();
-
-        ImagePlus imp = ovs.openFromDirectory(directory, null);
+        final OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
+        Thread t1 = new Thread(new Runnable() {
+            public void run() {
+                ImagePlus imp = ovs.openFromDirectory(directory, null);
+            }
+        });
+        t1.start();
+        IJ.wait(5000);
         ovs.showDialog();
-
-        //ImagePlus imp = ovs.openFromInfoFile(directory, "ovs.ser");
-        //ImagePlus imp = IJ.getImage();
-
-        //imp.show();
-        Registration register = new Registration(imp);
+        Registration register = new Registration(IJ.getImage());
         register.run("");
 
 

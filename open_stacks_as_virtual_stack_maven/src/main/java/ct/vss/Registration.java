@@ -198,7 +198,8 @@ public class Registration implements PlugIn, ImageListener {
         }
 
         public void highlightSelectedTrack() {
-            int r = table.getSelectedRow();
+            int rs = table.getSelectedRow();
+            int r = table.convertRowIndexToModel( rs );
             float x = new Float(table.getModel().getValueAt(r, 1).toString());
             float y = new Float(table.getModel().getValueAt(r, 2).toString());
             float z = new Float(table.getModel().getValueAt(r, 3).toString());
@@ -207,6 +208,7 @@ public class Registration implements PlugIn, ImageListener {
             Roi pr = new PointRoi(x,y);
             pr.setPosition(0,(int)z+1,t+1);
             imp.setRoi(pr);
+            //log(" rs="+rs+" r ="+r+" x="+x+" y="+y+" z="+z+" t="+t);
             //log("t="+table.getModel().getValueAt(r, 5));
         }
 
