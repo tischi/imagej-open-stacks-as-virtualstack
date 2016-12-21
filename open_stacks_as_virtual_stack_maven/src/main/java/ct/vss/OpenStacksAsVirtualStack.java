@@ -713,11 +713,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-        //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
+        final String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
         //String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        //String directory = "/Users/tischi/Desktop/example-data/compressed/";
-        final String directory = "/Volumes/My Passport/Res_13/";
+        //final String directory = "/Users/tischi/Desktop/example-data/compressed/";
+        //final String directory = "/Volumes/My Passport/Res_13/";
 
         String filter = null;
 
@@ -736,7 +736,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             }
         });
         t1.start();
-        IJ.wait(5000);
+        IJ.wait(500);
         ovs.showDialog();
         Registration register = new Registration(IJ.getImage());
         register.run("");

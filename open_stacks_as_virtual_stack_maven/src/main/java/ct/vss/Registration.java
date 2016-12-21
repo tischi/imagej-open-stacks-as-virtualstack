@@ -64,7 +64,6 @@ public class Registration implements PlugIn, ImageListener {
 
     private JFileChooser myJFileChooser = new JFileChooser(new File("."));
 
-
     public Registration() {
     }
 
@@ -259,9 +258,47 @@ public class Registration implements PlugIn, ImageListener {
 
         String[] actions = {
                 //"Add Track Start",
-                "Track selected Object",
-                "Crop Image along Tracks",
-                "Show Track Table", "Save Track Table"
+                "Track selected object",
+                "Crop image along tracks",
+                "Show track table",
+                "Save track table"
+        };
+
+        String[] actionHelps = {
+
+                "<html>" +
+                        "<h3>Track selected object</h3>" +
+                        "<p width=400>"+
+                        "Use ImageJ's Point Selection tool to select an object in the image and then " +
+                        "hit this button to start its tracking. " +
+                        "The tracking is based on computing the center of mass of the gray-scale values " +
+                        "within above chosen radii. " +
+                        "You do not have to wait for the tracking of one object " +
+                        "to be finished; you can immediately track another object. " +
+                        "</p>" +
+                        "</html>",
+
+                "<html>" +
+                        "<h3>Crop image along tracks</h3>" +
+                        "<p width=400>"+
+                        "Opens as many new image windows as there are completed tracks. " +
+                        "Each image window shows the data locally surrounding the respective track. " +
+                        "The size of the shown region can be adjusted by the changing the values in 'Cropping radii'. " +
+                        "</p>" +
+                        "<h4>Main ideas behind this functionality</h4>" +
+                        "<p width=400>"+
+                        "One often wants to observe morphological changes of moving objects. " +
+                        "It is however very challenging for the human brain " +
+                        "to focus on the morphological changes as it is distracted by the object's motion. " +
+                        "Thus, having a 'stabilized view' on the object, where its translocation is eliminated is " +
+                        "very helpful. " +
+                        "In addition, the 'stabilized view' also reduces the amount of data needed to further study the object." +
+                        "</p>" +
+                        "</html>",
+
+                "",
+
+                ""
         };
 
         String[] texts = {
@@ -296,7 +333,9 @@ public class Registration implements PlugIn, ImageListener {
                 buttons[i] = new JButton(actions[i]);
                 buttons[i].setActionCommand(actions[i]);
                 buttons[i].addActionListener(this);
+                buttons[i].setToolTipText(actionHelps[i]);
             }
+            ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 
             JTextField[] textFields = new JTextField[texts.length];
             JLabel[] labels = new JLabel[texts.length];
@@ -524,34 +563,6 @@ public class Registration implements PlugIn, ImageListener {
         }
     }
 
-    /*
-    public void showTrackReview(ImagePlus imp, Point3D[] pTracked) {
-        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-        FileInfoSer[][][] infos = vss.getFileInfosSer();
-        //Point3D[] pos = new Point3D[tMaxTrack-tMinTrack];
-        //System.arraycopy(pTracked, tMinTrack, pos, 0, tMaxTrack-tMinTrack);
-        Point3D[] pTrackCenters = new Point3D[imp.getNFrames()];
-        Point3D pTrackMin = new Point3D(0,0,0);
-        Point3D pTrackMax = new Point3D(99999,99999,99999);
-        for (int i = 0; i < pTrackCenters.length; i++) {
-            pTrackCenters[i] = pTracked[(int) (tMinTrack + (tMaxTrack - tMinTrack) / 2)];
-            // make a Point3D min function
-            if(pTracked[i].getX() < pTrackMin.getX()) {
-                pTrackMin = new Point3D(pTracked[i].getX(), pTrackMin.getY(), pTrackMin.getZ());
-            }
-            log("" + pTrackCenters[i].toString());
-        }
-        Point3D reviewTrackRadii = gui_pCropRadii.multiply(2);
-        impTR = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, pTrackCenters, reviewTrackRadii, tMinTrack, tMaxTrack);
-        impTR.show();
-        impTR.setPosition(0, (int) (impTR.getNSlices() / 2 + 0.5), 0);
-        impTR.resetDisplayRange();
-        impTR.setTitle("Review");
-        tTR = -1; showTrackOnFrame(impTR, pTracked); // tTR=-1 forces update
-
-    }*/
-
-
     public void imageClosed(ImagePlus imp) {
         // currently we are not interested in this event
     }
@@ -578,34 +589,38 @@ public class Registration implements PlugIn, ImageListener {
         return uncomplete;
     }
 
-    public void addTrackToOverlay(Track track, int i) {
+    public void addTrackToOverlay(final Track track, final int i) {
+        // using invokeLater to avoid that two different tracking threads change the imp overlay
+        // concurrently; which could lead to disruption of the imp overlay
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                int rx = (int) gui_pCenterOfMassRadii.getX();
+                int ry = (int) gui_pCenterOfMassRadii.getY();
+                int rz = (int) gui_pCenterOfMassRadii.getZ();
 
-        int rx = (int) gui_pCenterOfMassRadii.getX();
-        int ry = (int) gui_pCenterOfMassRadii.getY();
-        int rz = (int) gui_pCenterOfMassRadii.getZ();
+                Roi roi;
+                Overlay o = imp.getOverlay();
+                if(o==null) {
+                    o = new Overlay();
+                    imp.setOverlay(o);
+                }
 
-        Roi roi;
-        Overlay o = imp.getOverlay();
-        if(o==null) {
-            o = new Overlay();
-            imp.setOverlay(o);
-        }
+                int x = (int) track.getX(i);
+                int y = (int) track.getY(i);
+                int z = (int) track.getZ(i);
+                int c = (int) track.getC(i);
+                int t = (int) track.getT(i);
 
-        int x = (int) track.getX(i);
-        int y = (int) track.getY(i);
-        int z = (int) track.getZ(i);
-        int c = (int) track.getC(i);
-        int t = (int) track.getT(i);
-
-        int rrx, rry;
-        for(int iz=0; iz<imp.getNSlices(); iz++) {
-            rrx = Math.max(rx/(Math.abs(iz-z)+1),1);
-            rry = Math.max(ry/(Math.abs(iz-z)+1),1);
-            roi = new Roi(x - rrx, y - rry, 2 * rrx + 1, 2 * rry + 1);
-            roi.setPosition(c+1, iz+1, t+1);
-            o.add(roi);
-        }
-
+                int rrx, rry;
+                for(int iz=0; iz<imp.getNSlices(); iz++) {
+                    rrx = Math.max(rx/(Math.abs(iz-z)+1),1);
+                    rry = Math.max(ry/(Math.abs(iz-z)+1),1);
+                    roi = new Roi(x - rrx, y - rry, 2 * rrx + 1, 2 * rry + 1);
+                    roi.setPosition(c+1, iz+1, t+1);
+                    o.add(roi);
+                }
+            }
+        });
     }
 
     // todo: maybe reload more data if necessary
@@ -672,17 +687,28 @@ public class Registration implements PlugIn, ImageListener {
                 // update time-points, using linear interpolation
                 for (int j = 0; j < dt; j++) {
                     if ((it + j) < imp.getNFrames()) {
+
                         Point3D p = pStackCenter.add(pOffset.multiply((j + 1.0) / dt));
-                        // store as track
+
+                        //
+                        // Add to track
+                        // - thread safe, because only this thread is accessing this particular track
+                        //
                         track.addLocation(p, it + j, channel);
-                        // update also in table
+
+                        //
+                        // Update global track table and imp.overlay
+                        // - thread safe, because both internally use SwingUtilities.invokeLater
+                        //
                         trackTable.addRow(new Object[]{
                                 String.format("%1$04d",iTrack)+"_"+String.format("%1$05d",it),
                                 (float)p.getX(), (float)p.getY(), (float)p.getZ(), it, iTrack
                                 //totalElapsedTime, elapsedReadingTime, elapsedProcessingTime
                         });
-                        // add as overlay on the image
+
                         addTrackToOverlay(track, it + j - tStart);
+
+
                     }
                 }
 
