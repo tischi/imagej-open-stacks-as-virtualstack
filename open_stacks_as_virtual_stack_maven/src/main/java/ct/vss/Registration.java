@@ -68,7 +68,6 @@ public class Registration implements PlugIn, ImageListener {
 
     public Registration(ImagePlus imp) {
         this.imp = imp;
-        log("AAAAAAA");
         initialize();
     }
 
@@ -573,6 +572,7 @@ public class Registration implements PlugIn, ImageListener {
 
     public void imageUpdated(ImagePlus imp) {
         if( imp == this.imp) {
+            /*
             if (imp.getCanvas() == null)
                 log("canvas: null");
             else
@@ -585,6 +585,7 @@ public class Registration implements PlugIn, ImageListener {
                 log("overlays: " + imp.getOverlay().size());
                 //showTracksOnFrame(impTR, Tracks);
             }
+            */
         }
     }
 

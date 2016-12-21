@@ -272,6 +272,7 @@ public class VirtualStackOfStacks extends ImageStack {
 
         ImagePlus imp;
 
+
         if(Globals.verbose) {
             log("# VirtualStackOfStacks.getProcessor");
             log("requested slice [one-based]: "+(n+1));
