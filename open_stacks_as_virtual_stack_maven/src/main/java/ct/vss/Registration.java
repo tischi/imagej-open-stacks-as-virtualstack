@@ -295,9 +295,33 @@ public class Registration implements PlugIn, ImageListener {
                         "</p>" +
                         "</html>",
 
-                "",
+                "<html>" +
+                        "<h3>...</h3>" +
+                        "<p width=400>"+
+                        "..." +
+                        "..." +
+                        "</p>" +
+                        "<h4>...</h4>" +
+                        "<p width=400>"+
+                        "..."+
+                        "..." +
+                        "</p>" +
+                        "</html>",
 
-                ""
+
+                "<html>" +
+                        "<h3>...</h3>" +
+                        "<p width=400>"+
+                        "..." +
+                        "..." +
+                        "</p>" +
+                        "<h4>...</h4>" +
+                        "<p width=400>"+
+                        "..."+
+                        "..." +
+                        "</p>" +
+                        "</html>"
+
         };
 
         String[] texts = {

@@ -823,13 +823,97 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener {
 
     String[] actions = {
-            "Stream from Folder",
-            "Stream from Info File",
-            "Save as Info File",
-            "Save as Tiff Stacks",
+            "Stream from folder",
+            "Stream from info file",
+            "Save as info file",
+            "Save as tiff stacks",
             //"Save as H5 Stacks",
-            "Crop as new Stream",
+            "Crop as new stream",
             "Duplicate to RAM"};
+
+    String[] actionHelps = {
+
+            "<html>" +
+                    "<h3>Stream from folder</h3>" +
+                    "<p width=400>"+
+                    "Streams data from a folder containing image stacks, where one image stack " +
+                    "contains the XYZ data for one channel and time-point. " +
+                    "</p>" +
+                    "<h4>Supported image stack formats</h4>" +
+                    "<p width=400>"+
+                    "- Tiff (lzw compression is possible) <br>"+
+                    "- Hdf5 (please write the name of the data set into below text field <br>" +
+                    "</p>" +
+                    "</html>",
+
+            "<html>" +
+                    "<h3>Stream from info file</h3>" +
+                    "<p width=400>"+
+                    "Loads an info file that you saved before using " +
+                    "'Save as info file'." +
+                    "</p>" +
+                    "<h4>Idea behind this functionality</h4>" +
+                    "<p width=400>"+
+                    "Especially if your data format is compressed Tiff stacks "+
+                    "it can take quite some time to parse all the files in a folder." +
+                    "Once all files are parsed you can save all the extracted information " +
+                    "into one single Info file, which is much faster to load "+
+                    "and thus gives you much faster full access to your data."+
+                    "</p>" +
+                    "</html>",
+
+            "<html>" +
+                    "<h3>Save as info file</h3>" +
+                    "<p width=400>"+
+                    "..." +
+                    "..." +
+                    "</p>" +
+                    "<h4>Idea behind this functionality</h4>" +
+                    "<p width=400>"+
+                    "See 'Save as info file'"+
+                    "</p>" +
+                    "</html>",
+            "<html>" +
+                    "<h3>Save as Tiff stacks</h3>" +
+                    "<p width=400>"+
+                    "..." +
+                    "..." +
+                    "</p>" +
+                    "<h4>Idea behind this functionality</h4>" +
+                    "<p width=400>"+
+                    "..."+
+                    "..." +
+                    "</p>" +
+                    "</html>",
+            "<html>" +
+                    "<h3>Crop as new stream</h3>" +
+                    "<p width=400>"+
+                    "..." +
+                    "..." +
+                    "</p>" +
+                    "<h4>Idea behind this functionality</h4>" +
+                    "<p width=400>"+
+                    "..."+
+                    "..." +
+                    "</p>" +
+                    "</html>",
+            "<html>" +
+                    "<h3>Duplicate to RAM</h3>" +
+                    "<p width=400>"+
+                    "Loads all images and copies them into the RAM." +
+                    "Make sure that you have enough RAM before doing this." +
+                    "Also be prepared that this might take quite some time!" +
+                    "</p>" +
+                    "<h4>Idea behind this functionality</h4>" +
+                    "<p width=400>"+
+                    "Some operations in ImageJ using virtual stacks are very slow or not even "+
+                    "possible at all. Thus it might be necessary to copy the whole data " +
+                    "into RAM."+
+                    "</p>" +
+                    "</html>"
+
+    };
+
 
     JCheckBox cbLog = new JCheckBox("Verbose logging");
     JTextField tfH5DataSet = new JTextField("Data111", 10);
@@ -850,6 +934,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             buttons[i] = new JButton(actions[i]);
             buttons[i].setActionCommand(actions[i]);
             buttons[i].addActionListener(this);
+            buttons[i].setToolTipText(actionHelps[i]);
         }
 
         int i = 0, j = 0;
@@ -950,7 +1035,14 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fc.getSelectedFile();
-                //This is where a real application would save the file.
+                int numberOfUnparsedFiles = vss.numberOfUnparsedFiles();
+                if(numberOfUnparsedFiles > 0) {
+                    IJ.showMessage("There are still "+numberOfUnparsedFiles+
+                            " files in the folder that have not been parsed yet.\n" +
+                            "Please try again later (check ImageJ's status bar).");
+                    return;
+                }
+
                 log("Saving: " + file.getAbsolutePath());
                 osv.writeFileInfosSer(vss.getFileInfosSer(), file.getAbsolutePath());
             } else {

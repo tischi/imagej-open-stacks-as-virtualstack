@@ -102,6 +102,15 @@ public class VirtualStackOfStacks extends ImageStack {
         return directory;
     }
 
+    public int numberOfUnparsedFiles() {
+        int numberOfUnparsedFiles = 0;
+        for(int c = 0; c < nC; c++ )
+            for(int t = 0; t < nT; t++)
+                if (infos[c][t] == null)
+                    numberOfUnparsedFiles++;
+
+        return numberOfUnparsedFiles;
+    }
 
     /** Adds an image stack from file infos */
     public void setStackFromFile(int t, int c) {
