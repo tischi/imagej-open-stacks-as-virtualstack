@@ -68,6 +68,7 @@ public class Registration implements PlugIn, ImageListener {
 
     public Registration(ImagePlus imp) {
         this.imp = imp;
+        log("AAAAAAA");
         initialize();
     }
 

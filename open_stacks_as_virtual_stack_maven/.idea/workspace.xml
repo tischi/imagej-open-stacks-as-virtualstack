@@ -52,18 +52,17 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="282">
-              <caret line="575" column="36" selection-start-line="575" selection-start-column="36" selection-end-line="575" selection-end-column="36" />
+            <state relative-caret-position="248">
+              <caret line="70" column="9" selection-start-line="70" selection-start-column="9" selection-end-line="70" selection-end-column="9" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#Registration#0;class#Registration#0" expanded="false" />
-                <element signature="method#Registration#1;class#Registration#0" expanded="false" />
                 <element signature="method#run#0;class#Registration#0" expanded="false" />
                 <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
                 <element signature="method#initialize#0;class#Registration#0" expanded="false" />
                 <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
-                <element signature="e#4378#4585#0" expanded="true" />
-                <element signature="e#4584#4585#0" expanded="true" />
+                <element signature="e#4402#4609#0" expanded="true" />
+                <element signature="e#4608#4609#0" expanded="true" />
                 <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
@@ -84,8 +83,8 @@
                 <element signature="method#imageOpened#0;class#Registration#0" expanded="false" />
                 <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
                 <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-                <element signature="e#21134#22210#0" expanded="true" />
-                <element signature="e#22209#22210#0" expanded="true" />
+                <element signature="e#21158#22234#0" expanded="true" />
+                <element signature="e#22233#22234#0" expanded="true" />
                 <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
                 <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
                 <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
@@ -329,8 +328,8 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="50" />
-    <option name="y" value="69" />
+    <option name="x" value="211" />
+    <option name="y" value="62" />
     <option name="width" value="1271" />
     <option name="height" value="798" />
   </component>
@@ -768,8 +767,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="50" y="69" width="1271" height="798" extended-state="0" />
-    <editor active="true" />
+    <frame x="211" y="62" width="1271" height="798" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -779,7 +778,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19546743" sideWeight="0.3783564" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299373" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19546743" sideWeight="0.6216436" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19546743" sideWeight="0.6216436" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -822,7 +821,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java</url>
-          <line>75</line>
+          <line>76</line>
           <properties />
           <option name="timeStamp" value="57" />
         </line-breakpoint>
@@ -943,13 +942,12 @@
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />
-            <element signature="method#Registration#1;class#Registration#0" expanded="false" />
             <element signature="method#run#0;class#Registration#0" expanded="false" />
             <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
-            <element signature="e#4378#4585#0" expanded="true" />
-            <element signature="e#4584#4585#0" expanded="true" />
+            <element signature="e#4402#4609#0" expanded="true" />
+            <element signature="e#4608#4609#0" expanded="true" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
@@ -970,8 +968,8 @@
             <element signature="method#imageOpened#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#21134#22210#0" expanded="true" />
-            <element signature="e#22209#22210#0" expanded="true" />
+            <element signature="e#21158#22234#0" expanded="true" />
+            <element signature="e#22233#22234#0" expanded="true" />
             <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
             <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
@@ -1095,13 +1093,12 @@
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />
-            <element signature="method#Registration#1;class#Registration#0" expanded="false" />
             <element signature="method#run#0;class#Registration#0" expanded="false" />
             <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
-            <element signature="e#4378#4585#0" expanded="true" />
-            <element signature="e#4584#4585#0" expanded="true" />
+            <element signature="e#4402#4609#0" expanded="true" />
+            <element signature="e#4608#4609#0" expanded="true" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
@@ -1122,8 +1119,8 @@
             <element signature="method#imageOpened#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#21134#22210#0" expanded="true" />
-            <element signature="e#22209#22210#0" expanded="true" />
+            <element signature="e#21158#22234#0" expanded="true" />
+            <element signature="e#22233#22234#0" expanded="true" />
             <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
             <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
@@ -1288,13 +1285,12 @@
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />
-            <element signature="method#Registration#1;class#Registration#0" expanded="false" />
             <element signature="method#run#0;class#Registration#0" expanded="false" />
             <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
-            <element signature="e#4378#4585#0" expanded="true" />
-            <element signature="e#4584#4585#0" expanded="true" />
+            <element signature="e#4402#4609#0" expanded="true" />
+            <element signature="e#4608#4609#0" expanded="true" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
@@ -1315,8 +1311,8 @@
             <element signature="method#imageOpened#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#21134#22210#0" expanded="true" />
-            <element signature="e#22209#22210#0" expanded="true" />
+            <element signature="e#21158#22234#0" expanded="true" />
+            <element signature="e#22233#22234#0" expanded="true" />
             <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
             <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
@@ -1481,13 +1477,12 @@
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />
-            <element signature="method#Registration#1;class#Registration#0" expanded="false" />
             <element signature="method#run#0;class#Registration#0" expanded="false" />
             <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
-            <element signature="e#4378#4585#0" expanded="true" />
-            <element signature="e#4584#4585#0" expanded="true" />
+            <element signature="e#4402#4609#0" expanded="true" />
+            <element signature="e#4608#4609#0" expanded="true" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
@@ -1508,8 +1503,8 @@
             <element signature="method#imageOpened#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#21134#22210#0" expanded="true" />
-            <element signature="e#22209#22210#0" expanded="true" />
+            <element signature="e#21158#22234#0" expanded="true" />
+            <element signature="e#22233#22234#0" expanded="true" />
             <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
             <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
@@ -1863,18 +1858,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="282">
-          <caret line="575" column="36" selection-start-line="575" selection-start-column="36" selection-end-line="575" selection-end-column="36" />
+        <state relative-caret-position="248">
+          <caret line="70" column="9" selection-start-line="70" selection-start-column="9" selection-end-line="70" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />
-            <element signature="method#Registration#1;class#Registration#0" expanded="false" />
             <element signature="method#run#0;class#Registration#0" expanded="false" />
             <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
-            <element signature="e#4378#4585#0" expanded="true" />
-            <element signature="e#4584#4585#0" expanded="true" />
+            <element signature="e#4402#4609#0" expanded="true" />
+            <element signature="e#4608#4609#0" expanded="true" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
@@ -1895,8 +1889,8 @@
             <element signature="method#imageOpened#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#21134#22210#0" expanded="true" />
-            <element signature="e#22209#22210#0" expanded="true" />
+            <element signature="e#21158#22234#0" expanded="true" />
+            <element signature="e#22233#22234#0" expanded="true" />
             <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
             <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
