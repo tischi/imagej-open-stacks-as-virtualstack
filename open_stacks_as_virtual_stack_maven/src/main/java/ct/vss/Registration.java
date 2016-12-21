@@ -36,7 +36,6 @@ public class Registration implements PlugIn, ImageListener {
 
     VirtualStackOfStacks vss;
     ImagePlus imp;
-    ImagePlus impTR; // track review
     private static NonBlockingGenericDialog gd;
     private final static Point3D pOnes = new Point3D(1,1,1);
     // gui variables
@@ -572,11 +571,19 @@ public class Registration implements PlugIn, ImageListener {
     }
 
     public void imageUpdated(ImagePlus imp) {
-        // has the slice been changed?
-        if(imp == this.impTR) {
-            //showTracksOnFrame(impTR, Tracks);
-        } else {
-            //
+        if( imp == this.imp) {
+            if (imp.getCanvas() == null)
+                log("canvas: null");
+            else
+                log("canvas: found");
+
+            if (imp.getOverlay() == null) {
+                log("overlay: null");
+                //showTracksOnFrame(impTR, Tracks);
+            } else {
+                log("overlays: " + imp.getOverlay().size());
+                //showTracksOnFrame(impTR, Tracks);
+            }
         }
     }
 

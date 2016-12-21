@@ -839,7 +839,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
     }
 
     public void showDialog() {
-        JFrame frame = new JFrame("Stack Streaming Tools");
+        JFrame frame = new JFrame("Data Streaming Tools");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Container c = frame.getContentPane();
         c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
