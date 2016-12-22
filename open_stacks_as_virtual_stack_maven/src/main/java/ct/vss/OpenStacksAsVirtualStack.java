@@ -1,8 +1,5 @@
 package ct.vss;
 
-import ch.systemsx.cisd.hdf5.HDF5DataSetInformation;
-import ch.systemsx.cisd.hdf5.HDF5Factory;
-import ch.systemsx.cisd.hdf5.IHDF5Reader;
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
@@ -10,7 +7,6 @@ import ij.ImageStack;
 import ij.gui.GenericDialog;
 import ij.gui.NonBlockingGenericDialog;
 import ij.gui.Roi;
-import ij.io.FileInfo;
 import ij.io.FileSaver;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
@@ -20,6 +16,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 import static ij.IJ.log;
 
@@ -736,7 +734,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             }
         });
         t1.start();
-        IJ.wait(500);
+        IJ.wait(1000);
         ovs.showDialog();
         Registration register = new Registration(IJ.getImage());
         register.run("");
@@ -822,98 +820,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener {
 
-    String[] actions = {
-            "Stream from folder",
+    String[] actions = {"Stream from folder",
             "Stream from info file",
             "Save as info file",
             "Save as tiff stacks",
-            //"Save as H5 Stacks",
             "Crop as new stream",
             "Duplicate to RAM"};
-
-    String[] actionHelps = {
-
-            "<html>" +
-                    "<h3>Stream from folder</h3>" +
-                    "<p width=400>"+
-                    "Streams data from a folder containing image stacks, where one image stack " +
-                    "contains the XYZ data for one channel and time-point. " +
-                    "</p>" +
-                    "<h4>Supported image stack formats</h4>" +
-                    "<p width=400>"+
-                    "- Tiff (lzw compression is possible) <br>"+
-                    "- Hdf5 (please write the name of the data set into below text field <br>" +
-                    "</p>" +
-                    "</html>",
-
-            "<html>" +
-                    "<h3>Stream from info file</h3>" +
-                    "<p width=400>"+
-                    "Loads an info file that you saved before using " +
-                    "'Save as info file'." +
-                    "</p>" +
-                    "<h4>Idea behind this functionality</h4>" +
-                    "<p width=400>"+
-                    "Especially if your data format is compressed Tiff stacks "+
-                    "it can take quite some time to parse all the files in a folder." +
-                    "Once all files are parsed you can save all the extracted information " +
-                    "into one single Info file, which is much faster to load "+
-                    "and thus gives you much faster full access to your data."+
-                    "</p>" +
-                    "</html>",
-
-            "<html>" +
-                    "<h3>Save as info file</h3>" +
-                    "<p width=400>"+
-                    "..." +
-                    "..." +
-                    "</p>" +
-                    "<h4>Idea behind this functionality</h4>" +
-                    "<p width=400>"+
-                    "See 'Save as info file'"+
-                    "</p>" +
-                    "</html>",
-            "<html>" +
-                    "<h3>Save as Tiff stacks</h3>" +
-                    "<p width=400>"+
-                    "..." +
-                    "..." +
-                    "</p>" +
-                    "<h4>Idea behind this functionality</h4>" +
-                    "<p width=400>"+
-                    "..."+
-                    "..." +
-                    "</p>" +
-                    "</html>",
-            "<html>" +
-                    "<h3>Crop as new stream</h3>" +
-                    "<p width=400>"+
-                    "..." +
-                    "..." +
-                    "</p>" +
-                    "<h4>Idea behind this functionality</h4>" +
-                    "<p width=400>"+
-                    "..."+
-                    "..." +
-                    "</p>" +
-                    "</html>",
-            "<html>" +
-                    "<h3>Duplicate to RAM</h3>" +
-                    "<p width=400>"+
-                    "Loads all images and copies them into the RAM." +
-                    "Make sure that you have enough RAM before doing this." +
-                    "Also be prepared that this might take quite some time!" +
-                    "</p>" +
-                    "<h4>Idea behind this functionality</h4>" +
-                    "<p width=400>"+
-                    "Some operations in ImageJ using virtual stacks are very slow or not even "+
-                    "possible at all. Thus it might be necessary to copy the whole data " +
-                    "into RAM."+
-                    "</p>" +
-                    "</html>"
-
-    };
-
 
     JCheckBox cbLog = new JCheckBox("Verbose logging");
     JTextField tfH5DataSet = new JTextField("Data111", 10);
@@ -928,13 +840,16 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
         Container c = frame.getContentPane();
         c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
 
+        String[] toolTipTexts = getToolTipFile("DataStreamingHelp.html");
+
         JButton[] buttons = new JButton[actions.length];
 
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new JButton(actions[i]);
             buttons[i].setActionCommand(actions[i]);
             buttons[i].addActionListener(this);
-            buttons[i].setToolTipText(actionHelps[i]);
+            buttons[i].setToolTipText(toolTipTexts[i]);
+            log(toolTipTexts[i]);
         }
 
         int i = 0, j = 0;
@@ -1115,6 +1030,37 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
 
 
     }
+
+    private String[] getToolTipFile(String fileName) {
+        ArrayList<String> toolTipTexts = new ArrayList<String>();
+
+        //Get file from resources folder
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource(fileName).getFile());
+
+        try {
+            Scanner scanner = new Scanner(file);
+            StringBuilder sb = new StringBuilder("");
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if(line.equals("###")) {
+                    toolTipTexts.add(sb.toString());
+                    sb = new StringBuilder("");
+                } else {
+                    sb.append(line);
+                }
+
+            }
+
+            scanner.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return(toolTipTexts.toArray(new String[0]));
+    }
+
 }
 
 
