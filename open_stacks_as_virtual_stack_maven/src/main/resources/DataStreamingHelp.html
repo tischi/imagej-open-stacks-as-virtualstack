@@ -1,12 +1,12 @@
 <html>
 <h3>Stream from folder</h3>
 <p width=400>
-Streams data from a folder containing multiple image stacks, where one image stack
-contains the XYZ data for one channel and time-point.
+Streams data from a folder containing multiple image stacks, each image stack
+containing the XYZ data for one channel and one time-point.
 </p>
 <h4>Supported image stack formats</h4>
 <p width=400>
-- Tiff (LZW compression is supported) <br>
+- Multipage Tiff (LZW compression is supported) <br>
 - Hdf5 (please write the name of the data set into below text field) <br>
 </p>
 </html>
@@ -51,26 +51,31 @@ See 'Save as info file'
 <html>
 <h3>Save as Tiff stacks</h3>
 <p width=400>
-...
-...
+    Saves the current stream as a sequence of multi-page Tiff files; one
+    file per channel and time-point.
 </p>
 <h4>Idea behind this functionality</h4>
 <p width=400>
-...
-...
+    A sequence of Tiff stacks is a convenient and readily compatible format for storage and further processing.
+    For instance you might want to deconvolve each stack or register stacks against each other
+    using other software such as Huygens for deconvolution or Elastix for registration.
 </p>
 </html>
 ###
 <html>
 <h3>Crop as new stream</h3>
 <p width=400>
-...
-...
+    Crops the current stream based on a rectangular selection tool and shows it
+    in a new image window.
 </p>
 <h4>Idea behind this functionality</h4>
 <p width=400>
-...
-...
+    First of all the browsing of cropped data will be even faster, because
+    the software needs to load less data per z-slice.
+    More importantly however, the cropped data might be small enough to fit into RAM
+    (using: 'Duplicate to RAM') and thereby enable fast processing
+    in ImageJ; or, you may want to save the cropped data to disk (using 'Save as Tiff stacks') for
+    further processing with other software.
 </p>
 </html>
 ###
@@ -84,8 +89,7 @@ Also be prepared that this might take quite some time!
 <h4>Idea behind this functionality</h4>
 <p width=400>
 Some operations in ImageJ using virtual stacks are very slow or not even
-possible at all. Thus it might be necessary to copy the whole data
-into RAM.
+    possible at all. Thus it might be necessary to copy the whole data into RAM.
 </p>
 </html>
 ###

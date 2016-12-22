@@ -24,8 +24,8 @@
       <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="223">
-              <caret line="854" column="25" selection-start-line="854" selection-start-column="25" selection-end-line="854" selection-end-column="25" />
+            <state relative-caret-position="453">
+              <caret line="842" column="73" selection-start-line="842" selection-start-column="8" selection-end-line="842" selection-end-column="73" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -42,8 +42,10 @@
                 <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#openCroppedCenterRadiusFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="method#StackStreamToolsGUI#0;class#StackStreamToolsGUI#0" expanded="false" />
                 <element signature="method#itemStateChanged#0;class#StackStreamToolsGUI#0" expanded="false" />
                 <element signature="method#actionPerformed#0;class#StackStreamToolsGUI#0" expanded="false" />
+                <element signature="method#getToolTipFile#0;class#StackStreamToolsGUI#0" expanded="false" />
                 <element signature="e#35296#35304#0" expanded="true" />
                 <element signature="class#VirtualOpenerDialog#0" expanded="false" />
               </folding>
@@ -54,8 +56,18 @@
       <file leaf-file-name="DataStreamingHelp.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/resources/DataStreamingHelp.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="230">
-              <caret line="10" column="4" selection-start-line="10" selection-start-column="4" selection-end-line="10" selection-end-column="4" />
+            <state relative-caret-position="316">
+              <caret line="77" column="42" selection-start-line="77" selection-start-column="42" selection-end-line="77" selection-end-column="42" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TrackAndCropHelp.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="925">
+              <caret line="37" column="4" selection-start-line="37" selection-start-column="4" selection-end-line="37" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -64,8 +76,8 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-184">
-              <caret line="253" column="0" selection-start-line="253" selection-start-column="0" selection-end-line="253" selection-end-column="0" />
+            <state relative-caret-position="260">
+              <caret line="266" column="26" selection-start-line="266" selection-start-column="26" selection-end-line="266" selection-end-column="26" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#Registration#0;class#Registration#0" expanded="false" />
@@ -74,8 +86,8 @@
                 <element signature="method#initialize#0;class#Registration#0" expanded="false" />
                 <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
                 <element signature="class#TrackTable#0;class#Registration#0" expanded="false" />
-                <element signature="e#4378#4585#0" expanded="true" />
-                <element signature="e#4584#4585#0" expanded="true" />
+                <element signature="e#4404#4611#0" expanded="true" />
+                <element signature="e#4610#4611#0" expanded="true" />
                 <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
@@ -83,11 +95,12 @@
                 <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-                <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+                <element signature="method#getToolTipFile#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+                <element signature="e#15144#15152#0" expanded="true" />
                 <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
                 <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
                 <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
@@ -97,8 +110,8 @@
                 <element signature="method#imageUpdated#0;class#Registration#0" expanded="false" />
                 <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
                 <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-                <element signature="e#21964#23040#0" expanded="true" />
-                <element signature="e#23039#23040#0" expanded="true" />
+                <element signature="e#20241#21317#0" expanded="true" />
+                <element signature="e#21316#21317#0" expanded="true" />
                 <element signature="class#track3D#0;class#Registration#0" expanded="false" />
                 <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
                 <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
@@ -115,37 +128,6 @@
             <state relative-caret-position="195">
               <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Track.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Track.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="13" column="7" selection-start-line="13" selection-start-column="6" selection-end-line="13" selection-end-column="7" />
-              <folding>
-                <element signature="method#Track#0;class#Track#0" expanded="false" />
-                <element signature="method#addLocation#0;class#Track#0" expanded="false" />
-                <element signature="e#715#716#0" expanded="false" />
-                <element signature="e#741#742#0" expanded="false" />
-                <element signature="e#779#780#0" expanded="false" />
-                <element signature="e#804#805#0" expanded="false" />
-                <element signature="e#840#841#0" expanded="false" />
-                <element signature="e#868#869#0" expanded="false" />
-                <element signature="e#901#902#0" expanded="false" />
-                <element signature="e#936#937#0" expanded="false" />
-                <element signature="e#969#970#0" expanded="false" />
-                <element signature="e#1004#1005#0" expanded="false" />
-                <element signature="e#1037#1038#0" expanded="false" />
-                <element signature="e#1072#1073#0" expanded="false" />
-                <element signature="e#1102#1103#0" expanded="false" />
-                <element signature="e#1130#1131#0" expanded="false" />
-                <element signature="e#1160#1161#0" expanded="false" />
-                <element signature="e#1188#1189#0" expanded="false" />
-                <element signature="e#1357#1358#0" expanded="false" />
-                <element signature="e#1382#1383#0" expanded="false" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -316,11 +298,13 @@
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Track.java" />
         <option value="$MAVEN_REPOSITORY$/net/imagej/ij/1.51f/ij-1.51f.jar!/ij/ImagePlus.class" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/FileInfoSer.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
         <option value="$PROJECT_DIR$/src/main/resources/plugins.config" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
         <option value="$PROJECT_DIR$/src/main/resources/DataStreamingToolTips.txt" />
+        <option value="$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html" />
+        <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/DataStreamingHelp.html" />
       </list>
     </option>
   </component>
@@ -345,8 +329,8 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="106" />
-    <option name="y" value="41" />
+    <option name="x" value="34" />
+    <option name="y" value="69" />
     <option name="width" value="1271" />
     <option name="height" value="798" />
   </component>
@@ -784,7 +768,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="106" y="41" width="1271" height="798" extended-state="0" />
+    <frame x="34" y="69" width="1271" height="798" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -799,7 +783,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.37021968" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21318145" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.0" sideWeight="0.69548583" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -838,7 +822,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java</url>
-          <line>75</line>
+          <line>76</line>
           <properties />
           <option name="timeStamp" value="57" />
         </line-breakpoint>
@@ -852,18 +836,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Globals.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="1" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#361#362#0" expanded="false" />
-            <element signature="e#401#402#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5970">
@@ -919,8 +891,10 @@
             <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#openCroppedCenterRadiusFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#StackStreamToolsGUI#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="method#itemStateChanged#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#StackStreamToolsGUI#0" expanded="false" />
+            <element signature="method#getToolTipFile#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="e#35296#35304#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
@@ -939,8 +913,8 @@
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
             <element signature="class#TrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="e#4378#4585#0" expanded="true" />
-            <element signature="e#4584#4585#0" expanded="true" />
+            <element signature="e#4404#4611#0" expanded="true" />
+            <element signature="e#4610#4611#0" expanded="true" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
@@ -948,11 +922,12 @@
             <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="method#getToolTipFile#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="e#15144#15152#0" expanded="true" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
@@ -962,8 +937,8 @@
             <element signature="method#imageUpdated#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#21964#23040#0" expanded="true" />
-            <element signature="e#23039#23040#0" expanded="true" />
+            <element signature="e#20241#21317#0" expanded="true" />
+            <element signature="e#21316#21317#0" expanded="true" />
             <element signature="class#track3D#0;class#Registration#0" expanded="false" />
             <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
             <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
@@ -1068,8 +1043,10 @@
             <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#openCroppedCenterRadiusFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#StackStreamToolsGUI#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="method#itemStateChanged#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#StackStreamToolsGUI#0" expanded="false" />
+            <element signature="method#getToolTipFile#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="e#35296#35304#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
@@ -1096,8 +1073,8 @@
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
             <element signature="class#TrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="e#4378#4585#0" expanded="true" />
-            <element signature="e#4584#4585#0" expanded="true" />
+            <element signature="e#4404#4611#0" expanded="true" />
+            <element signature="e#4610#4611#0" expanded="true" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
@@ -1105,11 +1082,12 @@
             <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="method#getToolTipFile#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="e#15144#15152#0" expanded="true" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
@@ -1119,8 +1097,8 @@
             <element signature="method#imageUpdated#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#21964#23040#0" expanded="true" />
-            <element signature="e#23039#23040#0" expanded="true" />
+            <element signature="e#20241#21317#0" expanded="true" />
+            <element signature="e#21316#21317#0" expanded="true" />
             <element signature="class#track3D#0;class#Registration#0" expanded="false" />
             <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
             <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
@@ -1266,8 +1244,10 @@
             <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#openCroppedCenterRadiusFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#StackStreamToolsGUI#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="method#itemStateChanged#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#StackStreamToolsGUI#0" expanded="false" />
+            <element signature="method#getToolTipFile#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="e#35296#35304#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
@@ -1294,8 +1274,8 @@
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
             <element signature="class#TrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="e#4378#4585#0" expanded="true" />
-            <element signature="e#4584#4585#0" expanded="true" />
+            <element signature="e#4404#4611#0" expanded="true" />
+            <element signature="e#4610#4611#0" expanded="true" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
@@ -1303,11 +1283,12 @@
             <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="method#getToolTipFile#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="e#15144#15152#0" expanded="true" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
@@ -1317,8 +1298,8 @@
             <element signature="method#imageUpdated#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#21964#23040#0" expanded="true" />
-            <element signature="e#23039#23040#0" expanded="true" />
+            <element signature="e#20241#21317#0" expanded="true" />
+            <element signature="e#21316#21317#0" expanded="true" />
             <element signature="class#track3D#0;class#Registration#0" expanded="false" />
             <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
             <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
@@ -1464,8 +1445,10 @@
             <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#openCroppedCenterRadiusFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#StackStreamToolsGUI#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="method#itemStateChanged#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#StackStreamToolsGUI#0" expanded="false" />
+            <element signature="method#getToolTipFile#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="e#35296#35304#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
@@ -1492,8 +1475,8 @@
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
             <element signature="class#TrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="e#4378#4585#0" expanded="true" />
-            <element signature="e#4584#4585#0" expanded="true" />
+            <element signature="e#4404#4611#0" expanded="true" />
+            <element signature="e#4610#4611#0" expanded="true" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
@@ -1501,11 +1484,12 @@
             <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="method#getToolTipFile#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="e#15144#15152#0" expanded="true" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
@@ -1515,8 +1499,8 @@
             <element signature="method#imageUpdated#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#21964#23040#0" expanded="true" />
-            <element signature="e#23039#23040#0" expanded="true" />
+            <element signature="e#20241#21317#0" expanded="true" />
+            <element signature="e#21316#21317#0" expanded="true" />
             <element signature="class#track3D#0;class#Registration#0" expanded="false" />
             <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
             <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
@@ -1837,10 +1821,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/plugins.config">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="925">
+          <caret line="37" column="4" selection-start-line="37" selection-start-column="4" selection-end-line="37" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-184">
-          <caret line="253" column="0" selection-start-line="253" selection-start-column="0" selection-end-line="253" selection-end-column="0" />
+        <state relative-caret-position="260">
+          <caret line="266" column="26" selection-start-line="266" selection-start-column="26" selection-end-line="266" selection-end-column="26" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />
@@ -1849,8 +1849,8 @@
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="method#logStatus#0;class#Registration#0" expanded="false" />
             <element signature="class#TrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="e#4378#4585#0" expanded="true" />
-            <element signature="e#4584#4585#0" expanded="true" />
+            <element signature="e#4404#4611#0" expanded="true" />
+            <element signature="e#4610#4611#0" expanded="true" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mousePressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#mouseReleased#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
@@ -1858,11 +1858,12 @@
             <element signature="method#mouseExited#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyTyped#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#keyPressed#0;class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="method#getToolTipFile#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="e#15144#15152#0" expanded="true" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
@@ -1872,8 +1873,8 @@
             <element signature="method#imageUpdated#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#21964#23040#0" expanded="true" />
-            <element signature="e#23039#23040#0" expanded="true" />
+            <element signature="e#20241#21317#0" expanded="true" />
+            <element signature="e#21316#21317#0" expanded="true" />
             <element signature="class#track3D#0;class#Registration#0" expanded="false" />
             <element signature="method#getImageStack#0;class#Registration#0" expanded="false" />
             <element signature="method#iterativeCenterOfMass16bit#0;class#Registration#0" expanded="false" />
@@ -1883,18 +1884,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/plugins.config">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="854" column="25" selection-start-line="854" selection-start-column="25" selection-end-line="854" selection-end-column="25" />
+        <state relative-caret-position="453">
+          <caret line="842" column="73" selection-start-line="842" selection-start-column="8" selection-end-line="842" selection-end-column="73" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -1911,8 +1904,10 @@
             <element signature="method#checkFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#openCroppedCenterRadiusFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#crop#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#StackStreamToolsGUI#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="method#itemStateChanged#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="method#actionPerformed#0;class#StackStreamToolsGUI#0" expanded="false" />
+            <element signature="method#getToolTipFile#0;class#StackStreamToolsGUI#0" expanded="false" />
             <element signature="e#35296#35304#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
@@ -1921,8 +1916,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/DataStreamingHelp.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="10" column="4" selection-start-line="10" selection-start-column="4" selection-end-line="10" selection-end-column="4" />
+        <state relative-caret-position="316">
+          <caret line="77" column="42" selection-start-line="77" selection-start-column="42" selection-end-line="77" selection-end-column="42" />
           <folding />
         </state>
       </provider>

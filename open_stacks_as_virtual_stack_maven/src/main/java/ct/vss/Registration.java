@@ -17,6 +17,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -258,70 +259,9 @@ public class Registration implements PlugIn, ImageListener {
         String[] actions = {
                 //"Add Track Start",
                 "Track selected object",
-                "Crop image along tracks",
+                "Crop along tracks",
                 "Show track table",
                 "Save track table"
-        };
-
-        String[] actionHelps = {
-
-                "<html>" +
-                        "<h3>Track selected object</h3>" +
-                        "<p width=400>"+
-                        "Use ImageJ's Point Selection tool to select an object in the image and then " +
-                        "hit this button to start its tracking. " +
-                        "The tracking is based on computing the center of mass of the gray-scale values " +
-                        "within above chosen radii. " +
-                        "You do not have to wait for the tracking of one object " +
-                        "to be finished; you can immediately track another object. " +
-                        "</p>" +
-                        "</html>",
-
-                "<html>" +
-                        "<h3>Crop image along tracks</h3>" +
-                        "<p width=400>"+
-                        "Opens as many new image windows as there are completed tracks. " +
-                        "Each image window shows the data locally surrounding the respective track. " +
-                        "The size of the shown region can be adjusted by the changing the values in 'Cropping radii'. " +
-                        "</p>" +
-                        "<h4>Main ideas behind this functionality</h4>" +
-                        "<p width=400>"+
-                        "One often wants to observe morphological changes of moving objects. " +
-                        "It is however very challenging for the human brain " +
-                        "to focus on the morphological changes as it is distracted by the object's motion. " +
-                        "Thus, having a 'stabilized view' on the object, where its translocation is eliminated is " +
-                        "very helpful. " +
-                        "In addition, the 'stabilized view' also reduces the amount of data needed to further study the object." +
-                        "</p>" +
-                        "</html>",
-
-                "<html>" +
-                        "<h3>...</h3>" +
-                        "<p width=400>"+
-                        "..." +
-                        "..." +
-                        "</p>" +
-                        "<h4>...</h4>" +
-                        "<p width=400>"+
-                        "..."+
-                        "..." +
-                        "</p>" +
-                        "</html>",
-
-
-                "<html>" +
-                        "<h3>...</h3>" +
-                        "<p width=400>"+
-                        "..." +
-                        "..." +
-                        "</p>" +
-                        "<h4>...</h4>" +
-                        "<p width=400>"+
-                        "..."+
-                        "..." +
-                        "</p>" +
-                        "</html>"
-
         };
 
         String[] texts = {
@@ -350,13 +290,15 @@ public class Registration implements PlugIn, ImageListener {
             Container c = frame.getContentPane();
             c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
 
+            String[] toolTipTexts = getToolTipFile("TrackAndCropHelp.html");
+
             JButton[] buttons = new JButton[actions.length];
 
             for (int i = 0; i < buttons.length; i++) {
                 buttons[i] = new JButton(actions[i]);
                 buttons[i].setActionCommand(actions[i]);
                 buttons[i].addActionListener(this);
-                buttons[i].setToolTipText(actionHelps[i]);
+                buttons[i].setToolTipText(toolTipTexts[i]);
             }
             ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 
@@ -502,6 +444,37 @@ public class Registration implements PlugIn, ImageListener {
         public JFrame getFrame() {
             return frame;
         }
+
+        private String[] getToolTipFile(String fileName) {
+            ArrayList<String> toolTipTexts = new ArrayList<String>();
+
+            //Get file from resources folder
+            ClassLoader classLoader = getClass().getClassLoader();
+            File file = new File(classLoader.getResource(fileName).getFile());
+
+            try {
+                Scanner scanner = new Scanner(file);
+                StringBuilder sb = new StringBuilder("");
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    if(line.equals("###")) {
+                        toolTipTexts.add(sb.toString());
+                        sb = new StringBuilder("");
+                    } else {
+                        sb.append(line);
+                    }
+
+                }
+
+                scanner.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return(toolTipTexts.toArray(new String[0]));
+        }
+
     }
 
     public void showTrackTable(){
