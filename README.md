@@ -4,6 +4,11 @@
 
 This ImageJ plugin suite constructs a virtual stack (data stream) from a folder of image stacks. This is useful for large (~1TB) data sets as typically acquired with light-sheet microscopy. In addition to viewing the data it also allows you to track objects in the data set in an efficient and fast manner; it is efficient, because it only loads the data around the tracked objects and it is fast, because the code is optimised for speed and uses multi-threading. 
 
+## Help
+
+
+[Data Streaming Tools](http://htmlpreview.github.com/?https://github.com/tischi/imagej-open-stacks-as-virtualstack/blob/master/open_stacks_as_virtual_stack_maven/src/main/resources/DataStreamingHelp.html)
+
 ## Usage notes
 
 The folder structure of your input data currently must consist of one main folder containing subfolders for each channel, where each of the channel subfolders contains the image stacks representing the time-points. The names of the folders and files are arbitrary, they are only used to sort the channels and time-points (the sorted file lists will be printed in the IJ log window; please check that the order is correct!).
