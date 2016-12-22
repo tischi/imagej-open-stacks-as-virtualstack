@@ -4,10 +4,13 @@
 
 This ImageJ plugin suite constructs a virtual stack (data stream) from a folder of image stacks. This is useful for large (~1TB) data sets as typically acquired with light-sheet microscopy. In addition to viewing the data it also allows you to track objects in the data set in an efficient and fast manner; it is efficient, because it only loads the data around the tracked objects and it is fast, because the code is optimised for speed and uses multi-threading. 
 
-## Help
+## Plugin help
 
+Below pages summarise the information that you get by hovering with the mouse over the respective button in each plugin.
 
 [Data Streaming Tools](http://htmlpreview.github.com/?https://github.com/tischi/imagej-open-stacks-as-virtualstack/blob/master/open_stacks_as_virtual_stack_maven/src/main/resources/DataStreamingHelp.html)
+
+[Track and Crop](http://htmlpreview.github.com/?https://github.com/tischi/imagej-open-stacks-as-virtualstack/blob/master/open_stacks_as_virtual_stack_maven/src/main/resources/TrackAndCropHelp.html)
 
 ## Usage notes
 
