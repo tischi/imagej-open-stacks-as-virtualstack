@@ -1,7 +1,45 @@
 <html>
+<h3>Tracking: Radii</h3>
+<p width=400>
+    The tracking is based on computing the center of mass in a region whose
+    size you can adjust here. The radii should be large enough <b>to enclose one</b> of
+    your objects of interest, but small enough <b>not to enclose two</b> objects
+    as this can cause the algorithm to 'switch' objects during tracking. Please note
+    that you can change the tracking radii at any point; the 'Tracking Radii' are read again any time you
+    click the 'Track selected object' button. This means that you can subsequently track objects of
+    different sizes.
+</p>
+</html>
+###
+<html>
+<h3>Tracking: Track length</h3>
+<p width=400>
+    Here, you can specify the number of frames that you would like to track the object.
+    Please note that you do <b>not</b> need to start tracking at the first frame.
+    Simply move the time slider on the image forward and then select an object and click
+    'Track selected object'. Also note that you can track different objects for different
+    lengths.
+</p>
+</html>
+###
+<html>
+<h3>Cropping radii</h3>
+<p width=400>
+    Once you have tracked some objects you can use the 'Crop along tracks' button to
+    get a cropped view on your tracked objects in a coordinate system where the
+    respective object stands still. Here you can adjust the size of these cropped view.
+<h4>Additional comments</h4>
+<p width=400>
+    Currently, it only is possible to have the same cropped view on all objects
+    that you have track. If you feel you need more flexibility please raise an
+    issue on github.
+</p>
+</html>
+###
+<html>
 <h3>Track selected object</h3>
 <p width=400>
-Use ImageJ's Point Selection tool to select an object in the image and then
+    Use ImageJ's Point Selection tool to select an object in the image and then
 hit this button to start its tracking.
 The tracking is based on computing the center of mass of the gray-scale values
 within above chosen radii.
@@ -41,7 +79,14 @@ In addition, the 'stabilized view' also reduces the amount of data needed to fur
 <html>
 <h3>Save as track table</h3>
 <p width=400>
-Saves the table as a text file for further processing in, e.g. R or Excel.
+Saves the table as a text file for further processing, e.g. in R or Excel.
+</p>
+</html>
+###
+<html>
+<h3>Report issue</h3>
+<p width=400>
+    Opens the github issue web-site.
 </p>
 </html>
 ###

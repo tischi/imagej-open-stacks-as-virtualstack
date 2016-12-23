@@ -16,6 +16,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -825,7 +827,8 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             "Save as info file",
             "Save as tiff stacks",
             "Crop as new stream",
-            "Duplicate to RAM"};
+            "Duplicate to RAM",
+            "Report issue"};
 
     JCheckBox cbLog = new JCheckBox("Verbose logging");
     JTextField tfH5DataSet = new JTextField("Data111", 10);
@@ -842,47 +845,55 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
 
         String[] toolTipTexts = getToolTipFile("DataStreamingHelp.html");
 
+        // Buttons
         JButton[] buttons = new JButton[actions.length];
-
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new JButton(actions[i]);
             buttons[i].setActionCommand(actions[i]);
             buttons[i].addActionListener(this);
             buttons[i].setToolTipText(toolTipTexts[i]);
-            log(toolTipTexts[i]);
         }
 
-        int i = 0, j = 0;
+        // Textfields
+        JLabel labelH5DataSet = new JLabel("Hdf5 data set name: ");
+        labelH5DataSet.setLabelFor(tfH5DataSet);
 
-        JPanel[] panels = new JPanel[4];
-
-        panels[j] = new JPanel();
-        panels[j].add(buttons[i++]);
-        panels[j].add(buttons[i++]);
-        c.add(panels[j++]);
-
-        panels[j] = new JPanel();
-        panels[j].add(buttons[i++]);
-        panels[j].add(buttons[i++]);
-        //panels[j].add(buttons[i++]);
-        c.add(panels[j++]);
-
-        panels[j] = new JPanel();
-        panels[j].add(buttons[i++]);
-        panels[j].add(buttons[i++]);
-        c.add(panels[j++]);
-
+        // Checkboxes
         cbLog.setSelected(false);
         cbLog.addItemListener(this);
 
-        panels[j] = new JPanel();
-        panels[j].add(cbLog);
-        panels[j].add(tfH5DataSet);
-        c.add(panels[j++]);
+        int i = 0, j = 0;
 
-        //button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        ArrayList<JPanel> panels = new ArrayList<JPanel>();
 
-        //Display the window.
+        panels.add(new JPanel());
+        panels.get(j).add(buttons[i++]);
+        panels.get(j).add(buttons[i++]);
+        c.add(panels.get(j++));
+
+        panels.add(new JPanel());
+        panels.get(j).add(buttons[i++]);
+        panels.get(j).add(buttons[i++]);
+        c.add(panels.get(j++));
+
+        panels.add(new JPanel());
+        panels.get(j).add(buttons[i++]);
+        panels.get(j).add(buttons[i++]);
+        c.add(panels.get(j++));
+
+        panels.add(new JPanel());
+        panels.get(j).add(labelH5DataSet);
+        panels.get(j).add(tfH5DataSet);
+        c.add(panels.get(j++));
+
+        panels.add(new JPanel());
+        panels.get(j).add(cbLog);
+        c.add(panels.get(j++));
+
+        panels.add(new JPanel());
+        panels.get(j).add(buttons[i++]);
+        c.add(panels.get(j++));
+
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -1006,7 +1017,10 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
                 imp2.show();
 
         } else if (e.getActionCommand().equals(actions[i++])) {
+            //
             // duplicate to RAM
+            //
+
             Thread t1 = new Thread(new Runnable() {
                 public void run() {
                     ImagePlus imp2 = osv.duplicateToRAM(IJ.getImage());
@@ -1024,12 +1038,28 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             });
             t2.start();
 
+        } else if (e.getActionCommand().equals(actions[i++])) {
+                //
+                // Report issue
+                //
+                String url = "https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues";
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        final URI uri = new URI(url);
+                        Desktop.getDesktop().browse(uri);
+                    } catch (URISyntaxException uriEx) {
+                        IJ.showMessage(uriEx.toString());
+                    } catch (IOException ioEx) {
+                        IJ.showMessage(ioEx.toString());
+                    }
+                } else {
+                    IJ.showMessage("Could not open browser, please report issue here: \n" +
+                            "https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues");
+
+                }
+            }
+
         }
-
-
-
-
-    }
 
     private String[] getToolTipFile(String fileName) {
         ArrayList<String> toolTipTexts = new ArrayList<String>();

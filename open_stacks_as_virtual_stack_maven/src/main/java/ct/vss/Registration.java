@@ -16,6 +16,8 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
@@ -30,6 +32,8 @@ import static ij.IJ.log;
 /**
  * Created by tischi on 31/10/16.
  */
+
+// todo: add a clickable github link at the bottom of the plugin
 
 // todo: how to behave when the track is leaving the image bounds?
 
@@ -59,6 +63,8 @@ public class Registration implements PlugIn, ImageListener {
     long trackStatsLastTrackStarted;
     int trackStatsTotalPointsTrackedAtLastStart;
     TrackingGUI trackingGUI;
+
+    // todo: remove the background variable?!
 
     // todo: put actual tracking into different class
 
@@ -256,26 +262,26 @@ public class Registration implements PlugIn, ImageListener {
 
         JFrame frame;
 
+        String[] texts = {
+                "Tracking: Radii: x, y, z [pix]",
+                "Tracking: Track length [frames]",
+                "Cropping: Radii: x, y, z [pix]",
+        };
+
         String[] actions = {
                 //"Add Track Start",
                 "Track selected object",
                 "Crop along tracks",
                 "Show track table",
-                "Save track table"
+                "Save track table",
+                "Report issue"
         };
 
-        String[] texts = {
-                "Tracking center of mass radii; xy,z [pix]",
-                "Cropping radii; xy,z [pix]",
-                "Track length [frames]",
-                "Image background"
-        };
 
         String[] defaults = {
-                String.valueOf((int) gui_pCenterOfMassRadii.getX()) + "," + String.valueOf((int) gui_pCenterOfMassRadii.getZ()),
-                String.valueOf((int) gui_pCropRadii.getX()) + "," + String.valueOf((int) gui_pCropRadii.getZ()),
+                String.valueOf((int) gui_pCenterOfMassRadii.getX()) + "," + (int) gui_pCenterOfMassRadii.getY() + "," +String.valueOf((int) gui_pCenterOfMassRadii.getZ()),
                 String.valueOf(imp.getNFrames()),
-                String.valueOf(gui_bg)
+                String.valueOf((int) gui_pCropRadii.getX()) + "," + ((int) gui_pCropRadii.getY()) + "," + String.valueOf((int) gui_pCropRadii.getZ())
         };
 
         ExecutorService es = Executors.newCachedThreadPool();
@@ -285,35 +291,45 @@ public class Registration implements PlugIn, ImageListener {
 
         public void showDialog() {
 
-            frame = new JFrame("Big Data Tracker");
+            frame = new JFrame("Track and Crop");
             //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             Container c = frame.getContentPane();
             c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+            ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 
             String[] toolTipTexts = getToolTipFile("TrackAndCropHelp.html");
 
-            JButton[] buttons = new JButton[actions.length];
-
-            for (int i = 0; i < buttons.length; i++) {
-                buttons[i] = new JButton(actions[i]);
-                buttons[i].setActionCommand(actions[i]);
-                buttons[i].addActionListener(this);
-                buttons[i].setToolTipText(toolTipTexts[i]);
-            }
-            ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
-
+            //
+            // TextFields
+            //
             JTextField[] textFields = new JTextField[texts.length];
             JLabel[] labels = new JLabel[texts.length];
 
-            for (int i = 0; i < textFields.length; i++) {
+            int iToolTipText = 0;
+
+            for (int i = 0; i < textFields.length; i++, iToolTipText++) {
                 textFields[i] = new JTextField(6);
                 textFields[i].setActionCommand(texts[i]);
                 textFields[i].addActionListener(this);
                 textFields[i].addFocusListener(this);
                 textFields[i].setText(defaults[i]);
+                textFields[i].setToolTipText(toolTipTexts[iToolTipText]);
                 labels[i] = new JLabel(texts[i] + ": ");
                 labels[i].setLabelFor(textFields[i]);
             }
+
+            //
+            // Buttons
+            //
+            JButton[] buttons = new JButton[actions.length];
+
+            for (int i = 0; i < buttons.length; i++, iToolTipText++) {
+                buttons[i] = new JButton(actions[i]);
+                buttons[i].setActionCommand(actions[i]);
+                buttons[i].addActionListener(this);
+                buttons[i].setToolTipText(toolTipTexts[iToolTipText]);
+            }
+
 
             int i = 0, j = 0;
 
@@ -341,6 +357,11 @@ public class Registration implements PlugIn, ImageListener {
             panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
+            panels.add(new JPanel());
+            panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
+
+
             frame.pack();
             frame.setLocation(imp.getWindow().getX() + imp.getWindow().getWidth(), imp.getWindow().getY());
             frame.setVisible(true);
@@ -361,7 +382,6 @@ public class Registration implements PlugIn, ImageListener {
         public void actionPerformed(ActionEvent e) {
             int i = 0;
             int k = 0;
-            String[] sA;
             JFileChooser fc;
             final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
 
@@ -408,36 +428,40 @@ public class Registration implements PlugIn, ImageListener {
                     File file = fc.getSelectedFile();
                     saveTrackTable(file);
                 }
-            } else if (e.getActionCommand().equals(texts[k++])) {
+            } else if (e.getActionCommand().equals(actions[i++])) {
+                //
+                // Report issue
+                //
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        final URI uri = new URI("https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues");
+                        Desktop.getDesktop().browse(uri);
+                    } catch (URISyntaxException uriEx) {
+                        IJ.showMessage(uriEx.toString());
+                    } catch (IOException ioEx) {
+                        IJ.showMessage(ioEx.toString());
+                    }
+                } else { /* TODO: error handling */ }
+            }  else if (e.getActionCommand().equals(texts[k++])) {
                 //
                 // Tracking radii
                 //
                 JTextField source = (JTextField) e.getSource();
-                sA = source.getText().split(",");
-                log(texts[k-1] + ": " + source.getText());
-                gui_pCenterOfMassRadii = new Point3D(new Integer(sA[0]), new Integer(sA[0]), new Integer(sA[1]));
+                String[] sA = source.getText().split(",");
+                gui_pCenterOfMassRadii = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
+            } else if (e.getActionCommand().equals(texts[k++])) {
+                //
+                // Track length
+                //
+                JTextField source = (JTextField) e.getSource();
+                gui_ntTracking = new Integer(source.getText());
             } else if (e.getActionCommand().equals(texts[k++])) {
                 //
                 // Cropping radii
                 //
                 JTextField source = (JTextField) e.getSource();
-                sA = source.getText().split(",");
-                log(texts[k-1] + ": " + source.getText());
-                gui_pCropRadii = new Point3D(new Integer(sA[0]), new Integer(sA[0]), new Integer(sA[1]));
-            } else if (e.getActionCommand().equals(texts[k++])) {
-                //
-                // nt
-                //
-                JTextField source = (JTextField) e.getSource();
-                log(texts[k-1] + ": " + source.getText());
-                gui_ntTracking = new Integer(source.getText());
-            } else if (e.getActionCommand().equals(texts[k++])) {
-                //
-                // bg
-                //
-                JTextField source = (JTextField) e.getSource();
-                log(texts[k-1] + ": " + source.getText());
-                gui_bg = new Integer(source.getText());
+                String[] sA = source.getText().split(",");
+                gui_pCropRadii = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
             }
         }
 
@@ -629,15 +653,12 @@ public class Registration implements PlugIn, ImageListener {
         });
     }
 
-    // todo: maybe reload more data if necessary
-
+    // todo: reload more data if necessary
     class track3D implements Runnable {
-        int iTrack, c, nt, dt, dz, bg, iterations;
-        Point3D pStackRadii, pCenterOfMassRadii;
-        String log;
-
+        int iTrack, dt, dz, bg, iterations;
+        Point3D pCenterOfMassRadii, pOffset, pLocalCenter;
         ImageStack stack;
-        Point3D pOffset, pLocalCenter;
+
 
         track3D(int iTrack, int dt, int dz, Point3D pCenterOfMassRadii, int bg, int iterations) {
             this.iTrack = iTrack;
@@ -651,7 +672,7 @@ public class Registration implements PlugIn, ImageListener {
         public void run() {
             long startTime = 0, stopTime, elapsedReadingTime, elapsedProcessingTime;
             long startTimePerTimePoint, totalElapsedTime = 0;
-
+            int mean;
             Track track = Tracks.get(iTrack);
 
             int tStart = track.getTmin();
@@ -679,7 +700,8 @@ public class Registration implements PlugIn, ImageListener {
 
                 // compute center of mass (in zero-based local stack coordinates)
                 startTime = System.currentTimeMillis();
-                pLocalCenter = iterativeCenterOfMass16bit(stack, bg, pCenterOfMassRadii, iterations);
+                mean = computeMean16bit(stack);
+                pLocalCenter = iterativeCenterOfMass16bit(stack, mean, pCenterOfMassRadii, iterations);
                 // correct for the sub-sampling in z
                 pLocalCenter = new Point3D(pLocalCenter.getX(), pLocalCenter.getY(), dz * pLocalCenter.getZ());
                 stopTime = System.currentTimeMillis();
@@ -825,6 +847,7 @@ public class Registration implements PlugIn, ImageListener {
         */
 
         // compute one-based, otherwise the numbers at x=0,y=0,z=0 are lost for the center of mass
+        // todo: take the method if-statement of out of the loop for increased speed?!
         for(int z=zmin+1; z<=zmax+1; z++) {
             ImageProcessor ip = stack.getProcessor(z);
             short[] pixels = (short[]) ip.getPixels();
@@ -858,6 +881,36 @@ public class Registration implements PlugIn, ImageListener {
         //long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime; log("center of mass in [ms]: " + elapsedTime);
 
         return(new Point3D(xCenter,yCenter,zCenter));
+    }
+
+    public int computeMean16bit(ImageStack stack) {
+
+        //long startTime = System.currentTimeMillis();
+        double sum = 0.0;
+        int i;
+        int width = stack.getWidth();
+        int height = stack.getHeight();
+        int depth = stack.getSize();
+        int xMin = 0;
+        int xMax = (width-1);
+        int yMin = 0;
+        int yMax = (height-1);
+        int zMin = 0;
+        int zMax = (depth-1);
+
+        for(int z=zMin; z<=zMax; z++) {
+            short[] pixels = (short[]) stack.getProcessor(z+1).getPixels();
+            for (int y = yMin; y<=yMax; y++) {
+                i = y * width + xMin;
+                for (int x = xMin; x <= xMax; x++) {
+                    sum += (pixels[i] & 0xffff);
+                    i++;
+                }
+            }
+        }
+
+        return((int) sum/(width*height*depth));
+
     }
 
     public Point3D maxLoc16bit(ImageStack stack) {
