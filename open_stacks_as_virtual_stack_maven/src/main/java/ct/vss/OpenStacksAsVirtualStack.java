@@ -851,7 +851,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             buttons[i] = new JButton(actions[i]);
             buttons[i].setActionCommand(actions[i]);
             buttons[i].addActionListener(this);
-            buttons[i].setToolTipText(toolTipTexts[i]);
+            //buttons[i].setToolTipText(toolTipTexts[i]);
         }
 
         // Textfields
