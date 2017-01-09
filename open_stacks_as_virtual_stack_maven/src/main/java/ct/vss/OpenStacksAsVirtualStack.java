@@ -713,7 +713,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-        final String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
+        final String directory = "/Users/tischi/Desktop/Gustavo_Tiff/";
         //String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
         //final String directory = "/Users/tischi/Desktop/example-data/compressed/";
@@ -819,7 +819,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 }
 
 
-
 class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener {
 
     String[] actions = {"Stream from folder",
@@ -851,7 +850,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             buttons[i] = new JButton(actions[i]);
             buttons[i].setActionCommand(actions[i]);
             buttons[i].addActionListener(this);
-            //buttons[i].setToolTipText(toolTipTexts[i]);
+            buttons[i].setToolTipText(toolTipTexts[i]);
         }
 
         // Textfields
@@ -1062,37 +1061,46 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
         }
 
     private String[] getToolTipFile(String fileName) {
+
         ArrayList<String> toolTipTexts = new ArrayList<String>();
 
         //Get file from resources folder
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource(fileName).getFile());
+        //ClassLoader classLoader = getClass().getClassLoader();
+        //File file = new File(classLoader.getResource(fileName).getFile());
 
-        try {
-            Scanner scanner = new Scanner(file);
-            StringBuilder sb = new StringBuilder("");
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                if(line.equals("###")) {
-                    toolTipTexts.add(sb.toString());
-                    sb = new StringBuilder("");
-                } else {
-                    sb.append(line);
-                }
+        //try {
 
+        InputStream in = getClass().getResourceAsStream("/"+fileName);
+        BufferedReader input = new BufferedReader(new InputStreamReader(in));
+        Scanner scanner = new Scanner(input);
+
+        StringBuilder sb = new StringBuilder("");
+
+
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            if(line.equals("###")) {
+                toolTipTexts.add(sb.toString());
+                sb = new StringBuilder("");
+            } else {
+                sb.append(line);
             }
 
-            scanner.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
+        scanner.close();
+
+        //} catch (IOException e) {
+
+        //    log("Did not find tool tip file 2.");
+        //    e.printStackTrace();
+
+        //}
 
         return(toolTipTexts.toArray(new String[0]));
     }
 
 }
-
 
 
 class VirtualOpenerDialog extends GenericDialog {

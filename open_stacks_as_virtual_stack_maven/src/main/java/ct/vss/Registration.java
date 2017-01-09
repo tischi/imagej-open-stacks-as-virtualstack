@@ -473,28 +473,24 @@ public class Registration implements PlugIn, ImageListener {
             ArrayList<String> toolTipTexts = new ArrayList<String>();
 
             //Get file from resources folder
-            ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource(fileName).getFile());
+            InputStream in = getClass().getResourceAsStream("/"+fileName);
+            BufferedReader input = new BufferedReader(new InputStreamReader(in));
+            Scanner scanner = new Scanner(input);
+            StringBuilder sb = new StringBuilder("");
 
-            try {
-                Scanner scanner = new Scanner(file);
-                StringBuilder sb = new StringBuilder("");
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    if(line.equals("###")) {
-                        toolTipTexts.add(sb.toString());
-                        sb = new StringBuilder("");
-                    } else {
-                        sb.append(line);
-                    }
-
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if(line.equals("###")) {
+                    toolTipTexts.add(sb.toString());
+                    sb = new StringBuilder("");
+                } else {
+                    sb.append(line);
                 }
 
-                scanner.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+
+            scanner.close();
+
 
             return(toolTipTexts.toArray(new String[0]));
         }
@@ -800,7 +796,7 @@ public class Registration implements PlugIn, ImageListener {
         ImageStack stack = vss.getCroppedFrameCenterRadii(t, c, dz, p, pr).getStack();
         long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime;
         //log("loaded stack in [ms]: " + elapsedTime);
-        //imp.show();
+        imp.show();
         return(stack);
     }
 

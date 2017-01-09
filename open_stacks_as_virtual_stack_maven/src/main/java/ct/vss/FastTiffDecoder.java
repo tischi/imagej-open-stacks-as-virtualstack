@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+
+import static ij.IJ.log;
 /**
  Decodes single and multi-image TIFF files. The LZW decompression
  code was contributed by Curtis Rueden.
@@ -587,7 +589,6 @@ public class FastTiffDecoder {
         FileInfo fi = new FileInfo();
         fi.fileType = FileInfo.BITMAP;  //BitsPerSample defaults to 1
 
-
         for (int i=0; i<nEntries; i++) {
 
             tag = getShort();
@@ -862,7 +863,7 @@ public class FastTiffDecoder {
         // stripOffsets
         //
         // go to address where the pointer to the strips is stored
-        in.seek(stripInfos[1]+startLoc);
+        in.seek(startLoc+stripInfos[1]);
         long stripLoc = ((long)getInt())&0xffffffffL;
         // go to where the actual strips are stored
         in.seek(stripLoc);
@@ -884,7 +885,7 @@ public class FastTiffDecoder {
         // stripLengths
         //
         // go to address where the pointer to the strips is stored
-        in.seek(stripInfos[2]+startLoc);
+        in.seek(startLoc+stripInfos[2]);
         stripLoc = ((long)getInt())&0xffffffffL;
         // go to where the actual strips are stored
         in.seek(stripLoc);
@@ -1180,6 +1181,10 @@ public class FastTiffDecoder {
     }
 
     public FileInfo[] getTiffInfo() throws IOException {
+        if(Globals.verbose) {
+            log("# getTiffInfo");
+        }
+
         startTimeTotal = System.currentTimeMillis();
 
         long[] stripInfos = new long[5];
@@ -1197,8 +1202,10 @@ public class FastTiffDecoder {
         }
         if (debugMode) dInfo = "\n  " + name + ": opening\n";
         while (ifdOffset>0L) {
-            //log("ifdOffset "+ifdOffset);
             in.seek(ifdOffset);
+            if(Globals.verbose) {
+                log("reading IFD " + list.size() + " at " + ifdOffset);
+            }
             if(list.size()==0) {
                 fi = OpenFirstIFD(stripInfos);
                 //log("stripOffsetsRelativeLoc " + stripInfos[0]);
@@ -1211,14 +1218,31 @@ public class FastTiffDecoder {
                 //log("stripLengthsRelativeLoc " + stripInfos[1]);
                 //log("stripLengthFieldType " + stripInfos[2]);
             }
+            fi.longOffset = (long)fi.offset & 4294967295L;
+            if(Globals.verbose) {
+                log("fi.nImages: " + fi.nImages);
+                log("fi.longOffset: " + fi.longOffset);
+                log("fi.stripLengths.length: " + fi.stripLengths.length);
+                log("fi.stripOffsets.length: " + fi.stripOffsets.length);
+            }
             if (fi!=null) {
                 list.add(fi);
                 ifdOffset = ((long)getInt())&0xffffffffL;
             } else
                 ifdOffset = 0L;
             if (debugMode && ifdCount<10) dInfo += "  nextIFD=" + ifdOffset + "\n";
-            if (fi!=null && fi.nImages>1)
-                ifdOffset = 0L;   // ignore extra IFDs in ImageJ and NIH Image stacks
+            if (fi!=null && fi.nImages>1) {
+                // set offsets of the following IFDs
+                long size = fi.width*fi.height*fi.getBytesPerPixel();
+                for (int n=1; n<fi.nImages; n++) {
+                    FileInfo fi2 = new FileInfo();
+                    fi2.longOffset = fi.getOffset() + (n-1)*(size+fi.gapBetweenImages);
+                    fi2.offset = 0;
+                    fi2.nImages = 1;
+                    list.add(fi2);
+                }
+                ifdOffset = 0L;   // exit while loop
+            }
         }
         if (list.size()==0) {
             in.close();

@@ -110,7 +110,7 @@ class OpenerExtensions extends Opener {
         int readLength;
         long readStart;
 
-        if ((fi.stripOffsets != null && fi.stripOffsets.length > 1)) {
+        if (fi.stripOffsets != null && fi.stripOffsets.length > 1) {
             hasStrips = true;
         }
 
@@ -149,8 +149,13 @@ class OpenerExtensions extends Opener {
 
                 // convert rows to bytes
                 readStart = fi.longOffset + ys * fi0.width * fi0.bytesPerPixel;
-                readLength =  (int) (fi.longOffset + ((ye-ys)+1) * fi0.width * fi0.bytesPerPixel - readStart);
+                //readLength =  (int) (fi.longOffset + ((ye-ys)+1) * fi0.width * fi0.bytesPerPixel - readStart);
+                readLength = ((ye-ys)+1) * fi0.width * fi0.bytesPerPixel;
 
+                if(Globals.verbose) {
+                    log("no strips");
+                    log("readLength: "+readLength);
+                }
             }
 
             // SKIP to first strip (row) that we need to read of this z-plane
@@ -548,6 +553,7 @@ class process2stack implements Runnable {
         //log("Running " +  threadName );
 
         boolean hasStrips = false;
+
         if ((fi.stripOffsets != null && fi.stripOffsets.length > 1)) {
             hasStrips = true;
         }
@@ -606,7 +612,9 @@ class process2stack implements Runnable {
                 buffer[z - zs] = unCompressedBuffer;
 
             } else {
+
                 log("Unknown compression: "+fi0.compression);
+
             }
 
             //
@@ -618,6 +626,13 @@ class process2stack implements Runnable {
 
         } else { // no strips
 
+            if(Globals.verbose) {
+                log("z-zs : " + (z - zs));
+                log("buffer[z-zs].length : " + buffer[z - zs].length);
+                log("imWidth [bytes] : " + imByteWidth);
+                log("ny [#] : " + ny);
+            }
+            ys = 0; // the buffer contains only the correct y-range
             setShortPixelsCropXY((short[]) stack.getPixels(z - zs + 1), ys, ny, xs, nx, imByteWidth, buffer[z - zs]);
 
         }
@@ -767,7 +782,7 @@ class process2stack implements Runnable {
         int ip = 0;
         int bs, be;
         if(fi0.bytesPerPixel!=2) {
-            log("Unsupported bit depth: "+fi0.bytesPerPixel*8);
+            IJ.showMessage("Unsupported bit depth: "+fi0.bytesPerPixel*8);
         }
 
         for (int y = ys; y < ys + ny; y++) {
@@ -789,7 +804,7 @@ class process2stack implements Runnable {
                 else
                     for (int j = bs; j < be; j += 2)
                         pixels[ip++] = (short) (((buffer[j] & 0xff) << 8) | (buffer[j + 1] & 0xff));
-            }
+             }
         }
     }
 
