@@ -1,5 +1,5 @@
 <html>
-<h3>Tracking: Radii</h3>
+<h3>Tracking radii</h3>
 <p width=400>
     The tracking is based on computing the center of mass in a region whose
     size you can adjust here. The radii should be large enough <b>to enclose one</b> of
@@ -12,7 +12,15 @@
 </html>
 ###
 <html>
-<h3>Tracking: Track length</h3>
+<h3>Tracking sub-sampling</h3>
+<p width=400>
+    To increase the tracking speed you can analyse every dz plane. Especially when
+    working with Tiff stacks this will help as loading of the data will be much faster.
+</p>
+</html>
+###
+<html>
+<h3>Track length</h3>
 <p width=400>
     Here, you can specify the number of frames that you would like to track the object.
     Please note that you do <b>not</b> need to start tracking at the first frame.
@@ -40,11 +48,21 @@
 <h3>Track selected object</h3>
 <p width=400>
     Use ImageJ's Point Selection tool to select an object in the image and then
-hit this button to start its tracking.
-The tracking is based on computing the center of mass of the gray-scale values
-within above chosen radii.
-You do not have to wait for the tracking of one object
-to be finished; you can immediately track another object.
+    hit this button to start its tracking.
+    The tracking is based on computing the center of mass of all the gray-scale values
+    within above chosen radii (as a threshold only values above the mean gray value within
+    twice above chosen radii are taken into account).
+    You do not have to wait for the tracking of one object
+    to be finished; you can immediately track another object.
+</p>
+</html>
+###
+<html>
+<h3>Track whole data set</h3>
+<p width=400>
+    Tracks a drift of the whole data set. No ROI is needed.
+    The tracking is based on computing the center of mass of all the gray-scale values
+    above the mean value of the whole stack.
 </p>
 </html>
 ###

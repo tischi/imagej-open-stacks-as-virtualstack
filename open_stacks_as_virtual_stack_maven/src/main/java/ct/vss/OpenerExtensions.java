@@ -105,7 +105,7 @@ class OpenerExtensions extends Opener {
 
     }
 
-    private long readTiffOnePlaneCroppedRows(FileInfoSer fi0, FileInfoSer fi, RandomAccessFile in, long pointer, byte[][] buffer, int z, int zs, int ys, int ye) {
+    private long readTiffOnePlaneCroppedRows(FileInfoSer fi0, FileInfoSer fi, RandomAccessFile in, long pointer, byte[][] buffer, int z, int zs, int dz, int ys, int ye) {
         boolean hasStrips = false;
         int readLength;
         long readStart;
@@ -153,8 +153,10 @@ class OpenerExtensions extends Opener {
                 readLength = ((ye-ys)+1) * fi0.width * fi0.bytesPerPixel;
 
                 if(Globals.verbose) {
+                    /*
                     log("no strips");
                     log("readLength: "+readLength);
+                    */
                 }
             }
 
@@ -168,9 +170,9 @@ class OpenerExtensions extends Opener {
 
             // READ data
             //startTime = System.currentTimeMillis();
-            buffer[z-zs] = new byte[readLength];
+            buffer[(z-zs)/dz] = new byte[readLength];
             //pointer = read(in, buffer[z-zs], pointer);
-            in.readFully(buffer[z-zs]);
+            in.readFully(buffer[(z-zs)/dz]);
             //readingTime += (System.currentTimeMillis() - startTime);
 
 
@@ -296,7 +298,7 @@ class OpenerExtensions extends Opener {
         int imShortSize = nx*ny;
 
         for(int z=zs; z<=ze; z+=dz) {
-            short[] pixels = (short[]) imp.getStack().getPixels(z-zs+1);
+            short[] pixels = (short[]) imp.getStack().getPixels((z-zs)/dz+1);
             System.arraycopy(asFlatArray, (z-zs)*imShortSize, pixels, 0, imShortSize);
         }
 
@@ -382,7 +384,7 @@ class OpenerExtensions extends Opener {
                 //
 
                 startTime = System.currentTimeMillis();
-                pointer = readTiffOnePlaneCroppedRows(info[0], fi, in, pointer, buffer, z, zs, ys, ye) ;
+                pointer = readTiffOnePlaneCroppedRows(info[0], fi, in, pointer, buffer, z, zs, dz, ys, ye) ;
                 readingTime += (System.currentTimeMillis() - startTime);
 
                 //
@@ -391,7 +393,7 @@ class OpenerExtensions extends Opener {
 
                 startTime = System.currentTimeMillis();
                 // todo: strip loop ?
-                es.execute(new process2stack(info[0], fi, stack, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth));
+                es.execute(new process2stack(info[0], fi, stack, buffer, z, zs, ze, dz, ys, ye, ny, xs, xe, nx, imByteWidth));
                 threadInitTime += (System.currentTimeMillis() - startTime);
 
                 //decompressRearrangeCropAndPutIntoStack(fi, stack, pixels, buffer, z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth);
@@ -528,9 +530,9 @@ class process2stack implements Runnable {
     byte[][] buffer;
     FileInfoSer fi;
     FileInfoSer fi0;
-    int z, zs, ze, ys, ye, ny, xs, xe, nx, imByteWidth;
+    int z, zs, ze, dz, ys, ye, ny, xs, xe, nx, imByteWidth;
 
-    process2stack(FileInfoSer fi0, FileInfoSer fi, ImageStack stack, byte[][] buffer, int z, int zs, int ze, int ys, int ye, int ny, int xs, int xe, int nx, int imByteWidth) {
+    process2stack(FileInfoSer fi0, FileInfoSer fi, ImageStack stack, byte[][] buffer, int z, int zs, int ze, int dz, int ys, int ye, int ny, int xs, int xe, int nx, int imByteWidth) {
         threadName = ""+z;
         this.fi0 = fi0;
         this.fi = fi;
@@ -540,6 +542,7 @@ class process2stack implements Runnable {
         this.zs = zs;
         this.ze = ze;
         this.ys = ys;
+        this.dz =  dz;
         this.ye = ye;
         this.ny = ny;
         this.xs = xs;
@@ -582,7 +585,7 @@ class process2stack implements Runnable {
 
                     // get strip from read data
                     try {
-                        System.arraycopy(buffer[z - zs], pos, strip, 0, stripLength);
+                        System.arraycopy(buffer[(z - zs)/dz], pos, strip, 0, stripLength);
                     } catch (Exception e) {
                         log("" + e.toString());
                         log("------- s [#] : " + s);
@@ -590,6 +593,7 @@ class process2stack implements Runnable {
                         log("pos [bytes] : " + pos);
                         log("pos + stripLength [bytes] : " + (pos + stripLength));
                         log("z-zs : " + (z - zs));
+                        log("z-zs/dz : " + (z - zs)/dz);
                         log("buffer[z-zs].length : " + buffer[z - zs].length);
                         log("imWidth [bytes] : " + imByteWidth);
                         log("rows per strip [#] : " + rps);
@@ -609,7 +613,7 @@ class process2stack implements Runnable {
                     pos += stripLength;
                 }
 
-                buffer[z - zs] = unCompressedBuffer;
+                buffer[(z - zs)/dz] = unCompressedBuffer;
 
             } else {
 
@@ -622,18 +626,24 @@ class process2stack implements Runnable {
             //
             ys = ys % rps; // we might have to skip a few rows in the beginning because the strips can hold several rows
 
-            setShortPixelsCropXY((short[]) stack.getPixels(z - zs + 1), ys, ny, xs, nx, imByteWidth, buffer[z - zs]);
+            setShortPixelsCropXY((short[]) stack.getPixels((z - zs)/dz + 1), ys, ny, xs, nx, imByteWidth, buffer[(z - zs)/dz]);
 
         } else { // no strips
 
             if(Globals.verbose) {
-                log("z-zs : " + (z - zs));
+                log("z: " + z);
+                log("zs: " + zs);
+                log("dz: " + dz);
+                log("(z - zs)/dz: "+(z - zs)/dz);
+                log("buffer.length : " + buffer.length);
                 log("buffer[z-zs].length : " + buffer[z - zs].length);
                 log("imWidth [bytes] : " + imByteWidth);
                 log("ny [#] : " + ny);
+                short[] pixels = (short[]) stack.getPixels((z - zs)/dz + 1);
+                log("stack.getPixels((z - zs)/dz + 1).length: "+pixels.length);
             }
             ys = 0; // the buffer contains only the correct y-range
-            setShortPixelsCropXY((short[]) stack.getPixels(z - zs + 1), ys, ny, xs, nx, imByteWidth, buffer[z - zs]);
+            setShortPixelsCropXY((short[]) stack.getPixels((z - zs)/dz + 1), ys, ny, xs, nx, imByteWidth, buffer[(z - zs)/dz]);
 
         }
 

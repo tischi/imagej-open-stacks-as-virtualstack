@@ -230,18 +230,17 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         FileSaver fs;
 
-        nProgress = nT*nC;
-
         for (int c = 0; c < imp.getNChannels(); c++) {
 
             for (int t = 0; t < imp.getNFrames(); t++) {
 
-                ImagePlus impCT = vss.getFullFrame(t, c);
+                ImagePlus impCT = vss.getFullFrame(t, c, 1);
                 fs = new FileSaver(impCT);
                 String sC = String.format("%1$02d",c);
                 String sT = String.format("%1$05d",t);
                 String pathCT = path + "--C"+sC+"--T"+sT+".tif";
                 fs.saveAsTiffStack(pathCT);
+                nProgress = nT*nC;
                 iProgress = t+c*nT+1;
 
             }
@@ -996,7 +995,8 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
                 // update progress status
                 Thread t2 = new Thread(new Runnable() {
                     public void run() {
-                        osv.iProgress=0;osv.nProgress=100;osv.updateStatus("Saving file");
+                        osv.iProgress=0; osv.nProgress=1;
+                        osv.updateStatus("Saving file");
                     }
                 }); t2.start();
 

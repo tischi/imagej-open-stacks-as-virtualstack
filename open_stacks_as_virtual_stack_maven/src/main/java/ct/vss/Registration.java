@@ -263,14 +263,16 @@ public class Registration implements PlugIn, ImageListener {
         JFrame frame;
 
         String[] texts = {
-                "Tracking: Radii: x, y, z [pix]",
-                "Tracking: Track length [frames]",
-                "Cropping: Radii: x, y, z [pix]",
+                "Object tracking radii: x, y, z [pix]",
+                "Tracking sub-sampling: dz [pix]",
+                "Track length [frames]",
+                "Object cropping radii: x, y, z [pix]",
         };
 
         String[] actions = {
                 //"Add Track Start",
                 "Track selected object",
+                "Track whole image",
                 "Crop along tracks",
                 "Show track table",
                 "Save track table",
@@ -280,6 +282,7 @@ public class Registration implements PlugIn, ImageListener {
 
         String[] defaults = {
                 String.valueOf((int) gui_pCenterOfMassRadii.getX()) + "," + (int) gui_pCenterOfMassRadii.getY() + "," +String.valueOf((int) gui_pCenterOfMassRadii.getZ()),
+                String.valueOf((int) 1.0),
                 String.valueOf(imp.getNFrames()),
                 String.valueOf((int) gui_pCropRadii.getX()) + "," + ((int) gui_pCropRadii.getY()) + "," + String.valueOf((int) gui_pCropRadii.getZ())
         };
@@ -291,7 +294,7 @@ public class Registration implements PlugIn, ImageListener {
 
         public void showDialog() {
 
-            frame = new JFrame("Track and Crop");
+            frame = new JFrame("Big Data Tracker");
             //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             Container c = frame.getContentPane();
             c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
@@ -333,7 +336,6 @@ public class Registration implements PlugIn, ImageListener {
 
             int i = 0, j = 0;
 
-            // todo; replace by arraylist
             ArrayList<JPanel> panels = new ArrayList<JPanel>();
             int iPanel = 0;
 
@@ -387,21 +389,37 @@ public class Registration implements PlugIn, ImageListener {
 
             if (e.getActionCommand().equals(actions[i++])) {
                 //
-                // Add track
+                // Track selected object
                 //
                 Roi r = imp.getRoi();
                 if (r == null || !r.getTypeAsString().equals("Point")) {
                     IJ.showMessage("Please use IJ's 'Point selection tool' on image: '" + imp.getTitle()+"'");
                     return;
                 }
-                // add track start ...
+
+                // Add track start ...
                 int iNewTrack = addTrackStart(imp);
 
                 // ... and start tracking immediately
                 if( iNewTrack >= 0 ) {
                     trackStatsLastTrackStarted = System.currentTimeMillis();
                     trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
-                    es.execute(new Registration.track3D(iNewTrack, 1, gui_dz, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
+                    es.execute(new Registration.Track3D(iNewTrack, gui_dt, gui_dz, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
+                }
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+                //
+                // Track whole data set
+                //
+
+                // Add track start ...
+                int iNewTrack = addTrackStartWholeDataSet(imp);
+
+                // ... and start tracking immediately
+                if( iNewTrack >= 0 ) {
+                    trackStatsLastTrackStarted = System.currentTimeMillis();
+                    trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
+                    es.execute(new Registration.TrackWholeDataSet(iNewTrack, gui_dt, gui_dz, gui_bg));
                 }
 
             } else if (e.getActionCommand().equals(actions[i++])) {
@@ -449,6 +467,12 @@ public class Registration implements PlugIn, ImageListener {
                 JTextField source = (JTextField) e.getSource();
                 String[] sA = source.getText().split(",");
                 gui_pCenterOfMassRadii = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
+            } else if (e.getActionCommand().equals(texts[k++])) {
+                //
+                // Tracking sub-sampling
+                //
+                JTextField source = (JTextField) e.getSource();
+                gui_dz = new Integer(source.getText());
             } else if (e.getActionCommand().equals(texts[k++])) {
                 //
                 // Track length
@@ -557,6 +581,28 @@ public class Registration implements PlugIn, ImageListener {
 
     }
 
+    public int addTrackStartWholeDataSet(ImagePlus imp) {
+        int t;
+
+        int ntTracking = gui_ntTracking;
+        t = imp.getT()-1;
+
+        if(t+gui_ntTracking > imp.getNFrames()) {
+            IJ.showMessage("Your Track would be longer than the movie; " +
+                    "please reduce 'Track length' or start tracking from an earlier time point.");
+            return(-1);
+        }
+
+        totalTimePointsToBeTracked += ntTracking;
+        int newTrackID = Tracks.size();
+        //log("added new track start; id = "+newTrackID+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
+        Tracks.add(new Track(ntTracking));
+        Tracks.get(newTrackID).addLocation(new Point3D(0, 0, imp.getZ()-1), t, imp.getC()-1);
+
+        return(newTrackID);
+
+    }
+
     public void showCroppedTracks() {
         ImagePlus[] impA = new ImagePlus[Tracks.size()];
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
@@ -650,13 +696,11 @@ public class Registration implements PlugIn, ImageListener {
     }
 
     // todo: reload more data if necessary
-    class track3D implements Runnable {
+    class Track3D implements Runnable {
         int iTrack, dt, dz, bg, iterations;
         Point3D pCenterOfMassRadii, pOffset, pLocalCenter;
-        ImageStack stack;
 
-
-        track3D(int iTrack, int dt, int dz, Point3D pCenterOfMassRadii, int bg, int iterations) {
+        Track3D(int iTrack, int dt, int dz, Point3D pCenterOfMassRadii, int bg, int iterations) {
             this.iTrack = iTrack;
             this.dt = dt;
             this.dz = dz;
@@ -669,6 +713,8 @@ public class Registration implements PlugIn, ImageListener {
             long startTime = 0, stopTime, elapsedReadingTime, elapsedProcessingTime;
             long startTimePerTimePoint, totalElapsedTime = 0;
             int mean;
+            ImageStack stack;
+
             Track track = Tracks.get(iTrack);
 
             int tStart = track.getTmin();
@@ -690,7 +736,7 @@ public class Registration implements PlugIn, ImageListener {
                 // get stack, ensuring that extracted stack is still within bounds
                 pStackCenter = OpenStacksAsVirtualStack.curatePosition(imp, pStackCenter, pStackRadii);
                 startTime = System.currentTimeMillis();
-                stack = getImageStack(it, channel, dz, pStackCenter, pStackRadii);
+                stack = vss.getCubeByTimeCenterAndRadii(it, channel, dz, pStackCenter, pStackRadii).getStack();
                 stopTime = System.currentTimeMillis();
                 elapsedReadingTime = stopTime - startTime;
 
@@ -782,23 +828,123 @@ public class Registration implements PlugIn, ImageListener {
         }
     }
 
-    private ImageStack getImageStack(int t, int c, int dz, Point3D p, Point3D pr) {
-        //log("Registration.getImageStack p[0]: "+p[0]+" z:"+p[3]);
-        if(Globals.verbose) {
-            log("# Registration.getImageStack");
-            log("c: "+c);
-            log("t: "+t);
-            log(""+imp.getStackIndex(c+1,1,t+1));
+    // todo: reload more data if necessary
+    class TrackWholeDataSet implements Runnable {
+        int iTrack, dt, dz, bg, iterations;
+        Point3D pCenterOfMassRadii, pOffset;
+
+        TrackWholeDataSet(int iTrack, int dt, int dz, int bg) {
+            this.iTrack = iTrack;
+            this.dt = dt;
+            this.dz = dz;
+            this.bg = bg;
         }
 
-        long startTime = System.currentTimeMillis();
-        // todo: getCubeByTimeCenterAndRadii
-        ImageStack stack = vss.getCroppedFrameCenterRadii(t, c, dz, p, pr).getStack();
-        long stopTime = System.currentTimeMillis(); long elapsedTime = stopTime - startTime;
-        //log("loaded stack in [ms]: " + elapsedTime);
-        imp.show();
-        return(stack);
+        public void run() {
+            long startTime = 0, stopTime, elapsedReadingTime, elapsedProcessingTime;
+            ImageStack stack;
+            Point3D pCenter;
+
+            Track track = Tracks.get(iTrack);
+
+            int tStart = track.getTmin();
+            int channel = track.getC(0);
+            int nt = track.getLength();
+            track.reset();
+
+
+            if (Globals.verbose) {
+                log("# Registration.TrackWholeDataSet:");
+                log("iTrack: "+iTrack);
+                log("tStart, tMax, dt, dz " + tStart + "," + (tStart+nt-1) + "," + dt + "," + dz);
+            }
+
+            for (int it = tStart; it < tStart+nt; it = it + dt) {
+
+                // get stack, ensuring that extracted stack is still within bounds
+                startTime = System.currentTimeMillis();
+                stack = vss.getFullFrame(it, channel, dz).getStack();
+                stopTime = System.currentTimeMillis();
+                elapsedReadingTime = stopTime - startTime;
+
+                // compute center of mass (in zero-based local stack coordinates)
+                // ...using the mean of the stack as threshold
+                startTime = System.currentTimeMillis();
+                pCenter = computeCenter16bit(stack, computeMean16bit(stack), new Point3D(0.0,0.0,0.0), new Point3D(Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MAX_VALUE));
+                stopTime = System.currentTimeMillis();
+                elapsedProcessingTime = stopTime - startTime;
+
+                // correct for the sub-sampling in z
+                pCenter = new Point3D(pCenter.getX(), pCenter.getY(), dz * pCenter.getZ());
+
+                // update time-points, using linear interpolation; todo: implement!
+                for (int j = 0; j < dt; j++) {
+
+                    if ((it + j) < imp.getNFrames()) {
+
+                        Point3D p = pCenter; // todo: implement tracking
+
+                        //
+                        // Add to track
+                        // - thread safe, because only this thread is accessing this particular track
+                        //
+                        track.addLocation(p, it + j, channel);
+
+                        //
+                        // Update global track table and imp.overlay
+                        // - thread safe, because both internally use SwingUtilities.invokeLater
+                        //
+                        trackTable.addRow(new Object[]{
+                                String.format("%1$04d",iTrack)+"_"+String.format("%1$05d",it),
+                                (float)p.getX(), (float)p.getY(), (float)p.getZ(), it, iTrack
+                                //totalElapsedTime, elapsedReadingTime, elapsedProcessingTime
+                        });
+
+                        addTrackToOverlay(track, it + j - tStart);
+
+                    }
+                }
+
+                // show progress
+                int n = totalTimePointsTracked.addAndGet(1);
+                if( (System.currentTimeMillis() > trackStatsReportDelay+trackStatsLastReport)
+                        || (n==totalTimePointsToBeTracked))
+                {
+                    trackStatsLastReport = System.currentTimeMillis();
+
+                    long dt = System.currentTimeMillis()-trackStatsLastTrackStarted;
+                    int dn = n - trackStatsTotalPointsTrackedAtLastStart;
+                    int nToGo = totalTimePointsToBeTracked - n;
+                    float speed = (float)1.0*dn/dt*1000;
+                    float remainingTime = (float)1.0*nToGo/speed;
+
+                    Globals.threadlog(
+                            "progress = "+n+"/"+totalTimePointsToBeTracked+
+                                    "; speed [n/s] = "+String.format("%.2g",speed)+
+                                    "; remaining [s] = "+String.format("%.2g",remainingTime)+
+                                    "; reading [ms] = "+elapsedReadingTime+
+                                    "; processing [ms] = "+elapsedProcessingTime
+                    );
+                }
+
+                if(Globals.verbose) {
+                    log("Read data [ms]: " + elapsedReadingTime);
+                    log("Read data [ms]: " + elapsedReadingTime);
+                    log("Reading speed [MB/s]: " + stack.getHeight() * stack.getWidth() * stack.getSize() * 2 / ((elapsedReadingTime + 0.001) * 1000));
+                    log("Detected center [pixel]:" +
+                            " x:" + String.format("%d", pCenter.getX()) +
+                            " y:" + String.format("%d", pCenter.getY()) +
+                            " z:" + String.format("%d", pCenter.getZ()));
+                }
+
+            }
+
+            //Globals.threadlog("track id = "+iTrack+"; nt [frames] = "+nt+"; completed.");
+            track.completed = true;
+            return;
+        }
     }
+
 
     public Point3D iterativeCenterOfMass16bit(ImageStack stack, int bg, Point3D radii, int iterations) {
         Point3D pMin, pMax;
@@ -832,43 +978,48 @@ public class Registration implements PlugIn, ImageListener {
         int zmin = 0 > (int) pMin.getZ() ? 0 : (int) pMin.getZ();
         int zmax = (depth-1) < (int) pMax.getZ() ? (depth-1) : (int) pMax.getZ();
 
-        Point3D pMinCorr = new Point3D(xmin,ymin,zmin);
-        Point3D pMaxCorr = new Point3D(xmax,ymax,zmax);
-
-        /*
-        log("centerOfMass16bit: pMin: "+pMin.toString());
-        log("centerOfMass16bit: pMax: "+pMax.toString());
-        log("centerOfMass16bit: pMinCorr: "+pMinCorr.toString());
-        log("centerOfMass16bit: pMaxCorr: "+pMaxCorr.toString());
-        */
-
         // compute one-based, otherwise the numbers at x=0,y=0,z=0 are lost for the center of mass
         // todo: take the method if-statement of out of the loop for increased speed?!
-        for(int z=zmin+1; z<=zmax+1; z++) {
-            ImageProcessor ip = stack.getProcessor(z);
-            short[] pixels = (short[]) ip.getPixels();
-            i = 0;
-            for (int y = ymin+1; y<=ymax+1; y++) {
-                i = (y-1) * width + xmin; // zero-based location in pixel array
-                for (int x = xmin+1; x<=xmax+1; x++) {
-                    v = pixels[i] & 0xffff;
-                    if (v >= bg) {
-                        if (gui_centeringMethod == "center of mass") {
+        if (gui_centeringMethod == "center of mass") {
+            for(int z=zmin+1; z<=zmax+1; z++) {
+                ImageProcessor ip = stack.getProcessor(z);
+                short[] pixels = (short[]) ip.getPixels();
+                for (int y = ymin + 1; y <= ymax + 1; y++) {
+                    i = (y - 1) * width + xmin; // zero-based location in pixel array
+                    for (int x = xmin + 1; x <= xmax + 1; x++) {
+                        v = pixels[i] & 0xffff;
+                        if (v >= bg) {
                             sum += v;
                             xsum += x * v;
                             ysum += y * v;
                             zsum += z * v;
-                        } else if (gui_centeringMethod == "centroid") {
+                        }
+                        i++;
+                    }
+                }
+            }
+        }
+
+        if (gui_centeringMethod == "centroid") {
+            for(int z=zmin+1; z<=zmax+1; z++) {
+                ImageProcessor ip = stack.getProcessor(z);
+                short[] pixels = (short[]) ip.getPixels();
+                for (int y = ymin + 1; y <= ymax + 1; y++) {
+                    i = (y - 1) * width + xmin; // zero-based location in pixel array
+                    for (int x = xmin + 1; x <= xmax + 1; x++) {
+                        v = pixels[i] & 0xffff;
+                        if (v >= bg) {
                             sum += 1;
                             xsum += x;
                             ysum += y;
                             zsum += z;
-                        } // could add maximum here
+                        }
+                        i++;
                     }
-                    i++;
                 }
             }
         }
+
         // computation is one-based; result should be zero-based
         double xCenter = (xsum / sum) - 1;
         double yCenter = (ysum / sum) - 1;

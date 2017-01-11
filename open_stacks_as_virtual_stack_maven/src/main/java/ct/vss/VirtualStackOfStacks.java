@@ -337,7 +337,21 @@ public class VirtualStackOfStacks extends ImageStack {
         return(new Point3D(infos[0][0][0].pCropSize[0], infos[0][0][0].pCropSize[1], infos[0][0][0].pCropSize[2]));
     }
 
-    public ImagePlus getCroppedFrameCenterRadii(int t, int c, int dz, Point3D pc, Point3D pr) {
+    public ImagePlus getFullFrame(int t, int c, int dz) {
+        Point3D po, ps;
+
+        po = new Point3D(0, 0, 0);
+        if(infos[0][0][0].isCropped) {
+            ps = infos[0][0][0].getCropSize();
+        } else {
+            ps = new Point3D(nX, nY, nZ);
+        }
+
+        return(getCubeByTimeOffsetAndSize(t, c, dz, po, ps));
+
+    }
+
+    public ImagePlus getCubeByTimeCenterAndRadii(int t, int c, int dz, Point3D pc, Point3D pr) {
 
         if(Globals.verbose) {
             log("# VirtualStackOfStacks.getCroppedFrameCenterRadii");
@@ -367,21 +381,7 @@ public class VirtualStackOfStacks extends ImageStack {
         }
     }
 
-    public ImagePlus getFullFrame(int t, int c) {
-        Point3D po, ps;
-
-        po = new Point3D(0, 0, 0);
-        if(infos[0][0][0].isCropped) {
-            ps = infos[0][0][0].getCropSize();
-        } else {
-            ps = new Point3D(nX, nY, nZ);
-        }
-
-        return(getCroppedFrameOffsetSize(t, c, 1, po, ps));
-
-    }
-
-    public ImagePlus getCroppedFrameOffsetSize(int t, int c, int dz, Point3D po, Point3D ps) {
+    public ImagePlus getCubeByTimeOffsetAndSize(int t, int c, int dz, Point3D po, Point3D ps) {
 
         if(Globals.verbose) {
             log("# VirtualStackOfStacks.getCroppedFrameOffsetSize");
