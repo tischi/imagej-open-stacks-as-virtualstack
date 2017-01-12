@@ -271,9 +271,10 @@ public class Registration implements PlugIn, ImageListener {
 
         String[] actions = {
                 //"Add Track Start",
-                "Track selected object",
-                "Track whole image",
-                "Crop along tracks",
+                "Track selected object (center-of-mass)",
+                "Show tracked objects",
+                "Track whole data set (center-of-mass)",
+                "Show tracked data set",
                 "Show track table",
                 "Save track table",
                 "Report issue"
@@ -356,10 +357,14 @@ public class Registration implements PlugIn, ImageListener {
 
             panels.add(new JPanel());
             panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
+
+            panels.add(new JPanel());
             panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
             panels.add(new JPanel());
+            panels.get(iPanel).add(buttons[i++]);
             panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
@@ -408,6 +413,14 @@ public class Registration implements PlugIn, ImageListener {
                 }
 
             } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // View Object Tracks
+                //
+
+                showCroppedTracks();
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
                 //
                 // Track whole data set
                 //
@@ -423,10 +436,13 @@ public class Registration implements PlugIn, ImageListener {
                 }
 
             } else if (e.getActionCommand().equals(actions[i++])) {
+
                 //
-                // View Tracks
+                // View whole tracked Data set
                 //
-                showCroppedTracks();
+
+                showWholeDataSetAlongTracks();
+
             } else if (e.getActionCommand().equals(actions[i++])) {
                 //
                 // Show Table
@@ -624,6 +640,57 @@ public class Registration implements PlugIn, ImageListener {
             }
         }
     }
+
+    public void showWholeDataSetAlongTracks() {
+        ImagePlus[] impA = new ImagePlus[Tracks.size()];
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        FileInfoSer[][][] infos = vss.getFileInfosSer();
+
+        for(int i=0; i<Tracks.size(); i++) {
+            Track track = Tracks.get(i);
+            if (track.completed) {
+                log("# showCroppedTracks: id=" + i);
+
+                // convert track to drift
+                Point3D[] trackedPoints = track.getPoints3D();
+                int nt = trackedPoints.length;
+                Point3D po[] = new Point3D[nt];
+
+                double xMin=10000,yMin=10000,zMin=10000;
+                for(int it=0; it<nt; it++) {
+                    po[it] = trackedPoints[it].subtract(trackedPoints[0]);
+                    if(po[it].getX() < xMin) xMin = po[it].getX();
+                    if(po[it].getY() < yMin) yMin = po[it].getY();
+                    if(po[it].getZ() < zMin) zMin = po[it].getZ();
+                }
+                // shift such that minimal offset is (0,0,0)
+                double xMax=0,yMax=0,zMax=0;
+                for(int it=0; it<nt; it++) {
+                    po[it] = po[it].subtract(new Point3D(xMin,yMin,zMin));
+                    if(po[it].getX() > xMax) xMax = po[it].getX();
+                    if(po[it].getY() > yMax) yMax = po[it].getY();
+                    if(po[it].getZ() > zMax) zMax = po[it].getZ();
+                }
+
+                // ensure that the tracked image is within the bounds
+                Point3D ps = new Point3D(vss.nX-xMax,vss.nY-yMax,vss.nZ-zMax);
+
+                impA[i] = OpenStacksAsVirtualStack.openCroppedOffsetSizeFromInfos(imp, infos, po, ps, track.getTmin(), track.getTmax());
+
+                if (impA[i] == null) {
+                    log("..cropping failed.");
+                } else {
+                    impA[i].setTitle("Track" + i);
+                    impA[i].show();
+                    impA[i].setPosition(0, (int) (impA[i].getNSlices() / 2 + 0.5), 0);
+                    impA[i].resetDisplayRange();
+                }
+            }
+        }
+    }
+
+
+
 
     public void imageClosed(ImagePlus imp) {
         // currently we are not interested in this event
@@ -944,7 +1011,6 @@ public class Registration implements PlugIn, ImageListener {
             return;
         }
     }
-
 
     public Point3D iterativeCenterOfMass16bit(ImageStack stack, int bg, Point3D radii, int iterations) {
         Point3D pMin, pMax;
