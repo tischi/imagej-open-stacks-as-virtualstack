@@ -76,11 +76,19 @@
 </html>
 ###
 <html>
-<h3>Track whole data set</h3>
+<h3>Track whole data set (center of mass)</h3>
 <p width=400>
-    Tracks a drift of the whole data set. No ROI is needed.
-    The tracking is based on computing the center of mass of all the gray-scale values
-    above the mean value of the whole stack.
+    Tracks the center of mass of the whole data set. No ROI is needed.
+    Only the gray-scale values above the mean value of the whole stack are considered.
+</p>
+</html>
+###
+<html>
+<h3>Track whole data set (correlation)</h3>
+<p width=400>
+    The position of the first time-point is determined as its center of mass.
+    The position of any subsequent time-point is determined relative to the previous time-point by
+    computing the shift leading to the maximal cross-correlation between the signals.
 </p>
 </html>
 ###

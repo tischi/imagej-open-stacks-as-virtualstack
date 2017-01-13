@@ -21,5 +21,12 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="Maven: cisd:jhdf5:14.12.0" level="project" />
+    <orderEntry type="library" name="Maven: mpicbg:mpicbg:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: gov.nist.math:jama:1.0.3" level="project" />
+    <orderEntry type="library" name="Maven: mpicbg:imglib:2.0.0-beta6" level="project" />
+    <orderEntry type="library" name="Maven: mpicbg:imglib-ij:2.0.0-beta6" level="project" />
+    <orderEntry type="library" name="Maven: mpicbg:imglib-algorithms:2.0.0-beta6" level="project" />
+    <orderEntry type="library" name="Maven: edu.mines:mines-jtk:20100113" level="project" />
+    <orderEntry type="library" name="Maven: jama:jama:1.0.2" level="project" />
   </component>
 </module>
