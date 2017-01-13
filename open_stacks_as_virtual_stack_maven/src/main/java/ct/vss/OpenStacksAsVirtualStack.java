@@ -234,7 +234,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             for (int t = 0; t < imp.getNFrames(); t++) {
 
-                ImagePlus impCT = vss.getFullFrame(t, c, 1);
+                ImagePlus impCT = vss.getFullFrame(t, c, new Point3D(1,1,1));
                 fs = new FileSaver(impCT);
                 String sC = String.format("%1$02d",c);
                 String sT = String.format("%1$05d",t);
@@ -1032,7 +1032,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
 
             Thread t2 = new Thread(new Runnable() {
                 public void run() {
-                    osv.updateStatus("Duplicated time point");
+                    osv.updateStatus("Duplicated slice");
                 }
             });
             t2.start();

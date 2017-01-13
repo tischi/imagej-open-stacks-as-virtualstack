@@ -12,10 +12,26 @@
 </html>
 ###
 <html>
+<h3>Cropping radii</h3>
+<p width=400>
+    Once you have tracked some objects you can use the 'Crop along tracks' button to
+    get a cropped view on your tracked objects in a coordinate system where the
+    respective object stands still. Here you can adjust the size of these cropped view.
+<h4>Additional comments</h4>
+<p width=400>
+    Currently, it only is possible to have the same cropped view on all objects
+    that you have track. If you feel you need more flexibility please raise an
+    issue on github.
+</p>
+</html>
+###
+<html>
 <h3>Tracking sub-sampling</h3>
 <p width=400>
-    To increase the tracking speed you can analyse every dz plane. Especially when
-    working with Tiff stacks this will help as loading of the data will be much faster.
+    To increase the tracking speed you can analyse only every dx,dy,dz data point.
+    Especially when working with Tiff stacks this will help as loading only every dz plane will be much faster.
+    Center of mass computation is so fast that dx and dy sub-sampling do not help much.
+    However, for the correlation-based tracking dx and dy sub-subsampling makes a big difference in speed.
 </p>
 </html>
 ###
@@ -27,20 +43,6 @@
     Simply move the time slider on the image forward and then select an object and click
     'Track selected object'. Also note that you can track different objects for different
     lengths.
-</p>
-</html>
-###
-<html>
-<h3>Cropping radii</h3>
-<p width=400>
-    Once you have tracked some objects you can use the 'Crop along tracks' button to
-    get a cropped view on your tracked objects in a coordinate system where the
-    respective object stands still. Here you can adjust the size of these cropped view.
-<h4>Additional comments</h4>
-<p width=400>
-    Currently, it only is possible to have the same cropped view on all objects
-    that you have track. If you feel you need more flexibility please raise an
-    issue on github.
 </p>
 </html>
 ###
@@ -58,7 +60,7 @@
 </html>
 ###
 <html>
-<h3>Crop along tracks</h3>
+<h3>Show tracked objects</h3>
 <p width=400>
     Opens as many new image windows as there are completed tracks.
     Each image window shows the data locally surrounding the respective track.
@@ -76,24 +78,14 @@
 </html>
 ###
 <html>
-<h3>Track whole data set (center of mass)</h3>
+<h3>Track whole data set</h3>
 <p width=400>
-    Tracks the center of mass of the whole data set. No ROI is needed.
-    Only the gray-scale values above the mean value of the whole stack are considered.
+    Tracks the whole data set. No ROI is needed.
 </p>
 </html>
 ###
 <html>
-<h3>Track whole data set (correlation)</h3>
-<p width=400>
-    The position of the first time-point is determined as its center of mass.
-    The position of any subsequent time-point is determined relative to the previous time-point by
-    computing the shift leading to the maximal cross-correlation between the signals.
-</p>
-</html>
-###
-<html>
-<h3>View whole tracked data set</h3>
+<h3>Show tracked data set</h3>
 <p width=400>
     Shows the whole data set, using the computed tracks, typically to correct a drift.
 </p>
@@ -110,9 +102,16 @@
 </html>
 ###
 <html>
-<h3>Save as track table</h3>
+<h3>Save track table</h3>
 <p width=400>
 Saves the table as a text file for further processing, e.g. in R or Excel.
+</p>
+</html>
+###
+<html>
+<h3>Clear track table</h3>
+<p width=400>
+    Removes all tracks from the track table.
 </p>
 </html>
 ###
@@ -120,6 +119,16 @@ Saves the table as a text file for further processing, e.g. in R or Excel.
 <h3>Report issue</h3>
 <p width=400>
     Opens the github issue web-site.
+</p>
+</html>
+###
+<html>
+<h3>Tracking Method</h3>
+<p width=400>
+    You can choose between 'center of mass' and 'correlation'.
+    For 'correlation'the position of the first time-point is determined as its center of mass.
+    The position of subsequent time-points is however determined relative to the previous time-point by
+    computing the shift leading to the maximal cross-correlation between the signals.
 </p>
 </html>
 ###

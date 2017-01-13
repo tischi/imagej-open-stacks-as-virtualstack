@@ -337,7 +337,7 @@ public class VirtualStackOfStacks extends ImageStack {
         return(new Point3D(infos[0][0][0].pCropSize[0], infos[0][0][0].pCropSize[1], infos[0][0][0].pCropSize[2]));
     }
 
-    public ImagePlus getFullFrame(int t, int c, int dz) {
+    public ImagePlus getFullFrame(int t, int c, Point3D pSubSample) {
         Point3D po, ps;
 
         po = new Point3D(0, 0, 0);
@@ -347,8 +347,12 @@ public class VirtualStackOfStacks extends ImageStack {
             ps = new Point3D(nX, nY, nZ);
         }
 
-        return(getCubeByTimeOffsetAndSize(t, c, dz, po, ps));
-
+        ImagePlus imp = getCubeByTimeOffsetAndSize(t, c, (int)pSubSample.getZ(), po, ps);
+        if( (int)pSubSample.getX()>1 || (int)pSubSample.getY()>1) {
+            return(resizeWidthAndHeight(imp,(int)pSubSample.getX(),(int)pSubSample.getY()));
+        } else {
+            return(imp);
+        }
     }
 
     public ImagePlus getCubeByTimeCenterAndRadii(int t, int c, int dz, Point3D pc, Point3D pr) {
@@ -408,6 +412,27 @@ public class VirtualStackOfStacks extends ImageStack {
         } else {
             return imp;
         }
+    }
+
+    public ImagePlus resizeWidthAndHeight(ImagePlus imp, int dx, int dy) {
+        int nSlices = imp.getStackSize();
+        int nx = imp.getWidth(), ny = imp.getHeight();
+        ImagePlus imp2 = imp.createImagePlus();
+        ImageStack stack1 = imp.getStack();
+        ImageStack stack2 = new ImageStack(nx/dx, ny/dy);
+        ImageProcessor ip1, ip2;
+        int method = ImageProcessor.NEAREST_NEIGHBOR;
+        if (nx == 1 || ny == 1)
+            method = ImageProcessor.NONE;
+        for (int i = 1; i <= nSlices; i++) {
+            ip1 = stack1.getProcessor(i);
+            ip1.setInterpolationMethod(method);
+            ip2 = ip1.resize(nx/dx, ny/dy, false);
+            if (ip2 != null)
+                stack2.addSlice("", ip2);
+        }
+        imp2.setStack("", stack2);
+        return(imp2);
     }
 
     public int getSize() {
