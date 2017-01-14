@@ -258,6 +258,9 @@ class OpenerExtensions extends Opener {
         long totalTime = 0;
         long threadInitTime = 0;
         long allocationTime = 0;
+        short[] asFlatArray=null, pixels;
+        MDShortArray block;
+
 
         if (info == null) {
             IJ.showMessage("FileInfo was empty; could not load data.");
@@ -268,6 +271,8 @@ class OpenerExtensions extends Opener {
 
         int nx = xe - xs + 1;
         int ny = ye - ys + 1;
+        int imShortSize = nx * ny;
+
 
         if(Globals.verbose) {
             log("# openCroppedH5stack");
@@ -289,18 +294,32 @@ class OpenerExtensions extends Opener {
         // load everything in one go
         startTime = System.currentTimeMillis();
         IHDF5Reader reader = HDF5Factory.openForReading(directory + fi.directory + fi.fileName);
-        final MDShortArray block = reader.uint16().readMDArrayBlockWithOffset(fi.h5DataSet, new int[]{nz, ny, nx}, new long[]{zs, ys, xs});
-        final short[] asFlatArray = block.getAsFlatArray();
-        readingTime += (System.currentTimeMillis() - startTime);
 
-        // put into stack
-        // todo: could be done in parallel threads
-        int imShortSize = nx*ny;
+        if(dz==1) {
 
-        for(int z=zs; z<=ze; z+=dz) {
-            short[] pixels = (short[]) imp.getStack().getPixels((z-zs)/dz+1);
-            System.arraycopy(asFlatArray, (z-zs)*imShortSize, pixels, 0, imShortSize);
+            // read everything in one go
+            block = reader.uint16().readMDArrayBlockWithOffset(fi.h5DataSet, new int[]{nz, ny, nx}, new long[]{zs, ys, xs});
+            asFlatArray = block.getAsFlatArray();
+
+            // put plane-wise into stack
+            for (int z = zs; z <= ze; z ++) {
+                pixels = (short[]) imp.getStack().getPixels(z - zs + 1);
+                System.arraycopy(asFlatArray, (z - zs) * imShortSize, pixels, 0, imShortSize);
+            }
+
+        } else { // sub-sample in z
+
+            // read plane wise
+            int z = zs;
+            for (int iz=1; iz<=nz; iz++, z+=dz) {
+                block = reader.uint16().readMDArrayBlockWithOffset(fi.h5DataSet, new int[]{1, ny, nx}, new long[]{z, ys, xs});
+                asFlatArray = block.getAsFlatArray();
+                pixels = (short[]) imp.getStack().getPixels(iz);
+                System.arraycopy(asFlatArray, 0, pixels, 0, imShortSize);
+            }
+
         }
+        readingTime += (System.currentTimeMillis() - startTime);
 
         totalTime = (System.currentTimeMillis() - totalTime);
 
@@ -370,7 +389,9 @@ class OpenerExtensions extends Opener {
 
             long pointer=0L;
 
-            for(int z=zs; z<=ze; z+=dz) {
+            // read plane wise
+            int z = zs;
+            for (int iz=1; iz<=nz; iz++, z+=dz) {
 
                 if (z<0 || z>=info.length) {
                     IJ.showMessage("z=" + z + " is out of range. Please reduce your cropping z-radius.");

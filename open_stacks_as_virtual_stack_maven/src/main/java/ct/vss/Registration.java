@@ -73,6 +73,369 @@ public class Registration implements PlugIn, ImageListener {
 
     // todo: put actual tracking into different class
 
+
+    // to-do: add labels in front of the buttons to make the text smaller
+    class TrackingGUI implements ActionListener, FocusListener {
+
+        JFrame frame;
+
+        String[] texts = {
+                "Object tracking radii: x, y, z [pix]",
+                "Object cropping radii: x, y, z [pix]",
+                "Tracking sub-sampling: dx, dy, dz [pix]",
+                "Track length [frames]"
+        };
+
+        String[] actions = {
+                //"Add Track Start",
+                "Track selected object",
+                "Show tracked objects",
+                "Track whole data set",
+                "Show tracked data set",
+                "Show track table",
+                "Save track table",
+                "Clear track table",
+                "Report issue"
+        };
+
+
+        String[] defaults = {
+                String.valueOf((int) gui_pCenterOfMassRadii.getX()) + "," + (int) gui_pCenterOfMassRadii.getY() + "," +String.valueOf((int) gui_pCenterOfMassRadii.getZ()),
+                String.valueOf((int) gui_pCropRadii.getX()) + "," + ((int) gui_pCropRadii.getY()) + "," + String.valueOf((int) gui_pCropRadii.getZ()),
+                String.valueOf((int) gui_pSubSample.getX() + "," + (int) gui_pSubSample.getY() + "," + (int) gui_pSubSample.getZ() ),
+                String.valueOf(imp.getNFrames())
+        };
+
+        String[] comboNames = {
+                "Tracking method"
+        };
+
+        String[][] combos = {
+                {"center of mass","correlation"}
+        };
+
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        public void TrackingGUI() {
+        }
+
+        public void showDialog() {
+
+            frame = new JFrame("Big Data Tracker");
+            //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            Container c = frame.getContentPane();
+            c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+            ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
+
+            String[] toolTipTexts = getToolTipFile("TrackAndCropHelp.html");
+
+            //
+            // TextFields
+            //
+            JTextField[] textFields = new JTextField[texts.length];
+            JLabel[] labels = new JLabel[texts.length];
+
+            int iToolTipText = 0;
+
+            for (int i = 0; i < textFields.length; i++, iToolTipText++) {
+                textFields[i] = new JTextField(6);
+                textFields[i].setActionCommand(texts[i]);
+                textFields[i].addActionListener(this);
+                textFields[i].addFocusListener(this);
+                textFields[i].setText(defaults[i]);
+                textFields[i].setToolTipText(toolTipTexts[iToolTipText]);
+                labels[i] = new JLabel(texts[i] + ": ");
+                labels[i].setLabelFor(textFields[i]);
+            }
+
+            //
+            // Buttons
+            //
+            JButton[] buttons = new JButton[actions.length];
+
+            for (int i = 0; i < buttons.length; i++, iToolTipText++) {
+                buttons[i] = new JButton(actions[i]);
+                buttons[i].setActionCommand(actions[i]);
+                buttons[i].addActionListener(this);
+                buttons[i].setToolTipText(toolTipTexts[iToolTipText]);
+            }
+
+            //
+            // ComboBoxes
+            //
+
+            JComboBox[] comboBoxes = new JComboBox[comboNames.length];
+            JLabel[] comboLabels = new JLabel[comboNames.length];
+
+            for (int i = 0; i < combos.length; i++, iToolTipText++) {
+                comboBoxes[i] = new JComboBox(combos[i]);
+                comboBoxes[i].setActionCommand(comboNames[i]);
+                comboBoxes[i].addActionListener(this);
+                comboBoxes[i].setToolTipText(toolTipTexts[iToolTipText]);
+                comboLabels[i] = new JLabel(comboNames[i] + ": ");
+                comboLabels[i].setLabelFor(comboBoxes[i]);
+            }
+
+            //
+            // Panels
+            //
+
+            int i = 0, j = 0;
+            ArrayList<JPanel> panels = new ArrayList<JPanel>();
+            int iPanel = 0;
+
+            for (int k = 0; k < textFields.length; k++) {
+                panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
+                panels.get(iPanel).add(labels[k]);
+                panels.get(iPanel).add(textFields[k]);
+                c.add(panels.get(iPanel++));
+            }
+
+            for (int k = 0; k < comboNames.length; k++) {
+                panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
+                panels.get(iPanel).add(comboLabels[k]);
+                panels.get(iPanel).add(comboBoxes[k]);
+                c.add(panels.get(iPanel++));
+            }
+
+            panels.add(new JPanel());
+            panels.get(iPanel).add(buttons[i++]);
+            panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
+
+            panels.add(new JPanel());
+            panels.get(iPanel).add(buttons[i++]);
+            panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
+
+            panels.add(new JPanel());
+            panels.get(iPanel).add(buttons[i++]);
+            panels.get(iPanel).add(buttons[i++]);
+            panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
+
+            panels.add(new JPanel());
+            panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
+
+            frame.pack();
+            frame.setLocation(imp.getWindow().getX() + imp.getWindow().getWidth(), imp.getWindow().getY());
+            frame.setVisible(true);
+
+        }
+
+        public void focusGained(FocusEvent e) {
+            //
+        }
+
+        public void focusLost(FocusEvent e) {
+            JTextField tf = (JTextField) e.getSource();
+            if (!(tf == null)) {
+                tf.postActionEvent();
+            }
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            int i = 0, j = 0, k = 0;
+            JFileChooser fc;
+            final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
+
+            if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // Track selected object
+                //
+
+                if(gui_trackingMethod.equals("correlation")) {
+                    IJ.showMessage("Object tracking with correlation is not yet implemented.");
+                    return;
+                }
+
+                Roi r = imp.getRoi();
+                if (r == null || !r.getTypeAsString().equals("Point")) {
+                    IJ.showMessage("Please use IJ's 'Point selection tool' on image: '" + imp.getTitle()+"'");
+                    return;
+                }
+
+                // Add track start ...
+                int iNewTrack = addTrackStart(imp);
+
+                // ... and start tracking immediately
+                if( iNewTrack >= 0 ) {
+                    trackStatsLastTrackStarted = System.currentTimeMillis();
+                    trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
+                    es.execute(new Registration.TrackROI(iNewTrack, gui_dt, gui_pSubSample, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
+                }
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // View Object Tracks
+                //
+
+                showCroppedTracks();
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // Track whole data set using center of mass
+                //
+
+                // Add track start ...
+                int iNewTrack = addTrackStartWholeDataSet(imp);
+
+                // ... and start tracking immediately
+                if( iNewTrack >= 0 ) {
+
+                    trackStatsLastTrackStarted = System.currentTimeMillis();
+                    trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
+                    es.execute(new Registration.TrackAll(iNewTrack, gui_dt, gui_pSubSample, gui_bg));
+
+                }
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // View whole tracked Data set
+                //
+
+                showWholeDataSetAlongTracks();
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // Show Table
+                //
+
+                showTrackTable();
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // Save Table
+                //
+
+                TableModel model = trackTable.getTable().getModel();
+                if(model == null) {
+                    IJ.showMessage("There are no tracks yet.");
+                    return;
+                }
+                fc = new JFileChooser(vss.getDirectory());
+                if (fc.showSaveDialog(this.frame) == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    saveTrackTable(file);
+                }
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // Clear Table and all tracks
+                //
+
+                trackTable.clear();
+                Tracks = new ArrayList<Track>();
+                rTrackStarts = new ArrayList<Roi>();
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // Report issue
+                //
+
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        final URI uri = new URI("https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues");
+                        Desktop.getDesktop().browse(uri);
+                    } catch (URISyntaxException uriEx) {
+                        IJ.showMessage(uriEx.toString());
+                    } catch (IOException ioEx) {
+                        IJ.showMessage(ioEx.toString());
+                    }
+                } else { /* TODO: error handling */ }
+
+            }  else if (e.getActionCommand().equals(texts[k++])) {
+
+                //
+                // Tracking radii
+                //
+
+                JTextField source = (JTextField) e.getSource();
+                String[] sA = source.getText().split(",");
+                gui_pCenterOfMassRadii = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
+
+            } else if (e.getActionCommand().equals(texts[k++])) {
+
+                //
+                // Cropping radii
+                //
+
+                JTextField source = (JTextField) e.getSource();
+                String[] sA = source.getText().split(",");
+                gui_pCropRadii = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
+
+            } else if (e.getActionCommand().equals(texts[k++])) {
+
+                //
+                // Tracking sub-sampling
+                //
+
+                JTextField source = (JTextField) e.getSource();
+                String[] sA = source.getText().split(",");
+                gui_pSubSample = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
+
+            } else if (e.getActionCommand().equals(texts[k++])) {
+
+                //
+                // Track length
+                //
+                JTextField source = (JTextField) e.getSource();
+                gui_ntTracking = new Integer(source.getText());
+
+            } else if (e.getActionCommand().equals(comboNames[j++])) {
+
+                //
+                // Tracking method
+                //
+
+                JComboBox cb = (JComboBox)e.getSource();
+                gui_trackingMethod = (String)cb.getSelectedItem();
+
+            }
+        }
+
+        public JFrame getFrame() {
+            return frame;
+        }
+
+        private String[] getToolTipFile(String fileName) {
+            ArrayList<String> toolTipTexts = new ArrayList<String>();
+
+            //Get file from resources folder
+            InputStream in = getClass().getResourceAsStream("/"+fileName);
+            BufferedReader input = new BufferedReader(new InputStreamReader(in));
+            Scanner scanner = new Scanner(input);
+            StringBuilder sb = new StringBuilder("");
+
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if(line.equals("###")) {
+                    toolTipTexts.add(sb.toString());
+                    sb = new StringBuilder("");
+                } else {
+                    sb.append(line);
+                }
+
+            }
+
+            scanner.close();
+
+
+            return(toolTipTexts.toArray(new String[0]));
+        }
+
+    }
+
     private JFileChooser myJFileChooser = new JFileChooser(new File("."));
 
     public Registration() {
@@ -272,372 +635,6 @@ public class Registration implements PlugIn, ImageListener {
         public void keyReleased(KeyEvent e) {
             highlightSelectedTrack();
         }
-    }
-
-    // to-do: add labels in front of the buttons to make the text smaller
-    class TrackingGUI implements ActionListener, FocusListener {
-
-        JFrame frame;
-
-        String[] texts = {
-                "Object tracking radii: x, y, z [pix]",
-                "Object cropping radii: x, y, z [pix]",
-                "Tracking sub-sampling: dx, dy, dz [pix]",
-                "Track length [frames]"
-        };
-
-        String[] actions = {
-                //"Add Track Start",
-                "Track selected object",
-                "Show tracked objects",
-                "Track whole data set",
-                "Show tracked data set",
-                "Show track table",
-                "Save track table",
-                "Clear track table",
-                "Report issue"
-        };
-
-
-        String[] defaults = {
-                String.valueOf((int) gui_pCenterOfMassRadii.getX()) + "," + (int) gui_pCenterOfMassRadii.getY() + "," +String.valueOf((int) gui_pCenterOfMassRadii.getZ()),
-                String.valueOf((int) gui_pCropRadii.getX()) + "," + ((int) gui_pCropRadii.getY()) + "," + String.valueOf((int) gui_pCropRadii.getZ()),
-                String.valueOf((int) gui_pSubSample.getX() + "," + (int) gui_pSubSample.getY() + "," + (int) gui_pSubSample.getZ() ),
-                String.valueOf(imp.getNFrames())
-        };
-
-        String[] comboNames = {
-                "Tracking method"
-        };
-
-        String[][] combos = {
-                {"center of mass","correlation"}
-        };
-
-
-        ExecutorService es = Executors.newCachedThreadPool();
-
-        public void TrackingGUI() {
-        }
-
-        public void showDialog() {
-
-            frame = new JFrame("Big Data Tracker");
-            //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            Container c = frame.getContentPane();
-            c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
-            ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
-
-            String[] toolTipTexts = getToolTipFile("TrackAndCropHelp.html");
-
-            //
-            // TextFields
-            //
-            JTextField[] textFields = new JTextField[texts.length];
-            JLabel[] labels = new JLabel[texts.length];
-
-            int iToolTipText = 0;
-
-            for (int i = 0; i < textFields.length; i++, iToolTipText++) {
-                textFields[i] = new JTextField(6);
-                textFields[i].setActionCommand(texts[i]);
-                textFields[i].addActionListener(this);
-                textFields[i].addFocusListener(this);
-                textFields[i].setText(defaults[i]);
-                textFields[i].setToolTipText(toolTipTexts[iToolTipText]);
-                labels[i] = new JLabel(texts[i] + ": ");
-                labels[i].setLabelFor(textFields[i]);
-            }
-
-            //
-            // Buttons
-            //
-            JButton[] buttons = new JButton[actions.length];
-
-            for (int i = 0; i < buttons.length; i++, iToolTipText++) {
-                buttons[i] = new JButton(actions[i]);
-                buttons[i].setActionCommand(actions[i]);
-                buttons[i].addActionListener(this);
-                buttons[i].setToolTipText(toolTipTexts[iToolTipText]);
-            }
-
-            //
-            // ComboBoxes
-            //
-
-            JComboBox[] comboBoxes = new JComboBox[comboNames.length];
-            JLabel[] comboLabels = new JLabel[comboNames.length];
-
-            for (int i = 0; i < combos.length; i++, iToolTipText++) {
-                comboBoxes[i] = new JComboBox(combos[i]);
-                comboBoxes[i].setActionCommand(comboNames[i]);
-                comboBoxes[i].addActionListener(this);
-                comboBoxes[i].setToolTipText(toolTipTexts[iToolTipText]);
-                comboLabels[i] = new JLabel(comboNames[i] + ": ");
-                comboLabels[i].setLabelFor(comboBoxes[i]);
-            }
-
-            //
-            // Panels
-            //
-
-            int i = 0, j = 0;
-            ArrayList<JPanel> panels = new ArrayList<JPanel>();
-            int iPanel = 0;
-
-            for (int k = 0; k < textFields.length; k++) {
-                panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
-                panels.get(iPanel).add(labels[k]);
-                panels.get(iPanel).add(textFields[k]);
-                c.add(panels.get(iPanel++));
-            }
-
-            for (int k = 0; k < comboNames.length; k++) {
-                panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
-                panels.get(iPanel).add(comboLabels[k]);
-                panels.get(iPanel).add(comboBoxes[k]);
-                c.add(panels.get(iPanel++));
-            }
-
-            panels.add(new JPanel());
-            panels.get(iPanel).add(buttons[i++]);
-            panels.get(iPanel).add(buttons[i++]);
-            c.add(panels.get(iPanel++));
-
-            panels.add(new JPanel());
-            panels.get(iPanel).add(buttons[i++]);
-            panels.get(iPanel).add(buttons[i++]);
-            c.add(panels.get(iPanel++));
-
-            panels.add(new JPanel());
-            panels.get(iPanel).add(buttons[i++]);
-            panels.get(iPanel).add(buttons[i++]);
-            panels.get(iPanel).add(buttons[i++]);
-            c.add(panels.get(iPanel++));
-
-            panels.add(new JPanel());
-            panels.get(iPanel).add(buttons[i++]);
-            c.add(panels.get(iPanel++));
-
-            frame.pack();
-            frame.setLocation(imp.getWindow().getX() + imp.getWindow().getWidth(), imp.getWindow().getY());
-            frame.setVisible(true);
-
-        }
-
-        public void focusGained(FocusEvent e) {
-            //
-        }
-
-        public void focusLost(FocusEvent e) {
-            JTextField tf = (JTextField) e.getSource();
-            if (!(tf == null)) {
-                tf.postActionEvent();
-            }
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            int i = 0, j = 0, k = 0;
-            JFileChooser fc;
-            final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
-
-            if (e.getActionCommand().equals(actions[i++])) {
-
-                //
-                // Track selected object
-                //
-
-                if(gui_trackingMethod.equals("correlation")) {
-                    IJ.showMessage("Object tracking with correlation is not yet implemented.");
-                    return;
-                }
-
-                Roi r = imp.getRoi();
-                if (r == null || !r.getTypeAsString().equals("Point")) {
-                    IJ.showMessage("Please use IJ's 'Point selection tool' on image: '" + imp.getTitle()+"'");
-                    return;
-                }
-
-                // Add track start ...
-                int iNewTrack = addTrackStart(imp);
-
-                // ... and start tracking immediately
-                if( iNewTrack >= 0 ) {
-                    trackStatsLastTrackStarted = System.currentTimeMillis();
-                    trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
-                    es.execute(new Registration.Track3D(iNewTrack, gui_dt, gui_pSubSample, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
-                }
-
-            } else if (e.getActionCommand().equals(actions[i++])) {
-
-                //
-                // View Object Tracks
-                //
-
-                showCroppedTracks();
-
-            } else if (e.getActionCommand().equals(actions[i++])) {
-
-                //
-                // Track whole data set using center of mass
-                //
-
-                // Add track start ...
-                int iNewTrack = addTrackStartWholeDataSet(imp);
-
-                // ... and start tracking immediately
-                if( iNewTrack >= 0 ) {
-
-                    trackStatsLastTrackStarted = System.currentTimeMillis();
-                    trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
-
-                    if(gui_trackingMethod.equals("correlation")) {
-                        es.execute(new Registration.TrackWholeDataSetUsingPhaseCorrelation(iNewTrack, gui_dt, gui_pSubSample, gui_bg));
-                    } else if (gui_trackingMethod.equals("center of mass")) {
-                        es.execute(new Registration.TrackWholeDataSetUsingCenterOfMass(iNewTrack, gui_dt, gui_pSubSample, gui_bg));
-                    }
-                }
-
-            } else if (e.getActionCommand().equals(actions[i++])) {
-
-                //
-                // View whole tracked Data set
-                //
-
-                showWholeDataSetAlongTracks();
-
-            } else if (e.getActionCommand().equals(actions[i++])) {
-
-                //
-                // Show Table
-                //
-
-                showTrackTable();
-
-            } else if (e.getActionCommand().equals(actions[i++])) {
-
-                //
-                // Save Table
-                //
-
-                TableModel model = trackTable.getTable().getModel();
-                if(model == null) {
-                    IJ.showMessage("There are no tracks yet.");
-                    return;
-                }
-                fc = new JFileChooser(vss.getDirectory());
-                if (fc.showSaveDialog(this.frame) == JFileChooser.APPROVE_OPTION) {
-                    File file = fc.getSelectedFile();
-                    saveTrackTable(file);
-                }
-
-            } else if (e.getActionCommand().equals(actions[i++])) {
-
-                //
-                // Clear Table and all tracks
-                //
-
-                trackTable.clear();
-                Tracks = new ArrayList<Track>();
-                rTrackStarts = new ArrayList<Roi>();
-
-            } else if (e.getActionCommand().equals(actions[i++])) {
-
-                //
-                // Report issue
-                //
-
-                if (Desktop.isDesktopSupported()) {
-                    try {
-                        final URI uri = new URI("https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues");
-                        Desktop.getDesktop().browse(uri);
-                    } catch (URISyntaxException uriEx) {
-                        IJ.showMessage(uriEx.toString());
-                    } catch (IOException ioEx) {
-                        IJ.showMessage(ioEx.toString());
-                    }
-                } else { /* TODO: error handling */ }
-
-            }  else if (e.getActionCommand().equals(texts[k++])) {
-
-                //
-                // Tracking radii
-                //
-
-                JTextField source = (JTextField) e.getSource();
-                String[] sA = source.getText().split(",");
-                gui_pCenterOfMassRadii = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
-
-            } else if (e.getActionCommand().equals(texts[k++])) {
-
-                //
-                // Cropping radii
-                //
-
-                JTextField source = (JTextField) e.getSource();
-                String[] sA = source.getText().split(",");
-                gui_pCropRadii = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
-
-            } else if (e.getActionCommand().equals(texts[k++])) {
-
-                //
-                // Tracking sub-sampling
-                //
-
-                JTextField source = (JTextField) e.getSource();
-                String[] sA = source.getText().split(",");
-                gui_pSubSample = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
-
-            } else if (e.getActionCommand().equals(texts[k++])) {
-
-                //
-                // Track length
-                //
-                JTextField source = (JTextField) e.getSource();
-                gui_ntTracking = new Integer(source.getText());
-
-            } else if (e.getActionCommand().equals(comboNames[j++])) {
-
-                //
-                // Tracking method
-                //
-
-                JComboBox cb = (JComboBox)e.getSource();
-                gui_trackingMethod = (String)cb.getSelectedItem();
-
-            }
-        }
-
-        public JFrame getFrame() {
-            return frame;
-        }
-
-        private String[] getToolTipFile(String fileName) {
-            ArrayList<String> toolTipTexts = new ArrayList<String>();
-
-            //Get file from resources folder
-            InputStream in = getClass().getResourceAsStream("/"+fileName);
-            BufferedReader input = new BufferedReader(new InputStreamReader(in));
-            Scanner scanner = new Scanner(input);
-            StringBuilder sb = new StringBuilder("");
-
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                if(line.equals("###")) {
-                    toolTipTexts.add(sb.toString());
-                    sb = new StringBuilder("");
-                } else {
-                    sb.append(line);
-                }
-
-            }
-
-            scanner.close();
-
-
-            return(toolTipTexts.toArray(new String[0]));
-        }
-
     }
 
     public void showTrackTable(){
@@ -864,12 +861,12 @@ public class Registration implements PlugIn, ImageListener {
 
     // todo: make one class out of the three tracking classes?
 
-    class Track3D implements Runnable {
+    class TrackROI implements Runnable {
         // todo: reload more data if necessary
         int iTrack, dt, bg, iterations;
         Point3D pCenterOfMassRadii, pOffset, pLocalCenter, pSubSample;
 
-        Track3D(int iTrack, int dt, Point3D pSubSample, Point3D pCenterOfMassRadii, int bg, int iterations) {
+        TrackROI(int iTrack, int dt, Point3D pSubSample, Point3D pCenterOfMassRadii, int bg, int iterations) {
             this.iTrack = iTrack;
             this.dt = dt;
             this.pSubSample = pSubSample;
@@ -997,127 +994,11 @@ public class Registration implements PlugIn, ImageListener {
         }
     }
 
-    class TrackWholeDataSetUsingCenterOfMass implements Runnable {
-        int iTrack, dt, bg, iterations;
-        Point3D pCenterOfMassRadii, pOffset, pSubSample;
-
-        TrackWholeDataSetUsingCenterOfMass(int iTrack, int dt, Point3D pSubSample, int bg) {
-            this.iTrack = iTrack;
-            this.dt = dt;
-            this.pSubSample = pSubSample;
-            this.bg = bg;
-        }
-
-        public void run() {
-            long startTime = 0, stopTime, elapsedReadingTime, elapsedProcessingTime;
-            ImageStack stack;
-            Point3D pCenter;
-
-            Track track = Tracks.get(iTrack);
-
-            int tStart = track.getTmin();
-            int channel = track.getC(0);
-            int nt = track.getLength();
-            track.reset();
-
-
-            if (Globals.verbose) {
-                log("# Registration.TrackWholeDataSet:");
-                log("iTrack: "+iTrack);
-                log("tStart, tMax, dt" + tStart + "," + (tStart+nt-1) + "," + dt);
-            }
-
-            for (int it = tStart; it < tStart+nt; it = it + dt) {
-
-                // get stack, ensuring that extracted stack is still within bounds
-                startTime = System.currentTimeMillis();
-                stack = vss.getFullFrame(it, channel, pSubSample).getStack();
-                stopTime = System.currentTimeMillis();
-                elapsedReadingTime = stopTime - startTime;
-
-                // compute center of mass (in zero-based local stack coordinates)
-                // ...using the mean of the stack as threshold
-                startTime = System.currentTimeMillis();
-                pCenter = computeCenter16bit(stack, computeMean16bit(stack), new Point3D(0.0,0.0,0.0), new Point3D(Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MAX_VALUE));
-                stopTime = System.currentTimeMillis();
-                elapsedProcessingTime = stopTime - startTime;
-
-                // correct for the sub-sampling in z
-                pCenter = multiplyPoint3dComponents(pCenter,pSubSample);
-
-                // update time-points, using linear interpolation; todo: implement!
-                for (int j = 0; j < dt; j++) {
-
-                    if ((it + j) < imp.getNFrames()) {
-
-                        Point3D p = pCenter; // todo: implement tracking
-
-                        //
-                        // Add to track
-                        // - thread safe, because only this thread is accessing this particular track
-                        //
-                        track.addLocation(p, it + j, channel);
-
-                        //
-                        // Update global track table and imp.overlay
-                        // - thread safe, because both internally use SwingUtilities.invokeLater
-                        //
-                        trackTable.addRow(new Object[]{
-                                String.format("%1$04d",iTrack)+"_"+String.format("%1$05d",it),
-                                (float)p.getX(), (float)p.getY(), (float)p.getZ(), it, iTrack
-                                //totalElapsedTime, elapsedReadingTime, elapsedProcessingTime
-                        });
-
-                        addTrackToOverlay(track, it + j - tStart);
-
-                    }
-                }
-
-                // show progress
-                int n = totalTimePointsTracked.addAndGet(1);
-                if( (System.currentTimeMillis() > trackStatsReportDelay+trackStatsLastReport)
-                        || (n==totalTimePointsToBeTracked))
-                {
-                    trackStatsLastReport = System.currentTimeMillis();
-
-                    long dt = System.currentTimeMillis()-trackStatsLastTrackStarted;
-                    int dn = n - trackStatsTotalPointsTrackedAtLastStart;
-                    int nToGo = totalTimePointsToBeTracked - n;
-                    float speed = (float)1.0*dn/dt*1000;
-                    float remainingTime = (float)1.0*nToGo/speed;
-
-                    Globals.threadlog(
-                            "progress = "+n+"/"+totalTimePointsToBeTracked+
-                                    "; speed [n/s] = "+String.format("%.2g",speed)+
-                                    "; remaining [s] = "+String.format("%.2g",remainingTime)+
-                                    "; reading [ms] = "+elapsedReadingTime+
-                                    "; processing [ms] = "+elapsedProcessingTime
-                    );
-                }
-
-                if(Globals.verbose) {
-                    log("Read data [ms]: " + elapsedReadingTime);
-                    log("Read data [ms]: " + elapsedReadingTime);
-                    log("Reading speed [MB/s]: " + stack.getHeight() * stack.getWidth() * stack.getSize() * 2 / ((elapsedReadingTime + 0.001) * 1000));
-                    log("Detected center [pixel]:" +
-                            " x:" + String.format("%d", pCenter.getX()) +
-                            " y:" + String.format("%d", pCenter.getY()) +
-                            " z:" + String.format("%d", pCenter.getZ()));
-                }
-
-            }
-
-            //Globals.threadlog("track id = "+iTrack+"; nt [frames] = "+nt+"; completed.");
-            track.completed = true;
-            return;
-        }
-    }
-
-    class TrackWholeDataSetUsingPhaseCorrelation implements Runnable {
+    class TrackAll implements Runnable {
         int iTrack, dt, bg;
         Point3D pSubSample;
 
-        TrackWholeDataSetUsingPhaseCorrelation(int iTrack, int dt, Point3D pSubSample, int bg) {
+        TrackAll(int iTrack, int dt, Point3D pSubSample, int bg) {
             this.iTrack = iTrack;
             this.dt = dt;
             this.pSubSample = pSubSample;
@@ -1125,10 +1006,10 @@ public class Registration implements PlugIn, ImageListener {
         }
 
         public void run() {
-            long startTime = 0, stopTime, elapsedReadingTime, elapsedProcessingTime;
+            long startTime, stopTime, elapsedReadingTime, elapsedProcessingTime;
             ImagePlus imp0, imp1;
-            Point3D pShift;
-            Point3D pCenter;
+            Point3D pShift = new Point3D(0,0,0);
+            Point3D pCenter = new Point3D(0,0,0);;
 
             Track track = Tracks.get(iTrack);
 
@@ -1144,49 +1025,74 @@ public class Registration implements PlugIn, ImageListener {
                 log("tStart, tMax, dt, dz " + tStart + "," + (tStart+nt-1) + "," + dt );
             }
 
-            // init
+            // init first time-point
+
             // get  image
             startTime = System.currentTimeMillis();
             imp0 = vss.getFullFrame(tStart, channel, pSubSample);
             stopTime = System.currentTimeMillis();
             elapsedReadingTime = stopTime - startTime;
 
+            // compute center of mass
             startTime = System.currentTimeMillis();
             pCenter = computeCenter16bit(imp0.getStack(), computeMean16bit(imp0.getStack()), new Point3D(0.0,0.0,0.0), new Point3D(Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MAX_VALUE));
             stopTime = System.currentTimeMillis();
             elapsedProcessingTime = stopTime - startTime;
 
-            // correct for the sub-sampling in z
+            // correct for sub-sampling
             pCenter = multiplyPoint3dComponents(pCenter, pSubSample);
             log("pCenter "+pCenter.toString());
 
+
             // compute shifts
-            for (int it = tStart; it < tStart+nt; it = it + dt) {
+
+            for (int it = tStart ; it < tStart+nt; it = it + dt) {
 
                 if(it>tStart) {
-                    // get next image
-                    startTime = System.currentTimeMillis();
-                    imp1 = vss.getFullFrame(it, channel, pSubSample);
-                    stopTime = System.currentTimeMillis();
-                    elapsedReadingTime = stopTime - startTime;
 
-                    // compute shift
-                    // todo: subtract background or mean
-                    startTime = System.currentTimeMillis();
-                    pShift = computeShift16bitUsingPhaseCorrelation(imp0, imp1);
-                    stopTime = System.currentTimeMillis();
-                    elapsedProcessingTime = stopTime - startTime;
+                    if (gui_trackingMethod == "correlation") {
+                        // get next image
+                        startTime = System.currentTimeMillis();
+                        imp1 = vss.getFullFrame(it, channel, pSubSample);
+                        stopTime = System.currentTimeMillis();
+                        elapsedReadingTime = stopTime - startTime;
 
-                    // correct for the sub-sampling in z
-                    pShift = multiplyPoint3dComponents(pShift, pSubSample);
-                    log("pShift "+pShift.toString());
+                        // compute shift
+                        // todo: subtract background or mean
+                        startTime = System.currentTimeMillis();
+                        pShift = computeShift16bitUsingPhaseCorrelation(imp0, imp1);
+                        stopTime = System.currentTimeMillis();
+                        elapsedProcessingTime = stopTime - startTime;
 
-                    // add shift to current center
-                    pCenter = pCenter.add(pShift);
-                    log("pCenter " + pCenter.toString());
+                        // correct for the sub-sampling in z
+                        pShift = multiplyPoint3dComponents(pShift, pSubSample);
 
-                    // ...
-                    imp0 = imp1;
+                        // add shift to current center
+                        pCenter = pCenter.add(pShift);
+
+                        // update reference image
+                        imp0 = imp1;
+
+                    } else if (gui_trackingMethod == "center of mass") {
+
+                        // get stack
+                        startTime = System.currentTimeMillis();
+                        imp1 = vss.getFullFrame(it, channel, pSubSample);
+                        stopTime = System.currentTimeMillis();
+                        elapsedReadingTime = stopTime - startTime;
+
+                        // compute center of mass
+                        // ...using the mean of the stack as threshold
+                        startTime = System.currentTimeMillis();
+                        pCenter = computeCenter16bit(imp1.getStack(), computeMean16bit(imp1.getStack()), new Point3D(0.0, 0.0, 0.0), new Point3D(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE));
+                        stopTime = System.currentTimeMillis();
+                        elapsedProcessingTime = stopTime - startTime;
+
+                        // correct for the sub-sampling in z
+                        pCenter = multiplyPoint3dComponents(pCenter, pSubSample);
+
+                    }
+
                 }
 
 
@@ -1245,10 +1151,12 @@ public class Registration implements PlugIn, ImageListener {
                     log("Read data [ms]: " + elapsedReadingTime);
                     log("Read data [ms]: " + elapsedReadingTime);
                     log("Reading speed [MB/s]: " + imp0.getHeight() * imp0.getWidth() * imp0.getNSlices() * 2 / ((elapsedReadingTime + 0.001) * 1000));
-                    log("Detected center [pixel]:" +
+                    log("Center [pixel]:" +
                             " x:" + String.format("%d", pCenter.getX()) +
                             " y:" + String.format("%d", pCenter.getY()) +
                             " z:" + String.format("%d", pCenter.getZ()));
+                    log(" " + pShift.toString());
+
                 }
 
             }
