@@ -19,6 +19,27 @@
 	<name>plugins/OpenStacksAsVirtualStack.jar</name>
 	<description>A Maven project implementing an ImageJ 1.x plugin</description>
 
+
+
+    <repositories>
+    <!--
+		<repository>
+        <id>imagej.public</id>
+        <url>http://maven.imagej.net/content/groups/public</url>
+    	</repository>
+    -->
+
+    <repository>
+        <id>imagej.releases</id>
+        <url>http://maven.imagej.net/content/repositories/releases</url>
+    </repository>
+
+    <repository>
+        <id>imagej.snapshots</id>
+        <url>http://maven.imagej.net/content/repositories/snapshots</url>
+    </repository>
+    </repositories>
+
 	<developers>
 		<developer>
 			<id>tischi</id>
@@ -39,24 +60,6 @@
 		<main-class>ct.vss.OpenStacksAsVirtualStack</main-class>
 	</properties>
 
-	<repositories>
-		<!-- NB: for project parent -->
-		<repository>
-			<id>imagej.public</id>
-			<url>http://maven.imagej.net/content/groups/public</url>
-		</repository>
-
-        <repository>
-            <id>imagej.releases</id>
-            <url>http://maven.imagej.net/content/repositories/releases</url>
-        </repository>
-
-        <repository>
-            <id>imagej.snapshots</id>
-            <url>http://maven.imagej.net/content/repositories/snapshots</url>
-        </repository>
-
-	</repositories>
 
 	<dependencies>
 
@@ -123,3 +126,24 @@
 
 
 </project>
+
+
+
+<!--
+<repositories>
+<repository>
+	<id>imagej.public</id>
+	<url>http://maven.imagej.net/content/groups/public</url>
+</repository>
+
+<repository>
+	<id>imagej.releases</id>
+	<url>http://maven.imagej.net/content/repositories/releases</url>
+</repository>
+
+<repository>
+	<id>imagej.snapshots</id>
+	<url>http://maven.imagej.net/content/repositories/snapshots</url>
+</repository>
+</repositories>
+-->

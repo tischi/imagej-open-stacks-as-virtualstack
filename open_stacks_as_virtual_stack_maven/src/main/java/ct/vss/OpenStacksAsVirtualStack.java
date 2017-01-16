@@ -712,8 +712,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-        //final String directory = "/Users/tischi/Desktop/Gustavo_Crop/";
-        final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
+        final String directory = "/Users/tischi/Desktop/Gustavo_Crop/";
+        //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
         //final String directory = "/Users/tischi/Desktop/example-data/compressed/";
         //final String directory = "/Volumes/My Passport/Res_13/";
