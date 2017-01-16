@@ -80,7 +80,7 @@ public class Registration implements PlugIn, ImageListener {
         String[] texts = {
                 "Object tracking radii: x, y, z [pix]",
                 "Object cropping radii: x, y, z [pix]",
-                "Tracking sub-sampling: dx, dy, dz [pix]",
+                "Tracking sub-sampling: dx, dy, dz, dt [pix]",
                 "Track length [frames]"
         };
 
