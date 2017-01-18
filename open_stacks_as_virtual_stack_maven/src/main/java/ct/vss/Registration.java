@@ -72,6 +72,15 @@ public class Registration implements PlugIn, ImageListener {
     // todo: put actual tracking into different class
 
 
+
+    public Registration() {
+    }
+
+    public Registration(ImagePlus imp) {
+        this.imp = imp;
+        initialize();
+    }
+
     // to-do: add labels in front of the buttons to make the text smaller
     class TrackingGUI implements ActionListener, FocusListener {
 
@@ -277,7 +286,7 @@ public class Registration implements PlugIn, ImageListener {
             } else if (e.getActionCommand().equals(actions[i++])) {
 
                 //
-                // Track whole data set using center of mass
+                // Track whole data set
                 //
 
                 // Add track start ...
@@ -437,14 +446,6 @@ public class Registration implements PlugIn, ImageListener {
 
     private JFileChooser myJFileChooser = new JFileChooser(new File("."));
 
-    public Registration() {
-    }
-
-    public Registration(ImagePlus imp) {
-        this.imp = imp;
-        initialize();
-    }
-
     public void run(String arg) {
         this.imp = IJ.getImage();
         initialize();
@@ -466,6 +467,13 @@ public class Registration implements PlugIn, ImageListener {
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         if(vss==null) {
             throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
+        }
+        FileInfoSer[][][] infos = vss.getFileInfosSer();
+        if(infos[0][0][0].compression==6) {
+            IJ.showMessage(
+                    "This is a ZIP compressed data set." +
+                            "This will probably NOT WORK PROPERLY with this plugin!"
+            );
         }
         this.vss = vss;
         gui_pCenterOfMassRadii = new Point3D(30,30,5);

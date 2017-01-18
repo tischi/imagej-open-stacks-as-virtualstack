@@ -10,13 +10,14 @@ import ij.io.BitBuffer;
 import ij.io.Opener;
 import javafx.geometry.Point3D;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 import static ij.IJ.log;
 
@@ -114,13 +115,6 @@ class OpenerExtensions extends Opener {
             hasStrips = true;
         }
 
-        /*
-        if(Globals.verbose) {
-            log("# readFromPlane");
-            log("z-plane " + z);
-            log("hasStrips: " + hasStrips);
-        }*/
-
         try {
 
             if (hasStrips) {
@@ -153,10 +147,10 @@ class OpenerExtensions extends Opener {
                 readLength = ((ye-ys)+1) * fi0.width * fi0.bytesPerPixel;
 
                 if(Globals.verbose) {
-                    /*
-                    log("no strips");
+                    log("fi.longOffset: "+fi.longOffset);
+                    log("ys: "+ys);
+                    log("readStart: "+readStart);
                     log("readLength: "+readLength);
-                    */
                 }
             }
 
@@ -174,8 +168,6 @@ class OpenerExtensions extends Opener {
             //pointer = read(in, buffer[z-zs], pointer);
             in.readFully(buffer[(z-zs)/dz]);
             //readingTime += (System.currentTimeMillis() - startTime);
-
-
 
 
         } catch (Exception e) {
@@ -391,6 +383,7 @@ class OpenerExtensions extends Opener {
 
             // read plane wise
             int z = zs;
+
             for (int iz=1; iz<=nz; iz++, z+=dz) {
 
                 if (z<0 || z>=info.length) {
@@ -411,7 +404,10 @@ class OpenerExtensions extends Opener {
                 //
                 // Decompress, rearrange, crop X, put into stack
                 //
-
+                if((fi.compression!=1) && (fi.compression!=2) && (fi.compression!=6)) {
+                    IJ.showMessage("Tiff compression not implemented: fi.compression = " + fi.compression);
+                    return(null);
+                }
                 startTime = System.currentTimeMillis();
                 // todo: strip loop ?
                 es.execute(new process2stack(info[0], fi, stack, buffer, z, zs, ze, dz, ys, ye, ny, xs, xe, nx, imByteWidth));
@@ -533,6 +529,7 @@ class process2stack implements Runnable {
     public static final int LZW_WITH_DIFFERENCING = 3;
     public static final int JPEG = 4;
     public static final int PACK_BITS = 5;
+    public static final int ZIP = 6;
     private static final int CLEAR_CODE = 256;
     private static final int EOI_CODE = 257;
 
@@ -590,8 +587,10 @@ class process2stack implements Runnable {
         if(hasStrips) {
 
             if(fi0.compression == COMPRESSION_NONE) {
+
                 // do nothing
-            } else if (fi0.compression == LZW) {
+
+            }  else if (fi0.compression == LZW) {
 
                 // init to hold all data present in the uncompressed strips
                 byte[] unCompressedBuffer = new byte[(se - ss + 1) * rps * imByteWidth];
@@ -638,15 +637,16 @@ class process2stack implements Runnable {
 
             } else {
 
-                log("Unknown compression: "+fi0.compression);
+                IJ.showMessage("Tiff compression not implemented: fi0.compression = "+fi0.compression);
+                return;
 
             }
 
             //
             // copy the correct x and y subset into the image stack
             //
-            ys = ys % rps; // we might have to skip a few rows in the beginning because the strips can hold several rows
 
+            ys = ys % rps; // we might have to skip a few rows in the beginning because the strips can hold several rows
             setShortPixelsCropXY((short[]) stack.getPixels((z - zs)/dz + 1), ys, ny, xs, nx, imByteWidth, buffer[(z - zs)/dz]);
 
         } else { // no strips
@@ -663,6 +663,29 @@ class process2stack implements Runnable {
                 short[] pixels = (short[]) stack.getPixels((z - zs)/dz + 1);
                 log("stack.getPixels((z - zs)/dz + 1).length: "+pixels.length);
             }
+
+            if (fi0.compression == ZIP) {
+
+                /** TIFF Adobe ZIP support contributed by Jason Newton. */
+                ByteArrayOutputStream imageBuffer = new ByteArrayOutputStream();
+                byte[] tmpBuffer = new byte[1024];
+                Inflater decompressor = new Inflater();
+
+                decompressor.setInput(buffer[(z - zs)/dz]);
+                try {
+                    while(!decompressor.finished()) {
+                        int rlen = decompressor.inflate(tmpBuffer);
+                        imageBuffer.write(tmpBuffer, 0, rlen);
+                    }
+                } catch(DataFormatException e){
+                    IJ.log(e.toString());
+                }
+                decompressor.end();
+
+                buffer[(z - zs)/dz] = imageBuffer.toByteArray();
+
+            }
+
             ys = 0; // the buffer contains only the correct y-range
             setShortPixelsCropXY((short[]) stack.getPixels((z - zs)/dz + 1), ys, ny, xs, nx, imByteWidth, buffer[(z - zs)/dz]);
 

@@ -626,6 +626,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     " This method is only implemented for streamed (virtual) image stacks.");
             return null;
         }
+        FileInfoSer[][][] infos = vss.getFileInfosSer();
+        if(infos[0][0][0].compression==6) {
+            IJ.showMessage(
+                    "Cropping functionality is currently not supported for ZIP compressed data."
+                    );
+            return null;
+        }
         Roi roi = imp.getRoi();
         if (roi != null && roi.isArea()) {
 
@@ -712,7 +719,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-        final String directory = "/Users/tischi/Desktop/Gustavo_Crop/";
+        //final String directory = "/Users/tischi/Desktop/Gustavo_Crop/";
+        final String directory = "/Users/tischi/Desktop/example-data/iSPIM tif stacks/";
+
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
         //final String directory = "/Users/tischi/Desktop/example-data/compressed/";
@@ -914,6 +923,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
         osv.h5DataSet = tfH5DataSet.getText();
 
         if (e.getActionCommand().equals(actions[i++])) {
+
             // Open from folder
             final String directory = IJ.getDirectory("Select a Directory");
             if (directory == null)
@@ -945,6 +955,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             imp.show();
 
         } else if (e.getActionCommand().equals(actions[i++])) {
+
             // "Save as info file"
             ImagePlus imp = IJ.getImage();
             VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
@@ -970,6 +981,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
                 log("Save command cancelled by user.");
             }
         } else if (e.getActionCommand().equals(actions[i++])) {
+
             // "Save as tiff stacks"
             //    IJ.showMessage("Not yet implemented.");
             ImagePlus imp = IJ.getImage();
@@ -1007,7 +1019,12 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             // "Save as h5 stacks"
         //    IJ.showMessage("Not yet implemented.");
         }  else if (e.getActionCommand().equals(actions[i++])) {
-            // crop
+
+            //
+            // Crop As New Stream
+            //
+
+
             ImagePlus imp2 = osv.crop(IJ.getImage());
             if (imp2 != null)
                 imp2.show();
