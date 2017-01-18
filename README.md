@@ -34,8 +34,9 @@ When you stream from the main folder the first time, the plugin will analyse all
 This plugin currently only supports a few file formats; it was tested for
 
 - Luxendo h5 files (opening "/Data111")
-- Uncompressed tif files saved with MATLAB
-- LZW compressed tif files saved with MATLAB
+- Uncompressed tif files (saved with MATLAB)
+- LZW compressed tif files (saved with MATLAB)
+- ZIP compressed tif files (EMBL iSPIM data)
 
 ## Installation in Fiji
 
@@ -52,11 +53,11 @@ This plugin currently only supports a few file formats; it was tested for
 
 ### Data streaming
 
-1. Run: **[Plugins > ALMF SPIM > Stack Streaming Tools]**
-2. [Stream from folder]: Streams the image data from the folder into IJ's hyperstack viewer  
+1. Run: **[Plugins > ALMF SPIM > Data Streaming Tools]**
+2. **[Stream from folder]**: Streams the image data from the folder into IJ's hyperstack viewer  
 3. [Crop as new stream]: ...
 
 ### Tracking
 
-1. Run: **[Plugins > ALMF SPIM > Track and Crop]**
-2. [Track selected point]: ... 
+1. Run: **[Plugins > ALMF SPIM > Big Data Tracker]**
+2. ... 
