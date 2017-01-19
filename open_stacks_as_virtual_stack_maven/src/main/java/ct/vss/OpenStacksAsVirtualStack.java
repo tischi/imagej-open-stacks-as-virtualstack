@@ -122,12 +122,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         int iChannelFolder = 0;
         int t=0,z=0,c=0;
         ImagePlus imp = null;
-        Matcher matcherZ, matcherT;
         FileInfo[] info;
         FileInfo fi0;
 
         // todo: depending on the fileOrder do different things
         // todo: add the filter to the getFilesInFolder function
+        // todo: find a clean solution for the channel folder presence or absence!
+        // probably add channelfolder to filename!
 
         //
         // Check for sub-folders
@@ -137,7 +138,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         if (channelFolders == null) {
             lists = new String[1][];
             lists[0] = getFilesInFolder(directory);
-            channelFolders = new String[] {""}; // one empty subdirectory
         } else {
             lists = new String[channelFolders.length][];
             for (int i = 0; i < channelFolders.length; i++){
@@ -159,8 +159,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             fileType = "h5";
 
-            if (channelFolders == null) nC = 1;
-            else nC = channelFolders.length;
+            if (channelFolders == null) {
+                nC = 1;
+                channelFolders = new String[] {""};
+            } else {
+                nC = channelFolders.length;
+            }
             nT = lists[0].length;
 
             IHDF5Reader reader = HDF5Factory.openForReading(directory + channelFolders[c] + "/" + lists[0][0]);
@@ -171,64 +175,91 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             nX = (int) dsInfo.getDimensions()[2];
 
             // sort into the final file list
+            // todo: make one function for h5 and tif
+
             ctzFileList = new String[nC][nT][nZ];
 
             for (iChannelFolder = 0; iChannelFolder < channelFolders.length; iChannelFolder++) {
-                for (t = 0; t<lists[iChannelFolder].length; t++) {
+                for (t = 0; t < lists[iChannelFolder].length; t++) {
                     c = iChannelFolder;
-                    z = 0;
+                    z = 0; // everything in one stack
                     ctzFileList[c][t][z] = lists[iChannelFolder][t];
                 }
             }
-
 
         }  else if(lists[0][0].endsWith(".tif") && lists[0][0].contains("_Target--")) {
 
             fileType = "leica single tif";
 
-            // todo: add C
-            Pattern patternZ = Pattern.compile(".*--Z(.*).tif.*");
-            Pattern patternT = Pattern.compile(".*--t(.*)--.*");
+            Matcher matcherZ, matcherC, matcherT;
+
+            Pattern patternC = Pattern.compile(".*--C(.*).tif");
+            Pattern patternZnoC = Pattern.compile(".*--Z(.*).tif");
+            Pattern patternZwithC = Pattern.compile(".*--Z(.*)--C.*");
+            Pattern patternT = Pattern.compile(".*--t(.*)--Z.*");
+
 
             // check how many C, T and Z there are
-            for (iChannelFolder = 0; iChannelFolder < channelFolders.length; iChannelFolder++) {
-                for (String fileName : lists[iChannelFolder]) {
-                    matcherZ = patternZ.matcher(fileName);
-                    matcherT = patternT.matcher(fileName);
+            nC = 1; nT = 1; nZ =1;
+            for (String fileName : lists[0]) {
+
+                matcherC = patternC.matcher(fileName);
+
+                if (matcherC.matches()) {
+                    // has multi-channels
+                    c = Integer.parseInt(matcherC.group(1).toString());
+                    if (c >= nC) nC = c + 1;
+                    matcherZ = patternZwithC.matcher(fileName);
                     if (matcherZ.matches()) {
                         z = Integer.parseInt(matcherZ.group(1).toString());
                         if (z >= nZ) nZ = z + 1;
                     }
-                    if (matcherT.matches()) {
-                        t = Integer.parseInt(matcherT.group(1).toString());
-                        if (t >= nT) nT = t + 1;
+                } else {
+                    // has only one channel
+                    matcherZ = patternZnoC.matcher(fileName);
+                    if (matcherZ.matches()) {
+                        z = Integer.parseInt(matcherZ.group(1).toString());
+                        if (z >= nZ) nZ = z + 1;
                     }
                 }
+
+                matcherT = patternT.matcher(fileName);
+                if (matcherT.matches()) {
+                    String s = matcherT.group(1).toString();
+                    t = Integer.parseInt(matcherT.group(1).toString());
+                    if (t >= nT) nT = t + 1;
+                }
+
             }
-            nC = 1;
 
             // sort into the final file list
             ctzFileList = new String[nC][nT][nZ];
 
-            for (iChannelFolder = 0; iChannelFolder < channelFolders.length; iChannelFolder++) {
-                for (String fileName : lists[iChannelFolder]) {
-                    matcherZ = patternZ.matcher(fileName);
-                    matcherT = patternT.matcher(fileName);
-                    if (matcherZ.matches()) {
-                        z = Integer.parseInt(matcherZ.group(1).toString());
-                        if (z >= nZ) nZ = z + 1;
-                    }
-                    if (matcherT.matches()) {
-                        t = Integer.parseInt(matcherT.group(1).toString());
-                        if (t >= nT) nT = t + 1;
-                    }
-                    c = 0;
-                    ctzFileList[c][t][z] = fileName;
+            for (String fileName : lists[0]) {
+
+                matcherC = patternC.matcher(fileName);
+                matcherT = patternT.matcher(fileName);
+                if(nC>1) matcherZ = patternZwithC.matcher(fileName);
+                else matcherZ = patternZnoC.matcher(fileName);
+
+
+                if (matcherZ.matches()) {
+                    z = Integer.parseInt(matcherZ.group(1).toString());
                 }
+                if (matcherT.matches()) {
+                    t = Integer.parseInt(matcherT.group(1).toString());
+                }
+                if (matcherC.matches()) {
+                    c = Integer.parseInt(matcherC.group(1).toString());
+                } else {
+                    c = 0;
+                }
+
+                ctzFileList[c][t][z] = fileName;
             }
 
             try {
-                FastTiffDecoder ftd = new FastTiffDecoder(directory + channelFolders[0], ctzFileList[0][0][0]);
+                FastTiffDecoder ftd = new FastTiffDecoder(directory, ctzFileList[0][0][0]);
                 info = ftd.getTiffInfo();
             } catch(Exception e) {
                 info = null;
@@ -243,8 +274,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             fileType = "tif stacks";
 
-            if (channelFolders == null) nC = 1;
-            else nC = channelFolders.length;
+            if (channelFolders == null) {
+                nC = 1;
+                channelFolders = new String[] {""};
+            } else {
+                nC = channelFolders.length;
+            }
+
             nT = lists[0].length;
 
             try {
@@ -269,12 +305,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             ctzFileList = new String[nC][nT][nZ];
 
             for (iChannelFolder = 0; iChannelFolder < channelFolders.length; iChannelFolder++) {
-                for (t = 0; t<lists[iChannelFolder].length; t++) {
+                for (t = 0; t < lists[iChannelFolder].length; t++) {
                     c = iChannelFolder;
-                    z = 0;
+                    z = 0; // everything in one stack
                     ctzFileList[c][t][z] = lists[iChannelFolder][t];
                 }
             }
+
 
         } else {
 
@@ -303,11 +340,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     stack.setStackFromFile(t, c);
 
-                    iProgress = t+c*nT+1;
+                    iProgress++;
 
                 } // c-loop
 
-                // show window at 1st time-point
+                // show image window already after loading 1st time-point
                 if (t == 0) {
 
                     if (stack != null && stack.getSize() > 0) {
@@ -828,8 +865,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 
         //final String directory = "/Users/tischi/Desktop/Gustavo_Crop/";
-        final String directory = "/Users/tischi/Desktop/example-data/iSPIM tif stacks/";
+        //final String directory = "/Users/tischi/Desktop/example-data/iSPIM tif stacks/";
         //final String directory = "/Users/tischi/Desktop/example-data/Leica single tif files/";
+        final String directory = "/Users/tischi/Desktop/example-data/Leica single tif files 2channels/";
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
@@ -846,14 +884,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         final OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
         Thread t1 = new Thread(new Runnable() {
             public void run() {
-                ImagePlus imp = ovs.openFromDirectory(directory, null);
+                ovs.openFromDirectory(directory, null);
             }
         });
         t1.start();
-        IJ.wait(1000);
+        //IJ.wait(1000);
         ovs.showDialog();
-        Registration register = new Registration(IJ.getImage());
-        register.run("");
+        //Registration register = new Registration(IJ.getImage());
+        //register.run("");
 
 
         /*

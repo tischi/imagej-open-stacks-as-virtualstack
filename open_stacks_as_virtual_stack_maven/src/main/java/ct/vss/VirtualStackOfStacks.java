@@ -43,7 +43,12 @@ public class VirtualStackOfStacks extends ImageStack {
         this.nY = nY;
         this.nSlices = nC*nT*nZ;
         this.fileType = fileType;
-        this.channelFolders = channelFolders;
+        if(channelFolders==null) {
+            this.channelFolders = new String[nC];
+            for(int ic=0; ic<nC; ic++) this.channelFolders[ic] = "";
+        } else {
+            this.channelFolders = channelFolders;
+        }
         this.fileList = fileList;
         this.infos = new FileInfoSer[nC][nT][];
         this.h5DataSet = h5DataSet;
@@ -147,6 +152,7 @@ public class VirtualStackOfStacks extends ImageStack {
                 // (this is necessary if they are compressed in any way)
                 //
                 for (int z = 0; z < nZ; z++) {
+
                     ftd = new FastTiffDecoder(directory + channelFolders[c], fileList[c][t][z]);
                     info = ftd.getTiffInfo();
                     infoSer[z] = new FileInfoSer(info[0]); // just duplicate from first file
