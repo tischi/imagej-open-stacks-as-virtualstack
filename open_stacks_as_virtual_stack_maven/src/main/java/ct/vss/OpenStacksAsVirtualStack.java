@@ -1,5 +1,8 @@
 package ct.vss;
 
+import ch.systemsx.cisd.hdf5.HDF5DataSetInformation;
+import ch.systemsx.cisd.hdf5.HDF5Factory;
+import ch.systemsx.cisd.hdf5.IHDF5Reader;
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
@@ -7,6 +10,7 @@ import ij.ImageStack;
 import ij.gui.GenericDialog;
 import ij.gui.NonBlockingGenericDialog;
 import ij.gui.Roi;
+import ij.io.FileInfo;
 import ij.io.FileSaver;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
@@ -119,7 +123,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         int t=0,z=0,c=0;
         ImagePlus imp = null;
         Matcher matcherZ, matcherT;
-
+        FileInfo[] info;
+        FileInfo fi0;
 
         // todo: depending on the fileOrder do different things
         // todo: add the filter to the getFilesInFolder function
@@ -157,6 +162,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             if (channelFolders == null) nC = 1;
             else nC = channelFolders.length;
             nT = lists[0].length;
+
+            IHDF5Reader reader = HDF5Factory.openForReading(directory + channelFolders[c] + "/" + lists[0][0]);
+            HDF5DataSetInformation dsInfo = reader.object().getDataSetInformation("/" + h5DataSet);
+
+            nZ = (int) dsInfo.getDimensions()[0];
+            nY = (int) dsInfo.getDimensions()[1];
+            nX = (int) dsInfo.getDimensions()[2];
 
             // sort into the final file list
             ctzFileList = new String[nC][nT][nZ];
@@ -215,6 +227,18 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 }
             }
 
+            try {
+                FastTiffDecoder ftd = new FastTiffDecoder(directory + channelFolders[0], ctzFileList[0][0][0]);
+                info = ftd.getTiffInfo();
+            } catch(Exception e) {
+                info = null;
+                IJ.showMessage("Error: "+e.toString());
+            }
+
+            fi0 = info[0];
+            nX = fi0.width;
+            nY = fi0.height;
+
         } else if(lists[0][0].endsWith(".tif")) {
 
             fileType = "tif stacks";
@@ -222,6 +246,24 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             if (channelFolders == null) nC = 1;
             else nC = channelFolders.length;
             nT = lists[0].length;
+
+            try {
+                FastTiffDecoder ftd = new FastTiffDecoder(directory + channelFolders[0], lists[0][0]);
+                info = ftd.getTiffInfo();
+            } catch(Exception e) {
+                info = null;
+                IJ.showMessage("Error: "+e.toString());
+            }
+
+            fi0 = info[0];
+            if (fi0.nImages > 1) {
+                nZ = fi0.nImages;
+                fi0.nImages = 1;
+            } else {
+                nZ = info.length;
+            }
+            nX = fi0.width;
+            nY = fi0.height;
 
             // sort into the final file list
             ctzFileList = new String[nC][nT][nZ];
@@ -241,10 +283,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         }
 
-        nProgress = nT*nC;
+        nProgress = nT*nC; iProgress = 0;
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                updateStatus("Analyzed file");
+            }
+        });
+        thread.start();
 
         // init the VSS
-        VirtualStackOfStacks stack = new VirtualStackOfStacks(directory, channelFolders, ctzFileList, nC, nT, fileType, h5DataSet);
+        VirtualStackOfStacks stack = new VirtualStackOfStacks(directory, channelFolders, ctzFileList, nC, nT, nX, nY, nZ, fileType, h5DataSet);
 
         // set the file information for each c, t, z
         try {
@@ -273,23 +321,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 }
 
-                /*
-                if(t >= 1) {
-
-                    int selectedC = imp.getC();
-                    int selectedZ = imp.getZ();
-                    int selectedT = imp.getT();
-                    imp.setStack(stack, nC, nZ, t+1);
-                    imp.setDimensions(nC, nZ, t+1);
-                    imp.setPosition(selectedC, selectedZ, selectedT);
-                    imp.updateAndDraw();
-                    imp.repaintWindow();
-                    //imp.setOpenAsHyperStack(true);
-                    //log("number of frames: "+imp.getNFrames());
-
-                }*/
-
-
             } // t-loop
 
         } catch(Exception e) {
@@ -298,12 +329,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         iProgress = nProgress;
 
-        /*ImagePlus imp = null;
-        if(stack!=null && stack.getSize()>0) {
-            imp = makeImagePlus(stack, infoSer[0]);
-        }
-        String[] folders = directory.split("/");
-        imp.setTitle(folders[folders.length-1]);*/
         return(imp);
 
     }
@@ -1015,18 +1040,10 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
 
             Thread t1 = new Thread(new Runnable() {
                 public void run() {
-                    ImagePlus imp = osv.openFromDirectory(directory, null);
-                    //imp.show();
+                    osv.openFromDirectory(directory, null);
                 }
             });
             t1.start();
-
-            Thread t2 = new Thread(new Runnable() {
-                public void run() {
-                    osv.iProgress=0;osv.nProgress=100;osv.updateStatus("Analyzed file");
-                }
-            });
-            t2.start();
 
         } else if (e.getActionCommand().equals(actions[i++])) {
 
