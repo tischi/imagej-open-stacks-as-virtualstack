@@ -828,8 +828,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 
         //final String directory = "/Users/tischi/Desktop/Gustavo_Crop/";
-        //final String directory = "/Users/tischi/Desktop/example-data/iSPIM tif stacks/";
-        final String directory = "/Users/tischi/Desktop/example-data/Leica single tif files/";
+        final String directory = "/Users/tischi/Desktop/example-data/iSPIM tif stacks/";
+        //final String directory = "/Users/tischi/Desktop/example-data/Leica single tif files/";
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 

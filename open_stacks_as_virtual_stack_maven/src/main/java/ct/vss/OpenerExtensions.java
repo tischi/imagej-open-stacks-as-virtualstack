@@ -33,6 +33,7 @@ class OpenerExtensions extends Opener {
     public static final int LZW_WITH_DIFFERENCING = 3;
     public static final int JPEG = 4;
     public static final int PACK_BITS = 5;
+    public static final int ZIP = 6;
     private static final int CLEAR_CODE = 256;
     private static final int EOI_CODE = 257;
 
@@ -139,12 +140,19 @@ class OpenerExtensions extends Opener {
                     readLength += fi.stripLengths[s];
                 }
 
-            } else {  // no strips
+            } else {  // none or one strip
 
-                // convert rows to bytes
-                readStart = fi.longOffset + ys * fi0.width * fi0.bytesPerPixel;
-                //readLength =  (int) (fi.longOffset + ((ye-ys)+1) * fi0.width * fi0.bytesPerPixel - readStart);
-                readLength = ((ye-ys)+1) * fi0.width * fi0.bytesPerPixel;
+                if(fi0.compression == ZIP) {
+                    // read all data
+                    readStart = fi.longOffset;
+                    readLength = fi.stripLengths[0];
+
+                } else {
+                    // read subset
+                    // convert rows to bytes
+                    readStart = fi.longOffset + ys * fi0.width * fi0.bytesPerPixel;
+                    readLength = ((ye-ys)+1) * fi0.width * fi0.bytesPerPixel;
+                }
 
                 if(Globals.verbose) {
                     log("fi.longOffset: "+fi.longOffset);
@@ -152,6 +160,7 @@ class OpenerExtensions extends Opener {
                     log("readStart: "+readStart);
                     log("readLength: "+readLength);
                 }
+
             }
 
             // SKIP to first strip (row) that we need to read of this z-plane
