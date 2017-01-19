@@ -196,7 +196,9 @@ class OpenerExtensions extends Opener {
         }
 
         ImagePlus imp = null;
-        if(info[0].fileTypeString.equals("tif")) {
+        if(info[0].fileTypeString.equals("tif stacks")) {
+            imp = openCroppedTiffStackUsingIFDs(directory, info, zs, ze, nz, dz, xs, xe, ys, ye);
+        } else if(info[0].fileTypeString.equals("leica single tif")) {
             imp = openCroppedTiffStackUsingIFDs(directory, info, zs, ze, nz, dz, xs, xe, ys, ye);
         } else if(info[0].fileTypeString.equals("h5")) {
             imp = openCroppedH5stack(directory, info, zs, ze, nz, dz, xs, xe, ys, ye);
@@ -334,9 +336,10 @@ class OpenerExtensions extends Opener {
         long readingTime = 0;
         long totalTime = 0;
         long threadInitTime = 0;
+        FileInfoSer fi;
 
         if (info == null) return null;
-        FileInfoSer fi = info[0];
+        FileInfoSer fi0 = info[0];
 
         int nx = xe - xs + 1;
         int ny = ye - ys + 1;
@@ -345,11 +348,11 @@ class OpenerExtensions extends Opener {
             log("# openCroppedTiffStackUsingIFDs");
             log("root directory: " + directory);
             log("info.length: " + info.length);
-            log("fi.directory: " + fi.directory);
-            log("fi.filename: " + fi.fileName);
-            log("fi.compression: " + fi.compression);
-            log("fi.intelByteOrder: " + fi.intelByteOrder);
-            log("fi.bytesPerPixel: " + fi.bytesPerPixel);
+            log("fi0.directory: " + fi0.directory);
+            log("fi0.filename: " + fi0.fileName);
+            log("fi0.compression: " + fi0.compression);
+            log("fi0.intelByteOrder: " + fi0.intelByteOrder);
+            log("fi0.bytesPerPixel: " + fi0.bytesPerPixel);
             log("zs,dz,ze,nz,xs,xe,ys,ye: " + zs + "," + dz + "," + ze + "," + nz + "," + xs + "," + xe + "," + ys + "," + ye);
         }
 
@@ -357,27 +360,26 @@ class OpenerExtensions extends Opener {
 
         // initialisation and allocation
         startTime = System.currentTimeMillis();
-        int imByteWidth = fi.width*fi.bytesPerPixel;
+        int imByteWidth = fi0.width*fi0.bytesPerPixel;
         // todo: this is not necessary to allocate new, but could be filled
-        ImageStack stack = ImageStack.create(nx, ny, nz, fi.bytesPerPixel*8);
+        ImageStack stack = ImageStack.create(nx, ny, nz, fi0.bytesPerPixel*8);
         byte[][] buffer = new byte[nz][1];
         ExecutorService es = Executors.newCachedThreadPool();
         long allocationTime = (System.currentTimeMillis() - startTime);
 
 
         try {
+
             // get input stream to file
-            File f = new File(directory + fi.directory + fi.fileName);
+            File f = new File(directory + fi0.directory + fi0.fileName);
             //FileInputStream in = new FileInputStream(f);
             RandomAccessFile in = new RandomAccessFile(f, "r");
 
 
             if(in==null) {
-                IJ.showMessage("Could not open file: "+fi.directory+fi.fileName);
+                IJ.showMessage("Could not open file: "+fi0.directory+fi0.fileName);
                 throw new IllegalArgumentException("could not open file");
             }
-            //InputStream in = new BufferedInputStream(new FileInputStream(f));
-            //FileImageInputStream in = new FileImageInputStream(f);
 
             long pointer=0L;
 
@@ -392,6 +394,26 @@ class OpenerExtensions extends Opener {
                 }
 
                 fi = info[z];
+
+                //
+                // Leica needs new file for each z-plane
+                //
+                if(fi0.fileTypeString.equals("leica single tif")) {
+                    // get new input stream to file
+                    f = new File(directory + fi.directory + fi.fileName);
+                    in = new RandomAccessFile(f, "r");
+                    if(Globals.verbose) {
+                        log("z: "+z);
+                        log("fi.directory: " + fi.directory);
+                        log("fi.filename: " + fi.fileName);
+                        log("fi.compression: " + fi.compression);
+                        log("fi.intelByteOrder: " + fi.intelByteOrder);
+                        log("fi.bytesPerPixel: " + fi.bytesPerPixel);
+                        log("fi.longOffset: " + fi.longOffset);
+                    }
+                } else {
+                    // do nothing, input stream 'in' stays the same for all z-planes
+                }
 
                 //
                 // Read y subset from current z-slice
@@ -441,7 +463,7 @@ class OpenerExtensions extends Opener {
         totalTime = (System.currentTimeMillis() - totalTime);
 
         if(Globals.verbose) {
-            int usefulBytesRead = nz*nx*ny*fi.bytesPerPixel;
+            int usefulBytesRead = nz*nx*ny*fi0.bytesPerPixel;
             log("readingTime [ms]: " + readingTime);
             log("effective reading speed [MB/s]: " + usefulBytesRead/((readingTime+0.001)*1000));
             log("allocationTime [ms]: "+allocationTime);
@@ -775,7 +797,6 @@ class process2stack implements Runnable {
                     //symbol.add(symbolTable[oldCode]);
                     //symbol.add(symbolTable[code][0]);
                     int lengthOld = symbolTable[oldCode].length;
-
 
                     //byte[] newSymbol = new byte[lengthOld+1];
                     symbolTable[nextSymbol] = new byte[lengthOld+1];

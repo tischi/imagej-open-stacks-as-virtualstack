@@ -71,8 +71,6 @@ public class Registration implements PlugIn, ImageListener {
 
     // todo: put actual tracking into different class
 
-
-
     public Registration() {
     }
 

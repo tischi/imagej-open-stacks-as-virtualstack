@@ -31,19 +31,19 @@ public class VirtualStackOfStacks extends ImageStack {
     String fileType = "tiff"; // h5
     String directory = "";
     String[] channelFolders;
-    String[][] fileList;
+    String[][][] fileList;
     String h5DataSet;
 
     /** Creates a new, empty virtual stack of required size */
-    public VirtualStackOfStacks(String directory, String[] channelFolders, String[][] fileList, int nC, int nT, String fileType, String h5DataSet) {
+    public VirtualStackOfStacks(String directory, String[] channelFolders, String[][][] fileList, int nC, int nT, String fileType, String h5DataSet) {
         super();
 
         this.directory = directory;
-        this.channelFolders = channelFolders;
-        this.fileList = fileList;
         this.nC = nC;
         this.nT = nT;
         this.fileType = fileType;
+        this.channelFolders = channelFolders;
+        this.fileList = fileList;
         this.infos = new FileInfoSer[nC][nT][];
         this.h5DataSet = h5DataSet;
 
@@ -119,21 +119,26 @@ public class VirtualStackOfStacks extends ImageStack {
         FileInfoSer[] infoSer = null;
 
         String ctPath = directory + channelFolders[c] + "/" + fileList[c][t];
+
+        long startTime = System.currentTimeMillis();
+
+
         try {
-            if (fileType == "tif") {
 
-                long startTime = System.currentTimeMillis();
-                FastTiffDecoder ftd = new FastTiffDecoder(directory + channelFolders[c], fileList[c][t]);
-                info = ftd.getTiffInfo();
+            FastTiffDecoder ftd = new FastTiffDecoder(directory + channelFolders[c], fileList[c][t][0]);
+            info = ftd.getTiffInfo();
 
-                // first file
+            if ( fileType.equals("tif stacks") ) {
+
                 if (t == 0 && c == 0) {
+
+                    // first file => determine nX, nY, nZ
 
                     if (Globals.verbose) {
                         log("IFD reading time [ms]: " + (System.currentTimeMillis() - startTime));
-                        log("directory: "+directory);
-                        log("channelFolders[c]: "+channelFolders[c]);
-                        log("c: " + c + "; t: " + t + "; file: " + fileList[c][t]);
+                        log("directory: " + directory);
+                        log("channelFolders[c]: " + channelFolders[c]);
+                        log("c: " + c + "; t: " + t + "; file: " + fileList[c][t][0]);
                         log("info.length " + info.length);
                         log("info[0].compression " + info[0].compression);
                         log("info[0].stripLengths.length " + info[0].stripLengths.length);
@@ -148,33 +153,58 @@ public class VirtualStackOfStacks extends ImageStack {
                     }
                     nX = fi.width;
                     nY = fi.height;
-                    nSlices = nC*nT*nZ;
+                    nSlices = nC * nT * nZ;
 
+                } // first file
 
-                } else {
+                infoSer = new FileInfoSer[nZ];
+                for (int z = 0; z < nZ; z++) {
+                    infoSer[z] = new FileInfoSer(info[z]);
+                    infoSer[z].directory = channelFolders[c] + "/"; // relative path to main directory
+                    infoSer[z].fileTypeString = fileType;
+                }
+
+            } else if (fileType.equals("leica single tif")) {
+
+                if (t == 0 && c == 0) {
+
+                    // first file => determine nX, nY, nZ
 
                     if (Globals.verbose) {
                         log("IFD reading time [ms]: " + (System.currentTimeMillis() - startTime));
-                        log("c:" + c + "; t:" + t + "; file:" + fileList[c][t]);
+                        log("directory: " + directory);
+                        log("channelFolders[c]: " + channelFolders[c]);
+                        log("c: " + c + "; t: " + t + "; file: " + fileList[c][t][0]);
                         log("info.length " + info.length);
                         log("info[0].compression " + info[0].compression);
                         log("info[0].stripLengths.length " + info[0].stripLengths.length);
                         log("info[0].rowsPerStrip " + info[0].rowsPerStrip);
                     }
+                    fi = info[0];
+                    nX = fi.width;
+                    nY = fi.height;
+                    nZ = fileList[0][0].length;
+                    nSlices = nC * nT * nZ;
 
-                }
+                } // first file
 
-                // convert ij.io.FileInfo[] to FileInfoSer[]
+
                 infoSer = new FileInfoSer[nZ];
-                for (int i = 0; i < nZ; i++) {
-                    infoSer[i] = new FileInfoSer(info[i]);
-                    infoSer[i].directory = channelFolders[c] + "/"; // relative path to main directory
-                    infoSer[i].fileTypeString = fileType;
+
+                // open all IFDs from all files
+                // this is necessary if they are compressed in any way
+                for (int z = 0; z < nZ; z++) {
+                    ftd = new FastTiffDecoder(directory + channelFolders[c], fileList[c][t][z]);
+                    info = ftd.getTiffInfo();
+                    infoSer[z] = new FileInfoSer(info[0]); // just duplicate from first file
+                    infoSer[z].directory = channelFolders[c] + "/"; // relative path to main directory
+                    infoSer[z].fileName = fileList[c][t][z];
+                    infoSer[z].fileTypeString = fileType;
+
                 }
 
-            } // tif
 
-            if (fileType == "h5") {
+            } else if (fileType.equals("h5")) {
 
                 // first file
                 if (t == 0 && c == 0) {
@@ -200,7 +230,7 @@ public class VirtualStackOfStacks extends ImageStack {
                 infoSer = new FileInfoSer[nZ];
                 for (int i = 0; i < nZ; i++) {
                     infoSer[i] = new FileInfoSer();
-                    infoSer[i].fileName = fileList[c][t];
+                    infoSer[i].fileName = fileList[c][t][0];
                     infoSer[i].directory = channelFolders[c] + "/";
                     infoSer[i].width = nX;
                     infoSer[i].height = nY;
@@ -212,11 +242,13 @@ public class VirtualStackOfStacks extends ImageStack {
             } // h5
 
         } catch(Exception e) {
+
             IJ.showMessage("Error: "+e.toString());
 
         }
 
         this.infos[c][t] = infoSer;
+
     }
 
     /** Does nothing. */

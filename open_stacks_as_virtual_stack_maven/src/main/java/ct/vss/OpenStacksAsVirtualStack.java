@@ -20,6 +20,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static ij.IJ.log;
 
@@ -35,6 +37,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String info1;
     private String[] channelFolders;
     private String[][] lists; // c, t
+    private String[][][] ctzFileList;
     private String fileOrder;
     private String fileType;
     private static NonBlockingGenericDialog gd;
@@ -112,63 +115,143 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     public ImagePlus openFromDirectory(String directory, String filter) {
-
-        //log("# openFromDirectory");
+        int iChannelFolder = 0;
+        int t=0,z=0,c=0;
         ImagePlus imp = null;
+        Matcher matcherZ, matcherT;
+
 
         // todo: depending on the fileOrder do different things
         // todo: add the filter to the getFilesInFolder function
+
+        //
+        // Check for sub-folders
+        //
         channelFolders = getFoldersInFolder(directory);
 
         if (channelFolders == null) {
-            log("No channel sub-folders found.");
-            nC = 1;
-            channelFolders = new String[] {""};
-            //return(null);
+            lists = new String[1][];
+            lists[0] = getFilesInFolder(directory);
+            channelFolders = new String[] {""}; // one empty subdirectory
         } else {
-            nC = channelFolders.length;
-        }
-
-        lists = new String[nC][];
-        for (int i = 0; i < nC; i++) {
-            lists[i] = getFilesInFolder(directory + channelFolders[i]);
-            if (lists[i] == null) {
-                log("No files found!");
-                return(null);
+            lists = new String[channelFolders.length][];
+            for (int i = 0; i < channelFolders.length; i++){
+                lists[i] = getFilesInFolder(directory + channelFolders[i]);
+                if (lists[i] == null) {
+                    log("No files found in folder "+channelFolders[i]);
+                    return (null);
+                }
             }
         }
+
         // todo consistency check the list lengths
-        nT = lists[0].length;
+
+        //
+        // generate a nC,nT,nZ fileList
+        //
+
+        if(lists[0][0].endsWith(".h5")) {
+
+            fileType = "h5";
+
+            if (channelFolders == null) nC = 1;
+            else nC = channelFolders.length;
+            nT = lists[0].length;
+
+            // sort into the final file list
+            ctzFileList = new String[nC][nT][nZ];
+
+            for (iChannelFolder = 0; iChannelFolder < channelFolders.length; iChannelFolder++) {
+                for (t = 0; t<lists[iChannelFolder].length; t++) {
+                    c = iChannelFolder;
+                    z = 0;
+                    ctzFileList[c][t][z] = lists[iChannelFolder][t];
+                }
+            }
+
+
+        }  else if(lists[0][0].endsWith(".tif") && lists[0][0].contains("_Target--")) {
+
+            fileType = "leica single tif";
+
+            // todo: add C
+            Pattern patternZ = Pattern.compile(".*--Z(.*).tif.*");
+            Pattern patternT = Pattern.compile(".*--t(.*)--.*");
+
+            // check how many C, T and Z there are
+            for (iChannelFolder = 0; iChannelFolder < channelFolders.length; iChannelFolder++) {
+                for (String fileName : lists[iChannelFolder]) {
+                    matcherZ = patternZ.matcher(fileName);
+                    matcherT = patternT.matcher(fileName);
+                    if (matcherZ.matches()) {
+                        z = Integer.parseInt(matcherZ.group(1).toString());
+                        if (z >= nZ) nZ = z + 1;
+                    }
+                    if (matcherT.matches()) {
+                        t = Integer.parseInt(matcherT.group(1).toString());
+                        if (t >= nT) nT = t + 1;
+                    }
+                }
+            }
+            nC = 1;
+
+            // sort into the final file list
+            ctzFileList = new String[nC][nT][nZ];
+
+            for (iChannelFolder = 0; iChannelFolder < channelFolders.length; iChannelFolder++) {
+                for (String fileName : lists[iChannelFolder]) {
+                    matcherZ = patternZ.matcher(fileName);
+                    matcherT = patternT.matcher(fileName);
+                    if (matcherZ.matches()) {
+                        z = Integer.parseInt(matcherZ.group(1).toString());
+                        if (z >= nZ) nZ = z + 1;
+                    }
+                    if (matcherT.matches()) {
+                        t = Integer.parseInt(matcherT.group(1).toString());
+                        if (t >= nT) nT = t + 1;
+                    }
+                    c = 0;
+                    ctzFileList[c][t][z] = fileName;
+                }
+            }
+
+        } else if(lists[0][0].endsWith(".tif")) {
+
+            fileType = "tif stacks";
+
+            if (channelFolders == null) nC = 1;
+            else nC = channelFolders.length;
+            nT = lists[0].length;
+
+            // sort into the final file list
+            ctzFileList = new String[nC][nT][nZ];
+
+            for (iChannelFolder = 0; iChannelFolder < channelFolders.length; iChannelFolder++) {
+                for (t = 0; t<lists[iChannelFolder].length; t++) {
+                    c = iChannelFolder;
+                    z = 0;
+                    ctzFileList[c][t][z] = lists[iChannelFolder][t];
+                }
+            }
+
+        } else {
+
+            IJ.showMessage("Unsupported file type: "+lists[0][0]);
+            return(null);
+
+        }
 
         nProgress = nT*nC;
 
-        // figure out the filetype
-        if(lists[0][0].endsWith(".h5")) {
-            fileType = "h5";
-            //log("File type: "+fileType);
-        } else if(lists[0][0].endsWith(".tif")) {
-            fileType = "tif";
-            //log("File type: "+fileType);
-        } else {
-            IJ.showMessage("Unsupported file type: "+lists[0][0]);
-            return(null);
-        }
-
-
-        String path = "";
-        VirtualStackOfStacks stack = null;
-
-        //log("Obtaining information from all files...");
-        // loop through filtered list and add file-info
-
         // init the VSS
-        stack = new VirtualStackOfStacks(directory, channelFolders, lists, nC, nT, fileType, h5DataSet);
+        VirtualStackOfStacks stack = new VirtualStackOfStacks(directory, channelFolders, ctzFileList, nC, nT, fileType, h5DataSet);
 
+        // set the file information for each c, t, z
         try {
 
-            for (int t = 0; t < nT; t++) {
+            for (t = 0; t < nT; t++) {
 
-                for (int c = 0; c < nC; c++) {
+                for (c = 0; c < nC; c++) {
 
                     stack.setStackFromFile(t, c);
 
@@ -720,7 +803,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 
         //final String directory = "/Users/tischi/Desktop/Gustavo_Crop/";
-        final String directory = "/Users/tischi/Desktop/example-data/iSPIM tif stacks/";
+        //final String directory = "/Users/tischi/Desktop/example-data/iSPIM tif stacks/";
+        final String directory = "/Users/tischi/Desktop/example-data/Leica single tif files/";
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
