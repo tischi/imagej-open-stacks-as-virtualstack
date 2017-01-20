@@ -220,6 +220,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         }  else if(fileType.equals("leica single tif")) {
 
+            
             Matcher matcherZ, matcherC, matcherT;
 
             Pattern patternC = Pattern.compile(".*--C(.*).tif");
