@@ -141,6 +141,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //
         // Get files in main directory
         //
+        log("checking for files in main folder...");
         lists = new String[1][];
         lists[0] = getFilesInFolder(directory);
 
@@ -151,22 +152,19 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             matcherLeica = patternLeica.matcher(fileName);
             if(matcherLeica.matches()) {
                 fileType = "leica single tif";
+                log("detected fileType: "+fileType);
                 break;
             }
         }
 
-        if(! fileType.equals("leica single tif")) {
+        if(!fileType.equals("leica single tif")) {
 
             //
             // Check for sub-folders
             //
-
+            log("checking for sub-folders...");
             channelFolders = getFoldersInFolder(directory);
-
-            if (channelFolders == null) {
-                lists = new String[1][];
-                lists[0] = getFilesInFolder(directory);
-            } else {
+            if (channelFolders != null) {
                 lists = new String[channelFolders.length][];
                 for (int i = 0; i < channelFolders.length; i++) {
                     lists[i] = getFilesInFolder(directory + channelFolders[i]);
@@ -175,6 +173,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         return (null);
                     }
                 }
+                log("found sub-folders => interpreting as channel folders.");
+            } else {
+                log("no sub-folders found.");
             }
 
         }
@@ -217,9 +218,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 }
             }
 
-        }  else if(lists[0][0].endsWith(".tif") && lists[0][0].contains("_Target--")) {
-
-            fileType = "leica single tif";
+        }  else if(fileType.equals("leica single tif")) {
 
             Matcher matcherZ, matcherC, matcherT;
 

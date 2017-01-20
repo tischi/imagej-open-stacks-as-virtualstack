@@ -25,18 +25,18 @@
       <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.12955466">
-              <caret line="135" column="3" selection-start-line="135" selection-start-column="3" selection-end-line="135" selection-end-column="3" />
+            <state vertical-scroll-proportion="0.1902834">
+              <caret line="221" column="0" selection-start-line="221" selection-start-column="0" selection-end-line="221" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1727#1728#0" expanded="true" />
                 <element signature="e#1755#1756#0" expanded="true" />
-                <element signature="e#16646#16839#0" expanded="true" />
-                <element signature="e#16838#16839#0" expanded="true" />
-                <element signature="e#31836#31964#0" expanded="true" />
-                <element signature="e#31963#31964#0" expanded="true" />
-                <element signature="e#38181#38325#0" expanded="true" />
-                <element signature="e#38324#38325#0" expanded="true" />
+                <element signature="e#16750#16943#0" expanded="true" />
+                <element signature="e#16942#16943#0" expanded="true" />
+                <element signature="e#31940#32068#0" expanded="true" />
+                <element signature="e#32067#32068#0" expanded="true" />
+                <element signature="e#38285#38429#0" expanded="true" />
+                <element signature="e#38428#38429#0" expanded="true" />
                 <element signature="class#VirtualOpenerDialog#0" expanded="false" />
               </folding>
             </state>
@@ -226,8 +226,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-51" />
-    <option name="y" value="23" />
+    <option name="x" value="108" />
+    <option name="y" value="59" />
     <option name="width" value="1307" />
     <option name="height" value="807" />
   </component>
@@ -572,7 +572,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-51" y="23" width="1307" height="807" extended-state="0" />
+    <frame x="108" y="59" width="1307" height="807" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -810,12 +810,12 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1727#1728#0" expanded="true" />
             <element signature="e#1755#1756#0" expanded="true" />
-            <element signature="e#16646#16839#0" expanded="true" />
-            <element signature="e#16838#16839#0" expanded="true" />
-            <element signature="e#31836#31964#0" expanded="true" />
-            <element signature="e#31963#31964#0" expanded="true" />
-            <element signature="e#38181#38325#0" expanded="true" />
-            <element signature="e#38324#38325#0" expanded="true" />
+            <element signature="e#16750#16943#0" expanded="true" />
+            <element signature="e#16942#16943#0" expanded="true" />
+            <element signature="e#31940#32068#0" expanded="true" />
+            <element signature="e#32067#32068#0" expanded="true" />
+            <element signature="e#38285#38429#0" expanded="true" />
+            <element signature="e#38428#38429#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
         </state>
@@ -939,12 +939,12 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1727#1728#0" expanded="true" />
             <element signature="e#1755#1756#0" expanded="true" />
-            <element signature="e#16646#16839#0" expanded="true" />
-            <element signature="e#16838#16839#0" expanded="true" />
-            <element signature="e#31836#31964#0" expanded="true" />
-            <element signature="e#31963#31964#0" expanded="true" />
-            <element signature="e#38181#38325#0" expanded="true" />
-            <element signature="e#38324#38325#0" expanded="true" />
+            <element signature="e#16750#16943#0" expanded="true" />
+            <element signature="e#16942#16943#0" expanded="true" />
+            <element signature="e#31940#32068#0" expanded="true" />
+            <element signature="e#32067#32068#0" expanded="true" />
+            <element signature="e#38285#38429#0" expanded="true" />
+            <element signature="e#38428#38429#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
         </state>
@@ -1313,18 +1313,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.12955466">
-          <caret line="135" column="3" selection-start-line="135" selection-start-column="3" selection-end-line="135" selection-end-column="3" />
+        <state vertical-scroll-proportion="0.1902834">
+          <caret line="221" column="0" selection-start-line="221" selection-start-column="0" selection-end-line="221" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1727#1728#0" expanded="true" />
             <element signature="e#1755#1756#0" expanded="true" />
-            <element signature="e#16646#16839#0" expanded="true" />
-            <element signature="e#16838#16839#0" expanded="true" />
-            <element signature="e#31836#31964#0" expanded="true" />
-            <element signature="e#31963#31964#0" expanded="true" />
-            <element signature="e#38181#38325#0" expanded="true" />
-            <element signature="e#38324#38325#0" expanded="true" />
+            <element signature="e#16750#16943#0" expanded="true" />
+            <element signature="e#16942#16943#0" expanded="true" />
+            <element signature="e#31940#32068#0" expanded="true" />
+            <element signature="e#32067#32068#0" expanded="true" />
+            <element signature="e#38285#38429#0" expanded="true" />
+            <element signature="e#38428#38429#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
         </state>
