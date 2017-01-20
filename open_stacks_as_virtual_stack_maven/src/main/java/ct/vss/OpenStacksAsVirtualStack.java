@@ -864,10 +864,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-        //final String directory = "/Users/tischi/Desktop/Gustavo_Crop/";
+        final String directory = "/Users/tischi/Desktop/Gustavo_Crop/";
         //final String directory = "/Users/tischi/Desktop/example-data/iSPIM tif stacks/";
         //final String directory = "/Users/tischi/Desktop/example-data/Leica single tif files/";
-        final String directory = "/Users/tischi/Desktop/example-data/Leica single tif files 2channels/";
+        //final String directory = "/Users/tischi/Desktop/example-data/Leica single tif files 2channels/";
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
@@ -888,10 +888,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             }
         });
         t1.start();
-        //IJ.wait(1000);
+        IJ.wait(3000);
         ovs.showDialog();
-        //Registration register = new Registration(IJ.getImage());
-        //register.run("");
+        Registration register = new Registration(IJ.getImage());
+        register.run("");
 
 
         /*
