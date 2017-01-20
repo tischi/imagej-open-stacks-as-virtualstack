@@ -30,6 +30,10 @@ import java.util.regex.Pattern;
 import static ij.IJ.log;
 
 
+// todo: - don't allow to save info file if not all info is loaded
+// todo: - find out why loading and saving info file is so slow
+// todo: - save smaller info files
+
 /** Opens a folder of stacks as a virtual stack. */
 public class OpenStacksAsVirtualStack implements PlugIn {
 
@@ -49,6 +53,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     public String h5DataSet = "Data111";
 
     // todo: stop loading thread upon closing of image
+
+    // todo: increase speed of Leica tif parsing, possible?
 
     public OpenStacksAsVirtualStack() {
     }
@@ -122,6 +128,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         int iChannelFolder = 0;
         int t=0,z=0,c=0;
         ImagePlus imp = null;
+        fileType = "not determined";
         FileInfo[] info;
         FileInfo fi0;
 
@@ -130,23 +137,46 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         // todo: find a clean solution for the channel folder presence or absence!
         // probably add channelfolder to filename!
 
-        //
-        // Check for sub-folders
-        //
-        channelFolders = getFoldersInFolder(directory);
 
-        if (channelFolders == null) {
-            lists = new String[1][];
-            lists[0] = getFilesInFolder(directory);
-        } else {
-            lists = new String[channelFolders.length][];
-            for (int i = 0; i < channelFolders.length; i++){
-                lists[i] = getFilesInFolder(directory + channelFolders[i]);
-                if (lists[i] == null) {
-                    log("No files found in folder "+channelFolders[i]);
-                    return (null);
+        //
+        // Get files in main directory
+        //
+        lists = new String[1][];
+        lists[0] = getFilesInFolder(directory);
+
+        // check if it is Leica single tiff SPIM files
+        Pattern patternLeica = Pattern.compile(".*_Target--.*");
+        Matcher matcherLeica;
+        for (String fileName : lists[0]) {
+            matcherLeica = patternLeica.matcher(fileName);
+            if(matcherLeica.matches()) {
+                fileType = "leica single tif";
+                break;
+            }
+        }
+
+        if(! fileType.equals("leica single tif")) {
+
+            //
+            // Check for sub-folders
+            //
+
+            channelFolders = getFoldersInFolder(directory);
+
+            if (channelFolders == null) {
+                lists = new String[1][];
+                lists[0] = getFilesInFolder(directory);
+            } else {
+                lists = new String[channelFolders.length][];
+                for (int i = 0; i < channelFolders.length; i++) {
+                    lists[i] = getFilesInFolder(directory + channelFolders[i]);
+                    if (lists[i] == null) {
+                        log("No files found in folder " + channelFolders[i]);
+                        return (null);
+                    }
                 }
             }
+
         }
 
         // todo consistency check the list lengths
@@ -198,38 +228,39 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             Pattern patternZwithC = Pattern.compile(".*--Z(.*)--C.*");
             Pattern patternT = Pattern.compile(".*--t(.*)--Z.*");
 
-
             // check how many C, T and Z there are
             nC = 1; nT = 1; nZ =1;
             for (String fileName : lists[0]) {
 
-                matcherC = patternC.matcher(fileName);
+                matcherLeica = patternLeica.matcher(fileName);
+                if(matcherLeica.matches()) {
 
-                if (matcherC.matches()) {
-                    // has multi-channels
-                    c = Integer.parseInt(matcherC.group(1).toString());
-                    if (c >= nC) nC = c + 1;
-                    matcherZ = patternZwithC.matcher(fileName);
-                    if (matcherZ.matches()) {
-                        z = Integer.parseInt(matcherZ.group(1).toString());
-                        if (z >= nZ) nZ = z + 1;
+                    matcherC = patternC.matcher(fileName);
+                    if (matcherC.matches()) {
+                        // has multi-channels
+                        c = Integer.parseInt(matcherC.group(1).toString());
+                        if (c >= nC) nC = c + 1;
+                        matcherZ = patternZwithC.matcher(fileName);
+                        if (matcherZ.matches()) {
+                            z = Integer.parseInt(matcherZ.group(1).toString());
+                            if (z >= nZ) nZ = z + 1;
+                        }
+                    } else {
+                        // has only one channel
+                        matcherZ = patternZnoC.matcher(fileName);
+                        if (matcherZ.matches()) {
+                            z = Integer.parseInt(matcherZ.group(1).toString());
+                            if (z >= nZ) nZ = z + 1;
+                        }
                     }
-                } else {
-                    // has only one channel
-                    matcherZ = patternZnoC.matcher(fileName);
-                    if (matcherZ.matches()) {
-                        z = Integer.parseInt(matcherZ.group(1).toString());
-                        if (z >= nZ) nZ = z + 1;
+
+                    matcherT = patternT.matcher(fileName);
+                    if (matcherT.matches()) {
+                        String s = matcherT.group(1).toString();
+                        t = Integer.parseInt(matcherT.group(1).toString());
+                        if (t >= nT) nT = t + 1;
                     }
                 }
-
-                matcherT = patternT.matcher(fileName);
-                if (matcherT.matches()) {
-                    String s = matcherT.group(1).toString();
-                    t = Integer.parseInt(matcherT.group(1).toString());
-                    if (t >= nT) nT = t + 1;
-                }
-
             }
 
             // sort into the final file list
@@ -237,25 +268,32 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             for (String fileName : lists[0]) {
 
-                matcherC = patternC.matcher(fileName);
-                matcherT = patternT.matcher(fileName);
-                if(nC>1) matcherZ = patternZwithC.matcher(fileName);
-                else matcherZ = patternZnoC.matcher(fileName);
+                matcherLeica = patternLeica.matcher(fileName);
+
+                if(matcherLeica.matches()) {
+
+                    matcherC = patternC.matcher(fileName);
+                    matcherT = patternT.matcher(fileName);
+                    if (nC > 1) matcherZ = patternZwithC.matcher(fileName);
+                    else matcherZ = patternZnoC.matcher(fileName);
 
 
-                if (matcherZ.matches()) {
-                    z = Integer.parseInt(matcherZ.group(1).toString());
-                }
-                if (matcherT.matches()) {
-                    t = Integer.parseInt(matcherT.group(1).toString());
-                }
-                if (matcherC.matches()) {
-                    c = Integer.parseInt(matcherC.group(1).toString());
-                } else {
-                    c = 0;
+                    if (matcherZ.matches()) {
+                        z = Integer.parseInt(matcherZ.group(1).toString());
+                    }
+                    if (matcherT.matches()) {
+                        t = Integer.parseInt(matcherT.group(1).toString());
+                    }
+                    if (matcherC.matches()) {
+                        c = Integer.parseInt(matcherC.group(1).toString());
+                    } else {
+                        c = 0;
+                    }
+
+                    ctzFileList[c][t][z] = fileName;
+
                 }
 
-                ctzFileList[c][t][z] = fileName;
             }
 
             try {
@@ -323,7 +361,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         nProgress = nT*nC; iProgress = 0;
         Thread thread = new Thread(new Runnable() {
             public void run() {
-                updateStatus("Analyzed file");
+                updateStatus("Analyzed image stack");
             }
         });
         thread.start();
