@@ -399,8 +399,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         int count = 0;
         for (int i = 0; i < rawlist.length; i++) {
             String name = rawlist[i];
-            if (name.startsWith(".") || name.equals("Thumbs.db") || name.endsWith(".txt"))
+
+            if (name.startsWith(".") ||
+                    name.equals("Thumbs.db") ||
+                    name.endsWith(".txt") ||
+                    name.endsWith(".xlef") )
+
                 rawlist[i] = null;
+
             else
                 count++;
         }
