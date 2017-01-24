@@ -220,7 +220,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         }  else if(fileType.equals("leica single tif")) {
 
-            
+
             Matcher matcherZ, matcherC, matcherT;
 
             Pattern patternC = Pattern.compile(".*--C(.*).tif");
@@ -437,16 +437,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         int count = 0;
         for (int i = 0; i < rawlist.length; i++) {
             String name = rawlist[i];
-
-            if (name.startsWith(".") ||
-                    name.equals("Thumbs.db") ||
-                    name.endsWith(".txt") ||
-                    name.endsWith(".xlef") )
-
+            if (name.endsWith(".tif") || name.endsWith(".h5") )
+                count++;
+            else
                 rawlist[i] = null;
 
-            else
-                count++;
         }
         if (count == 0) return null;
         String[] list = rawlist;
@@ -551,6 +546,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             oos.close();
             fout.close();
             log("Wrote: " + path);
+            iProgress = nProgress;
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -1141,7 +1137,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
 
             // "Save as info file"
             ImagePlus imp = IJ.getImage();
-            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+            final VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
             if(vss==null) {
                 IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
                 return;
@@ -1149,7 +1145,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             fc = new JFileChooser(vss.getDirectory());
             int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = fc.getSelectedFile();
+                final File file = fc.getSelectedFile();
                 int numberOfUnparsedFiles = vss.numberOfUnparsedFiles();
                 if(numberOfUnparsedFiles > 0) {
                     IJ.showMessage("There are still "+numberOfUnparsedFiles+
@@ -1158,8 +1154,21 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
                     return;
                 }
 
-                log("Saving: " + file.getAbsolutePath());
-                osv.writeFileInfosSer(vss.getFileInfosSer(), file.getAbsolutePath());
+                Thread t1 = new Thread(new Runnable() {
+                    public void run() {
+                        log("Saving: " + file.getAbsolutePath());
+                        osv.writeFileInfosSer(vss.getFileInfosSer(), file.getAbsolutePath());
+                    }
+                }); t1.start();
+                // update progress status
+                Thread t2 = new Thread(new Runnable() {
+                    public void run() {
+                        osv.iProgress=0; osv.nProgress=1;
+                        osv.updateStatus("Saving info file");
+                    }
+                });
+                t2.start();
+
             } else {
                 log("Save command cancelled by user.");
             }
