@@ -60,7 +60,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     public void run(String arg) {
-        showDialog();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                showDialog();
+            }
+        });
     }
 
     public void showDialog() {
@@ -1029,8 +1033,10 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
     }
 
     public void showDialog() {
+
         JFrame frame = new JFrame("Data Streaming Tools");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
         Container c = frame.getContentPane();
         c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
 
