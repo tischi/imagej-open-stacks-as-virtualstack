@@ -330,7 +330,7 @@ public class VirtualStackOfStacks extends ImageStack {
         }
     }
 
-    public ImagePlus getCubeByTimeCenterAndRadii(int t, int c, int dz, Point3D pc, Point3D pr) {
+    public ImagePlus getCubeByTimeCenterAndRadii(int t, int c, Point3D psub, Point3D pc, Point3D pr) {
 
         if(Globals.verbose) {
             log("# VirtualStackOfStacks.getCroppedFrameCenterRadii");
@@ -350,7 +350,7 @@ public class VirtualStackOfStacks extends ImageStack {
             setStackFromFile(t, c);
         }
 
-        ImagePlus imp = new OpenerExtensions().openCroppedStackCenterRadii(directory, infos[c][t], dz, pc, pr);
+        ImagePlus imp = new OpenerExtensions().openCroppedStackCenterRadii(directory, infos[c][t], (int) psub.getZ(), pc, pr);
 
         if (imp==null) {
             log("Error: loading failed!");

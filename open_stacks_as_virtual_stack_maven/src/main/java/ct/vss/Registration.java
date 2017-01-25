@@ -907,7 +907,7 @@ public class Registration implements PlugIn, ImageListener {
                 // get stack, ensuring that extracted stack is still within bounds
                 pStackCenter = OpenStacksAsVirtualStack.curatePosition(imp, pStackCenter, pStackRadii);
                 startTime = System.currentTimeMillis();
-                stack = vss.getCubeByTimeCenterAndRadii(it, channel, (int)pSubSample.getZ(), pStackCenter, pStackRadii).getStack();
+                stack = vss.getCubeByTimeCenterAndRadii(it, channel, pSubSample, pStackCenter, pStackRadii).getStack();
                 stopTime = System.currentTimeMillis();
                 elapsedReadingTime = stopTime - startTime;
 
@@ -1087,7 +1087,7 @@ public class Registration implements PlugIn, ImageListener {
 
                     // compute shift
                     startTime = System.currentTimeMillis();
-                    IJ.run(imp1, "Subtract...", "value="+computeMean16bit(imp0.getStack()));
+                    IJ.run(imp1, "Subtract...", "value="+computeMean16bit(imp1.getStack()));
                     pShift = computeShift16bitUsingPhaseCorrelation(imp0, imp1);
                     stopTime = System.currentTimeMillis();
                     elapsedProcessingTime = stopTime - startTime;
@@ -1209,31 +1209,21 @@ public class Registration implements PlugIn, ImageListener {
             if(pCenterOfMassRadii!=null) this.objectTracking = true;
             this.bg = bg;
         }
+
         public void run() {
-            /*
             long startTime, stopTime, elapsedReadingTime, elapsedProcessingTime;
             ImagePlus imp0, imp1;
             Point3D pShift = new Point3D(0,0,0);
             Point3D pCenter0 = new Point3D(0,0,0);
             Point3D pCenter1 = new Point3D(0,0,0);
-            Point3D pStackRadii;
+            Point3D pStackRadii = null;
 
             Track track = Tracks.get(iTrack);
             int tStart = track.getTmin();
             int channel = track.getC(0);
             int nt = track.getLength();
             track.reset();
-            if(objectTracking) {
-                pStackCenter0 = track.getXYZ(0);
-                pStackRadii = pCenterOfMassRadii.multiply(2.0);
-            }
 
-
-            if (Globals.verbose) {
-                log("# Registration.TrackWholeDataSet:");
-                log("iTrack: "+iTrack);
-                log("tStart, tMax, dt, dz " + tStart + "," + (tStart+nt-1) + "," + dt );
-            }
 
             //
             // init first time-point
@@ -1242,12 +1232,20 @@ public class Registration implements PlugIn, ImageListener {
             if(objectTracking) {
 
                 //
+                // get selected track start
+                //
+                pCenter0 = track.getXYZ(0);
+                pStackRadii = pCenterOfMassRadii.multiply(2.0);
+
+                //
                 // read data
                 //
 
                 // todo: implement x,y sub-sampling in getCubeByTimeCenterAndRadii
+                pSubSample = new Point3D(1,1,pSubSample.getZ());
+                // todo: maybe it is better to load a smaller part of the data instead?
                 pCenter0 = OpenStacksAsVirtualStack.curatePosition(imp, pCenter0, pStackRadii);
-                imp0 = vss.getCubeByTimeCenterAndRadii(tStart, channel, (int)pSubSample.getZ(), pCenter0, pStackRadii);
+                imp0 = vss.getCubeByTimeCenterAndRadii(tStart, channel, pSubSample, pCenter0, pStackRadii);
 
                 //
                 // compute center of mass (in zero-based local stack coordinates)
@@ -1258,13 +1256,17 @@ public class Registration implements PlugIn, ImageListener {
                 elapsedProcessingTime = System.currentTimeMillis() - startTime;
 
                 // correct for the sub-sampling
-                // todo: !! implement x,y subsampling in getCubeByTimeCenterAndRadii
                 pLocalCenter = multiplyPoint3dComponents(pLocalCenter, pSubSample);
 
                 // compute offset to zero-based center of stack
                 pOffset = pLocalCenter.subtract(pStackRadii);
+
+                // replaced the clicked pCenter0 by the center-of-mass
+                pCenter0 = pCenter0.add(pOffset);
+
                 // compute position for loading the object in the next time point
-                pCenter1 = pCenter0.add(pOffset);
+                // ..as don't know anything about the motions now, the same position is the best guess
+                pCenter1 = pCenter0;
 
 
             } else {
@@ -1282,9 +1284,13 @@ public class Registration implements PlugIn, ImageListener {
 
             }
 
+            // subtract background for correlation tracking
+            if(gui_trackingMethod.equals("correlation")) {
+                IJ.run(imp0, "Subtract...", "value="+computeMean16bit(imp0.getStack()));
+            }
 
             //
-            // compute shifts
+            // compute shifts for all following time-points
             //
 
             boolean finish = false;
@@ -1299,9 +1305,8 @@ public class Registration implements PlugIn, ImageListener {
 
                 if(itNow >= itMax) {
                     // due to the sub-sampling in t the addition of dt
-                    // caused the frame to be outside of
-                    // the tracking range => load the last frame and adjust dt
-                    // (this happens because nt might not be divisible by dt)
+                    // can cause the frame to be outside of
+                    // the tracking range => load the last frame
                     itNow = itMax;
                     finish = true;
                 }
@@ -1312,9 +1317,8 @@ public class Registration implements PlugIn, ImageListener {
 
                 startTime = System.currentTimeMillis();
                 if(objectTracking) {
-                    // todo: implement x,y sub-sampling in getCubeByTimeCenterAndRadii
                     pCenter1 = OpenStacksAsVirtualStack.curatePosition(imp, pCenter1, pStackRadii);
-                    imp1 = vss.getCubeByTimeCenterAndRadii(tStart, channel, (int)pSubSample.getZ(), pCenter1, pStackRadii);
+                    imp1 = vss.getCubeByTimeCenterAndRadii(itNow, channel, pSubSample, pCenter1, pStackRadii);
                 } else {
                     imp1 = vss.getFullFrame(itNow, channel, pSubSample);
                 }
@@ -1323,9 +1327,9 @@ public class Registration implements PlugIn, ImageListener {
 
                 if (gui_trackingMethod == "correlation") {
 
-                    // compute shift
-                    // todo: subtract background or mean
+                    // compute shift on mean subtracted image
                     startTime = System.currentTimeMillis();
+                    IJ.run(imp1, "Subtract...", "value="+computeMean16bit(imp1.getStack()));
                     pShift = computeShift16bitUsingPhaseCorrelation(imp0, imp1);
                     stopTime = System.currentTimeMillis();
                     elapsedProcessingTime = stopTime - startTime;
@@ -1430,7 +1434,7 @@ public class Registration implements PlugIn, ImageListener {
             }
 
             track.completed = true;
-            */
+
             return;
 
         }
@@ -1563,9 +1567,7 @@ public class Registration implements PlugIn, ImageListener {
         return(new Point3D(xCenter,yCenter,zCenter));
     }
 
-    // !! background has to be subtracted outside
     // ?? why is background subtraction necessary ?
-    // IJ.run(imp1, "Subtract...", "value="+str(bg_level)+" stack");
     public Point3D computeShift16bitUsingPhaseCorrelation(ImagePlus imp0, ImagePlus imp1) {
         PhaseCorrelation phc = new PhaseCorrelation(ImagePlusAdapter.wrap(imp1), ImagePlusAdapter.wrap(imp0), 5, true);
         phc.process();

@@ -205,6 +205,27 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             nT = lists[0].length;
 
             IHDF5Reader reader = HDF5Factory.openForReading(directory + channelFolders[c] + "/" + lists[0][0]);
+
+            //
+            // Check whether the data set exists
+            // todo: put into own function
+            String dataSets = "";
+            boolean dataSetExists = false;
+            for (String dataSet : reader.getGroupMembers("/"))
+            {
+                if(dataSet.equals(h5DataSet)) {
+                    dataSetExists = true;
+                }
+                dataSets += "- " + dataSet + "\n";
+            }
+
+            if(!dataSetExists) {
+                IJ.showMessage("The selected Hdf5 data set does not exist; " +
+                        "please change to one of the following:\n" +
+                        dataSets);
+                return null;
+            }
+
             HDF5DataSetInformation dsInfo = reader.object().getDataSetInformation("/" + h5DataSet);
 
             nZ = (int) dsInfo.getDimensions()[0];
@@ -1045,7 +1066,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
         }
 
         // Textfields
-        JLabel labelH5DataSet = new JLabel("Hdf5 data set name: ");
+        JLabel labelH5DataSet = new JLabel("Hdf5 data set: ");
         labelH5DataSet.setLabelFor(tfH5DataSet);
 
         // Checkboxes

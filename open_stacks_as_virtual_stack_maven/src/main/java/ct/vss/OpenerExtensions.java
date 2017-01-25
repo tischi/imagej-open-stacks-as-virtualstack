@@ -263,6 +263,7 @@ class OpenerExtensions extends Opener {
         long allocationTime = 0;
         short[] asFlatArray=null, pixels;
         MDShortArray block;
+        boolean dataSetExists = false;
 
 
         if (info == null) {
