@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 import static ij.IJ.log;
 
 
-// todo: - don't allow to save info file if not all info is loaded
 // todo: - find out why loading and saving info file is so slow
 // todo: - save smaller info files
 
@@ -135,6 +134,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         fileType = "not determined";
         FileInfo[] info;
         FileInfo fi0;
+        Pattern patternLeica = Pattern.compile(".*_Target--.*");
+        Matcher matcherLeica;
+
 
         // todo: depending on the fileOrder do different things
         // todo: add the filter to the getFilesInFolder function
@@ -149,15 +151,15 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         lists = new String[1][];
         lists[0] = getFilesInFolder(directory);
 
-        // check if it is Leica single tiff SPIM files
-        Pattern patternLeica = Pattern.compile(".*_Target--.*");
-        Matcher matcherLeica;
-        for (String fileName : lists[0]) {
-            matcherLeica = patternLeica.matcher(fileName);
-            if(matcherLeica.matches()) {
-                fileType = "leica single tif";
-                log("detected fileType: "+fileType);
-                break;
+        if(lists[0]!=null) {
+            // check if it is Leica single tiff SPIM files
+            for (String fileName : lists[0]) {
+                matcherLeica = patternLeica.matcher(fileName);
+                if (matcherLeica.matches()) {
+                    fileType = "leica single tif";
+                    log("detected fileType: " + fileType);
+                    break;
+                }
             }
         }
 
@@ -498,17 +500,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     String[] getFilesInFolder(String directory) {
-        //log("# getFilesInFolder: " + directory);
         // todo: can getting the file-list be faster?
         String[] list = new File(directory).list();
         if (list == null || list.length == 0)
             return null;
         list = this.sortFileList(list);
-        //log("Number of files: " + list.length);
-        //log("Sorted files:");
-        for(String item : list) {
-            //log("" + item);
-        }
         if (list == null) return null;
         else return (list);
     }
@@ -523,10 +519,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         });
         if (list == null || list.length == 0)
             return null;
-        list = this.sortFileList(list);
-        for(String item : list) {
-            //log("" + item);
-        }
+        //list = this.sortFileList(list);
         return (list);
 
     }
@@ -908,12 +901,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }*/
 
 
-        final String directory = "/Users/tischi/Desktop/Gustavo_Crop/";
+        //final String directory = "/Users/tischi/Desktop/Gustavo_Crop/";
         //final String directory = "/Users/tischi/Desktop/example-data/iSPIM tif stacks/";
         //final String directory = "/Users/tischi/Desktop/example-data/Leica single tif files/";
         //final String directory = "/Users/tischi/Desktop/example-data/Leica single tif files 2channels/";
 
-        //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
+        final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
         //final String directory = "/Users/tischi/Desktop/example-data/compressed/";
         //final String directory = "/Volumes/My Passport/Res_13/";
@@ -1141,17 +1134,24 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
 
         } else if (e.getActionCommand().equals(actions[i++])) {
 
+            //
             // "Save as info file"
+            //
+
             ImagePlus imp = IJ.getImage();
             final VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
             if(vss==null) {
                 IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
                 return;
             }
+
             fc = new JFileChooser(vss.getDirectory());
             int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 final File file = fc.getSelectedFile();
+                //
+                // Check that all image files have been parsed
+                //
                 int numberOfUnparsedFiles = vss.numberOfUnparsedFiles();
                 if(numberOfUnparsedFiles > 0) {
                     IJ.showMessage("There are still "+numberOfUnparsedFiles+
@@ -1160,6 +1160,9 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
                     return;
                 }
 
+                //
+                // Save the info file
+                //
                 Thread t1 = new Thread(new Runnable() {
                     public void run() {
                         log("Saving: " + file.getAbsolutePath());
