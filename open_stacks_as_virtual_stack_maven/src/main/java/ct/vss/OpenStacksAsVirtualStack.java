@@ -892,10 +892,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        //final String directory = "/Users/tischi/Desktop/example-data/compressed/";
+        final String directory = "/Users/tischi/Desktop/example-data/compressed/";
         //final String directory = "/Volumes/My Passport/Res_13/";
         //final String directory = "/Users/tischi/Desktop/example-data/tracking_test/";
-        final String directory = "/Volumes/almfspim/tischi/SPIM-example-data/Nils-MATLAB--tif-stacks--1channel--lzw-compressed/";
+        //final String directory = "/Volumes/almfspim/tischi/SPIM-example-data/Nils-MATLAB--tif-stacks--1channel--lzw-compressed/";
         //String filter = null;
 
         //String openingMethod = "tiffLoadAllIFDs";

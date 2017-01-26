@@ -80,19 +80,18 @@ public class Registration implements PlugIn, ImageListener {
         initialize();
     }
 
-    // to-do: add labels in front of the buttons to make the text smaller
     class TrackingGUI implements ActionListener, FocusListener {
 
         JFrame frame;
 
         String[] texts = {
-                "Tracking range: nx, ny, nz [pix]",
-                "Tracking sub-sampling: dx, dy, dz, dt [pix]",
+                "Object size: nx, ny, nz [pix]",
+                "Sub-sampling: dx, dy, dz, dt [pix]",
                 "Track length [frames]"
         };
 
         String[] actions = {
-                //"Add Track Start",
+                "Get nx, ny from ROI",
                 "Track selected object",
                 "Show tracked objects",
                 "Show track table",
@@ -116,10 +115,16 @@ public class Registration implements PlugIn, ImageListener {
                 {"center of mass","correlation"}
         };
 
+        JTextField[] textFields = new JTextField[texts.length];
+        JLabel[] labels = new JLabel[texts.length];
 
         ExecutorService es = Executors.newCachedThreadPool();
 
         public void TrackingGUI() {
+        }
+
+        public void changeTextField(int i, String text) {
+            textFields[i].setText(text);
         }
 
         public void showDialog() {
@@ -136,8 +141,6 @@ public class Registration implements PlugIn, ImageListener {
             //
             // TextFields
             //
-            JTextField[] textFields = new JTextField[texts.length];
-            JLabel[] labels = new JLabel[texts.length];
 
             int iToolTipText = 0;
 
@@ -183,18 +186,25 @@ public class Registration implements PlugIn, ImageListener {
             // Panels
             //
 
-            int i = 0, j = 0;
+            int i = 0;
             ArrayList<JPanel> panels = new ArrayList<JPanel>();
             int iPanel = 0;
 
-            for (int k = 0; k < textFields.length; k++) {
+            int k = 0;
+            panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
+            panels.get(iPanel).add(labels[k]);
+            panels.get(iPanel).add(textFields[k]);
+            panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
+
+            for (k = 1; k < textFields.length; k++) {
                 panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
                 panels.get(iPanel).add(labels[k]);
                 panels.get(iPanel).add(textFields[k]);
                 c.add(panels.get(iPanel++));
             }
 
-            for (int k = 0; k < comboNames.length; k++) {
+            for (k = 0; k < comboNames.length; k++) {
                 panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
                 panels.get(iPanel).add(comboLabels[k]);
                 panels.get(iPanel).add(comboBoxes[k]);
@@ -240,6 +250,18 @@ public class Registration implements PlugIn, ImageListener {
             final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
 
             if (e.getActionCommand().equals(actions[i++])) {
+
+                Roi r = imp.getRoi();
+
+                if(r==null || !r.getTypeAsString().equals("Rectangle")) {
+                    IJ.showMessage("Please put a rectangular selection on the image");
+                    return;
+                }
+
+                gui_pTrackingSize = new Point3D((int)r.getFloatWidth(), (int)r.getFloatHeight(), gui_pTrackingSize.getZ() );
+                trackingGUI.changeTextField(0, ""+(int)gui_pTrackingSize.getX()+","+(int)gui_pTrackingSize.getY()+","+(int)gui_pTrackingSize.getZ());
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
 
                 //
                 // Track selected object
@@ -396,8 +418,6 @@ public class Registration implements PlugIn, ImageListener {
 
     }
 
-    private JFileChooser myJFileChooser = new JFileChooser(new File("."));
-
     public void run(String arg) {
         this.imp = IJ.getImage();
         initialize();
@@ -432,21 +452,6 @@ public class Registration implements PlugIn, ImageListener {
         gui_bg = (int) imp.getProcessor().getMin();
         trackTable = new TrackTable();
         ImagePlus.addImageListener(this);
-    }
-
-    public void logStatus() {
-        log("# Current track status:");
-        if(Tracks.size()==0) {
-            log("no tracks yet");
-            return;
-        }
-        for(int iTrack=0; iTrack<Tracks.size(); iTrack++) {
-            if(!Tracks.get(iTrack).completed) {
-                log("track "+iTrack+": not completed");
-            } else {
-                log("track "+iTrack+": completed; length="+Tracks.get(iTrack).getLength());
-            }
-        }
     }
 
     class TrackTable  {
@@ -625,33 +630,18 @@ public class Registration implements PlugIn, ImageListener {
     }
 
     public int addTrackStart(ImagePlus imp) {
-        Point3D p0 = null;
-        Point3D p1 = null;
-        Point3D pSize;
+        Point3D pTrackCenter = null;
 
         int t;
         Roi r = imp.getRoi();
 
-        if(r.getTypeAsString().equals("Rectangle")) {
-            //
-            // Determine z0 and z1
-            //
-
-            // todo: openGUI to determine z
-
-            p0 = new Point3D(r.getPolygon().xpoints[0], r.getPolygon().ypoints[0], 0);
-            p1 = new Point3D(r.getPolygon().xpoints[1], r.getPolygon().ypoints[1], 0);
-            pSize = p1.subtract(p0);
-
-            // todo: update gui_pTrackingSize
-
-        } else if(r.getTypeAsString().equals("Point")) {
-
-            pSize = gui_pTrackingSize;
-            p0 = new Point3D(r.getPolygon().xpoints[0],
+        if(r.getTypeAsString().equals("Point")) {
+            pTrackCenter = new Point3D(r.getPolygon().xpoints[0],
                              r.getPolygon().ypoints[0],
                              imp.getZ()-1);
-
+        } else {
+            IJ.showMessage("Please use the point selection tool to mark an object.");
+            return(-1);
         }
 
         int ntTracking = gui_ntTracking;
@@ -666,30 +656,8 @@ public class Registration implements PlugIn, ImageListener {
         int newTrackID = Tracks.size();
         //log("added new track start; id = "+newTrackID+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
         Tracks.add(new Track(ntTracking));
-        Tracks.get(newTrackID).addLocation(p0, t, imp.getC() - 1);
+        Tracks.get(newTrackID).addLocation(pTrackCenter, t, imp.getC() - 1);
         Tracks.get(newTrackID).setObjectSize(gui_pTrackingSize);
-        return(newTrackID);
-
-    }
-
-    public int addTrackStartWholeDataSet(ImagePlus imp) {
-        int t;
-
-        int ntTracking = gui_ntTracking;
-        t = imp.getT()-1;
-
-        if(t+gui_ntTracking > imp.getNFrames()) {
-            IJ.showMessage("Your track would be longer than the movie!\n" +
-                    "Please\n- reduce the 'Track length', or\n- move the time slider to an earlier time point.");
-            return(-1);
-        }
-
-        totalTimePointsToBeTracked += ntTracking;
-        int newTrackID = Tracks.size();
-        //log("added new track start; id = "+newTrackID+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
-        Tracks.add(new Track(ntTracking));
-        Tracks.get(newTrackID).addLocation(new Point3D(0, 0, imp.getZ()-1), t, imp.getC()-1);
-
         return(newTrackID);
 
     }
@@ -789,15 +757,6 @@ public class Registration implements PlugIn, ImageListener {
             }
             */
         }
-    }
-
-    public int getNumberOfUncompletedTracks() {
-        int uncomplete = 0;
-        for(Track t:Tracks) {
-            if(!t.completed)
-                uncomplete++;
-        }
-        return uncomplete;
     }
 
     public void addTrackToOverlay(final Track track, final int i) {
@@ -1234,5 +1193,41 @@ public class Registration implements PlugIn, ImageListener {
 }
 
 
+/*
+    public int addTrackStartWholeDataSet(ImagePlus imp) {
+        int t;
+
+        int ntTracking = gui_ntTracking;
+        t = imp.getT()-1;
+
+        if(t+gui_ntTracking > imp.getNFrames()) {
+            IJ.showMessage("Your track would be longer than the movie!\n" +
+                    "Please\n- reduce the 'Track length', or\n- move the time slider to an earlier time point.");
+            return(-1);
+        }
+
+        totalTimePointsToBeTracked += ntTracking;
+        int newTrackID = Tracks.size();
+        //log("added new track start; id = "+newTrackID+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
+        Tracks.add(new Track(ntTracking));
+        Tracks.get(newTrackID).addLocation(new Point3D(0, 0, imp.getZ()-1), t, imp.getC()-1);
+
+        return(newTrackID);
+
+    }
+*/
 
 
+/*
+
+    public int getNumberOfUncompletedTracks() {
+        int uncomplete = 0;
+        for(Track t:Tracks) {
+            if(!t.completed)
+                uncomplete++;
+        }
+        return uncomplete;
+    }
+
+
+ */

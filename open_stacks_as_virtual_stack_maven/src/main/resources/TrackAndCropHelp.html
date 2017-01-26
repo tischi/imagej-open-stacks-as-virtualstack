@@ -1,27 +1,13 @@
 <html>
-<h3>Tracking radii</h3>
+<h3>Object size</h3>
 <p width=400>
     The tracking is based on computing the center of mass in a region whose
-    size you can adjust here. The radii should be large enough <b>to enclose one</b> of
+    size you can adjust here. The size should be large enough <b>to enclose one</b> of
     your objects of interest, but small enough <b>not to enclose two</b> objects
     as this can cause the algorithm to 'switch' objects during tracking. Please note
-    that you can change the tracking radii at any point; the 'Tracking Radii' are read again any time you
+    that you can change the object size at any point; the 'Object size' is  read again any time you
     click the 'Track selected object' button. This means that you can subsequently track objects of
     different sizes.
-</p>
-</html>
-###
-<html>
-<h3>Cropping radii</h3>
-<p width=400>
-    Once you have tracked some objects you can use the 'Crop along tracks' button to
-    get a cropped view on your tracked objects in a coordinate system where the
-    respective object stands still. Here you can adjust the size of these cropped view.
-<h4>Additional comments</h4>
-<p width=400>
-    Currently, it only is possible to have the same cropped view on all objects
-    that you have track. If you feel you need more flexibility please raise an
-    issue on github.
 </p>
 </html>
 ###
@@ -43,6 +29,13 @@
     Simply move the time slider on the image forward and then select an object and click
     'Track selected object'. Also note that you can track different objects for different
     lengths.
+</p>
+</html>
+###
+<html>
+<h3>Get nx, ny from ROI</h3>
+<p width=400>
+    Place a rectangluar selection on the image and click this button to read its width and height.
 </p>
 </html>
 ###
@@ -74,20 +67,6 @@
     Thus, having a 'stabilized view' on the object, where its translocation is eliminated is
     very helpful.
     In addition, the 'stabilized view' also reduces the amount of data needed to further study the object.
-</p>
-</html>
-###
-<html>
-<h3>Track whole data set</h3>
-<p width=400>
-    Tracks the whole data set. No ROI is needed.
-</p>
-</html>
-###
-<html>
-<h3>Show tracked data set</h3>
-<p width=400>
-    Shows the whole data set, using the computed tracks, typically to correct a drift.
 </p>
 </html>
 ###
