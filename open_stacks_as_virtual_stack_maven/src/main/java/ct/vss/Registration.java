@@ -85,18 +85,19 @@ public class Registration implements PlugIn, ImageListener {
         JFrame frame;
 
         String[] texts = {
-                "Object size: nx, ny, nz [pix]",
-                "Sub-sampling: dx, dy, dz, dt [pix]",
+                "Object size: nx, ny, nz [pixels]",
+                "Sub-sampling: dx, dy, dz, dt [pixels, frames]",
                 "Track length [frames]"
         };
 
         String[] actions = {
-                "Get nx, ny from ROI",
+                "Set nx,ny",
+                "Set nz",
                 "Track selected object",
                 "Show tracked objects",
-                "Show track table",
-                "Save track table",
-                "Clear track table",
+                "Show",
+                "Save",
+                "Clear",
                 "Report issue"
         };
 
@@ -117,6 +118,8 @@ public class Registration implements PlugIn, ImageListener {
 
         JTextField[] textFields = new JTextField[texts.length];
         JLabel[] labels = new JLabel[texts.length];
+
+        int previouslySelectedZ = -1;
 
         ExecutorService es = Executors.newCachedThreadPool();
 
@@ -195,6 +198,7 @@ public class Registration implements PlugIn, ImageListener {
             panels.get(iPanel).add(labels[k]);
             panels.get(iPanel).add(textFields[k]);
             panels.get(iPanel).add(buttons[i++]);
+            panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
             for (k = 1; k < textFields.length; k++) {
@@ -217,6 +221,9 @@ public class Registration implements PlugIn, ImageListener {
             c.add(panels.get(iPanel++));
 
             panels.add(new JPanel());
+            JLabel labelTrackTable = new JLabel("  Track table: ");
+            labelTrackTable.setLabelFor(buttons[i]);
+            panels.get(iPanel).add(labelTrackTable);
             panels.get(iPanel).add(buttons[i++]);
             panels.get(iPanel).add(buttons[i++]);
             panels.get(iPanel).add(buttons[i++]);
@@ -251,6 +258,10 @@ public class Registration implements PlugIn, ImageListener {
 
             if (e.getActionCommand().equals(actions[i++])) {
 
+                //
+                // Set nx, ny
+                //
+
                 Roi r = imp.getRoi();
 
                 if(r==null || !r.getTypeAsString().equals("Rectangle")) {
@@ -259,7 +270,23 @@ public class Registration implements PlugIn, ImageListener {
                 }
 
                 gui_pTrackingSize = new Point3D((int)r.getFloatWidth(), (int)r.getFloatHeight(), gui_pTrackingSize.getZ() );
-                trackingGUI.changeTextField(0, ""+(int)gui_pTrackingSize.getX()+","+(int)gui_pTrackingSize.getY()+","+(int)gui_pTrackingSize.getZ());
+                trackingGUI.changeTextField(0, "" + (int) gui_pTrackingSize.getX() + "," + (int) gui_pTrackingSize.getY() + "," + (int) gui_pTrackingSize.getZ());
+
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+                //
+                //  Set nz
+                //
+
+                int z = imp.getZ()-1;
+                if (previouslySelectedZ==-1) {
+                    // first time do nothing
+                } else {
+                    int nz = Math.abs(z - previouslySelectedZ);
+                    gui_pTrackingSize = new Point3D(gui_pTrackingSize.getX(), gui_pTrackingSize.getY(), nz);
+                    trackingGUI.changeTextField(0, "" + (int) gui_pTrackingSize.getX() + "," + (int) gui_pTrackingSize.getY() + "," + (int) gui_pTrackingSize.getZ());
+                }
+                previouslySelectedZ = z;
 
             } else if (e.getActionCommand().equals(actions[i++])) {
 
