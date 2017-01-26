@@ -322,7 +322,7 @@ public class VirtualStackOfStacks extends ImageStack {
             ps = new Point3D(nX, nY, nZ);
         }
 
-        ImagePlus imp = getCubeByTimeOffsetAndSize(t, c, (int)pSubSample.getZ(), po, ps);
+        ImagePlus imp = getCubeByTimeOffsetAndSize(t, c, pSubSample, po, ps);
         if( (int)pSubSample.getX()>1 || (int)pSubSample.getY()>1) {
             return(resizeWidthAndHeight(imp,(int)pSubSample.getX(),(int)pSubSample.getY()));
         } else {
@@ -330,37 +330,7 @@ public class VirtualStackOfStacks extends ImageStack {
         }
     }
 
-    public ImagePlus getCubeByTimeCenterAndRadii(int t, int c, Point3D psub, Point3D pc, Point3D pr) {
-
-        if(Globals.verbose) {
-            log("# VirtualStackOfStacks.getCroppedFrameCenterRadii");
-            log("t: "+t);
-            log("c: "+c);
-            }
-
-        FileInfoSer fi = infos[0][0][0];
-
-        if(fi.isCropped) {
-            // load cropped slice
-            pc = pc.add(fi.getCropOffset());
-        }
-
-        if(infos[c][t] == null) {
-            // file info not yet loaded => get it!
-            setStackFromFile(t, c);
-        }
-
-        ImagePlus imp = new OpenerExtensions().openCroppedStackCenterRadii(directory, infos[c][t], (int) psub.getZ(), pc, pr);
-
-        if (imp==null) {
-            log("Error: loading failed!");
-            return null;
-        } else {
-            return imp;
-        }
-    }
-
-    public ImagePlus getCubeByTimeOffsetAndSize(int t, int c, int dz, Point3D po, Point3D ps) {
+    public ImagePlus getCubeByTimeOffsetAndSize(int t, int c, Point3D po, Point3D pSize, Point3D pSubSample) {
 
         if(Globals.verbose) {
             log("# VirtualStackOfStacks.getCroppedFrameOffsetSize");
@@ -379,13 +349,17 @@ public class VirtualStackOfStacks extends ImageStack {
             setStackFromFile(t, c);
         }
 
-        ImagePlus imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);
+        ImagePlus imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], (int) pSubSample.getZ(), po, pSize);
 
         if (imp==null) {
             log("Error: loading failed!");
             return null;
         } else {
-            return imp;
+            if( (int)pSubSample.getX()>1 || (int)pSubSample.getY()>1) {
+                return(resizeWidthAndHeight(imp,(int)pSubSample.getX(),(int)pSubSample.getY()));
+            } else {
+                return(imp);
+            }
         }
     }
 
@@ -469,3 +443,35 @@ public class VirtualStackOfStacks extends ImageStack {
             deleteSlice(nSlices);
     }*/
 
+/*
+// todo: put the conversion from centerRadii to offsetSize into this function
+    public ImagePlus getCubeByTimeCenterAndRadii(int t, int c, Point3D psub, Point3D pc, Point3D pr) {
+
+        if(Globals.verbose) {
+            log("# VirtualStackOfStacks.getCroppedFrameCenterRadii");
+            log("t: "+t);
+            log("c: "+c);
+            }
+
+        FileInfoSer fi = infos[0][0][0];
+
+        if(fi.isCropped) {
+            // load cropped slice
+            pc = pc.add(fi.getCropOffset());
+        }
+
+        if(infos[c][t] == null) {
+            // file info not yet loaded => get it!
+            setStackFromFile(t, c);
+        }
+
+        ImagePlus imp = new OpenerExtensions().openCroppedStackCenterRadii(directory, infos[c][t], (int) psub.getZ(), pc, pr);
+
+        if (imp==null) {
+            log("Error: loading failed!");
+            return null;
+        } else {
+            return imp;
+        }
+    }
+    */

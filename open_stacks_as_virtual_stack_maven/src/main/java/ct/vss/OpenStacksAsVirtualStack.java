@@ -98,6 +98,27 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         return true;
     }
 
+
+    public boolean checkIfHdf5DataSetExists(IHDF5Reader reader) {
+        String dataSets = "";
+        boolean dataSetExists = false;
+
+        for (String dataSet : reader.getGroupMembers("/")) {
+            if (dataSet.equals(h5DataSet)) {
+                dataSetExists = true;
+            }
+            dataSets += "- " + dataSet + "\n";
+        }
+
+        if (!dataSetExists) {
+            IJ.showMessage("The selected Hdf5 data set does not exist; " +
+                    "please change to one of the following:\n\n" +
+                    dataSets);
+        }
+
+        return dataSetExists;
+    }
+
     public ImagePlus openFromInfoFile(String directory, String fileName){
 
         File f = new File(directory+fileName);
@@ -208,23 +229,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             //
             // Check whether the data set exists
-            // todo: put into own function
-            String dataSets = "";
-            boolean dataSetExists = false;
-            for (String dataSet : reader.getGroupMembers("/"))
-            {
-                if(dataSet.equals(h5DataSet)) {
-                    dataSetExists = true;
-                }
-                dataSets += "- " + dataSet + "\n";
-            }
-
-            if(!dataSetExists) {
-                IJ.showMessage("The selected Hdf5 data set does not exist; " +
-                        "please change to one of the following:\n" +
-                        dataSets);
-                return null;
-            }
+            //
+            if(!checkIfHdf5DataSetExists(reader)) return null;
 
             HDF5DataSetInformation dsInfo = reader.object().getDataSetInformation("/" + h5DataSet);
 
@@ -589,104 +595,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     }
 
-    // todo: implement
-    public void checkFiles() {
-    /*
-    if(checkOffsets) {
-        log("# Checking offsets to first image in all files");
-        long offset0 = 0;
-        boolean differentOffsets = false;
-        for (int i = 0; i < list.length; i++) {
-            try {
-                TiffDecoderExtension tde = new TiffDecoderExtension(directory, list[i]);
-                fi = tde.getFirstIFD();
-                if (fi == null) {
-                    IJ.showMessage("Tiff file checking", "Could not open " + directory + list[i]);
-                }
-            } catch (IOException ex) {
-                IJ.showMessage("File Checking", ex.toString());
-                return null;
-            }
-            if (i == 0) {
-                offset0 = fi.getOffset();
-                log("File: " + list[i]);
-                log("Offset: " + fi.getOffset());
-            } else if (fi.getOffset() != offset0) {
-                log("File: " + list[i]);
-                log("Offset:" + i + ": " + fi.getOffset());
-                differentOffsets = true;
-            }
-        }
-        if (differentOffsets) {
-            log("");
-            log("There have been different offsets!");
-            log("");
-        } else {
-            log("All offsets are the same.");
-        }
-    }
-    log("# Analyzing IFDs from: " + list[0]);
-    info = Opener.getTiffFileInfo(directory + list[0]);
-
-    if (info == null) {
-        log("Failed to open file!");
-        return (null);
-    }
-
-    if (info[0].width==0) {
-        IJ.showMessage("File Checking", "This folder does not appear to contain only TIFF Stacks");
-        return null;
-    }
-
-    fi = info[0]; // Set first IFD as reference
-
-    if(info.length > 1) {
-        log("Number of IFDs: " + info.length);
-        log("nImages: " + info[0].nImages);
-
-        int size = 0, sizeOfFirstImage = 0, gapBetweenImages = 0, gapBetweenFirstImages = 0;
-        for (int j = 0; j < info.length-1; j++) {
-            size = info[j].width*info[j].height*info[j].getBytesPerPixel();
-            gapBetweenImages = (int) (info[j+1].getOffset() - info[j].getOffset() - size);
-            //log(""+info[j].getOffset());
-            if (j==0) {
-                gapBetweenFirstImages = gapBetweenImages;
-                sizeOfFirstImage = size;
-                log("gapBetweenImages "+ j + ": " + gapBetweenFirstImages);
-                log("image size "+ j + ": " + sizeOfFirstImage);
-            } else if (gapBetweenImages != gapBetweenFirstImages) {
-                log("gapBetweenImages " + j + ": " + gapBetweenImages);
-                log("image size "+ j + ": " + size);
-                gapBetweenFirstImages = gapBetweenImages;
-                //IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
-                //return null;
-            }
-            if (size != sizeOfFirstImage) {
-                log("Size of image 1: " + sizeOfFirstImage);
-                log("Size of image "+j+": " + size);
-                log("Gap between images: " + gapBetweenImages);
-                //IJ.showMessage("Import image stack", "Inconsistent image stack; check log window!");
-                //return null;
-            }
-            //log("Size image: "+info[j].width*info[j].height*info[j].getBytesPerPixel());
-            //log("Gap between images: " + gapBetweenImages);
-        }
-        log("Size of all images: "+info[0].width*info[0].height*info[0].getBytesPerPixel());
-        log("Gap between all images: " + gapBetweenImages);
-        fi.gapBetweenImages = gapBetweenFirstImages;
-    } else {
-        log("Number of IFDs: " + info.length);
-        log("nImages: " + fi.nImages);
-        log("Image size [B]: " + fi.width * fi.height * fi.getBytesPerPixel());
-        log("gapBetweenImages: " + fi.gapBetweenImages);
-    }
-    log("File checking done.\n");
-*/
-
-
-
-}
-
     // opens a new (info-based) view on the data
     // todo: call the OffsetSize method from this
     public static ImagePlus openCroppedCenterRadiusFromInfos(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] pc, Point3D pr, int tMin, int tMax) {
@@ -697,7 +605,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         Point3D pcCurate;
 
         for(int t=tMin; t<=tMax; t++) {
-            pcCurate = OpenStacksAsVirtualStack.curatePosition(imp, pc[t-tMin], pr);
+            pcCurate = curatePositionCenterRadii(imp, pc[t-tMin], pr);
             po[t-tMin] = pcCurate.subtract(pr);
         }
 
@@ -705,7 +613,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     }
 
-    public static Point3D curatePosition(ImagePlus imp, Point3D p, Point3D pr) {
+    public static Point3D curatePositionCenterRadii(ImagePlus imp, Point3D p, Point3D pr) {
         boolean shifted = false;
 
         // round the values
@@ -736,6 +644,45 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
         if (z-rz < 0) {
             IJ.showMessage("z_radius*margin_factor is too large; please reduce!");
+            throw new IllegalArgumentException("out of range");
+        }
+        if(shifted) {
+            log("!! image: "+imp.getTitle()+": cropping region needed to be shifted to stay within image bounds.");
+        }
+        return(new Point3D(x,y,z));
+    }
+
+    public static Point3D curatePositionOffsetSize(ImagePlus imp, Point3D po, Point3D ps) {
+        boolean shifted = false;
+
+        // round the values
+        int x = (int) (po.getX()+0.5);
+        int y = (int) (po.getY()+0.5);
+        int z = (int) (po.getZ()+0.5);
+        int xs = (int) (ps.getX()+0.5);
+        int ys = (int) (ps.getY()+0.5);
+        int zs = (int) (ps.getZ()+0.5);
+
+        // make sure that the ROI stays within the image bounds
+        if (x < 0) {x = 0; shifted = true;}
+        if (y < 0) {y = 0; shifted = true;}
+        if (z < 0) {z = 0; shifted = true;}
+
+        if (x+xs > imp.getWidth()-1) {x = imp.getWidth()-xs-1; shifted = true;}
+        if (y+ys > imp.getHeight()-1) {y = imp.getHeight()-ys-1; shifted = true;}
+        if (z+zs > imp.getNSlices()-1) {z = imp.getNSlices()-zs-1; shifted = true;}
+
+        // check if it is ok now, otherwise the chosen radius simply is too large
+        if (x < 0)  {
+            IJ.showMessage("object size in x is too large; please reduce!");
+            throw new IllegalArgumentException("out of range");
+        }
+        if (y < 0){
+            IJ.showMessage("object size in y is too large; please reduce!");
+            throw new IllegalArgumentException("out of range");
+        }
+        if (z < 0) {
+            IJ.showMessage("object size in z is too large; please reduce!");
             throw new IllegalArgumentException("out of range");
         }
         if(shifted) {
@@ -927,11 +874,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //final String directory = "/Users/tischi/Desktop/example-data/Leica single tif files/";
         //final String directory = "/Users/tischi/Desktop/example-data/Leica single tif files 2channels/";
 
-        final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
+        //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
         //final String directory = "/Users/tischi/Desktop/example-data/compressed/";
         //final String directory = "/Volumes/My Passport/Res_13/";
-        //String directory = "/Users/tischi/Desktop/example-data/MATLABtiff/";
+        final String directory = "/Users/tischi/Desktop/example-data/tracking_test/";
         //String filter = null;
 
         //String openingMethod = "tiffLoadAllIFDs";

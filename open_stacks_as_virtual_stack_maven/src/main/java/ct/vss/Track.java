@@ -10,6 +10,7 @@ public class Track {
     int[] t;
     int[] c; // todo: why c? change from array to index
     Point3D[] p;
+    Point3D objectSize;
     int i;
     int n;
     boolean completed = false;
@@ -31,6 +32,14 @@ public class Track {
         this.t[i] = t;
         this.c[i] = c;
         i++;
+    }
+
+    public void setObjectSize(Point3D p) {
+        this.objectSize = p;
+    }
+
+    public Point3D getObjectSize() {
+        return(this.objectSize);
     }
 
     public void reset() {

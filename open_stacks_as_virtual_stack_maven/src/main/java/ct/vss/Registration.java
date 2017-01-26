@@ -48,9 +48,10 @@ public class Registration implements PlugIn, ImageListener {
     // gui variables
     int gui_ntTracking, gui_bg;
     int gui_iterations = 6;
-    Point3D gui_pCenterOfMassRadii;
+    Point3D gui_pTrackingSize;
     Point3D gui_pCropRadii;
-    Point3D gui_pSubSample = new Point3D(1,1,1);
+    Point3D gui_pCropSize;
+    Point3D gui_pSubSample = new Point3D(3,3,3);
     int gui_tSubSample = 1;
     ArrayList<Track> Tracks = new ArrayList<Track>();
     ArrayList<Roi> rTrackStarts = new ArrayList<Roi>();
@@ -85,8 +86,7 @@ public class Registration implements PlugIn, ImageListener {
         JFrame frame;
 
         String[] texts = {
-                "Object tracking radii: x, y, z [pix]",
-                "Object cropping radii: x, y, z [pix]",
+                "Tracking object size: nx, ny, nz [pix]",
                 "Tracking sub-sampling: dx, dy, dz, dt [pix]",
                 "Track length [frames]"
         };
@@ -95,8 +95,6 @@ public class Registration implements PlugIn, ImageListener {
                 //"Add Track Start",
                 "Track selected object",
                 "Show tracked objects",
-                "Track whole data set",
-                "Show tracked data set",
                 "Show track table",
                 "Save track table",
                 "Clear track table",
@@ -105,8 +103,7 @@ public class Registration implements PlugIn, ImageListener {
 
 
         String[] defaults = {
-                String.valueOf((int) gui_pCenterOfMassRadii.getX()) + "," + (int) gui_pCenterOfMassRadii.getY() + "," +String.valueOf((int) gui_pCenterOfMassRadii.getZ()),
-                String.valueOf((int) gui_pCropRadii.getX()) + "," + ((int) gui_pCropRadii.getY()) + "," + String.valueOf((int) gui_pCropRadii.getZ()),
+                String.valueOf((int) gui_pTrackingSize.getX()) + "," + (int) gui_pTrackingSize.getY() + "," +String.valueOf((int) gui_pTrackingSize.getZ()),
                 String.valueOf((int) gui_pSubSample.getX() + "," + (int) gui_pSubSample.getY() + "," + (int) gui_pSubSample.getZ() + "," + gui_tSubSample),
                 String.valueOf(imp.getNFrames())
         };
@@ -170,7 +167,6 @@ public class Registration implements PlugIn, ImageListener {
             //
             // ComboBoxes
             //
-
             JComboBox[] comboBoxes = new JComboBox[comboNames.length];
             JLabel[] comboLabels = new JLabel[comboNames.length];
 
@@ -213,11 +209,6 @@ public class Registration implements PlugIn, ImageListener {
             panels.add(new JPanel());
             panels.get(iPanel).add(buttons[i++]);
             panels.get(iPanel).add(buttons[i++]);
-            c.add(panels.get(iPanel++));
-
-            panels.add(new JPanel());
-            panels.get(iPanel).add(buttons[i++]);
-            panels.get(iPanel).add(buttons[i++]);
             panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
@@ -243,6 +234,7 @@ public class Registration implements PlugIn, ImageListener {
         }
 
         public void actionPerformed(ActionEvent e) {
+
             int i = 0, j = 0, k = 0;
             JFileChooser fc;
             final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
@@ -253,14 +245,10 @@ public class Registration implements PlugIn, ImageListener {
                 // Track selected object
                 //
 
-                if(gui_trackingMethod.equals("correlation")) {
-                    IJ.showMessage("Object tracking with correlation is not yet implemented.");
-                    return;
-                }
 
                 Roi r = imp.getRoi();
-                if (r == null || !r.getTypeAsString().equals("Point")) {
-                    IJ.showMessage("Please use IJ's 'Point selection tool' on image: '" + imp.getTitle()+"'");
+                if (r == null || ! (r.getTypeAsString().equals("Point") || r.getTypeAsString().equals("Rectangle")) ) {
+                    IJ.showMessage("Please use ImageJ's 'Point' or 'Rectangular' selection tool on image: '" + imp.getTitle()+"'");
                     return;
                 }
 
@@ -271,7 +259,7 @@ public class Registration implements PlugIn, ImageListener {
                 if( iNewTrack >= 0 ) {
                     trackStatsLastTrackStarted = System.currentTimeMillis();
                     trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
-                    es.execute(new Registration.TrackROI(iNewTrack, gui_tSubSample, gui_pSubSample, gui_pCenterOfMassRadii, gui_bg, gui_iterations));
+                    es.execute(new Registration.Tracking(iNewTrack, gui_pSubSample, gui_tSubSample, gui_bg, gui_iterations));
                 }
 
             } else if (e.getActionCommand().equals(actions[i++])) {
@@ -282,33 +270,7 @@ public class Registration implements PlugIn, ImageListener {
 
                 showCroppedTracks();
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
-
-                //
-                // Track whole data set
-                //
-
-                // Add track start ...
-                int iNewTrack = addTrackStartWholeDataSet(imp);
-
-                // ... and start tracking immediately
-                if( iNewTrack >= 0 ) {
-
-                    trackStatsLastTrackStarted = System.currentTimeMillis();
-                    trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
-                    es.execute(new Registration.TrackAll(iNewTrack, gui_pSubSample, gui_tSubSample, gui_bg));
-
-                }
-
-            } else if (e.getActionCommand().equals(actions[i++])) {
-
-                //
-                // View whole tracked Data set
-                //
-
-                showWholeDataSetAlongTracks();
-
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            }  else if (e.getActionCommand().equals(actions[i++])) {
 
                 //
                 // Show Table
@@ -363,22 +325,12 @@ public class Registration implements PlugIn, ImageListener {
             }  else if (e.getActionCommand().equals(texts[k++])) {
 
                 //
-                // Tracking radii
+                // Tracking object size
                 //
 
                 JTextField source = (JTextField) e.getSource();
                 String[] sA = source.getText().split(",");
-                gui_pCenterOfMassRadii = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
-
-            } else if (e.getActionCommand().equals(texts[k++])) {
-
-                //
-                // Cropping radii
-                //
-
-                JTextField source = (JTextField) e.getSource();
-                String[] sA = source.getText().split(",");
-                gui_pCropRadii = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
+                gui_pTrackingSize = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
 
             } else if (e.getActionCommand().equals(texts[k++])) {
 
@@ -396,6 +348,7 @@ public class Registration implements PlugIn, ImageListener {
                 //
                 // Track length
                 //
+
                 JTextField source = (JTextField) e.getSource();
                 gui_ntTracking = new Integer(source.getText());
 
@@ -474,8 +427,7 @@ public class Registration implements PlugIn, ImageListener {
             );
         }
         this.vss = vss;
-        gui_pCenterOfMassRadii = new Point3D(30,30,5);
-        gui_pCropRadii = new Point3D(60,60,10);
+        gui_pTrackingSize = new Point3D(200,200,30);
         gui_ntTracking = imp.getNFrames();
         gui_bg = (int) imp.getProcessor().getMin();
         trackTable = new TrackTable();
@@ -673,16 +625,34 @@ public class Registration implements PlugIn, ImageListener {
     }
 
     public int addTrackStart(ImagePlus imp) {
-        int x,y,t;
+        Point3D p0 = null;
+        Point3D p1 = null;
+        Point3D pSize;
+
+        int t;
         Roi r = imp.getRoi();
 
-        if(!r.getTypeAsString().equals("Point")) {
-            IJ.showMessage("Please use IJ's 'Point selection tool' to mark objects.");
-            return(-1);
-        }
+        if(r.getTypeAsString().equals("Rectangle")) {
+            //
+            // Determine z0 and z1
+            //
 
-        x = r.getPolygon().xpoints[0];
-        y = r.getPolygon().ypoints[0];
+            // todo: openGUI to determine z
+
+            p0 = new Point3D(r.getPolygon().xpoints[0], r.getPolygon().ypoints[0], 0);
+            p1 = new Point3D(r.getPolygon().xpoints[1], r.getPolygon().ypoints[1], 0);
+            pSize = p1.subtract(p0);
+
+            // todo: update gui_pTrackingSize
+
+        } else if(r.getTypeAsString().equals("Point")) {
+
+            pSize = gui_pTrackingSize;
+            p0 = new Point3D(r.getPolygon().xpoints[0],
+                             r.getPolygon().ypoints[0],
+                             imp.getZ()-1);
+
+        }
 
         int ntTracking = gui_ntTracking;
         t = imp.getT()-1;
@@ -696,8 +666,8 @@ public class Registration implements PlugIn, ImageListener {
         int newTrackID = Tracks.size();
         //log("added new track start; id = "+newTrackID+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
         Tracks.add(new Track(ntTracking));
-        Tracks.get(newTrackID).addLocation(new Point3D(x, y, imp.getZ()-1), t, imp.getC()-1);
-
+        Tracks.get(newTrackID).addLocation(p0, t, imp.getC() - 1);
+        Tracks.get(newTrackID).setObjectSize(gui_pTrackingSize);
         return(newTrackID);
 
     }
@@ -835,9 +805,9 @@ public class Registration implements PlugIn, ImageListener {
         // concurrently; which could lead to disruption of the imp overlay
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                int rx = (int) gui_pCenterOfMassRadii.getX();
-                int ry = (int) gui_pCenterOfMassRadii.getY();
-                int rz = (int) gui_pCenterOfMassRadii.getZ();
+                int rx = (int) track.getObjectSize().getX()/2;
+                int ry = (int) track.getObjectSize().getY()/2;
+                int rz = (int) track.getObjectSize().getZ()/2;
 
                 Roi roi;
                 Overlay o = imp.getOverlay();
@@ -864,359 +834,27 @@ public class Registration implements PlugIn, ImageListener {
         });
     }
 
-
-    // todo: make one class out of the three tracking classes!!
-    class TrackROI implements Runnable {
-        // todo: reload more data if necessary
-        int iTrack, dt, bg, iterations;
-        Point3D pCenterOfMassRadii, pOffset, pLocalCenter, pSubSample;
-
-        TrackROI(int iTrack, int dt, Point3D pSubSample, Point3D pCenterOfMassRadii, int bg, int iterations) {
-            this.iTrack = iTrack;
-            this.dt = dt;
-            this.pSubSample = pSubSample;
-            this.iterations = iterations;
-            this.pCenterOfMassRadii = pCenterOfMassRadii;
-            this.bg = bg;
-        }
-
-        public void run() {
-            long startTime = 0, stopTime, elapsedReadingTime, elapsedProcessingTime;
-            long startTimePerTimePoint, totalElapsedTime = 0;
-            int mean;
-            ImageStack stack;
-
-            Track track = Tracks.get(iTrack);
-
-            int tStart = track.getTmin();
-            int channel = track.getC(0);
-            int nt = track.getLength();
-            Point3D pStackCenter = track.getXYZ(0);
-            track.reset();
-            Point3D pStackRadii = pCenterOfMassRadii.multiply(2.0);
-
-            if (Globals.verbose) {
-                log("# Registration.track3D:");
-                log("iTrack: "+iTrack);
-                log("tStart, tMax, dt " + tStart + "," + (tStart+nt-1) + "," + dt);
-                log("pTrackStart "+pStackCenter.toString());
-            }
-
-            for (int it = tStart; it < tStart+nt; it = it + dt) {
-
-                // get stack, ensuring that extracted stack is still within bounds
-                pStackCenter = OpenStacksAsVirtualStack.curatePosition(imp, pStackCenter, pStackRadii);
-                startTime = System.currentTimeMillis();
-                stack = vss.getCubeByTimeCenterAndRadii(it, channel, pSubSample, pStackCenter, pStackRadii).getStack();
-                stopTime = System.currentTimeMillis();
-                elapsedReadingTime = stopTime - startTime;
-
-                // compute center of mass (in zero-based local stack coordinates)
-                startTime = System.currentTimeMillis();
-                mean = computeMean16bit(stack);
-                pLocalCenter = iterativeCenterOfMass16bit(stack, mean, pCenterOfMassRadii, iterations);
-                // correct for the sub-sampling
-                pLocalCenter = multiplyPoint3dComponents(pLocalCenter, pSubSample);
-                stopTime = System.currentTimeMillis();
-                elapsedProcessingTime = stopTime - startTime;
-                //log("Computed center of mass [ms]: " + elapsedTime);
-
-                // compute offset to zero-based center of stack
-                pOffset = pLocalCenter.subtract(pStackRadii);
-                //pOffset = pOffset.subtract(pOnes);
-
-                // update time-points, using linear interpolation
-                for (int j = 0; j < dt; j++) {
-                    if ((it + j) < imp.getNFrames()) {
-
-                        Point3D p = pStackCenter.add(pOffset.multiply((j + 1.0) / dt));
-
-                        //
-                        // Add to track
-                        // - thread safe, because only this thread is accessing this particular track
-                        //
-                        track.addLocation(p, it + j, channel);
-
-                        //
-                        // Update global track table and imp.overlay
-                        // - thread safe, because both internally use SwingUtilities.invokeLater
-                        //
-                        trackTable.addRow(new Object[]{
-                                String.format("%1$04d",iTrack)+"_"+String.format("%1$05d",it),
-                                (float)p.getX(), (float)p.getY(), (float)p.getZ(), it, iTrack
-                                //totalElapsedTime, elapsedReadingTime, elapsedProcessingTime
-                        });
-
-                        addTrackToOverlay(track, it + j - tStart);
-
-
-                    }
-                }
-
-                // update next center using Brownian motion model (position of next is same as this)
-                // todo:
-                // - also have a linear motion model for the update, i.e. add pOffset*2
-                pStackCenter = pStackCenter.add(pOffset);
-
-
-                // show progress
-                int n = totalTimePointsTracked.addAndGet(dt);
-                if( (System.currentTimeMillis() > trackStatsReportDelay+trackStatsLastReport)
-                        || (n==totalTimePointsToBeTracked))
-                    {
-                    trackStatsLastReport = System.currentTimeMillis();
-
-                    long dtt = System.currentTimeMillis()-trackStatsLastTrackStarted;
-                    int dn = n - trackStatsTotalPointsTrackedAtLastStart;
-                    int nToGo = totalTimePointsToBeTracked - n;
-                    float speed = (float)1.0*dn/dtt*1000;
-                    float remainingTime = (float)1.0*nToGo/speed;
-
-                    Globals.threadlog(
-                            "progress = "+n+"/"+totalTimePointsToBeTracked+
-                            "; speed [n/s] = "+String.format("%.2g",speed)+
-                            "; remaining [s] = "+String.format("%.2g",remainingTime)+
-                            "; reading [ms] = "+elapsedReadingTime+
-                            "; processing [ms] = "+elapsedProcessingTime
-                    );
-                }
-
-                if(Globals.verbose) {
-                    log("Read data [ms]: " + elapsedReadingTime);
-                    log("Read data [ms]: " + elapsedReadingTime);
-                    log("Reading speed [MB/s]: " + stack.getHeight() * stack.getWidth() * stack.getSize() * 2 / ((elapsedReadingTime + 0.001) * 1000));
-                    log("Detected shift [pixel]:" +
-                            " x:" + String.format("%.2g", pOffset.getX()) +
-                            " y:" + String.format("%.2g", pOffset.getY()) +
-                            " z:" + String.format("%.2g", pOffset.getZ()));
-                }
-
-            }
-
-            //Globals.threadlog("track id = "+iTrack+"; nt [frames] = "+nt+"; completed.");
-            track.completed = true;
-            return;
-        }
-    }
-
-    class TrackAll implements Runnable {
-        int iTrack, dt, bg;
-        Point3D pSubSample;
-
-        TrackAll(int iTrack, Point3D pSubSample, int gui_tSubSample, int bg) {
-            this.iTrack = iTrack;
-            this.dt = gui_tSubSample;
-            this.pSubSample = pSubSample;
-            this.bg = bg;
-        }
-
-        public void run() {
-            long startTime, stopTime, elapsedReadingTime, elapsedProcessingTime;
-            ImagePlus imp0, imp1;
-            Point3D pShift = new Point3D(0,0,0);
-            Point3D pCenter0 = new Point3D(0,0,0);
-            Point3D pCenter1 = new Point3D(0,0,0);
-            int mean;
-
-            Track track = Tracks.get(iTrack);
-
-            int tStart = track.getTmin();
-            int channel = track.getC(0);
-            int nt = track.getLength();
-            track.reset();
-
-
-            if (Globals.verbose) {
-                log("# Registration.TrackWholeDataSet:");
-                log("iTrack: "+iTrack);
-                log("tStart, tMax, dt, dz " + tStart + "," + (tStart+nt-1) + "," + dt );
-            }
-
-            //
-            // init first time-point
-            //
-
-            // get  image
-            imp0 = vss.getFullFrame(tStart, channel, pSubSample);
-
-            // compute center of mass above background (=mean)
-            startTime = System.currentTimeMillis();
-            mean = computeMean16bit(imp0.getStack());
-            pCenter0 = computeCenter16bit(imp0.getStack(), mean, new Point3D(0.0, 0.0, 0.0), new Point3D(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE));
-            elapsedProcessingTime = System.currentTimeMillis() - startTime;
-
-            // correct for sub-sampling
-            pCenter0 = multiplyPoint3dComponents(pCenter0, pSubSample);
-
-            // subtract background for correlation tracking
-            if(gui_trackingMethod.equals("correlation")) {
-                IJ.run(imp0, "Subtract...", "value="+mean);
-            }
-
-
-            //
-            // compute shifts
-            //
-
-            boolean finish = false;
-            int itMax = tStart + nt - 1;
-            int itPrevious = tStart;
-            int itNow;
-            int itMaxUpdate;
-
-            for (int it = tStart + dt; it < tStart + nt + dt; it = it + dt) {
-
-                itNow = it;
-
-                if(itNow >= itMax) {
-                    // due to the sub-sampling in t the addition of dt
-                    // caused the frame to be outside of
-                    // the tracking range => load the last frame and adjust dt
-                    // (this happens because nt might not be divisible by dt)
-                    itNow = itMax;
-                    finish = true;
-                }
-
-                // get next image
-                startTime = System.currentTimeMillis();
-                imp1 = vss.getFullFrame(itNow, channel, pSubSample);
-                stopTime = System.currentTimeMillis();
-                elapsedReadingTime = stopTime - startTime;
-
-                if (gui_trackingMethod.equals("correlation")) {
-
-                    // compute shift
-                    startTime = System.currentTimeMillis();
-                    IJ.run(imp1, "Subtract...", "value="+computeMean16bit(imp1.getStack()));
-                    pShift = computeShift16bitUsingPhaseCorrelation(imp0, imp1);
-                    stopTime = System.currentTimeMillis();
-                    elapsedProcessingTime = stopTime - startTime;
-
-                    // correct for sub-sampling
-                    pShift = multiplyPoint3dComponents(pShift, pSubSample);
-                    pCenter1 = pCenter0.add(pShift);
-
-                } else if (gui_trackingMethod == "center of mass") {
-
-                    // compute center of mass
-                    // ...using the mean of the stack as threshold
-                    startTime = System.currentTimeMillis();
-                    pCenter1 = computeCenter16bit(imp1.getStack(), computeMean16bit(imp1.getStack()), new Point3D(0.0, 0.0, 0.0), new Point3D(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE));
-                    stopTime = System.currentTimeMillis();
-                    elapsedProcessingTime = stopTime - startTime;
-
-                    // correct for the sub-sampling in z
-                    pCenter1 = multiplyPoint3dComponents(pCenter1, pSubSample);
-
-                    // compute shift
-                    pShift = pCenter1.subtract(pCenter0);
-
-                }
-
-                // compute time-points between this and the previous one (inclusive)
-                // using linear interpolation
-
-                itMaxUpdate = itNow - 1;
-                if(finish) itMaxUpdate = itNow; // include last data point
-
-                for (int itUpdate = itPrevious; itUpdate <= itMaxUpdate; itUpdate++) {
-
-                    Point3D p;
-                    p = pCenter0.add(pShift.multiply((double)(itUpdate-itPrevious)/(double)(itNow-itPrevious)));
-
-                    //
-                    // Add to track
-                    // - thread safe, because only this thread is accessing this particular track
-                    //
-                    track.addLocation(p, itUpdate, channel);
-
-
-                    // Update global track table and imp.overlay
-                    // - thread safe, because both internally use SwingUtilities.invokeLater
-                    //
-                    trackTable.addRow(new Object[]{
-                            String.format("%1$04d", iTrack) + "_" + String.format("%1$05d", itUpdate ),
-                            (float) p.getX(), (float) p.getY(), (float) p.getZ(), itUpdate, iTrack
-                            //totalElapsedTime, elapsedReadingTime, elapsedProcessingTime
-                    });
-
-                    addTrackToOverlay(track, itUpdate - tStart);
-
-                }
-                itPrevious = itNow;
-
-                //
-                // show progress
-                //
-                int n = totalTimePointsTracked.addAndGet(dt);
-                if( (System.currentTimeMillis() > trackStatsReportDelay+trackStatsLastReport)
-                        || (n==totalTimePointsToBeTracked))
-                {
-                    trackStatsLastReport = System.currentTimeMillis();
-
-                    long dtt = System.currentTimeMillis()-trackStatsLastTrackStarted;
-                    int dn = n - trackStatsTotalPointsTrackedAtLastStart;
-                    int nToGo = totalTimePointsToBeTracked - n;
-                    float speed = (float)1.0*dn/dtt*1000;
-                    float remainingTime = (float)1.0*nToGo/speed;
-
-                    Globals.threadlog(
-                            "progress = "+n+"/"+totalTimePointsToBeTracked+
-                                    "; speed [n/s] = "+String.format("%.2g",speed)+
-                                    "; remaining [s] = "+String.format("%.2g",remainingTime)+
-                                    "; reading [ms] = "+elapsedReadingTime+
-                                    "; processing [ms] = "+elapsedProcessingTime
-                    );
-                }
-
-                if(Globals.verbose) {
-                    log("Read data [ms]: " + elapsedReadingTime);
-                    log("Read data [ms]: " + elapsedReadingTime);
-                    log("Reading speed [MB/s]: " + imp0.getHeight() * imp0.getWidth() * imp0.getNSlices() * 2 / ((elapsedReadingTime + 0.001) * 1000));
-                    log("New center [pixel]:" +
-                            " x:" + String.format("%d", pCenter1.getX()) +
-                            " y:" + String.format("%d", pCenter1.getY()) +
-                            " z:" + String.format("%d", pCenter1.getZ()));
-                    log(" " + pShift.toString());
-
-                }
-
-                // update reference image
-                imp0 = imp1;
-
-                // update reference point
-                pCenter0 = pCenter1;
-
-                if(finish) break;
-
-            }
-
-            track.completed = true;
-            return;
-        }
-    }
-
     class Tracking implements Runnable {
         int iTrack, dt, bg, iterations;
         boolean objectTracking = false;
-        Point3D pCenterOfMassRadii, pOffset, pLocalCenter, pSubSample;
+        Point3D pSubSample;
 
-        Tracking(int iTrack, Point3D pSubSample, Point3D pCenterOfMassRadii, int gui_tSubSample, int bg) {
+        Tracking(int iTrack, Point3D pSubSample, int gui_tSubSample, int bg, int iterations) {
             this.iTrack = iTrack;
             this.dt = gui_tSubSample;
             this.pSubSample = pSubSample;
-            this.pCenterOfMassRadii = pCenterOfMassRadii;
-            if(pCenterOfMassRadii!=null) this.objectTracking = true;
+            this.iterations = iterations;
             this.bg = bg;
         }
 
         public void run() {
             long startTime, stopTime, elapsedReadingTime, elapsedProcessingTime;
             ImagePlus imp0, imp1;
-            Point3D pShift = new Point3D(0,0,0);
-            Point3D pCenter0 = new Point3D(0,0,0);
-            Point3D pCenter1 = new Point3D(0,0,0);
-            Point3D pStackRadii = null;
+            Point3D p0offset = null;
+            Point3D p1offset = null;
+            Point3D pShift = null;
+            Point3D pSize = null;
+            int meanIntensity;
 
             Track track = Tracks.get(iTrack);
             int tStart = track.getTmin();
@@ -1224,73 +862,54 @@ public class Registration implements PlugIn, ImageListener {
             int nt = track.getLength();
             track.reset();
 
-
             //
             // init first time-point
             //
 
-            if(objectTracking) {
-
-                //
-                // get selected track start
-                //
-                pCenter0 = track.getXYZ(0);
-                pStackRadii = pCenterOfMassRadii.multiply(2.0);
-
-                //
-                // read data
-                //
-
-                // todo: implement x,y sub-sampling in getCubeByTimeCenterAndRadii
-                pSubSample = new Point3D(1,1,pSubSample.getZ());
-                // todo: maybe it is better to load a smaller part of the data instead?
-                pCenter0 = OpenStacksAsVirtualStack.curatePosition(imp, pCenter0, pStackRadii);
-                imp0 = vss.getCubeByTimeCenterAndRadii(tStart, channel, pSubSample, pCenter0, pStackRadii);
-
-                //
-                // compute center of mass (in zero-based local stack coordinates)
-                //
-
-                startTime = System.currentTimeMillis();
-                pLocalCenter = iterativeCenterOfMass16bit(imp0.getStack(), computeMean16bit(imp0.getStack()), pCenterOfMassRadii, iterations);
-                elapsedProcessingTime = System.currentTimeMillis() - startTime;
-
-                // correct for the sub-sampling
-                pLocalCenter = multiplyPoint3dComponents(pLocalCenter, pSubSample);
-
-                // compute offset to zero-based center of stack
-                pOffset = pLocalCenter.subtract(pStackRadii);
-
-                // replaced the clicked pCenter0 by the center-of-mass
-                pCenter0 = pCenter0.add(pOffset);
-
-                // compute position for loading the object in the next time point
-                // ..as don't know anything about the motions now, the same position is the best guess
-                pCenter1 = pCenter0;
-
-
-            } else {
-
-                // whole image tracking
-                imp0 = vss.getFullFrame(tStart, channel, pSubSample);
-
-                // compute center of mass
-                startTime = System.currentTimeMillis();
-                pCenter0 = computeCenter16bit(imp0.getStack(), computeMean16bit(imp0.getStack()), new Point3D(0.0, 0.0, 0.0), new Point3D(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE));
-                elapsedProcessingTime = System.currentTimeMillis() - startTime;
-
-                // correct for sub-sampling
-                pCenter0 = multiplyPoint3dComponents(pCenter0, pSubSample);
-
-            }
-
-            // subtract background for correlation tracking
-            if(gui_trackingMethod.equals("correlation")) {
-                IJ.run(imp0, "Subtract...", "value="+computeMean16bit(imp0.getStack()));
-            }
+            // get selected track coordinates
+            pSize = track.getObjectSize();
+            p0offset = computeOffset(track.getXYZ(0), pSize);
 
             //
-            // compute shifts for all following time-points
+            // read data
+            //
+
+            // todo: has to be considered for the shift computation? only for center of mass?!
+            p0offset = OpenStacksAsVirtualStack.curatePositionOffsetSize(imp, p0offset, pSize);
+            imp0 = vss.getCubeByTimeOffsetAndSize(tStart, channel, p0offset, pSize, pSubSample);
+            IJ.run(imp0, "Subtract...", "value="+computeMean16bit(imp0.getStack()));
+
+            // iteratively compute the shift of the center of mass relative to the center of the image stack
+            // using only half the image size for iteration
+            startTime = System.currentTimeMillis();
+            pShift = computeIterativeCenterOfMassShift16bit(imp0.getStack(), pSize.multiply(0.5), iterations);
+            elapsedProcessingTime = System.currentTimeMillis() - startTime;
+
+            // correct for sub-sampling
+            pShift = multiplyPoint3dComponents(pShift, pSubSample);
+
+            // drift corrected position
+            p1offset = p0offset.add(pShift);
+
+            //
+            // Add track location for first image
+            //
+            Point3D pUpdate = computeCenter(p1offset, pSize);
+            track.addLocation(pUpdate, tStart, channel);
+
+            // Update global track table and imp.overlay
+            // - thread safe, because both internally use SwingUtilities.invokeLater
+            //
+            trackTable.addRow(new Object[]{
+                    String.format("%1$04d", iTrack) + "_" + String.format("%1$05d", tStart ),
+                    (float) pUpdate.getX(), (float) pUpdate.getY(), (float) pUpdate.getZ(), tStart, iTrack
+            });
+
+            addTrackToOverlay(track, tStart - tStart);
+
+
+            //
+            // compute shifts for following time-points
             //
 
             boolean finish = false;
@@ -1311,66 +930,60 @@ public class Registration implements PlugIn, ImageListener {
                     finish = true;
                 }
 
-                //
-                // get next image
-                //
-
+                // curate position
+                p1offset = OpenStacksAsVirtualStack.curatePositionOffsetSize(imp, p1offset, pSize);
+                // load image
                 startTime = System.currentTimeMillis();
-                if(objectTracking) {
-                    pCenter1 = OpenStacksAsVirtualStack.curatePosition(imp, pCenter1, pStackRadii);
-                    imp1 = vss.getCubeByTimeCenterAndRadii(itNow, channel, pSubSample, pCenter1, pStackRadii);
-                } else {
-                    imp1 = vss.getFullFrame(itNow, channel, pSubSample);
-                }
+                imp1 = vss.getCubeByTimeOffsetAndSize(itNow, channel, p1offset, pSize, pSubSample);
                 elapsedReadingTime = System.currentTimeMillis() - startTime;
 
+                // subtract mean intensity
+                IJ.run(imp1, "Subtract...", "value="+computeMean16bit(imp1.getStack()));
 
                 if (gui_trackingMethod == "correlation") {
 
-                    // compute shift on mean subtracted image
+                    // compute shift relative to previous time-point
                     startTime = System.currentTimeMillis();
-                    IJ.run(imp1, "Subtract...", "value="+computeMean16bit(imp1.getStack()));
-                    pShift = computeShift16bitUsingPhaseCorrelation(imp0, imp1);
+                    pShift = computeShift16bitUsingPhaseCorrelation(imp1, imp0);
+                    log("pShift correlation: "+pShift);
                     stopTime = System.currentTimeMillis();
                     elapsedProcessingTime = stopTime - startTime;
 
-                    // correct for sub-sampling
-                    pShift = multiplyPoint3dComponents(pShift, pSubSample);
-                    pCenter1 = pCenter0.add(pShift);
 
                 } else if (gui_trackingMethod == "center of mass") {
 
-                    // compute center of mass
-                    // ...using the mean of the stack as threshold
+                    // compute center of mass shift
                     startTime = System.currentTimeMillis();
-                    pCenter1 = computeCenter16bit(imp1.getStack(), computeMean16bit(imp1.getStack()), new Point3D(0.0, 0.0, 0.0), new Point3D(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE));
+                    pShift = computeIterativeCenterOfMassShift16bit(imp1.getStack(), pSize.multiply(0.5), iterations);
                     stopTime = System.currentTimeMillis();
                     elapsedProcessingTime = stopTime - startTime;
 
-                    // correct for the sub-sampling in z
-                    pCenter1 = multiplyPoint3dComponents(pCenter1, pSubSample);
-
-                    // compute shift
-                    pShift = pCenter1.subtract(pCenter0);
-
                 }
+
+                // correct for sub-sampling
+                pShift = multiplyPoint3dComponents(pShift, pSubSample);
+
+                // take into account the different loading positions of the images
+                pShift = pShift.add(p1offset.subtract(p0offset));
+
 
                 // compute time-points between this and the previous one (inclusive)
                 // using linear interpolation
 
-                itMaxUpdate = itNow - 1;
+                itMaxUpdate = itNow;
                 if(finish) itMaxUpdate = itNow; // include last data point
 
-                for (int itUpdate = itPrevious; itUpdate <= itMaxUpdate; itUpdate++) {
+                for (int itUpdate = itPrevious + 1; itUpdate <= itMaxUpdate; itUpdate++) {
 
-                    Point3D p;
-                    p = pCenter0.add(pShift.multiply((double)(itUpdate-itPrevious)/(double)(itNow-itPrevious)));
+                    Point3D pPrevious = track.getXYZ(itPrevious);
+                    double interpolation = (double) (itUpdate - itPrevious) / (double) (itNow - itPrevious);
+                    pUpdate = pPrevious.add(pShift.multiply(interpolation));
 
                     //
                     // Add to track
                     // - thread safe, because only this thread is accessing this particular track
                     //
-                    track.addLocation(p, itUpdate, channel);
+                    track.addLocation(pUpdate, itUpdate, channel);
 
 
                     // Update global track table and imp.overlay
@@ -1378,14 +991,19 @@ public class Registration implements PlugIn, ImageListener {
                     //
                     trackTable.addRow(new Object[]{
                             String.format("%1$04d", iTrack) + "_" + String.format("%1$05d", itUpdate ),
-                            (float) p.getX(), (float) p.getY(), (float) p.getZ(), itUpdate, iTrack
-                            //totalElapsedTime, elapsedReadingTime, elapsedProcessingTime
+                            (float) pUpdate.getX(), (float) pUpdate.getY(), (float) pUpdate.getZ(), itUpdate, iTrack
                     });
 
                     addTrackToOverlay(track, itUpdate - tStart);
 
                 }
+
                 itPrevious = itNow;
+                imp0 = imp1;
+                p0offset = p1offset; // this need to be the real positions where the images were loaded, without
+                p1offset = p1offset.add(pShift); // those include the drift correction as those are the positions
+
+
 
                 //
                 // show progress
@@ -1403,31 +1021,14 @@ public class Registration implements PlugIn, ImageListener {
                     float remainingTime = (float)1.0*nToGo/speed;
 
                     Globals.threadlog(
-                            "progress = "+n+"/"+totalTimePointsToBeTracked+
-                                    "; speed [n/s] = "+String.format("%.2g",speed)+
-                                    "; remaining [s] = "+String.format("%.2g",remainingTime)+
-                                    "; reading [ms] = "+elapsedReadingTime+
-                                    "; processing [ms] = "+elapsedProcessingTime
+                            "progress = " + n + "/" + totalTimePointsToBeTracked +
+                                    "; speed [n/s] = " + String.format("%.2g", speed) +
+                                    "; remaining [s] = " + String.format("%.2g", remainingTime) +
+                                    "; reading [ms] = " + elapsedReadingTime +
+                                    "; processing [ms] = " + elapsedProcessingTime
                     );
                 }
 
-                if(Globals.verbose) {
-                    log("Read data [ms]: " + elapsedReadingTime);
-                    log("Read data [ms]: " + elapsedReadingTime);
-                    log("Reading speed [MB/s]: " + imp0.getHeight() * imp0.getWidth() * imp0.getNSlices() * 2 / ((elapsedReadingTime + 0.001) * 1000));
-                    log("New center [pixel]:" +
-                            " x:" + String.format("%d", pCenter1.getX()) +
-                            " y:" + String.format("%d", pCenter1.getY()) +
-                            " z:" + String.format("%d", pCenter1.getZ()));
-                    log(" " + pShift.toString());
-
-                }
-
-                // update reference image
-                imp0 = imp1;
-
-                // update reference point
-                pCenter0 = pCenter1;
 
                 if(finish) break;
 
@@ -1441,6 +1042,14 @@ public class Registration implements PlugIn, ImageListener {
 
     }
 
+    public Point3D computeOffset(Point3D pCenter, Point3D pSize) {
+        return(pCenter.subtract(pSize.multiply(0.5)));
+    }
+
+    public Point3D computeCenter(Point3D pOffset, Point3D pSize) {
+        return(pOffset.add(pSize.multiply(0.5)));
+    }
+
     public Point3D multiplyPoint3dComponents(Point3D p0, Point3D p1) {
 
         double x = p0.getX() * p1.getX();
@@ -1451,24 +1060,24 @@ public class Registration implements PlugIn, ImageListener {
 
     }
 
-    public Point3D iterativeCenterOfMass16bit(ImageStack stack, int bg, Point3D radii, int iterations) {
+    public Point3D computeIterativeCenterOfMassShift16bit(ImageStack stack, Point3D pSize, int iterations) {
         Point3D pMin, pMax;
 
-        Point3D pCenter = new Point3D(stack.getWidth()/2+0.5,stack.getHeight()/2+0.5,stack.getSize()/2+0.5);
-        //log(""+radii.toString());
-        //log(""+pCenter.toString());
-
+        // compute stack center and tracking radii
+        // at each iteration, the center of mass is only computed for a subset of the data cube
+        // this subset iteratively shifts every iteration according to the results of the center of mass computation
+        Point3D pStackSize = new Point3D(stack.getWidth(), stack.getHeight(), stack.getSize() );
+        Point3D pStackCenter = computeCenter(new Point3D(0,0,0), pStackSize);
+        Point3D pCenter = pStackCenter;
         for(int i=0; i<iterations; i++) {
-            //log("# Iteration "+i);
-            pMin = pCenter.subtract(radii);
-            pMax = pCenter.add(radii);
-            pCenter = computeCenter16bit(stack, bg, pMin, pMax);
-            //log("iterativeCenterOfMass16bit: center: "+pCenter.toString());
+            pMin = pCenter.subtract(pSize.multiply(0.5));
+            pMax = pCenter.add(pSize.multiply(0.5));
+            pCenter = computeCenter16bit(stack, pMin, pMax);
         }
-        return(pCenter);
+        return(pCenter.subtract(pStackCenter));
     }
 
-    public Point3D computeCenter16bit(ImageStack stack, int bg, Point3D pMin, Point3D pMax) {
+    public Point3D computeCenter16bit(ImageStack stack, Point3D pMin, Point3D pMax) {
 
         //long startTime = System.currentTimeMillis();
         double sum = 0.0, xsum = 0.0, ysum = 0.0, zsum = 0.0;
@@ -1484,74 +1093,41 @@ public class Registration implements PlugIn, ImageListener {
         int zmax = (depth-1) < (int) pMax.getZ() ? (depth-1) : (int) pMax.getZ();
 
         // compute one-based, otherwise the numbers at x=0,y=0,z=0 are lost for the center of mass
-        // todo: take the method if-statement of out of the loop for increased speed?!
 
-        if(bg>0) {
-
-            //
-            // ignore values <bg
-            //
-
-            if (gui_centeringMethod == "center of mass") {
-                for (int z = zmin + 1; z <= zmax + 1; z++) {
-                    ImageProcessor ip = stack.getProcessor(z);
-                    short[] pixels = (short[]) ip.getPixels();
-                    for (int y = ymin + 1; y <= ymax + 1; y++) {
-                        i = (y - 1) * width + xmin; // zero-based location in pixel array
-                        for (int x = xmin + 1; x <= xmax + 1; x++) {
-                            v = pixels[i] & 0xffff;
-                            if (v >= bg) {
-                                sum += v;
-                                xsum += x * v;
-                                ysum += y * v;
-                                zsum += z * v;
-                            }
-                            i++;
-                        }
+        if (gui_centeringMethod == "center of mass") {
+            for (int z = zmin + 1; z <= zmax + 1; z++) {
+                ImageProcessor ip = stack.getProcessor(z);
+                short[] pixels = (short[]) ip.getPixels();
+                for (int y = ymin + 1; y <= ymax + 1; y++) {
+                    i = (y - 1) * width + xmin; // zero-based location in pixel array
+                    for (int x = xmin + 1; x <= xmax + 1; x++) {
+                        v = pixels[i] & 0xffff;
+                        // v=0 is ignored automatially
+                        sum += v;
+                        xsum += x * v;
+                        ysum += y * v;
+                        zsum += z * v;
+                        i++;
                     }
                 }
             }
+        }
 
-            if (gui_centeringMethod == "centroid") {
-                for (int z = zmin + 1; z <= zmax + 1; z++) {
-                    ImageProcessor ip = stack.getProcessor(z);
-                    short[] pixels = (short[]) ip.getPixels();
-                    for (int y = ymin + 1; y <= ymax + 1; y++) {
-                        i = (y - 1) * width + xmin; // zero-based location in pixel array
-                        for (int x = xmin + 1; x <= xmax + 1; x++) {
-                            v = pixels[i] & 0xffff;
-                            if (v >= bg) {
-                                sum += 1;
-                                xsum += x;
-                                ysum += y;
-                                zsum += z;
-                            }
-                            i++;
+        if (gui_centeringMethod == "centroid") {
+            for (int z = zmin + 1; z <= zmax + 1; z++) {
+                ImageProcessor ip = stack.getProcessor(z);
+                short[] pixels = (short[]) ip.getPixels();
+                for (int y = ymin + 1; y <= ymax + 1; y++) {
+                    i = (y - 1) * width + xmin; // zero-based location in pixel array
+                    for (int x = xmin + 1; x <= xmax + 1; x++) {
+                        v = pixels[i] & 0xffff;
+                        if (v > 0) {
+                            sum += 1;
+                            xsum += x;
+                            ysum += y;
+                            zsum += z;
                         }
-                    }
-                }
-            }
-
-        } else {
-
-            //
-            // no background
-            //
-
-            if (gui_centeringMethod == "center of mass") {
-                for (int z = zmin + 1; z <= zmax + 1; z++) {
-                    ImageProcessor ip = stack.getProcessor(z);
-                    short[] pixels = (short[]) ip.getPixels();
-                    for (int y = ymin + 1; y <= ymax + 1; y++) {
-                        i = (y - 1) * width + xmin; // zero-based location in pixel array
-                        for (int x = xmin + 1; x <= xmax + 1; x++) {
-                            v = pixels[i] & 0xffff;
-                            sum += v;
-                            xsum += x * v;
-                            ysum += y * v;
-                            zsum += z * v;
-                            i++;
-                        }
+                        i++;
                     }
                 }
             }
@@ -1567,8 +1143,7 @@ public class Registration implements PlugIn, ImageListener {
         return(new Point3D(xCenter,yCenter,zCenter));
     }
 
-    // ?? why is background subtraction necessary ?
-    public Point3D computeShift16bitUsingPhaseCorrelation(ImagePlus imp0, ImagePlus imp1) {
+    public Point3D computeShift16bitUsingPhaseCorrelation(ImagePlus imp1, ImagePlus imp0) {
         PhaseCorrelation phc = new PhaseCorrelation(ImagePlusAdapter.wrap(imp1), ImagePlusAdapter.wrap(imp0), 5, true);
         phc.process();
         int[] shift = phc.getShift().getPosition();
