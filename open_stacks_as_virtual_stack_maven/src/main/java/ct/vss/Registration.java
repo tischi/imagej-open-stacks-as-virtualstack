@@ -86,7 +86,7 @@ public class Registration implements PlugIn, ImageListener {
         JFrame frame;
 
         String[] texts = {
-                "Tracking object size: nx, ny, nz [pix]",
+                "Tracking range: nx, ny, nz [pix]",
                 "Tracking sub-sampling: dx, dy, dz, dt [pix]",
                 "Track length [frames]"
         };
@@ -850,9 +850,10 @@ public class Registration implements PlugIn, ImageListener {
         public void run() {
             long startTime, stopTime, elapsedReadingTime, elapsedProcessingTime;
             ImagePlus imp0, imp1;
-            Point3D p0offset = null;
-            Point3D p1offset = null;
-            Point3D pShift = null;
+            Point3D p0offset;
+            Point3D p1offset, p1offsetCurated;
+            Point3D pShift;
+            Point3D pLocalShift = null;
             Point3D pSize = null;
             int meanIntensity;
 
@@ -882,19 +883,16 @@ public class Registration implements PlugIn, ImageListener {
             // iteratively compute the shift of the center of mass relative to the center of the image stack
             // using only half the image size for iteration
             startTime = System.currentTimeMillis();
-            pShift = computeIterativeCenterOfMassShift16bit(imp0.getStack(), pSize.multiply(0.5), iterations);
+            pShift = computeIterativeCenterOfMassShift16bit(imp0.getStack(), 0.5, iterations);
             elapsedProcessingTime = System.currentTimeMillis() - startTime;
 
             // correct for sub-sampling
             pShift = multiplyPoint3dComponents(pShift, pSubSample);
 
-            // drift corrected position
-            p1offset = p0offset.add(pShift);
-
             //
             // Add track location for first image
             //
-            Point3D pUpdate = computeCenter(p1offset, pSize);
+            Point3D pUpdate = computeCenter(p0offset.add(pShift), pSize);
             track.addLocation(pUpdate, tStart, channel);
 
             // Update global track table and imp.overlay
@@ -918,6 +916,11 @@ public class Registration implements PlugIn, ImageListener {
             int itNow;
             int itMaxUpdate;
 
+            //
+            //  Important notes for the logic:
+            //  - p0offset has to be the position where the previous images was loaded
+            //  - p1offset has to be the position where the current image was loaded
+
             for (int it = tStart + dt; it < tStart + nt + dt; it = it + dt) {
 
                 itNow = it;
@@ -930,8 +933,14 @@ public class Registration implements PlugIn, ImageListener {
                     finish = true;
                 }
 
-                // curate position
-                p1offset = OpenStacksAsVirtualStack.curatePositionOffsetSize(imp, p1offset, pSize);
+                // load next image at the same position where the previous image has been loaded (p0offset)
+                // plus the computed shift (pShift), basically a linear motion model
+                // but curate this position according to the image bounds
+                log("Position where previous image was loaded: " + p0offset);
+                log("Position where previous image was loaded plus shift: " + p0offset.add(pShift));
+                p1offset = OpenStacksAsVirtualStack.curatePositionOffsetSize(imp, p0offset.add(pShift), pSize);
+                log("Curated position where this image is loaded: " + p1offset);
+
                 // load image
                 startTime = System.currentTimeMillis();
                 imp1 = vss.getCubeByTimeOffsetAndSize(itNow, channel, p1offset, pSize, pSubSample);
@@ -945,26 +954,38 @@ public class Registration implements PlugIn, ImageListener {
                     // compute shift relative to previous time-point
                     startTime = System.currentTimeMillis();
                     pShift = computeShift16bitUsingPhaseCorrelation(imp1, imp0);
-                    log("pShift correlation: "+pShift);
                     stopTime = System.currentTimeMillis();
                     elapsedProcessingTime = stopTime - startTime;
+
+                    // correct for sub-sampling
+                    pShift = multiplyPoint3dComponents(pShift, pSubSample);
+                    log("Correlation Tracking Shift: "+pShift);
+
+                    // take into account the different loading positions of this and the previous image
+                    pShift = pShift.add(p1offset.subtract(p0offset));
+                    log("Correlation Tracking Shift including image shift: "+pShift);
 
 
                 } else if (gui_trackingMethod == "center of mass") {
 
-                    // compute center of mass shift
+                    // compute the different of the center of mass
+                    // to the geometric center of imp1
                     startTime = System.currentTimeMillis();
-                    pShift = computeIterativeCenterOfMassShift16bit(imp1.getStack(), pSize.multiply(0.5), iterations);
+                    pLocalShift = computeIterativeCenterOfMassShift16bit(imp1.getStack(), 0.5, iterations);
                     stopTime = System.currentTimeMillis();
                     elapsedProcessingTime = stopTime - startTime;
 
+                    // correct for sub-sampling
+                    pLocalShift = multiplyPoint3dComponents(pLocalShift, pSubSample);
+                    log("Center of Mass Local Shift: "+pLocalShift);
+
+                    // the drift corrected position in the global coordinate system is: p1offset.add(pLocalShift)
+                    // in center coordinates this is: computeCenter(p1offset.add(pShift),pSize)
+                    // relative to previous tracking position:
+                    pShift = computeCenter(p1offset.add(pLocalShift),pSize).subtract(track.getXYZ(itPrevious));
+                    log("Center of Mass Tracking Shift relative to previous position: "+pShift);
+
                 }
-
-                // correct for sub-sampling
-                pShift = multiplyPoint3dComponents(pShift, pSubSample);
-
-                // take into account the different loading positions of the images
-                pShift = pShift.add(p1offset.subtract(p0offset));
 
 
                 // compute time-points between this and the previous one (inclusive)
@@ -1000,9 +1021,7 @@ public class Registration implements PlugIn, ImageListener {
 
                 itPrevious = itNow;
                 imp0 = imp1;
-                p0offset = p1offset; // this need to be the real positions where the images were loaded, without
-                p1offset = p1offset.add(pShift); // those include the drift correction as those are the positions
-
+                p0offset = p1offset; // store the position where this image was loaded
 
 
                 //
@@ -1060,7 +1079,7 @@ public class Registration implements PlugIn, ImageListener {
 
     }
 
-    public Point3D computeIterativeCenterOfMassShift16bit(ImageStack stack, Point3D pSize, int iterations) {
+    public Point3D computeIterativeCenterOfMassShift16bit(ImageStack stack, double trackingFraction, int iterations) {
         Point3D pMin, pMax;
 
         // compute stack center and tracking radii
@@ -1070,8 +1089,8 @@ public class Registration implements PlugIn, ImageListener {
         Point3D pStackCenter = computeCenter(new Point3D(0,0,0), pStackSize);
         Point3D pCenter = pStackCenter;
         for(int i=0; i<iterations; i++) {
-            pMin = pCenter.subtract(pSize.multiply(0.5));
-            pMax = pCenter.add(pSize.multiply(0.5));
+            pMin = pCenter.subtract(pStackSize.multiply(trackingFraction));
+            pMax = pCenter.add(pStackSize.multiply(trackingFraction));
             pCenter = computeCenter16bit(stack, pMin, pMax);
         }
         return(pCenter.subtract(pStackCenter));
