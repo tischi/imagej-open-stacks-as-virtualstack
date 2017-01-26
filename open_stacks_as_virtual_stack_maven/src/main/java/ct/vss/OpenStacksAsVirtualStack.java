@@ -168,7 +168,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //
         // Get files in main directory
         //
-        log("checking for files in main folder...");
+        log("checking for files in root folder: "+directory);
         lists = new String[1][];
         lists[0] = getFilesInFolder(directory);
 
@@ -196,7 +196,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 for (int i = 0; i < channelFolders.length; i++) {
                     lists[i] = getFilesInFolder(directory + channelFolders[i]);
                     if (lists[i] == null) {
-                        log("No files found in folder " + channelFolders[i]);
+                        log("no files found in folder: " + directory + channelFolders[i]);
                         return (null);
                     }
                 }
@@ -427,6 +427,17 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     }
                     imp.show();
 
+                    // show compression
+                    FileInfoSer[][][] infos = stack.getFileInfosSer();
+                    if(infos[0][0][0].compression == 1)
+                        log("Compression = None");
+                    else if(infos[0][0][0].compression == 2)
+                        log("Compression = LZW");
+                    else if(infos[0][0][0].compression == 6)
+                        log("Compression = ZIP");
+                    else
+                        log("Compression = "+infos[0][0][0].compression);
+
                 }
 
             } // t-loop
@@ -605,7 +616,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         Point3D pcCurate;
 
         for(int t=tMin; t<=tMax; t++) {
-            pcCurate = curatePositionCenterRadii(imp, pc[t-tMin], pr);
+            pcCurate = curatePositionCenterRadii(imp, pc[t - tMin], pr);
             po[t-tMin] = pcCurate.subtract(pr);
         }
 
@@ -878,7 +889,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //final String directory = "/Users/tischi/Desktop/example-data/compressed/";
         //final String directory = "/Volumes/My Passport/Res_13/";
-        final String directory = "/Users/tischi/Desktop/example-data/tracking_test/";
+        //final String directory = "/Users/tischi/Desktop/example-data/tracking_test/";
+        final String directory = "/Volumes/almfspim/tischi/SPIM-example-data/Nils-MATLAB--tif-stacks--1channel--lzw-compressed/";
         //String filter = null;
 
         //String openingMethod = "tiffLoadAllIFDs";

@@ -25,32 +25,32 @@
       <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.6296296">
-              <caret line="674" column="48" selection-start-line="674" selection-start-column="48" selection-end-line="674" selection-end-column="48" />
+            <state vertical-scroll-proportion="-9.481482">
+              <caret line="890" column="64" selection-start-line="890" selection-start-column="64" selection-end-line="890" selection-end-column="64" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1697#1799#0" expanded="true" />
                 <element signature="e#1798#1799#0" expanded="true" />
-                <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#12792#12918#0" expanded="true" />
-                <element signature="e#12917#12918#0" expanded="true" />
+                <element signature="method#checkIfHdf5DataSetExists#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="e#12814#12940#0" expanded="true" />
+                <element signature="e#12939#12940#0" expanded="true" />
                 <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#17306#17499#0" expanded="true" />
-                <element signature="e#17498#17499#0" expanded="true" />
+                <element signature="e#17868#18061#0" expanded="true" />
+                <element signature="e#18060#18061#0" expanded="true" />
                 <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#curatePositionCenterRadii#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#openCroppedOffsetSizeFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#30241#30369#0" expanded="true" />
-                <element signature="e#30368#30369#0" expanded="true" />
-                <element signature="e#36586#36730#0" expanded="true" />
-                <element signature="e#36729#36730#0" expanded="true" />
-                <element signature="e#38427#38683#0" expanded="true" />
-                <element signature="e#38682#38683#0" expanded="true" />
-                <element signature="e#39937#40118#0" expanded="true" />
-                <element signature="e#40117#40118#0" expanded="true" />
+                <element signature="e#30937#31065#0" expanded="true" />
+                <element signature="e#31064#31065#0" expanded="true" />
+                <element signature="e#37282#37426#0" expanded="true" />
+                <element signature="e#37425#37426#0" expanded="true" />
+                <element signature="e#39123#39379#0" expanded="true" />
+                <element signature="e#39378#39379#0" expanded="true" />
+                <element signature="e#40633#40814#0" expanded="true" />
+                <element signature="e#40813#40814#0" expanded="true" />
                 <element signature="class#VirtualOpenerDialog#0" expanded="false" />
               </folding>
             </state>
@@ -77,8 +77,8 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.85560346">
-              <caret line="898" column="84" selection-start-line="898" selection-start-column="84" selection-end-line="898" selection-end-column="84" />
+            <state vertical-scroll-proportion="0.29094827">
+              <caret line="785" column="20" selection-start-line="785" selection-start-column="20" selection-end-line="785" selection-end-column="20" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1517#1524#0" expanded="true" />
@@ -93,15 +93,12 @@
                 <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
                 <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
                 <element signature="method#addTrackStartWholeDataSet#0;class#Registration#0" expanded="false" />
-                <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
-                <element signature="method#showWholeDataSetAlongTracks#0;class#Registration#0" expanded="false" />
                 <element signature="method#imageClosed#0;class#Registration#0" expanded="false" />
                 <element signature="method#imageOpened#0;class#Registration#0" expanded="false" />
-                <element signature="method#imageUpdated#0;class#Registration#0" expanded="false" />
                 <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
                 <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-                <element signature="e#26903#27982#0" expanded="true" />
-                <element signature="e#27981#27982#0" expanded="true" />
+                <element signature="e#26906#27985#0" expanded="true" />
+                <element signature="e#27984#27985#0" expanded="true" />
                 <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
                 <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
                 <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
@@ -259,8 +256,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="192" />
-    <option name="y" value="24" />
+    <option name="x" value="34" />
+    <option name="y" value="23" />
     <option name="width" value="1403" />
     <option name="height" value="849" />
   </component>
@@ -605,7 +602,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="192" y="24" width="1403" height="849" extended-state="0" />
+    <frame x="34" y="23" width="1403" height="849" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -740,15 +737,12 @@
             <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStartWholeDataSet#0;class#Registration#0" expanded="false" />
-            <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
-            <element signature="method#showWholeDataSetAlongTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#imageClosed#0;class#Registration#0" expanded="false" />
             <element signature="method#imageOpened#0;class#Registration#0" expanded="false" />
-            <element signature="method#imageUpdated#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#26903#27982#0" expanded="true" />
-            <element signature="e#27981#27982#0" expanded="true" />
+            <element signature="e#26906#27985#0" expanded="true" />
+            <element signature="e#27984#27985#0" expanded="true" />
             <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
             <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
@@ -834,26 +828,26 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1697#1799#0" expanded="true" />
             <element signature="e#1798#1799#0" expanded="true" />
-            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#12792#12918#0" expanded="true" />
-            <element signature="e#12917#12918#0" expanded="true" />
+            <element signature="method#checkIfHdf5DataSetExists#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#12814#12940#0" expanded="true" />
+            <element signature="e#12939#12940#0" expanded="true" />
             <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#17306#17499#0" expanded="true" />
-            <element signature="e#17498#17499#0" expanded="true" />
+            <element signature="e#17868#18061#0" expanded="true" />
+            <element signature="e#18060#18061#0" expanded="true" />
             <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#curatePositionCenterRadii#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#openCroppedOffsetSizeFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#30241#30369#0" expanded="true" />
-            <element signature="e#30368#30369#0" expanded="true" />
-            <element signature="e#36586#36730#0" expanded="true" />
-            <element signature="e#36729#36730#0" expanded="true" />
-            <element signature="e#38427#38683#0" expanded="true" />
-            <element signature="e#38682#38683#0" expanded="true" />
-            <element signature="e#39937#40118#0" expanded="true" />
-            <element signature="e#40117#40118#0" expanded="true" />
+            <element signature="e#30937#31065#0" expanded="true" />
+            <element signature="e#31064#31065#0" expanded="true" />
+            <element signature="e#37282#37426#0" expanded="true" />
+            <element signature="e#37425#37426#0" expanded="true" />
+            <element signature="e#39123#39379#0" expanded="true" />
+            <element signature="e#39378#39379#0" expanded="true" />
+            <element signature="e#40633#40814#0" expanded="true" />
+            <element signature="e#40813#40814#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
         </state>
@@ -884,15 +878,12 @@
             <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStartWholeDataSet#0;class#Registration#0" expanded="false" />
-            <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
-            <element signature="method#showWholeDataSetAlongTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#imageClosed#0;class#Registration#0" expanded="false" />
             <element signature="method#imageOpened#0;class#Registration#0" expanded="false" />
-            <element signature="method#imageUpdated#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#26903#27982#0" expanded="true" />
-            <element signature="e#27981#27982#0" expanded="true" />
+            <element signature="e#26906#27985#0" expanded="true" />
+            <element signature="e#27984#27985#0" expanded="true" />
             <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
             <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
@@ -978,26 +969,26 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1697#1799#0" expanded="true" />
             <element signature="e#1798#1799#0" expanded="true" />
-            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#12792#12918#0" expanded="true" />
-            <element signature="e#12917#12918#0" expanded="true" />
+            <element signature="method#checkIfHdf5DataSetExists#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#12814#12940#0" expanded="true" />
+            <element signature="e#12939#12940#0" expanded="true" />
             <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#17306#17499#0" expanded="true" />
-            <element signature="e#17498#17499#0" expanded="true" />
+            <element signature="e#17868#18061#0" expanded="true" />
+            <element signature="e#18060#18061#0" expanded="true" />
             <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#curatePositionCenterRadii#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#openCroppedOffsetSizeFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#30241#30369#0" expanded="true" />
-            <element signature="e#30368#30369#0" expanded="true" />
-            <element signature="e#36586#36730#0" expanded="true" />
-            <element signature="e#36729#36730#0" expanded="true" />
-            <element signature="e#38427#38683#0" expanded="true" />
-            <element signature="e#38682#38683#0" expanded="true" />
-            <element signature="e#39937#40118#0" expanded="true" />
-            <element signature="e#40117#40118#0" expanded="true" />
+            <element signature="e#30937#31065#0" expanded="true" />
+            <element signature="e#31064#31065#0" expanded="true" />
+            <element signature="e#37282#37426#0" expanded="true" />
+            <element signature="e#37425#37426#0" expanded="true" />
+            <element signature="e#39123#39379#0" expanded="true" />
+            <element signature="e#39378#39379#0" expanded="true" />
+            <element signature="e#40633#40814#0" expanded="true" />
+            <element signature="e#40813#40814#0" expanded="true" />
             <element signature="class#VirtualOpenerDialog#0" expanded="false" />
           </folding>
         </state>
@@ -1028,15 +1019,12 @@
             <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStartWholeDataSet#0;class#Registration#0" expanded="false" />
-            <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
-            <element signature="method#showWholeDataSetAlongTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#imageClosed#0;class#Registration#0" expanded="false" />
             <element signature="method#imageOpened#0;class#Registration#0" expanded="false" />
-            <element signature="method#imageUpdated#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#26903#27982#0" expanded="true" />
-            <element signature="e#27981#27982#0" expanded="true" />
+            <element signature="e#26906#27985#0" expanded="true" />
+            <element signature="e#27984#27985#0" expanded="true" />
             <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
             <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
@@ -1347,39 +1335,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.6296296">
-          <caret line="674" column="48" selection-start-line="674" selection-start-column="48" selection-end-line="674" selection-end-column="48" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1697#1799#0" expanded="true" />
-            <element signature="e#1798#1799#0" expanded="true" />
-            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#12792#12918#0" expanded="true" />
-            <element signature="e#12917#12918#0" expanded="true" />
-            <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#17306#17499#0" expanded="true" />
-            <element signature="e#17498#17499#0" expanded="true" />
-            <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#curatePositionCenterRadii#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#openCroppedOffsetSizeFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#30241#30369#0" expanded="true" />
-            <element signature="e#30368#30369#0" expanded="true" />
-            <element signature="e#36586#36730#0" expanded="true" />
-            <element signature="e#36729#36730#0" expanded="true" />
-            <element signature="e#38427#38683#0" expanded="true" />
-            <element signature="e#38682#38683#0" expanded="true" />
-            <element signature="e#39937#40118#0" expanded="true" />
-            <element signature="e#40117#40118#0" expanded="true" />
-            <element signature="class#VirtualOpenerDialog#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/mpicbg/imglib-algorithms/2.0.0-beta6/imglib-algorithms-2.0.0-beta6.jar!/mpicbg/imglib/algorithm/fft/PhaseCorrelation.class">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="1.2168674">
@@ -1388,10 +1343,43 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-9.481482">
+          <caret line="890" column="64" selection-start-line="890" selection-start-column="64" selection-end-line="890" selection-end-column="64" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1697#1799#0" expanded="true" />
+            <element signature="e#1798#1799#0" expanded="true" />
+            <element signature="method#checkIfHdf5DataSetExists#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#12814#12940#0" expanded="true" />
+            <element signature="e#12939#12940#0" expanded="true" />
+            <element signature="method#saveAsTiffStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#17868#18061#0" expanded="true" />
+            <element signature="e#18060#18061#0" expanded="true" />
+            <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#curatePositionCenterRadii#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openCroppedOffsetSizeFromInfos#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#30937#31065#0" expanded="true" />
+            <element signature="e#31064#31065#0" expanded="true" />
+            <element signature="e#37282#37426#0" expanded="true" />
+            <element signature="e#37425#37426#0" expanded="true" />
+            <element signature="e#39123#39379#0" expanded="true" />
+            <element signature="e#39378#39379#0" expanded="true" />
+            <element signature="e#40633#40814#0" expanded="true" />
+            <element signature="e#40813#40814#0" expanded="true" />
+            <element signature="class#VirtualOpenerDialog#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.85560346">
-          <caret line="898" column="84" selection-start-line="898" selection-start-column="84" selection-end-line="898" selection-end-column="84" />
+        <state vertical-scroll-proportion="0.29094827">
+          <caret line="785" column="20" selection-start-line="785" selection-start-column="20" selection-end-line="785" selection-end-column="20" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1517#1524#0" expanded="true" />
@@ -1406,15 +1394,12 @@
             <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackStartWholeDataSet#0;class#Registration#0" expanded="false" />
-            <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
-            <element signature="method#showWholeDataSetAlongTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#imageClosed#0;class#Registration#0" expanded="false" />
             <element signature="method#imageOpened#0;class#Registration#0" expanded="false" />
-            <element signature="method#imageUpdated#0;class#Registration#0" expanded="false" />
             <element signature="method#getNumberOfUncompletedTracks#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#26903#27982#0" expanded="true" />
-            <element signature="e#27981#27982#0" expanded="true" />
+            <element signature="e#26906#27985#0" expanded="true" />
+            <element signature="e#27984#27985#0" expanded="true" />
             <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
             <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />

@@ -703,7 +703,7 @@ public class Registration implements PlugIn, ImageListener {
             Track track = Tracks.get(i);
             if (track.completed) {
                 log("# showCroppedTracks: id=" + i);
-                impA[i] = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, track.getPoints3D(), gui_pCropRadii, track.getTmin(), track.getTmax());
+                impA[i] = OpenStacksAsVirtualStack.openCroppedCenterRadiusFromInfos(imp, infos, track.getPoints3D(), gui_pTrackingSize, track.getTmin(), track.getTmax());
                 if (impA[i] == null) {
                     log("..cropping failed.");
                 } else {
@@ -936,10 +936,10 @@ public class Registration implements PlugIn, ImageListener {
                 // load next image at the same position where the previous image has been loaded (p0offset)
                 // plus the computed shift (pShift), basically a linear motion model
                 // but curate this position according to the image bounds
-                log("Position where previous image was loaded: " + p0offset);
-                log("Position where previous image was loaded plus shift: " + p0offset.add(pShift));
+                //log("Position where previous image was loaded: " + p0offset);
+                //log("Position where previous image was loaded plus shift: " + p0offset.add(pShift));
                 p1offset = OpenStacksAsVirtualStack.curatePositionOffsetSize(imp, p0offset.add(pShift), pSize);
-                log("Curated position where this image is loaded: " + p1offset);
+                //log("Curated position where this image is loaded: " + p1offset);
 
                 // load image
                 startTime = System.currentTimeMillis();
@@ -959,11 +959,11 @@ public class Registration implements PlugIn, ImageListener {
 
                     // correct for sub-sampling
                     pShift = multiplyPoint3dComponents(pShift, pSubSample);
-                    log("Correlation Tracking Shift: "+pShift);
+                    //log("Correlation Tracking Shift: "+pShift);
 
                     // take into account the different loading positions of this and the previous image
                     pShift = pShift.add(p1offset.subtract(p0offset));
-                    log("Correlation Tracking Shift including image shift: "+pShift);
+                    //log("Correlation Tracking Shift including image shift: "+pShift);
 
 
                 } else if (gui_trackingMethod == "center of mass") {
@@ -977,13 +977,13 @@ public class Registration implements PlugIn, ImageListener {
 
                     // correct for sub-sampling
                     pLocalShift = multiplyPoint3dComponents(pLocalShift, pSubSample);
-                    log("Center of Mass Local Shift: "+pLocalShift);
+                    //log("Center of Mass Local Shift: "+pLocalShift);
 
                     // the drift corrected position in the global coordinate system is: p1offset.add(pLocalShift)
                     // in center coordinates this is: computeCenter(p1offset.add(pShift),pSize)
                     // relative to previous tracking position:
                     pShift = computeCenter(p1offset.add(pLocalShift),pSize).subtract(track.getXYZ(itPrevious));
-                    log("Center of Mass Tracking Shift relative to previous position: "+pShift);
+                    //log("Center of Mass Tracking Shift relative to previous position: "+pShift);
 
                 }
 
