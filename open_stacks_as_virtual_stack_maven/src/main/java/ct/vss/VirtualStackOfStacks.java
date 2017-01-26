@@ -322,7 +322,7 @@ public class VirtualStackOfStacks extends ImageStack {
             ps = new Point3D(nX, nY, nZ);
         }
 
-        ImagePlus imp = getCubeByTimeOffsetAndSize(t, c, pSubSample, po, ps);
+        ImagePlus imp = getCubeByTimeOffsetAndSize(t, c, po, ps, pSubSample);
         if( (int)pSubSample.getX()>1 || (int)pSubSample.getY()>1) {
             return(resizeWidthAndHeight(imp,(int)pSubSample.getX(),(int)pSubSample.getY()));
         } else {

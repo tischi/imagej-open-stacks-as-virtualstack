@@ -33,6 +33,9 @@ import static ij.IJ.log;
 // todo: - find out why loading and saving info file is so slow
 // todo: - save smaller info files
 
+// todo: saving as tiff stacks does not always work, e.g. after object tracking
+// todo: check if all files are parsed before allowing to "crop as new stream"
+
 /** Opens a folder of stacks as a virtual stack. */
 public class OpenStacksAsVirtualStack implements PlugIn {
 
@@ -453,9 +456,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     public void saveAsTiffStacks(ImagePlus imp, String path) {
-
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         FileSaver fs;
+
+        log("Saving to: " + path);
 
         for (int c = 0; c < imp.getNChannels(); c++) {
 
@@ -474,6 +478,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
 
         iProgress = nProgress;
+        log("done!");
 
     }
 
@@ -1129,6 +1134,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 final File file = fc.getSelectedFile();
+
                 //
                 // Check that all image files have been parsed
                 //
@@ -1163,19 +1169,33 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             }
         } else if (e.getActionCommand().equals(actions[i++])) {
 
+
+            //
             // "Save as tiff stacks"
-            //    IJ.showMessage("Not yet implemented.");
+            //
             ImagePlus imp = IJ.getImage();
             VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
             if(vss==null) {
                 IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
                 return;
             }
+
+            //
+            // Check that all image files have been parsed
+            //
+            int numberOfUnparsedFiles = vss.numberOfUnparsedFiles();
+            if(numberOfUnparsedFiles > 0) {
+                IJ.showMessage("There are still "+numberOfUnparsedFiles+
+                        " files in the folder that have not been parsed yet.\n" +
+                        "Please try again later (check ImageJ's status bar).");
+                return;
+            }
+
+
             fc = new JFileChooser(vss.getDirectory());
             int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 final File file = fc.getSelectedFile();
-                log("Saving to: " + file.getAbsolutePath() + "...");
                 // do the job
                 Thread t1 = new Thread(new Runnable() {
                     public void run() {
@@ -1205,8 +1225,25 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             // Crop As New Stream
             //
 
+            ImagePlus imp = IJ.getImage();
+            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+            if(vss==null) {
+                IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
+                return;
+            }
 
-            ImagePlus imp2 = osv.crop(IJ.getImage());
+            //
+            // Check that all image files have been parsed
+            //
+            int numberOfUnparsedFiles = vss.numberOfUnparsedFiles();
+            if(numberOfUnparsedFiles > 0) {
+                IJ.showMessage("There are still "+numberOfUnparsedFiles+
+                        " files in the folder that have not been parsed yet.\n" +
+                        "Please try again later (check ImageJ's status bar).");
+                return;
+            }
+
+            ImagePlus imp2 = osv.crop(imp);
             if (imp2 != null)
                 imp2.show();
 
