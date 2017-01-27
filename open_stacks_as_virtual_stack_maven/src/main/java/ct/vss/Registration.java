@@ -85,7 +85,7 @@ public class Registration implements PlugIn, ImageListener {
         JFrame frame;
 
         String[] texts = {
-                "Object size: nx, ny, nz [pixels]",
+                "Tracking window: nx, ny, nz [pixels]",
                 "Sub-sampling: dx, dy, dz, dt [pixels, frames]",
                 "Track length [frames]"
         };
@@ -148,7 +148,7 @@ public class Registration implements PlugIn, ImageListener {
             int iToolTipText = 0;
 
             for (int i = 0; i < textFields.length; i++, iToolTipText++) {
-                textFields[i] = new JTextField(6);
+                textFields[i] = new JTextField(12);
                 textFields[i].setActionCommand(texts[i]);
                 textFields[i].addActionListener(this);
                 textFields[i].addFocusListener(this);
@@ -849,8 +849,9 @@ public class Registration implements PlugIn, ImageListener {
             int nt = track.getLength();
             track.reset();
 
+
             //
-            // init first time-point
+            // track first time-point by center of mass
             //
 
             // get selected track coordinates
@@ -861,7 +862,6 @@ public class Registration implements PlugIn, ImageListener {
             // read data
             //
 
-            // todo: has to be considered for the shift computation? only for center of mass?!
             p0offset = OpenStacksAsVirtualStack.curatePositionOffsetSize(imp, p0offset, pSize);
             imp0 = vss.getCubeByTimeOffsetAndSize(tStart, channel, p0offset, pSize, pSubSample);
             IJ.run(imp0, "Subtract...", "value="+computeMean16bit(imp0.getStack()));

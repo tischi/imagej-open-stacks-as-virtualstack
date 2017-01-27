@@ -53,6 +53,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private static NonBlockingGenericDialog gd;
     public int iProgress=0, nProgress=100;
     public String h5DataSet = "Data111";
+    public int cropZmin = 0;
+    public int cropZmax = 1;
 
     // todo: stop loading thread upon closing of image
 
@@ -784,7 +786,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		return(imp);
 	}
 
-    public static ImagePlus crop(ImagePlus imp) {
+    public static ImagePlus crop(ImagePlus imp, int zMin, int zMax) {
 
         VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
         if (vss == null) {
@@ -792,6 +794,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     " This method is only implemented for streamed (virtual) image stacks.");
             return null;
         }
+
         FileInfoSer[][][] infos = vss.getFileInfosSer();
         if(infos[0][0][0].compression==6) {
             IJ.showMessage(
@@ -799,26 +802,43 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     );
             return null;
         }
+
+        if(zMax-zMin+1 > vss.nZ) {
+            IJ.showMessage(
+                    "The z-cropping range is larger than the data; please change the values."
+            );
+            return null;
+        }
+
+        if(zMax<=zMin) {
+            IJ.showMessage(
+                    "zMax of the cropping range needs to be larger than zMin; please change the values."
+            );
+            return null;
+        }
+
+
         Roi roi = imp.getRoi();
         if (roi != null && roi.isArea()) {
 
             int tMin = 0;
             int tMax = vss.nT - 1;
-            int zMin = 0;
 
             Point3D[] po = new Point3D[vss.nT];
             for (int t = 0; t < vss.nT; t++) {
                 po[t] = new Point3D(roi.getBounds().getX(), roi.getBounds().getY(), zMin);
             }
-            Point3D ps = new Point3D(roi.getBounds().getWidth(), roi.getBounds().getHeight(), vss.nZ);
+            Point3D ps = new Point3D(roi.getBounds().getWidth(), roi.getBounds().getHeight(), zMax-zMin+1);
 
             ImagePlus impCropped = openCroppedOffsetSizeFromInfos(imp, vss.getFileInfosSer(), po, ps, tMin, tMax);
             impCropped.setTitle(imp.getTitle()+"-crop");
             return impCropped;
 
         } else {
-            IJ.showMessage("Please put a rectangular ROI on the image.");
+
+            IJ.showMessage("Please put a rectangular selection on the image.");
             return null;
+
         }
     }
 
@@ -827,13 +847,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         VirtualStackOfStacks stack = (VirtualStackOfStacks) imp.getStack();
         if (stack == null) {
             IJ.showMessage("Wrong image type.");
-        }
-
-        // crop if wanted
-        Roi roi = imp.getRoi();
-        if (roi != null && roi.isArea()) {
-            imp = crop(imp);
-            stack = (VirtualStackOfStacks) imp.getStack();
         }
 
         nProgress = stack.nSlices;
@@ -992,8 +1005,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 }
 
+// todo: here the GUI class is outside of the other class, in Registration it is not, why?
 
-class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener {
+class StackStreamToolsGUI extends JPanel implements ActionListener, FocusListener, ItemListener {
 
     String[] actions = {"Stream from folder",
             "Stream from info file",
@@ -1003,8 +1017,11 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             "Duplicate to RAM",
             "Report issue"};
 
+
     JCheckBox cbLog = new JCheckBox("Verbose logging");
     JTextField tfH5DataSet = new JTextField("Data111", 10);
+    JTextField tfCropZminZmax = new JTextField("0,0", 7);
+
     JFileChooser fc;
 
     public void StackStreamToolsGUI() {
@@ -1032,6 +1049,8 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
         // Textfields
         JLabel labelH5DataSet = new JLabel("Hdf5 data set: ");
         labelH5DataSet.setLabelFor(tfH5DataSet);
+        JLabel labelCropZminZmax = new JLabel("zMin, zMax: ");
+        labelCropZminZmax.setLabelFor(tfCropZminZmax);
 
         // Checkboxes
         cbLog.setSelected(false);
@@ -1052,7 +1071,12 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
         c.add(panels.get(j++));
 
         panels.add(new JPanel());
+        panels.get(j).add(labelCropZminZmax);
+        panels.get(j).add(tfCropZminZmax);
         panels.get(j).add(buttons[i++]);
+        c.add(panels.get(j++));
+
+        panels.add(new JPanel());
         panels.get(j).add(buttons[i++]);
         c.add(panels.get(j++));
 
@@ -1075,6 +1099,17 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
 
     }
 
+    public void focusGained(FocusEvent e) {
+        //
+    }
+
+    public void focusLost(FocusEvent e) {
+        JTextField tf = (JTextField) e.getSource();
+        if (!(tf == null)) {
+            tf.postActionEvent();
+        }
+    }
+
     public void itemStateChanged(ItemEvent e) {
         Object source = e.getItemSelectable();
 
@@ -1089,8 +1124,8 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
 
     public void actionPerformed(ActionEvent e) {
         int i = 0;
-        final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
 
+        final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
         osv.h5DataSet = tfH5DataSet.getText();
 
         if (e.getActionCommand().equals(actions[i++])) {
@@ -1167,8 +1202,8 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             } else {
                 log("Save command cancelled by user.");
             }
-        } else if (e.getActionCommand().equals(actions[i++])) {
 
+        } else if (e.getActionCommand().equals(actions[i++])) {
 
             //
             // "Save as tiff stacks"
@@ -1215,10 +1250,10 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
                 return;
             }
 
-
-            //} else if (e.getActionCommand().equals(actions[i++])) {
-            // "Save as h5 stacks"
+        //} else if (e.getActionCommand().equals(actions[i++])) {
+        // "Save as h5 stacks"
         //    IJ.showMessage("Not yet implemented.");
+
         }  else if (e.getActionCommand().equals(actions[i++])) {
 
             //
@@ -1235,6 +1270,7 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             //
             // Check that all image files have been parsed
             //
+
             int numberOfUnparsedFiles = vss.numberOfUnparsedFiles();
             if(numberOfUnparsedFiles > 0) {
                 IJ.showMessage("There are still "+numberOfUnparsedFiles+
@@ -1243,11 +1279,22 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
                 return;
             }
 
-            ImagePlus imp2 = osv.crop(imp);
+            //
+            // Get z cropping range
+            //
+
+            String[] sA = tfCropZminZmax.getText().split(",");
+            if(sA.length!=2) {
+                IJ.showMessage("Something went wrong parsing the zMin, zMax croppping values.\n" +
+                        "Please check that there are two comma separated values.");
+                return;
+            }
+            ImagePlus imp2 = osv.crop(imp, new Integer(sA[0]), new Integer(sA[1]));
             if (imp2 != null)
                 imp2.show();
 
         } else if (e.getActionCommand().equals(actions[i++])) {
+
             //
             // duplicate to RAM
             //
@@ -1270,24 +1317,34 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, ItemListener
             t2.start();
 
         } else if (e.getActionCommand().equals(actions[i++])) {
-                //
-                // Report issue
-                //
-                String url = "https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues";
-                if (Desktop.isDesktopSupported()) {
-                    try {
-                        final URI uri = new URI(url);
-                        Desktop.getDesktop().browse(uri);
-                    } catch (URISyntaxException uriEx) {
-                        IJ.showMessage(uriEx.toString());
-                    } catch (IOException ioEx) {
-                        IJ.showMessage(ioEx.toString());
-                    }
-                } else {
-                    IJ.showMessage("Could not open browser, please report issue here: \n" +
-                            "https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues");
 
+            //
+            // Report issue
+            //
+
+            String url = "https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues";
+            if (Desktop.isDesktopSupported()) {
+                try {
+                    final URI uri = new URI(url);
+                    Desktop.getDesktop().browse(uri);
+                } catch (URISyntaxException uriEx) {
+                    IJ.showMessage(uriEx.toString());
+                } catch (IOException ioEx) {
+                    IJ.showMessage(ioEx.toString());
                 }
+            } else {
+                IJ.showMessage("Could not open browser, please report issue here: \n" +
+                        "https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues");
+
+            }
+
+        }  else if (e.getActionCommand().equals(tfCropZminZmax)) {
+
+                //
+                // Change of cropping size
+                //
+
+                // do nothing
             }
 
         }

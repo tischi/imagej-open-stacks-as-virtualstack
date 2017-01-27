@@ -1,11 +1,13 @@
 <html>
-<h3>Object size</h3>
+<h3>Tracking window</h3>
 <p width=400>
     The tracking is based on computing the center of mass in a region whose
-    size you can adjust here. The size should be large enough <b>to enclose one</b> of
+    size you can adjust here. The "Tracking window" should be large enough <b>to readily enclose one</b> of
     your objects of interest, but small enough <b>not to enclose two</b> objects
-    as this can cause the algorithm to 'switch' objects during tracking. Please note
-    that you can change the object size at any point; the 'Object size' is  read again any time you
+    as this can cause the algorithm to 'switch' objects during tracking. In addition, the "Tracking window"
+    needs to be large enough to cover the distance that the object moves between subsequent time-points.
+    If the objects moves out of the "Tracking window" the algorithm will no find it anymore.
+    Please note that you can change the object size at any point; the 'Object size' is  read again any time you
     click the 'Track selected object' button. This means that you can subsequently track objects of
     different sizes.
 </p>
@@ -17,7 +19,7 @@
     To increase the tracking speed you can analyse only every dx,dy,dz data point.
     Especially when working with Tiff stacks this will help as loading only every dz plane will be much faster.
     Center of mass computation is so fast that dx and dy sub-sampling do not help much.
-    However, for the correlation-based tracking dx and dy sub-subsampling makes a big difference in speed.
+    However, for the correlation-based tracking dx and dy sub-sampling makes a big difference in speed.
 </p>
 </html>
 ###
@@ -51,11 +53,8 @@
 <p width=400>
     Use ImageJ's Point Selection tool to select an object in the image and then
     hit this button to start its tracking.
-    The tracking is based on computing the center of mass of all the gray-scale values
-    within above chosen radii (as a threshold only values above the mean gray value within
-    twice above chosen radii are taken into account).
     You do not have to wait for the tracking of one object
-    to be finished; you can immediately track another object.
+    to be finished; you can immediately start tracking another object.
 </p>
 </html>
 ###
@@ -112,9 +111,13 @@ Saves the table as a text file for further processing, e.g. in R or Excel.
 <h3>Tracking Method</h3>
 <p width=400>
     You can choose between 'center of mass' and 'correlation'.
-    For 'correlation'the position of the first time-point is determined as its center of mass.
-    The position of subsequent time-points is however determined relative to the previous time-point by
-    computing the shift leading to the maximal cross-correlation between the signals.
+    For 'center of mass' the position at each time-point is determined by an **iterative** (n=6) center-of-mass
+    computation in a region of **half the tracking window's size**.
+    For 'correlation' the position of the first time-point is determined as its center of mass.
+    The position of subsequent time-points is determined relative to the previous time-point by
+    computing the shift that yields the maximal cross-correlation between the signals.
+    For both methods, the **mean intensity** within the current tracking window **is subtracted** from each pixel as a
+    background removal.
 </p>
 </html>
 ###
