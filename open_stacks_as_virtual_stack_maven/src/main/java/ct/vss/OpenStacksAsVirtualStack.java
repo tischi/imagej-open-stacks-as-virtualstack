@@ -470,15 +470,17 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     if (stack != null && stack.getSize() > 0) {
                         imp = makeImagePlus(stack);
-                        imp.show();
                     } else {
                         IJ.showMessage("Something went wrong loading the first image stack!");
                         return(null);
                     }
+
                     imp.show();
 
                     if(fileType.equals("leica single tif")) {
-                        imp.setTitle(filenamePattern);
+                        imp.setTitle(filenamePattern+getLastDir(directory));
+                    } else {
+                        imp.setTitle(getLastDir(directory));
                     }
 
                     // show compression
@@ -504,6 +506,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         return(imp);
 
+    }
+
+
+    public static String getLastDir(String fileOrDirPath) {
+        boolean endsWithSlash = fileOrDirPath.endsWith(File.separator);
+        String[] split = fileOrDirPath.split(File.separator);
+        if(endsWithSlash) return split[split.length-1];
+        else return split[split.length];
     }
 
     public void saveAsTiffStacks(ImagePlus imp, String path) {
@@ -761,8 +771,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         FileInfoSer[][][] infos = stack.getFileInfosSer();
         FileInfoSer fi = infos[0][0][0];
 
-        ImagePlus imp = new ImagePlus(fi.directory, stack);
-        imp.setTitle(fi.directory);
+        ImagePlus imp = new ImagePlus("", stack);
 
         if (imp.getType()==ImagePlus.GRAY16 || imp.getType()==ImagePlus.GRAY32)
 			imp.getProcessor().setMinAndMax(min, max);

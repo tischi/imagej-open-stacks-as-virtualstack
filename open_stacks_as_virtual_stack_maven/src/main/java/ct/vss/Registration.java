@@ -746,7 +746,7 @@ public class Registration implements PlugIn {
                 if (impA[i] == null) {
                     log("..cropping failed.");
                 } else {
-                    impA[i].setTitle("Track_" + track.getID());
+                    impA[i].setTitle(imp.getTitle()+"Track_" + track.getID());
                     impA[i].show();
                     impA[i].setPosition(0, (int) (impA[i].getNSlices() / 2 + 0.5), 0);
                     impA[i].resetDisplayRange();
