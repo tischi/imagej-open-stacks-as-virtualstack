@@ -20,7 +20,6 @@
 	<description>A Maven project implementing an ImageJ 1.x plugin</description>
 
 
-
     <repositories>
     <!--
 		<repository>

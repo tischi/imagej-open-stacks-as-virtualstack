@@ -14,6 +14,7 @@ public class Track {
     int i;
     int n;
     boolean completed = false;
+    int id;
 
     Track(int n) {
         this.t = new int[n];
@@ -36,6 +37,14 @@ public class Track {
 
     public void setObjectSize(Point3D p) {
         this.objectSize = p;
+    }
+
+    public void setID(int id) {
+        this.id = id;
+    }
+
+    public int getID() {
+        return(this.id);
     }
 
     public Point3D getObjectSize() {

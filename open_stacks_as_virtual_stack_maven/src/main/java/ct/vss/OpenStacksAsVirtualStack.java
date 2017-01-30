@@ -651,9 +651,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             IJ.showMessage("object size in z is too large; please reduce!");
             throw new IllegalArgumentException("out of range");
         }
-        if(shifted[0]) {
-            log("++ region was shifted to stay within image bounds.");
-        }
+        //if(shifted[0]) {
+        //    log("++ region was shifted to stay within image bounds.");
+        //}
         return(new Point3D(x,y,z));
     }
 

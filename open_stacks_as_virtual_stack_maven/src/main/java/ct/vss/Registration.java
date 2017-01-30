@@ -65,8 +65,6 @@ public class Registration implements PlugIn {
     int trackStatsTotalPointsTrackedAtLastStart;
     TrackingGUI trackingGUI;
 
-    // todo: remove the background variable?!
-
     // todo: put actual tracking into different class
 
     public Registration() {
@@ -251,7 +249,9 @@ public class Registration implements PlugIn {
 
             int i = 0, j = 0, k = 0;
             JFileChooser fc;
-            final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
+
+            // update current imp object
+            imp = IJ.getImage();
 
             if (e.getActionCommand().equals(actions[i++])) {
 
@@ -291,7 +291,6 @@ public class Registration implements PlugIn {
                 // Track selected object
                 //
 
-
                 Roi r = imp.getRoi();
                 if (r == null || ! (r.getTypeAsString().equals("Point") || r.getTypeAsString().equals("Rectangle")) ) {
                     IJ.showMessage("Please use ImageJ's 'Point' or 'Rectangular' selection tool on image: '" + imp.getTitle()+"'");
@@ -307,6 +306,14 @@ public class Registration implements PlugIn {
                     trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
                     es.execute(new Registration.Tracking(iNewTrack, gui_pSubSample, gui_tSubSample, gui_bg, gui_iterations));
                 }
+
+                Thread t = new Thread(new Runnable() {
+                    public void run() {
+                        logIfTrackingFinished();
+                    }
+                });
+                t.start();
+
 
             } else if (e.getActionCommand().equals(actions[i++])) {
 
@@ -350,6 +357,12 @@ public class Registration implements PlugIn {
                 trackTable.clear();
                 Tracks = new ArrayList<Track>();
                 rTrackStarts = new ArrayList<Roi>();
+
+                // remove overlay
+                imp.setOverlay(new Overlay());
+
+                totalTimePointsToBeTracked = 0;
+
 
             } else if (e.getActionCommand().equals(actions[i++])) {
 
@@ -442,6 +455,18 @@ public class Registration implements PlugIn {
 
     }
 
+    public boolean logIfTrackingFinished() {
+
+        while(totalTimePointsTracked.get()<totalTimePointsToBeTracked) {
+            IJ.wait(500);
+            //log(""+totalTimePointsTracked.get()+" "+totalTimePointsToBeTracked);
+        }
+        Globals.threadlog(
+                "Tracking completed!"
+        );
+        return true;
+    }
+
     public void run(String arg) {
         this.imp = IJ.getImage();
         initialize();
@@ -471,7 +496,7 @@ public class Registration implements PlugIn {
             );
         }
         this.vss = vss;
-        gui_pTrackingSize = new Point3D(200,200,30);
+        gui_pTrackingSize = new Point3D(20,20,30);
         gui_ntTracking = imp.getNFrames();
         gui_bg = (int) imp.getProcessor().getMin();
         trackTable = new TrackTable();
@@ -677,10 +702,13 @@ public class Registration implements PlugIn {
 
         totalTimePointsToBeTracked += ntTracking;
         int newTrackID = Tracks.size();
-        //log("added new track start; id = "+newTrackID+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
+
         Tracks.add(new Track(ntTracking));
-        Tracks.get(newTrackID).addLocation(pTrackCenter, t, imp.getC() - 1);
-        Tracks.get(newTrackID).setObjectSize(gui_pTrackingSize);
+        Track track = Tracks.get(newTrackID);
+        track.setID(newTrackID);
+        track.addLocation(pTrackCenter, t, imp.getC() - 1);
+        track.setObjectSize(gui_pTrackingSize);
+
         return(newTrackID);
 
     }
@@ -707,7 +735,10 @@ public class Registration implements PlugIn {
                 for(int iPosition=0; iPosition<track.getLength(); iPosition++) {
                     Point3D offset = computeOffset(track.getXYZ(iPosition), track.getObjectSize());
                     Point3D offsetCurated = osv.curatePositionOffsetSize(imp, offset, track.getObjectSize(), shifted);
-                    log(""+shifted[0]);
+                    if(shifted[0]) {
+                        log("Track_"+track.getID()+" was out of image bounds at frame "+iPosition+
+                                " (frame "+track.getT(iPosition)+" in original image)");
+                    };
                     trackOffsets[iPosition] = offsetCurated;
                 }
 
@@ -715,7 +746,7 @@ public class Registration implements PlugIn {
                 if (impA[i] == null) {
                     log("..cropping failed.");
                 } else {
-                    impA[i].setTitle("Track " + i);
+                    impA[i].setTitle("Track_" + track.getID());
                     impA[i].show();
                     impA[i].setPosition(0, (int) (impA[i].getNSlices() / 2 + 0.5), 0);
                     impA[i].resetDisplayRange();
@@ -723,7 +754,6 @@ public class Registration implements PlugIn {
             }
         }
     }
-
 
     public void addTrackToOverlay(final Track track, final int i) {
         // using invokeLater to avoid that two different tracking threads change the imp overlay
@@ -833,6 +863,8 @@ public class Registration implements PlugIn {
             });
 
             addTrackToOverlay(track, tStart - tStart);
+
+            totalTimePointsTracked.addAndGet(1);
 
             //
             // compute shifts for following time-points
@@ -969,9 +1001,10 @@ public class Registration implements PlugIn {
                 // show progress
                 //
                 int n = totalTimePointsTracked.addAndGet(dt);
+
                 if( (System.currentTimeMillis() > trackStatsReportDelay+trackStatsLastReport)
                         || (n==totalTimePointsToBeTracked))
-                {
+                    {
                     trackStatsLastReport = System.currentTimeMillis();
 
                     long dtt = System.currentTimeMillis()-trackStatsLastTrackStarted;
@@ -987,8 +1020,7 @@ public class Registration implements PlugIn {
                                     "; reading [ms] = " + elapsedReadingTime +
                                     "; processing [ms] = " + elapsedProcessingTime
                     );
-                }
-
+                    }
 
                 if(finish) break;
 
