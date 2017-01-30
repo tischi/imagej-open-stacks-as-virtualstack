@@ -613,65 +613,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     }
 
-    // opens a new (info-based) view on the data
-    // todo: call the OffsetSize method from this
-    public static ImagePlus openCroppedCenterRadiusFromInfos(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] pc, Point3D pr, int tMin, int tMax) {
-		int nT = tMax-tMin+1;
-
-        Point3D[] po = new Point3D[nT];
-        Point3D ps = pr.multiply(2).add(1, 1, 1);
-        Point3D pcCurate;
-
-        for(int t=tMin; t<=tMax; t++) {
-            pcCurate = curatePositionCenterRadii(imp, pc[t - tMin], pr);
-            po[t-tMin] = pcCurate.subtract(pr);
-        }
-
-        return(openCroppedOffsetSizeFromInfos(imp, infos, po, ps, tMin, tMax));
-
-    }
-
-    public static Point3D curatePositionCenterRadii(ImagePlus imp, Point3D p, Point3D pr) {
-        boolean shifted = false;
-
-        // round the values
-        int x = (int) (p.getX()+0.5);
-        int y = (int) (p.getY()+0.5);
-        int z = (int) (p.getZ()+0.5);
-        int rx = (int) (pr.getX()+0.5);
-        int ry = (int) (pr.getY()+0.5);
-        int rz = (int) (pr.getZ()+0.5);
-
-        // make sure that the ROI stays within the image bounds
-        if (x-rx < 0) {x = rx; shifted = true;}
-        if (y-ry < 0) {y = ry; shifted = true;}
-        if (z-rz < 0) {z = rz; shifted = true;}
-
-        if (x+rx > imp.getWidth()-1) {x = imp.getWidth()-rx-1; shifted = true;}
-        if (y+ry > imp.getHeight()-1) {y = imp.getHeight()-ry-1; shifted = true;}
-        if (z+rz > imp.getNSlices()-1) {z = imp.getNSlices()-rz-1; shifted = true;}
-
-        // check if it is ok now, otherwise the chose radius is simply too large
-        if (x-rx < 0)  {
-            IJ.showMessage("x_radius*margin_factor is too large; please reduce!");
-            throw new IllegalArgumentException("out of range");
-        }
-        if (y-ry < 0){
-            IJ.showMessage("y_radius*margin_factor is too large; please reduce!");
-            throw new IllegalArgumentException("out of range");
-        }
-        if (z-rz < 0) {
-            IJ.showMessage("z_radius*margin_factor is too large; please reduce!");
-            throw new IllegalArgumentException("out of range");
-        }
-        if(shifted) {
-            log("!! image: "+imp.getTitle()+": cropping region needed to be shifted to stay within image bounds.");
-        }
-        return(new Point3D(x,y,z));
-    }
-
     public static Point3D curatePositionOffsetSize(ImagePlus imp, Point3D po, Point3D ps) {
-        boolean shifted = false;
+        boolean[] shifted = new boolean[1];
+        return(curatePositionOffsetSize(imp, po, ps, shifted));
+    }
+
+    public static Point3D curatePositionOffsetSize(ImagePlus imp, Point3D po, Point3D ps, boolean[] shifted) {
+        shifted[0] = false;
 
         // round the values
         int x = (int) (po.getX()+0.5);
@@ -682,13 +630,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         int zs = (int) (ps.getZ()+0.5);
 
         // make sure that the ROI stays within the image bounds
-        if (x < 0) {x = 0; shifted = true;}
-        if (y < 0) {y = 0; shifted = true;}
-        if (z < 0) {z = 0; shifted = true;}
+        if (x < 0) {x = 0; shifted[0] = true;}
+        if (y < 0) {y = 0; shifted[0] = true;}
+        if (z < 0) {z = 0; shifted[0] = true;}
 
-        if (x+xs > imp.getWidth()-1) {x = imp.getWidth()-xs-1; shifted = true;}
-        if (y+ys > imp.getHeight()-1) {y = imp.getHeight()-ys-1; shifted = true;}
-        if (z+zs > imp.getNSlices()-1) {z = imp.getNSlices()-zs-1; shifted = true;}
+        if (x+xs > imp.getWidth()-1) {x = imp.getWidth()-xs-1; shifted[0] = true;}
+        if (y+ys > imp.getHeight()-1) {y = imp.getHeight()-ys-1; shifted[0] = true;}
+        if (z+zs > imp.getNSlices()-1) {z = imp.getNSlices()-zs-1; shifted[0] = true;}
 
         // check if it is ok now, otherwise the chosen radius simply is too large
         if (x < 0)  {
@@ -703,8 +651,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             IJ.showMessage("object size in z is too large; please reduce!");
             throw new IllegalArgumentException("out of range");
         }
-        if(shifted) {
-            log("!! image: "+imp.getTitle()+": cropping region needed to be shifted to stay within image bounds.");
+        if(shifted[0]) {
+            log("++ region was shifted to stay within image bounds.");
         }
         return(new Point3D(x,y,z));
     }
@@ -885,9 +833,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		new ImageJ();
         //IJ.run("Memory & Threads...", "maximum=3000 parallel=4 run");
 
-
-
-
         // todo: remove the initialisation from the constructor and put it into openFromDirectory
 
         /*if(interactive) {
@@ -905,7 +850,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        final String directory = "/Users/tischi/Desktop/example-data/compressed/";
+        final String directory = "/Users/tischi/Desktop/example-data/Ashna_119series/";
         //final String directory = "/Volumes/My Passport/Res_13/";
         //final String directory = "/Users/tischi/Desktop/example-data/tracking_test/";
         //final String directory = "/Volumes/almfspim/tischi/SPIM-example-data/Nils-MATLAB--tif-stacks--1channel--lzw-compressed/";
