@@ -23,7 +23,9 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,10 +57,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     public String h5DataSet = "Data111";
     public int cropZmin = 0;
     public int cropZmax = 1;
+    private String filenamePattern = "_Target--";
 
     // todo: stop loading thread upon closing of image
 
     // todo: increase speed of Leica tif parsing, possible?
+
+    // todo: make an editable dropdown list for the fileNamePattern
 
     public OpenStacksAsVirtualStack() {
     }
@@ -75,34 +80,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         StackStreamToolsGUI sstGUI = new StackStreamToolsGUI();
         sstGUI.showDialog();
     }
-
-    boolean showOpenDialog(String[] list) {
-        int fileCount = list.length;
-        VirtualOpenerDialog gd = new VirtualOpenerDialog("Sequence opening options", list);
-        gd.addNumericField("Number of stacks:", fileCount, 0);
-        gd.addNumericField("Starting stack:", 1, 0);
-        gd.addNumericField("Increment:", 1, 0);
-        gd.addStringField("File name contains:", "");
-        gd.addNumericField("Number of channels:", 1, 0);
-        String[] fileOrders = {"ct", "tc"};
-        gd.addChoice("File order:", fileOrders, "ct");
-
-        gd.showDialog();
-        if (gd.wasCanceled())
-            return false;
-
-        // set global variables
-        n = (int) gd.getNextNumber();
-        start = (int) gd.getNextNumber();
-        increment = (int) gd.getNextNumber();
-        if (increment < 1)
-            increment = 1;
-        filter = gd.getNextString();
-        nC = (int) gd.getNextNumber();
-        fileOrder = gd.getNextChoice();
-        return true;
-    }
-
 
     public boolean checkIfHdf5DataSetExists(IHDF5Reader reader) {
         String dataSets = "";
@@ -160,15 +137,19 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         fileType = "not determined";
         FileInfo[] info;
         FileInfo fi0;
-        Pattern patternLeica = Pattern.compile(".*_Target--.*");
-        Matcher matcherLeica;
+
+        // treat as different channels
+        Pattern patternLeicaFused = Pattern.compile(".*_Target--.*");
+        Pattern patternLeica00 = Pattern.compile(".*--LSEA00--.*");
+        Pattern patternLeica01 = Pattern.compile(".*--LSEA01--.*");
+
+        Matcher matcherLeicaFused, matcherLeica00, matcherLeica01;
 
 
         // todo: depending on the fileOrder do different things
         // todo: add the filter to the getFilesInFolder function
         // todo: find a clean solution for the channel folder presence or absence!
         // probably add channelfolder to filename!
-
 
         //
         // Get files in main directory
@@ -180,10 +161,15 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         if(lists[0]!=null) {
             // check if it is Leica single tiff SPIM files
             for (String fileName : lists[0]) {
-                matcherLeica = patternLeica.matcher(fileName);
-                if (matcherLeica.matches()) {
+
+                matcherLeicaFused = patternLeicaFused.matcher(fileName);
+                matcherLeica00 = patternLeica00.matcher(fileName);
+                matcherLeica01 = patternLeica01.matcher(fileName);
+
+                if (matcherLeicaFused.matches() || matcherLeica00.matches() || matcherLeica01.matches()) {
                     fileType = "leica single tif";
                     log("detected fileType: " + fileType);
+
                     break;
                 }
             }
@@ -258,80 +244,139 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         }  else if(fileType.equals("leica single tif")) {
 
+            Matcher matcherZ, matcherC, matcherT, matcherID;
 
-            Matcher matcherZ, matcherC, matcherT;
-
+            Pattern patternFileName = Pattern.compile(".*"+filenamePattern+".*");
             Pattern patternC = Pattern.compile(".*--C(.*).tif");
             Pattern patternZnoC = Pattern.compile(".*--Z(.*).tif");
             Pattern patternZwithC = Pattern.compile(".*--Z(.*)--C.*");
             Pattern patternT = Pattern.compile(".*--t(.*)--Z.*");
+            Pattern patternID = Pattern.compile(".*_(.*)"+filenamePattern+".*");
 
-            // check how many C, T and Z there are
-            nC = 1; nT = 1; nZ =1;
+            // filter for general file name pattern
+            ArrayList<String> filteredFileNames = new ArrayList<String>();
             for (String fileName : lists[0]) {
+                if (patternFileName.matcher(fileName).matches()) {
+                    filteredFileNames.add(fileName);
+                }
+            }
 
-                matcherLeica = patternLeica.matcher(fileName);
-                if(matcherLeica.matches()) {
+            if(filteredFileNames.size()==0) {
+                IJ.showMessage("No files matching this pattern were found: "+filenamePattern);
+                return null;
+            }
+
+            log("Number of files matching the pattern: "+filteredFileNames.size());
+
+            // check which different fileIDs there are
+            Set<String> fileIDset = new HashSet();
+            for (String fileName : filteredFileNames) {
+                matcherID = patternID.matcher(fileName);
+                if (matcherID.matches()) {
+                    fileIDset.add(matcherID.group(1));
+                }
+            }
+            String[] fileIDs = fileIDset.toArray(new String[fileIDset.size()]);
+
+            // check which different C, T and Z there are for each FileID
+
+            ArrayList<HashSet<String>> channels = new ArrayList<HashSet<String>>();
+            ArrayList<HashSet<String>> timepoints = new ArrayList<HashSet<String>>();
+            ArrayList<HashSet<String>> slices = new ArrayList<HashSet<String>>();
+
+            for(String fileID : fileIDs) {
+                channels.add(new HashSet<String>());
+                timepoints.add(new HashSet<String>());
+                slices.add(new HashSet<String>());
+                log("FileID: "+fileID);
+            }
+
+            for (int iFileID = 0; iFileID < fileIDs.length; iFileID++) {
+
+                for (String fileName : filteredFileNames) {
 
                     matcherC = patternC.matcher(fileName);
                     if (matcherC.matches()) {
                         // has multi-channels
-                        c = Integer.parseInt(matcherC.group(1).toString());
-                        if (c >= nC) nC = c + 1;
+                        channels.get(iFileID).add(matcherC.group(1));
                         matcherZ = patternZwithC.matcher(fileName);
                         if (matcherZ.matches()) {
-                            z = Integer.parseInt(matcherZ.group(1).toString());
-                            if (z >= nZ) nZ = z + 1;
+                            slices.get(iFileID).add(matcherZ.group(1));
                         }
                     } else {
                         // has only one channel
                         matcherZ = patternZnoC.matcher(fileName);
                         if (matcherZ.matches()) {
-                            z = Integer.parseInt(matcherZ.group(1).toString());
-                            if (z >= nZ) nZ = z + 1;
+                            slices.get(iFileID).add(matcherZ.group(1));
                         }
                     }
 
                     matcherT = patternT.matcher(fileName);
                     if (matcherT.matches()) {
-                        String s = matcherT.group(1).toString();
-                        t = Integer.parseInt(matcherT.group(1).toString());
-                        if (t >= nT) nT = t + 1;
+                        timepoints.get(iFileID).add(matcherT.group(1));
                     }
+
                 }
+
             }
 
+
+            nT = 0;
+            int[] tOffsets = new int[fileIDs.length+1]; // last offset is not used, but added anyway
+            tOffsets[0] = 0;
+
+            for (int iFileID = 0; iFileID < fileIDs.length; iFileID++) {
+
+                nC = Math.max(1,channels.get(iFileID).size());
+                nZ = slices.get(iFileID).size(); // must be the same for all fileIDs
+
+                log("FileID: "+fileIDs[iFileID]);
+                log("  Channels: "+nC);
+                log("  TimePoints: "+timepoints.get(iFileID).size());
+                log("  Slices: "+nZ);
+
+                nT += timepoints.get(iFileID).size();
+                tOffsets[iFileID+1] = nT;
+            }
+
+            //
             // sort into the final file list
+            //
+
             ctzFileList = new String[nC][nT][nZ];
 
-            for (String fileName : lists[0]) {
+            for (int iFileID = 0; iFileID < fileIDs.length; iFileID++) {
 
-                matcherLeica = patternLeica.matcher(fileName);
+                Pattern patternFileID = Pattern.compile(".*"+fileIDs[iFileID]+".*");
 
-                if(matcherLeica.matches()) {
+                for (String fileName : lists[0]) {
 
-                    matcherC = patternC.matcher(fileName);
-                    matcherT = patternT.matcher(fileName);
-                    if (nC > 1) matcherZ = patternZwithC.matcher(fileName);
-                    else matcherZ = patternZnoC.matcher(fileName);
+                    if (patternFileName.matcher(fileName).matches() &&
+                            patternFileID.matcher(fileName).matches()) {
 
+                        // figure out which C,Z,T the file is
+                        matcherC = patternC.matcher(fileName);
+                        matcherT = patternT.matcher(fileName);
+                        if (nC > 1) matcherZ = patternZwithC.matcher(fileName);
+                        else matcherZ = patternZnoC.matcher(fileName);
 
-                    if (matcherZ.matches()) {
-                        z = Integer.parseInt(matcherZ.group(1).toString());
+                        if (matcherZ.matches()) {
+                            z = Integer.parseInt(matcherZ.group(1).toString());
+                        }
+                        if (matcherT.matches()) {
+                            t = Integer.parseInt(matcherT.group(1).toString());
+                            t += tOffsets[iFileID];
+                        }
+                        if (matcherC.matches()) {
+                            c = Integer.parseInt(matcherC.group(1).toString());
+                        } else {
+                            c = 0;
+                        }
+
+                        ctzFileList[c][t][z] = fileName;
+
                     }
-                    if (matcherT.matches()) {
-                        t = Integer.parseInt(matcherT.group(1).toString());
-                    }
-                    if (matcherC.matches()) {
-                        c = Integer.parseInt(matcherC.group(1).toString());
-                    } else {
-                        c = 0;
-                    }
-
-                    ctzFileList[c][t][z] = fileName;
-
                 }
-
             }
 
             try {
@@ -431,6 +476,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         return(null);
                     }
                     imp.show();
+
+                    if(fileType.equals("leica single tif")) {
+                        imp.setTitle(filenamePattern);
+                    }
 
                     // show compression
                     FileInfoSer[][][] infos = stack.getFileInfosSer();
@@ -850,7 +899,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        final String directory = "/Users/tischi/Desktop/example-data/Ashna_119series/";
+        //final String directory = "/Users/tischi/Desktop/example-data/Ashna_119series/";
+        final String directory = "/Volumes/USB DISK/Ashna -test/";
+
         //final String directory = "/Volumes/My Passport/Res_13/";
         //final String directory = "/Users/tischi/Desktop/example-data/tracking_test/";
         //final String directory = "/Volumes/almfspim/tischi/SPIM-example-data/Nils-MATLAB--tif-stacks--1channel--lzw-compressed/";
@@ -948,172 +999,220 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     }
 
-}
 
-// todo: here the GUI class is outside of the other class, in Registration it is not, why?
+    class StackStreamToolsGUI extends JPanel implements ActionListener, FocusListener, ItemListener {
 
-class StackStreamToolsGUI extends JPanel implements ActionListener, FocusListener, ItemListener {
-
-    String[] actions = {"Stream from folder",
-            "Stream from info file",
-            "Save as info file",
-            "Save as tiff stacks",
-            "Crop as new stream",
-            "Duplicate to RAM",
-            "Report issue"};
+        String[] actions = {"Stream from folder",
+                "Stream from info file",
+                "Save as info file",
+                "Save as tiff stacks",
+                "Crop as new stream",
+                "Duplicate to RAM",
+                "Report issue"};
 
 
-    JCheckBox cbLog = new JCheckBox("Verbose logging");
-    JTextField tfH5DataSet = new JTextField("Data111", 10);
-    JTextField tfCropZminZmax = new JTextField("0,0", 7);
+        JCheckBox cbLog = new JCheckBox("Verbose logging");
+        JTextField tfH5DataSet = new JTextField("Data111", 10);
+        JTextField tfCropZminZmax = new JTextField("0,0", 7);
 
-    JFileChooser fc;
+        //JTextField tfFileNamePattern = new JTextField(".*LSEA00.*", 10);
 
-    public void StackStreamToolsGUI() {
-    }
+        String[] fileNamePatterns = {"_Target--","--LSEA00--","--LSEA01--"};
+        JComboBox fileNamePatternComboBox = new JComboBox(fileNamePatterns);
 
-    public void showDialog() {
+        JFileChooser fc;
 
-        JFrame frame = new JFrame("Data Streaming Tools");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        Container c = frame.getContentPane();
-        c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
-
-        String[] toolTipTexts = getToolTipFile("DataStreamingHelp.html");
-
-        // Buttons
-        JButton[] buttons = new JButton[actions.length];
-        for (int i = 0; i < buttons.length; i++) {
-            buttons[i] = new JButton(actions[i]);
-            buttons[i].setActionCommand(actions[i]);
-            buttons[i].addActionListener(this);
-            buttons[i].setToolTipText(toolTipTexts[i]);
+        public void StackStreamToolsGUI() {
         }
 
-        // Textfields
-        JLabel labelH5DataSet = new JLabel("Hdf5 data set: ");
-        labelH5DataSet.setLabelFor(tfH5DataSet);
-        JLabel labelCropZminZmax = new JLabel("zMin, zMax: ");
-        labelCropZminZmax.setLabelFor(tfCropZminZmax);
+        public void showDialog() {
 
-        // Checkboxes
-        cbLog.setSelected(false);
-        cbLog.addItemListener(this);
+            JFrame frame = new JFrame("Data Streaming Tools");
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        int i = 0, j = 0;
+            Container c = frame.getContentPane();
+            c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
 
-        ArrayList<JPanel> panels = new ArrayList<JPanel>();
+            String[] toolTipTexts = getToolTipFile("DataStreamingHelp.html");
+            ToolTipManager.sharedInstance().setDismissDelay(10000000);
 
-        panels.add(new JPanel());
-        panels.get(j).add(buttons[i++]);
-        panels.get(j).add(buttons[i++]);
-        c.add(panels.get(j++));
+            // Buttons
+            JButton[] buttons = new JButton[actions.length];
+            for (int i = 0; i < buttons.length; i++) {
+                buttons[i] = new JButton(actions[i]);
+                buttons[i].setActionCommand(actions[i]);
+                buttons[i].addActionListener(this);
+                buttons[i].setToolTipText(toolTipTexts[i]);
+            }
 
-        panels.add(new JPanel());
-        panels.get(j).add(buttons[i++]);
-        panels.get(j).add(buttons[i++]);
-        c.add(panels.get(j++));
+            // Checkboxes
+            cbLog.setSelected(false);
+            cbLog.addItemListener(this);
 
-        panels.add(new JPanel());
-        panels.get(j).add(labelCropZminZmax);
-        panels.get(j).add(tfCropZminZmax);
-        panels.get(j).add(buttons[i++]);
-        c.add(panels.get(j++));
+            int i = 0, j = 0;
 
-        panels.add(new JPanel());
-        panels.get(j).add(buttons[i++]);
-        c.add(panels.get(j++));
+            ArrayList<JPanel> panels = new ArrayList<JPanel>();
 
-        panels.add(new JPanel());
-        panels.get(j).add(labelH5DataSet);
-        panels.get(j).add(tfH5DataSet);
-        c.add(panels.get(j++));
+            panels.add(new JPanel());
+            panels.get(j).add(buttons[i++]);
+            panels.get(j).add(buttons[i++]);
+            c.add(panels.get(j++));
 
-        panels.add(new JPanel());
-        panels.get(j).add(cbLog);
-        c.add(panels.get(j++));
+            panels.add(new JPanel());
+            panels.get(j).add(buttons[i++]);
+            panels.get(j).add(buttons[i++]);
+            c.add(panels.get(j++));
 
-        panels.add(new JPanel());
-        panels.get(j).add(buttons[i++]);
-        c.add(panels.get(j++));
+            panels.add(new JPanel());
+            panels.get(j).add(new JLabel("zMin, zMax:"));
+            panels.get(j).add(tfCropZminZmax);
+            panels.get(j).add(buttons[i++]);
+            c.add(panels.get(j++));
 
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+            panels.add(new JPanel());
+            panels.get(j).add(buttons[i++]);
+            c.add(panels.get(j++));
 
-    }
+            panels.add(new JPanel());
+            panels.get(j).add(new JLabel("Hdf5 data set:"));
+            panels.get(j).add(tfH5DataSet);
+            c.add(panels.get(j++));
 
-    public void focusGained(FocusEvent e) {
-        //
-    }
+            panels.add(new JPanel());
+            panels.get(j).add(new JLabel("Leica filename pattern:"));
+            panels.get(j).add(fileNamePatternComboBox);
+            c.add(panels.get(j++));
 
-    public void focusLost(FocusEvent e) {
-        JTextField tf = (JTextField) e.getSource();
-        if (!(tf == null)) {
-            tf.postActionEvent();
+            panels.add(new JPanel());
+            panels.get(j).add(cbLog);
+            c.add(panels.get(j++));
+
+            panels.add(new JPanel());
+            panels.get(j).add(buttons[i++]);
+            c.add(panels.get(j++));
+
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+
         }
-    }
 
-    public void itemStateChanged(ItemEvent e) {
-        Object source = e.getItemSelectable();
+        public void focusGained(FocusEvent e) {
+            //
+        }
 
-        if (source == cbLog) {
-            if (e.getStateChange() == ItemEvent.DESELECTED) {
-                Globals.verbose = false;
-            } else {
-                Globals.verbose = true;
+        public void focusLost(FocusEvent e) {
+            JTextField tf = (JTextField) e.getSource();
+            if (!(tf == null)) {
+                tf.postActionEvent();
             }
         }
-    }
 
-    public void actionPerformed(ActionEvent e) {
-        int i = 0;
+        public void itemStateChanged(ItemEvent e) {
+            Object source = e.getItemSelectable();
 
-        final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
-        osv.h5DataSet = tfH5DataSet.getText();
-
-        if (e.getActionCommand().equals(actions[i++])) {
-
-            // Open from folder
-            final String directory = IJ.getDirectory("Select a Directory");
-            if (directory == null)
-                return;
-
-            Thread t1 = new Thread(new Runnable() {
-                public void run() {
-                    osv.openFromDirectory(directory, null);
+            if (source == cbLog) {
+                if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    Globals.verbose = false;
+                } else {
+                    Globals.verbose = true;
                 }
-            });
-            t1.start();
-
-        } else if (e.getActionCommand().equals(actions[i++])) {
-
-            // Open from file
-            String filePath = IJ.getFilePath("Select *.ser file");
-            if (filePath == null)
-                return;
-            File file = new File(filePath);
-            ImagePlus imp = osv.openFromInfoFile(file.getParent() + "/", file.getName());
-            imp.show();
-
-        } else if (e.getActionCommand().equals(actions[i++])) {
-
-            //
-            // "Save as info file"
-            //
-
-            ImagePlus imp = IJ.getImage();
-            final VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-            if(vss==null) {
-                IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
-                return;
             }
+        }
 
-            fc = new JFileChooser(vss.getDirectory());
-            int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                final File file = fc.getSelectedFile();
+        public void actionPerformed(ActionEvent e) {
+            int i = 0;
+
+            final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
+            osv.h5DataSet = tfH5DataSet.getText();
+            osv.filenamePattern = (String)fileNamePatternComboBox.getSelectedItem();
+
+            if (e.getActionCommand().equals(actions[i++])) {
+
+                // Open from folder
+                final String directory = IJ.getDirectory("Select a Directory");
+                if (directory == null)
+                    return;
+
+                Thread t1 = new Thread(new Runnable() {
+                    public void run() {
+                        osv.openFromDirectory(directory, null);
+                    }
+                });
+                t1.start();
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                // Open from file
+                String filePath = IJ.getFilePath("Select *.ser file");
+                if (filePath == null)
+                    return;
+                File file = new File(filePath);
+                ImagePlus imp = osv.openFromInfoFile(file.getParent() + "/", file.getName());
+                imp.show();
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // "Save as info file"
+                //
+
+                ImagePlus imp = IJ.getImage();
+                final VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+                if(vss==null) {
+                    IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
+                    return;
+                }
+
+                fc = new JFileChooser(vss.getDirectory());
+                int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    final File file = fc.getSelectedFile();
+
+                    //
+                    // Check that all image files have been parsed
+                    //
+                    int numberOfUnparsedFiles = vss.numberOfUnparsedFiles();
+                    if(numberOfUnparsedFiles > 0) {
+                        IJ.showMessage("There are still "+numberOfUnparsedFiles+
+                                " files in the folder that have not been parsed yet.\n" +
+                                "Please try again later (check ImageJ's status bar).");
+                        return;
+                    }
+
+                    //
+                    // Save the info file
+                    //
+                    Thread t1 = new Thread(new Runnable() {
+                        public void run() {
+                            log("Saving: " + file.getAbsolutePath());
+                            osv.writeFileInfosSer(vss.getFileInfosSer(), file.getAbsolutePath());
+                        }
+                    }); t1.start();
+                    // update progress status
+                    Thread t2 = new Thread(new Runnable() {
+                        public void run() {
+                            osv.iProgress=0; osv.nProgress=1;
+                            osv.updateStatus("Saving info file");
+                        }
+                    });
+                    t2.start();
+
+                } else {
+                    log("Save command cancelled by user.");
+                }
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // "Save as tiff stacks"
+                //
+                ImagePlus imp = IJ.getImage();
+                VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+                if(vss==null) {
+                    IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
+                    return;
+                }
 
                 //
                 // Check that all image files have been parsed
@@ -1126,164 +1225,119 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, FocusListene
                     return;
                 }
 
+
+                fc = new JFileChooser(vss.getDirectory());
+                int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    final File file = fc.getSelectedFile();
+                    // do the job
+                    Thread t1 = new Thread(new Runnable() {
+                        public void run() {
+                            osv.saveAsTiffStacks(IJ.getImage(), file.getAbsolutePath());
+                        }
+                    }); t1.start();
+                    // update progress status
+                    Thread t2 = new Thread(new Runnable() {
+                        public void run() {
+                            osv.iProgress=0; osv.nProgress=1;
+                            osv.updateStatus("Saving file");
+                        }
+                    }); t2.start();
+
+                } else {
+                    log("Save command cancelled by user.");
+                    return;
+                }
+
+                //} else if (e.getActionCommand().equals(actions[i++])) {
+                // "Save as h5 stacks"
+                //    IJ.showMessage("Not yet implemented.");
+
+            }  else if (e.getActionCommand().equals(actions[i++])) {
+
                 //
-                // Save the info file
+                // Crop As New Stream
                 //
+
+                ImagePlus imp = IJ.getImage();
+                VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+                if(vss==null) {
+                    IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
+                    return;
+                }
+
+                //
+                // Check that all image files have been parsed
+                //
+
+                int numberOfUnparsedFiles = vss.numberOfUnparsedFiles();
+                if(numberOfUnparsedFiles > 0) {
+                    IJ.showMessage("There are still "+numberOfUnparsedFiles+
+                            " files in the folder that have not been parsed yet.\n" +
+                            "Please try again later (check ImageJ's status bar).");
+                    return;
+                }
+
+                //
+                // Get z cropping range
+                //
+
+                String[] sA = tfCropZminZmax.getText().split(",");
+                if(sA.length!=2) {
+                    IJ.showMessage("Something went wrong parsing the zMin, zMax croppping values.\n" +
+                            "Please check that there are two comma separated values.");
+                    return;
+                }
+                ImagePlus imp2 = osv.crop(imp, new Integer(sA[0]), new Integer(sA[1]));
+                if (imp2 != null)
+                    imp2.show();
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // duplicate to RAM
+                //
+
                 Thread t1 = new Thread(new Runnable() {
                     public void run() {
-                        log("Saving: " + file.getAbsolutePath());
-                        osv.writeFileInfosSer(vss.getFileInfosSer(), file.getAbsolutePath());
+                        ImagePlus imp2 = osv.duplicateToRAM(IJ.getImage());
+                        if (imp2 != null)
+                            imp2.show();
+
                     }
-                }); t1.start();
-                // update progress status
+                });
+                t1.start();
+
                 Thread t2 = new Thread(new Runnable() {
                     public void run() {
-                        osv.iProgress=0; osv.nProgress=1;
-                        osv.updateStatus("Saving info file");
+                        osv.updateStatus("Duplicated slice");
                     }
                 });
                 t2.start();
 
-            } else {
-                log("Save command cancelled by user.");
-            }
+            } else if (e.getActionCommand().equals(actions[i++])) {
 
-        } else if (e.getActionCommand().equals(actions[i++])) {
+                //
+                // Report issue
+                //
 
-            //
-            // "Save as tiff stacks"
-            //
-            ImagePlus imp = IJ.getImage();
-            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-            if(vss==null) {
-                IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
-                return;
-            }
-
-            //
-            // Check that all image files have been parsed
-            //
-            int numberOfUnparsedFiles = vss.numberOfUnparsedFiles();
-            if(numberOfUnparsedFiles > 0) {
-                IJ.showMessage("There are still "+numberOfUnparsedFiles+
-                        " files in the folder that have not been parsed yet.\n" +
-                        "Please try again later (check ImageJ's status bar).");
-                return;
-            }
-
-
-            fc = new JFileChooser(vss.getDirectory());
-            int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                final File file = fc.getSelectedFile();
-                // do the job
-                Thread t1 = new Thread(new Runnable() {
-                    public void run() {
-                        osv.saveAsTiffStacks(IJ.getImage(), file.getAbsolutePath());
+                String url = "https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues";
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        final URI uri = new URI(url);
+                        Desktop.getDesktop().browse(uri);
+                    } catch (URISyntaxException uriEx) {
+                        IJ.showMessage(uriEx.toString());
+                    } catch (IOException ioEx) {
+                        IJ.showMessage(ioEx.toString());
                     }
-                }); t1.start();
-                // update progress status
-                Thread t2 = new Thread(new Runnable() {
-                    public void run() {
-                        osv.iProgress=0; osv.nProgress=1;
-                        osv.updateStatus("Saving file");
-                    }
-                }); t2.start();
-
-            } else {
-                log("Save command cancelled by user.");
-                return;
-            }
-
-        //} else if (e.getActionCommand().equals(actions[i++])) {
-        // "Save as h5 stacks"
-        //    IJ.showMessage("Not yet implemented.");
-
-        }  else if (e.getActionCommand().equals(actions[i++])) {
-
-            //
-            // Crop As New Stream
-            //
-
-            ImagePlus imp = IJ.getImage();
-            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-            if(vss==null) {
-                IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
-                return;
-            }
-
-            //
-            // Check that all image files have been parsed
-            //
-
-            int numberOfUnparsedFiles = vss.numberOfUnparsedFiles();
-            if(numberOfUnparsedFiles > 0) {
-                IJ.showMessage("There are still "+numberOfUnparsedFiles+
-                        " files in the folder that have not been parsed yet.\n" +
-                        "Please try again later (check ImageJ's status bar).");
-                return;
-            }
-
-            //
-            // Get z cropping range
-            //
-
-            String[] sA = tfCropZminZmax.getText().split(",");
-            if(sA.length!=2) {
-                IJ.showMessage("Something went wrong parsing the zMin, zMax croppping values.\n" +
-                        "Please check that there are two comma separated values.");
-                return;
-            }
-            ImagePlus imp2 = osv.crop(imp, new Integer(sA[0]), new Integer(sA[1]));
-            if (imp2 != null)
-                imp2.show();
-
-        } else if (e.getActionCommand().equals(actions[i++])) {
-
-            //
-            // duplicate to RAM
-            //
-
-            Thread t1 = new Thread(new Runnable() {
-                public void run() {
-                    ImagePlus imp2 = osv.duplicateToRAM(IJ.getImage());
-                    if (imp2 != null)
-                        imp2.show();
+                } else {
+                    IJ.showMessage("Could not open browser, please report issue here: \n" +
+                            "https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues");
 
                 }
-            });
-            t1.start();
 
-            Thread t2 = new Thread(new Runnable() {
-                public void run() {
-                    osv.updateStatus("Duplicated slice");
-                }
-            });
-            t2.start();
-
-        } else if (e.getActionCommand().equals(actions[i++])) {
-
-            //
-            // Report issue
-            //
-
-            String url = "https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues";
-            if (Desktop.isDesktopSupported()) {
-                try {
-                    final URI uri = new URI(url);
-                    Desktop.getDesktop().browse(uri);
-                } catch (URISyntaxException uriEx) {
-                    IJ.showMessage(uriEx.toString());
-                } catch (IOException ioEx) {
-                    IJ.showMessage(ioEx.toString());
-                }
-            } else {
-                IJ.showMessage("Could not open browser, please report issue here: \n" +
-                        "https://github.com/tischi/imagej-open-stacks-as-virtualstack/issues");
-
-            }
-
-        }  else if (e.getActionCommand().equals(tfCropZminZmax)) {
+            }  else if (e.getActionCommand().equals(tfCropZminZmax)) {
 
                 //
                 // Change of cropping size
@@ -1294,47 +1348,52 @@ class StackStreamToolsGUI extends JPanel implements ActionListener, FocusListene
 
         }
 
-    private String[] getToolTipFile(String fileName) {
+        private String[] getToolTipFile(String fileName) {
 
-        ArrayList<String> toolTipTexts = new ArrayList<String>();
+            ArrayList<String> toolTipTexts = new ArrayList<String>();
 
-        //Get file from resources folder
-        //ClassLoader classLoader = getClass().getClassLoader();
-        //File file = new File(classLoader.getResource(fileName).getFile());
+            //Get file from resources folder
+            //ClassLoader classLoader = getClass().getClassLoader();
+            //File file = new File(classLoader.getResource(fileName).getFile());
 
-        //try {
+            //try {
 
-        InputStream in = getClass().getResourceAsStream("/"+fileName);
-        BufferedReader input = new BufferedReader(new InputStreamReader(in));
-        Scanner scanner = new Scanner(input);
+            InputStream in = getClass().getResourceAsStream("/"+fileName);
+            BufferedReader input = new BufferedReader(new InputStreamReader(in));
+            Scanner scanner = new Scanner(input);
 
-        StringBuilder sb = new StringBuilder("");
+            StringBuilder sb = new StringBuilder("");
 
 
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            if(line.equals("###")) {
-                toolTipTexts.add(sb.toString());
-                sb = new StringBuilder("");
-            } else {
-                sb.append(line);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if(line.equals("###")) {
+                    toolTipTexts.add(sb.toString());
+                    sb = new StringBuilder("");
+                } else {
+                    sb.append(line);
+                }
+
             }
 
+            scanner.close();
+
+            //} catch (IOException e) {
+
+            //    log("Did not find tool tip file 2.");
+            //    e.printStackTrace();
+
+            //}
+
+            return(toolTipTexts.toArray(new String[0]));
         }
 
-        scanner.close();
-
-        //} catch (IOException e) {
-
-        //    log("Did not find tool tip file 2.");
-        //    e.printStackTrace();
-
-        //}
-
-        return(toolTipTexts.toArray(new String[0]));
     }
 
 }
+
+// todo: here the GUI class is outside of the other class, in Registration it is not, why?
+
 
 
 class VirtualOpenerDialog extends GenericDialog {
