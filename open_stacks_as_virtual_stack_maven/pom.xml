@@ -68,7 +68,13 @@
 			<version>1.51f</version>
 		</dependency>
 
-		<dependency>
+        <dependency>
+            <groupId>sc.fiji</groupId>
+            <artifactId>legacy-imglib1</artifactId>
+            <version>1.1.6</version>
+        </dependency>
+
+        <dependency>
 			<groupId>cisd</groupId>
 			<artifactId>jhdf5</artifactId>
 		</dependency>
@@ -79,21 +85,18 @@
             <version>1.0.1</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/mpicbg/imglib -->
         <dependency>
             <groupId>mpicbg</groupId>
             <artifactId>imglib</artifactId>
             <version>2.0.0-beta6</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/mpicbg/imglib-ij -->
         <dependency>
             <groupId>mpicbg</groupId>
             <artifactId>imglib-ij</artifactId>
             <version>2.0.0-beta6</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/mpicbg/imglib-algorithms -->
         <dependency>
             <groupId>mpicbg</groupId>
             <artifactId>imglib-algorithms</artifactId>

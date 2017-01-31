@@ -88,8 +88,8 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.429078">
-              <caret line="741" column="0" selection-start-line="741" selection-start-column="0" selection-end-line="741" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.4007092">
+              <caret line="1139" column="33" selection-start-line="1139" selection-start-column="33" selection-end-line="1139" selection-end-column="33" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1511#1518#0" expanded="true" />
@@ -110,14 +110,22 @@
                 <element signature="method#initialize#0;class#Registration#0" expanded="false" />
                 <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
-                <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
                 <element signature="e#25302#26381#0" expanded="true" />
                 <element signature="e#26380#26381#0" expanded="true" />
                 <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
                 <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
-                <element signature="method#computeShift16bitUsingPhaseCorrelation#0;class#Registration#0" expanded="false" />
                 <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -241,11 +249,11 @@
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/FileInfoSer.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/FastTiffDecoder.java" />
         <option value="$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html" />
-        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Track.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
       </list>
     </option>
@@ -836,12 +844,10 @@
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
             <element signature="e#25302#26381#0" expanded="true" />
             <element signature="e#26380#26381#0" expanded="true" />
             <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
             <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeShift16bitUsingPhaseCorrelation#0;class#Registration#0" expanded="false" />
             <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
@@ -989,12 +995,10 @@
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
             <element signature="e#25302#26381#0" expanded="true" />
             <element signature="e#26380#26381#0" expanded="true" />
             <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
             <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeShift16bitUsingPhaseCorrelation#0;class#Registration#0" expanded="false" />
             <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
@@ -1247,14 +1251,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="73" column="4" selection-start-line="73" selection-start-column="4" selection-end-line="73" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Globals.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1362,10 +1358,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.429078">
-          <caret line="741" column="0" selection-start-line="741" selection-start-column="0" selection-end-line="741" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.4007092">
+          <caret line="1139" column="33" selection-start-line="1139" selection-start-column="33" selection-end-line="1139" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1511#1518#0" expanded="true" />
@@ -1386,12 +1390,10 @@
             <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
             <element signature="e#25302#26381#0" expanded="true" />
             <element signature="e#26380#26381#0" expanded="true" />
             <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
             <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeShift16bitUsingPhaseCorrelation#0;class#Registration#0" expanded="false" />
             <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>

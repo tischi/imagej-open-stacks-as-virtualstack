@@ -1137,6 +1137,7 @@ public class Registration implements PlugIn {
 
     public Point3D computeShift16bitUsingPhaseCorrelation(ImagePlus imp1, ImagePlus imp0) {
         PhaseCorrelation phc = new PhaseCorrelation(ImagePlusAdapter.wrap(imp1), ImagePlusAdapter.wrap(imp0), 5, true);
+        if(Globals.verbose) log("phc.process()... ");
         phc.process();
         int[] shift = phc.getShift().getPosition();
         return(new Point3D(shift[0],shift[1],shift[2]));
