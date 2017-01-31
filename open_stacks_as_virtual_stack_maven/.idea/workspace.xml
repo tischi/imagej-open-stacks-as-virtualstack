@@ -25,8 +25,8 @@
       <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.43392506">
-              <caret line="260" column="33" selection-start-line="260" selection-start-column="33" selection-end-line="260" selection-end-column="33" />
+            <state vertical-scroll-proportion="0.9842209">
+              <caret line="268" column="13" selection-start-line="268" selection-start-column="13" selection-end-line="268" selection-end-column="13" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#2110#2212#0" expanded="true" />
@@ -261,8 +261,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="72" />
-    <option name="y" value="36" />
+    <option name="x" value="64" />
+    <option name="y" value="43" />
     <option name="width" value="1213" />
     <option name="height" value="819" />
   </component>
@@ -577,7 +577,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="72" y="36" width="1213" height="819" extended-state="0" />
+    <frame x="64" y="43" width="1213" height="819" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -1341,8 +1341,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.43392506">
-          <caret line="260" column="33" selection-start-line="260" selection-start-column="33" selection-end-line="260" selection-end-column="33" />
+        <state vertical-scroll-proportion="0.9842209">
+          <caret line="268" column="13" selection-start-line="268" selection-start-column="13" selection-end-line="268" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#2110#2212#0" expanded="true" />
