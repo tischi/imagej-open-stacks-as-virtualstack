@@ -219,41 +219,6 @@ class OpenerExtensions extends Opener {
 
     }
 
-    public ImagePlus openCroppedStackCenterRadii(String directory, FileInfoSer[] info, int dz, Point3D pc, Point3D pr) {
-
-        // compute ranges to be loaded
-        // todo: make this Point3D based and move to extra function
-        int xc = (int) (pc.getX() + 0.5);
-        int yc = (int) (pc.getY() + 0.5);
-        int zc = (int) (pc.getZ() + 0.5);
-        int rx = (int) (pr.getX() + 0.5);
-        int ry = (int) (pr.getY() + 0.5);
-        int rz = (int) (pr.getZ() + 0.5);
-        int xs = xc - rx;
-        int ys = yc - ry;
-        int zs = zc - rz;
-        int xe = xc + rx;
-        int ye = yc + ry;
-        int ze = zc + rz;
-        int nz = ze - zs + 1;
-
-        if (dz > 1) {
-            nz = (int) (1.0 * nz / dz + 0.5);
-        }
-
-        ImagePlus imp = null;
-        if(info[0].fileTypeString.equals("tif")) {
-            imp = openCroppedTiffStackUsingIFDs(directory, info, zs, ze, nz, dz, xs, xe, ys, ye);
-        } else if(info[0].fileTypeString.equals("h5")) {
-            imp = openCroppedH5stack(directory, info, zs, ze, nz, dz, xs, xe, ys, ye);
-        } else {
-            IJ.showMessage("unsupported file type: "+info[0].fileTypeString);
-        }
-
-        return(imp);
-
-    }
-
     // todo make Points from the ints
     public ImagePlus openCroppedH5stack(String directory, FileInfoSer[] info, int zs, int ze, int nz, int dz, int xs, int xe, int ys, int ye) {
         long startTime;
@@ -484,65 +449,6 @@ class OpenerExtensions extends Opener {
         }
 
         return imp;
-    }
-
-    public FileInfoSer[] cropInfoCenterRadius(FileInfoSer[] info, int dz, Point3D pc, Point3D pr) {
-
-        // todo: make this some methods in some class!!!
-        int x = (int) (pc.getX() + 0.5);
-        int y = (int) (pc.getY() + 0.5);
-        int z = (int) (pc.getZ() + 0.5);
-        int rx = (int) (pr.getX() + 0.5);
-        int ry = (int) (pr.getY() + 0.5);
-        int rz = (int) (pr.getZ() + 0.5);
-        int nx = (int) (2 * rx + 1);
-        int ny = (int) (2 * ry + 1);
-        int nz = (int) (2 * rz + 1);
-        x = x - rx;
-        y = y - ry;
-        z = z - rz;
-
-        if (dz > 1) {
-            nz = (int) (1.0 * nz / dz + 0.5);
-        }
-
-        if (Globals.verbose) {
-            log("# OpenerExtension.cropInfo:");
-            log("filename: " + info[0].fileName);
-            log("dz: " + dz);
-            log("rx,ry,rz: " + pr.getX() + "," + pr.getY() + "," + pr.getZ());
-            log("z,nz,x,nx,y,ny: " + z + "," + nz + "," + x + "," + nx + "," + y + "," + ny);
-            log("info.length: " + info.length);
-        }
-
-        FileInfoSer[] croppedInfo = new FileInfoSer[nz];
-        FileInfoSer fi = info[0];
-
-        /*if(fi.fileTypeString == "tif") {
-
-            for (int iz = z, jz = z; iz < (z + nz); iz++, jz += dz) {
-                if (jz < 0 || jz >= info.length) {
-                    IJ.showMessage("z=" + jz + " is out of range. Please reduce your z-radius.");
-                    throw new IllegalArgumentException("z=" + jz + " is out of range; iz=" + iz);
-                }
-                croppedInfo[iz-z] = (FileInfoSer) info[jz].clone();
-                croppedInfo[iz-z].longOffset = croppedInfo[iz-z].longOffset;
-                croppedInfo[iz-z].stripLengths = new int[ny];
-                croppedInfo[iz-z].stripOffsets = new int[ny];
-                for (int i = 0; i < ny; i++) {
-                    croppedInfo[iz-z].stripLengths[i] = nx * fi.bytesPerPixel;
-                    croppedInfo[iz-z].stripOffsets[i] = (int) croppedInfo[iz-z].longOffset + ((((y + i) * fi.width) + x) * fi.bytesPerPixel);
-                    //infoModified[iz-z].stripOffsets[i] = (int) (i * fi.width * fi.bytesPerPixel);
-                }
-                croppedInfo[iz-z].height = ny;
-                croppedInfo[iz-z].width = nx;
-            }
-
-        } else if(fi.fileTypeString == "h5") {
-
-        }*/
-
-        return (croppedInfo);
     }
 
 }

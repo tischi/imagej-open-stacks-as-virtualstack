@@ -290,6 +290,8 @@ public class VirtualStackOfStacks extends ImageStack {
             ps = new Point3D(fi.width,fi.height,1);
         }
 
+        // todo: call the getCube... method from here
+
         imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);
 
         if (imp==null) {
@@ -298,6 +300,7 @@ public class VirtualStackOfStacks extends ImageStack {
         }
 
         return imp.getProcessor();
+
     }
 
     public boolean isCropped() {
@@ -332,34 +335,38 @@ public class VirtualStackOfStacks extends ImageStack {
 
     public ImagePlus getCubeByTimeOffsetAndSize(int t, int c, Point3D po, Point3D pSize, Point3D pSubSample) {
 
-        if(Globals.verbose) {
+        if (Globals.verbose) {
             log("# VirtualStackOfStacks.getCroppedFrameOffsetSize");
-            log("t: "+t);
-            log("c: "+c);
+            log("t: " + t);
+            log("c: " + c);
         }
 
         FileInfoSer fi = infos[0][0][0];
 
-        if(fi.isCropped) {
+        if (fi.isCropped) {
             po = po.add(fi.getCropOffset());
         }
 
-        if(infos[c][t] == null) {
+        if (infos[c][t] == null) {
             // file info not yet loaded => get it!
             setStackFromFile(t, c);
         }
 
+        // todo: load less if out-of-bounds
         ImagePlus imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], (int) pSubSample.getZ(), po, pSize);
 
-        if (imp==null) {
+        if (imp == null) {
             log("Error: loading failed!");
             return null;
+        }
+
+        // todo: pad with zeros if loaded less
+
+
+        if ((int) pSubSample.getX() > 1 || (int) pSubSample.getY() > 1) {
+            return (resizeWidthAndHeight(imp, (int) pSubSample.getX(), (int) pSubSample.getY()));
         } else {
-            if( (int)pSubSample.getX()>1 || (int)pSubSample.getY()>1) {
-                return(resizeWidthAndHeight(imp,(int)pSubSample.getX(),(int)pSubSample.getY()));
-            } else {
-                return(imp);
-            }
+            return (imp);
         }
     }
 

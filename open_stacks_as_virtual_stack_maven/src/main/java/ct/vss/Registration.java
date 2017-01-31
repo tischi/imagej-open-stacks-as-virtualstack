@@ -716,8 +716,6 @@ public class Registration implements PlugIn {
     public void showCroppedTracks() {
 
         ImagePlus[] impA = new ImagePlus[Tracks.size()];
-        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-        FileInfoSer[][][] infos = vss.getFileInfosSer();
         OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
 
         for(int i=0; i<Tracks.size(); i++) {
@@ -742,7 +740,7 @@ public class Registration implements PlugIn {
                     trackOffsets[iPosition] = offsetCurated;
                 }
 
-                impA[i] = OpenStacksAsVirtualStack.openCroppedOffsetSizeFromInfos(imp, infos, trackOffsets, track.getObjectSize(), track.getTmin(), track.getTmax());
+                impA[i] = OpenStacksAsVirtualStack.makeCroppedVirtualStack(imp, trackOffsets, track.getObjectSize(), track.getTmin(), track.getTmax());
                 if (impA[i] == null) {
                     log("..cropping failed.");
                 } else {

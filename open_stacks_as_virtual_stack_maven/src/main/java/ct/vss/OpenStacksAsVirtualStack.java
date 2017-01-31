@@ -293,29 +293,33 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             for (int iFileID = 0; iFileID < fileIDs.length; iFileID++) {
 
+                Pattern patternFileID = Pattern.compile(".*"+fileIDs[iFileID]+".*");
+
                 for (String fileName : filteredFileNames) {
 
-                    matcherC = patternC.matcher(fileName);
-                    if (matcherC.matches()) {
-                        // has multi-channels
-                        channels.get(iFileID).add(matcherC.group(1));
-                        matcherZ = patternZwithC.matcher(fileName);
-                        if (matcherZ.matches()) {
-                            slices.get(iFileID).add(matcherZ.group(1));
+                    if (patternFileID.matcher(fileName).matches()) {
+
+                        matcherC = patternC.matcher(fileName);
+                        if (matcherC.matches()) {
+                            // has multi-channels
+                            channels.get(iFileID).add(matcherC.group(1));
+                            matcherZ = patternZwithC.matcher(fileName);
+                            if (matcherZ.matches()) {
+                                slices.get(iFileID).add(matcherZ.group(1));
+                            }
+                        } else {
+                            // has only one channel
+                            matcherZ = patternZnoC.matcher(fileName);
+                            if (matcherZ.matches()) {
+                                slices.get(iFileID).add(matcherZ.group(1));
+                            }
                         }
-                    } else {
-                        // has only one channel
-                        matcherZ = patternZnoC.matcher(fileName);
-                        if (matcherZ.matches()) {
-                            slices.get(iFileID).add(matcherZ.group(1));
+
+                        matcherT = patternT.matcher(fileName);
+                        if (matcherT.matches()) {
+                            timepoints.get(iFileID).add(matcherT.group(1));
                         }
                     }
-
-                    matcherT = patternT.matcher(fileName);
-                    if (matcherT.matches()) {
-                        timepoints.get(iFileID).add(matcherT.group(1));
-                    }
-
                 }
 
             }
@@ -349,10 +353,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 Pattern patternFileID = Pattern.compile(".*"+fileIDs[iFileID]+".*");
 
-                for (String fileName : lists[0]) {
+                for (String fileName : filteredFileNames) {
 
-                    if (patternFileName.matcher(fileName).matches() &&
-                            patternFileID.matcher(fileName).matches()) {
+                    if (patternFileID.matcher(fileName).matches()) {
 
                         // figure out which C,Z,T the file is
                         matcherC = patternC.matcher(fileName);
@@ -716,8 +719,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         return(new Point3D(x,y,z));
     }
 
-    // opens a new (info-based) view on the data
-    public static ImagePlus openCroppedOffsetSizeFromInfos(ImagePlus imp, FileInfoSer[][][] infos, Point3D[] po, Point3D ps, int tMin, int tMax) {
+    // creates a new view on the data
+    public static ImagePlus makeCroppedVirtualStack(ImagePlus imp, Point3D[] po, Point3D ps, int tMin, int tMax) {
+
+        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+        FileInfoSer[][][] infos = vss.getFileInfosSer();
+
         int nC = infos.length;
         int nT = tMax-tMin+1;
         int nZ = infos[0][0].length;
@@ -836,9 +843,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             }
             Point3D ps = new Point3D(roi.getBounds().getWidth(), roi.getBounds().getHeight(), zMax-zMin+1);
 
-            ImagePlus impCropped = openCroppedOffsetSizeFromInfos(imp, vss.getFileInfosSer(), po, ps, tMin, tMax);
+            ImagePlus impCropped = makeCroppedVirtualStack(imp, po, ps, tMin, tMax);
             impCropped.setTitle(imp.getTitle()+"-crop");
             return impCropped;
+
+
+
 
         } else {
 
