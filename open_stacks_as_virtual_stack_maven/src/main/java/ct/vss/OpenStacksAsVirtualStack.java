@@ -299,8 +299,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 for (String fileName : filteredFileNames) {
 
-                    log(""+fileName);
-
                     if (patternFileID.matcher(fileName).matches()) {
 
                         matcherC = patternC.matcher(fileName);
