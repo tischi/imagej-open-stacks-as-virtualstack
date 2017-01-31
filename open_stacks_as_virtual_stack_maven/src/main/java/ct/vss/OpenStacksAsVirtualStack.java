@@ -485,9 +485,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     imp.show();
 
                     if(fileType.equals("leica single tif")) {
-                        imp.setTitle(filenamePattern+getLastDir(directory));
+                        imp.setTitle(filenamePattern); //+getLastDir(directory));
                     } else {
-                        imp.setTitle(getLastDir(directory));
+                        imp.setTitle("image");
                     }
 
                     // show compression
