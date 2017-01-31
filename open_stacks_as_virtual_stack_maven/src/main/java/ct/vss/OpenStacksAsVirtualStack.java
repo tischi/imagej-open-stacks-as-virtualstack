@@ -38,6 +38,8 @@ import static ij.IJ.log;
 // todo: saving as tiff stacks does not always work, e.g. after object tracking
 // todo: check if all files are parsed before allowing to "crop as new stream"
 
+// todo: rearrange the GUI
+
 /** Opens a folder of stacks as a virtual stack. */
 public class OpenStacksAsVirtualStack implements PlugIn {
 
@@ -246,14 +248,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             Matcher matcherZ, matcherC, matcherT, matcherID;
 
-            Pattern patternFileName = Pattern.compile(".*"+filenamePattern+".*");
+            Pattern patternFileName = Pattern.compile(".*"+filenamePattern+".*.tif");
             Pattern patternC = Pattern.compile(".*--C(.*).tif");
             Pattern patternZnoC = Pattern.compile(".*--Z(.*).tif");
             Pattern patternZwithC = Pattern.compile(".*--Z(.*)--C.*");
             Pattern patternT = Pattern.compile(".*--t(.*)--Z.*");
             Pattern patternID = Pattern.compile(".*_(.*)"+filenamePattern+".*");
 
-            // filter for general file name pattern
+            // filter for general file name pattern, i.e. Target, LSEA00, LSEA01
             ArrayList<String> filteredFileNames = new ArrayList<String>();
             for (String fileName : lists[0]) {
                 if (patternFileName.matcher(fileName).matches()) {
@@ -296,6 +298,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 Pattern patternFileID = Pattern.compile(".*"+fileIDs[iFileID]+".*");
 
                 for (String fileName : filteredFileNames) {
+
+                    log(""+fileName);
 
                     if (patternFileID.matcher(fileName).matches()) {
 
@@ -919,7 +923,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
         //final String directory = "/Users/tischi/Desktop/example-data/Ashna_119series/";
-        final String directory = "/Volumes/USB DISK/Ashna -test/";
+        // final String directory = "/Volumes/USB DISK/Ashna -test/";
+        final String directory = "/Users/tischi/Desktop/example-data/Ashna-Leica-Target-LSEA/";
+
+
 
         //final String directory = "/Volumes/My Passport/Res_13/";
         //final String directory = "/Users/tischi/Desktop/example-data/tracking_test/";

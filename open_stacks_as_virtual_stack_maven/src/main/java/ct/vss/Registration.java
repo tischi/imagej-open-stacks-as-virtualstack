@@ -40,7 +40,6 @@ import static ij.IJ.log;
 
 public class Registration implements PlugIn {
 
-    VirtualStackOfStacks vss;
     ImagePlus imp;
     private static NonBlockingGenericDialog gd;
     private final static Point3D pOnes = new Point3D(1,1,1);
@@ -252,6 +251,7 @@ public class Registration implements PlugIn {
 
             // update current imp object
             imp = IJ.getImage();
+            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
 
             if (e.getActionCommand().equals(actions[i++])) {
 
@@ -304,7 +304,7 @@ public class Registration implements PlugIn {
                 if( iNewTrack >= 0 ) {
                     trackStatsLastTrackStarted = System.currentTimeMillis();
                     trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
-                    es.execute(new Registration.Tracking(iNewTrack, gui_pSubSample, gui_tSubSample, gui_bg, gui_iterations));
+                    es.execute(new Registration.Tracking(imp, iNewTrack, gui_pSubSample, gui_tSubSample, gui_bg, gui_iterations));
                 }
 
                 Thread t = new Thread(new Runnable() {
@@ -495,7 +495,7 @@ public class Registration implements PlugIn {
                             "This will probably NOT WORK PROPERLY with this plugin!"
             );
         }
-        this.vss = vss;
+
         gui_pTrackingSize = new Point3D(20,20,30);
         gui_ntTracking = imp.getNFrames();
         gui_bg = (int) imp.getProcessor().getMin();
@@ -791,14 +791,18 @@ public class Registration implements PlugIn {
         int iTrack, dt, bg, iterations;
         Point3D pSubSample;
         double centerOfMassFractionOfImage;
+        ImagePlus imp;
 
-        Tracking(int iTrack, Point3D pSubSample, int gui_tSubSample, int bg, int iterations) {
+        Tracking(ImagePlus imp, int iTrack, Point3D pSubSample, int gui_tSubSample, int bg, int iterations) {
             this.iTrack = iTrack;
             this.dt = gui_tSubSample;
             this.pSubSample = pSubSample;
             this.iterations = iterations;
             this.bg = bg;
             this.centerOfMassFractionOfImage = 0.5; // todo: what to do here??
+            this.imp = imp;
+
+
         }
 
         public void run() {
@@ -809,6 +813,8 @@ public class Registration implements PlugIn {
             Point3D pShift;
             Point3D pLocalShift;
             Point3D pSize;
+
+            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
 
             Track track = Tracks.get(iTrack);
             int tStart = track.getTmin();
@@ -1136,6 +1142,7 @@ public class Registration implements PlugIn {
     }
 
     public Point3D computeShift16bitUsingPhaseCorrelation(ImagePlus imp1, ImagePlus imp0) {
+        if(Globals.verbose) log("PhaseCorrelation phc = new PhaseCorrelation(...)");
         PhaseCorrelation phc = new PhaseCorrelation(ImagePlusAdapter.wrap(imp1), ImagePlusAdapter.wrap(imp0), 5, true);
         if(Globals.verbose) log("phc.process()... ");
         phc.process();

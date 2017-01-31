@@ -22,110 +22,86 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="30.296297">
-              <caret line="295" column="0" selection-start-line="295" selection-start-column="0" selection-end-line="295" selection-end-column="0" />
+            <state vertical-scroll-proportion="-2.200431">
+              <caret line="285" column="71" selection-start-line="285" selection-start-column="71" selection-end-line="285" selection-end-column="71" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#2082#2184#0" expanded="true" />
-                <element signature="e#2183#2184#0" expanded="true" />
-                <element signature="e#8400#8408#0" expanded="true" />
-                <element signature="e#9450#9467#0" expanded="true" />
-                <element signature="e#9536#9553#0" expanded="true" />
-                <element signature="e#9618#9635#0" expanded="true" />
-                <element signature="e#15322#15448#0" expanded="true" />
-                <element signature="e#15447#15448#0" expanded="true" />
-                <element signature="e#20949#21142#0" expanded="true" />
-                <element signature="e#21141#21142#0" expanded="true" />
-                <element signature="e#32227#32355#0" expanded="true" />
-                <element signature="e#32354#32355#0" expanded="true" />
-                <element signature="e#37242#37250#0" expanded="true" />
-                <element signature="e#39879#40039#0" expanded="true" />
-                <element signature="e#40038#40039#0" expanded="true" />
-                <element signature="e#41885#42161#0" expanded="true" />
-                <element signature="e#42160#42161#0" expanded="true" />
-                <element signature="e#42265#42501#0" expanded="true" />
-                <element signature="e#42500#42501#0" expanded="true" />
-                <element signature="e#43945#44142#0" expanded="true" />
-                <element signature="e#44141#44142#0" expanded="true" />
-                <element signature="e#44246#44477#0" expanded="true" />
-                <element signature="e#44476#44477#0" expanded="true" />
-                <element signature="e#46524#46780#0" expanded="true" />
-                <element signature="e#46779#46780#0" expanded="true" />
-                <element signature="e#46851#47009#0" expanded="true" />
-                <element signature="e#47008#47009#0" expanded="true" />
-                <element signature="e#48279#48287#0" expanded="true" />
-                <element signature="e#49744#49745#0" expanded="true" />
-                <element signature="e#49765#49766#0" expanded="true" />
-                <element signature="e#49811#49812#0" expanded="true" />
-                <element signature="e#49832#49833#0" expanded="true" />
-                <element signature="e#49878#49879#0" expanded="true" />
-                <element signature="e#49899#49900#0" expanded="true" />
+                <element signature="e#2110#2212#0" expanded="true" />
+                <element signature="e#2211#2212#0" expanded="true" />
+                <element signature="e#8461#8469#0" expanded="true" />
+                <element signature="e#9511#9528#0" expanded="true" />
+                <element signature="e#9679#9696#0" expanded="true" />
+                <element signature="e#15422#15548#0" expanded="true" />
+                <element signature="e#15547#15548#0" expanded="true" />
+                <element signature="e#21049#21242#0" expanded="true" />
+                <element signature="e#21241#21242#0" expanded="true" />
+                <element signature="e#32428#32556#0" expanded="true" />
+                <element signature="e#32555#32556#0" expanded="true" />
+                <element signature="e#37443#37451#0" expanded="true" />
+                <element signature="e#40080#40240#0" expanded="true" />
+                <element signature="e#40239#40240#0" expanded="true" />
+                <element signature="e#42086#42362#0" expanded="true" />
+                <element signature="e#42361#42362#0" expanded="true" />
+                <element signature="e#42466#42702#0" expanded="true" />
+                <element signature="e#42701#42702#0" expanded="true" />
+                <element signature="e#44146#44343#0" expanded="true" />
+                <element signature="e#44342#44343#0" expanded="true" />
+                <element signature="e#44447#44678#0" expanded="true" />
+                <element signature="e#44677#44678#0" expanded="true" />
+                <element signature="e#46725#46981#0" expanded="true" />
+                <element signature="e#46980#46981#0" expanded="true" />
+                <element signature="e#47052#47210#0" expanded="true" />
+                <element signature="e#47209#47210#0" expanded="true" />
+                <element signature="e#48480#48488#0" expanded="true" />
+                <element signature="e#49945#49946#0" expanded="true" />
+                <element signature="e#49966#49967#0" expanded="true" />
+                <element signature="e#50012#50013#0" expanded="true" />
+                <element signature="e#50033#50034#0" expanded="true" />
+                <element signature="e#50079#50080#0" expanded="true" />
+                <element signature="e#50100#50101#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Track.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Track.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
-              <folding>
-                <element signature="e#768#769#0" expanded="true" />
-                <element signature="e#803#804#0" expanded="true" />
-                <element signature="e#890#891#0" expanded="true" />
-                <element signature="e#921#922#0" expanded="true" />
-                <element signature="e#1582#1583#0" expanded="true" />
-                <element signature="e#1637#1638#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4007092">
-              <caret line="1139" column="33" selection-start-line="1139" selection-start-column="33" selection-end-line="1139" selection-end-column="33" />
+            <state vertical-scroll-proportion="-9.096774">
+              <caret line="1155" column="10" selection-start-line="1155" selection-start-column="10" selection-end-line="1155" selection-end-column="10" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1511#1518#0" expanded="true" />
+                <element signature="e#1481#1488#0" expanded="true" />
                 <element signature="method#Registration#0;class#Registration#0" expanded="false" />
-                <element signature="method#Registration#1;class#Registration#0" expanded="false" />
                 <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-                <element signature="e#6107#6115#0" expanded="true" />
+                <element signature="e#6077#6085#0" expanded="true" />
                 <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-                <element signature="e#10818#10963#0" expanded="true" />
-                <element signature="e#10962#10963#0" expanded="true" />
-                <element signature="e#14645#14653#0" expanded="true" />
+                <element signature="e#10871#11016#0" expanded="true" />
+                <element signature="e#11015#11016#0" expanded="true" />
+                <element signature="e#14698#14706#0" expanded="true" />
                 <element signature="method#logIfTrackingFinished#0;class#Registration#0" expanded="false" />
                 <element signature="method#run#0;class#Registration#0" expanded="false" />
-                <element signature="e#15870#15972#0" expanded="true" />
-                <element signature="e#15971#15972#0" expanded="true" />
+                <element signature="e#15923#16025#0" expanded="true" />
+                <element signature="e#16024#16025#0" expanded="true" />
                 <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
-                <element signature="method#initialize#0;class#Registration#0" expanded="false" />
                 <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
-                <element signature="e#25302#26381#0" expanded="true" />
-                <element signature="e#26380#26381#0" expanded="true" />
+                <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
+                <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
+                <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
+                <element signature="e#25332#26411#0" expanded="true" />
+                <element signature="e#26410#26411#0" expanded="true" />
                 <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
+                <element signature="method#computeCenter#0;class#Registration#0" expanded="false" />
                 <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
-                <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
+                <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="false" />
+                <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
+                <element signature="method#computeShift16bitUsingPhaseCorrelation#0;class#Registration#0" expanded="false" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -147,7 +123,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="362" column="8" selection-start-line="362" selection-start-column="8" selection-end-line="362" selection-end-column="8" />
+              <caret line="23" column="13" selection-start-line="23" selection-start-column="13" selection-end-line="23" selection-end-column="13" />
               <folding>
                 <element signature="method#VirtualStackOfStacks#1;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#addSlice#2;class#VirtualStackOfStacks#0" expanded="false" />
@@ -168,14 +144,11 @@
       <file leaf-file-name="OpenerExtensions.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.888889">
-              <caret line="190" column="118" selection-start-line="190" selection-start-column="118" selection-end-line="190" selection-end-column="118" />
+            <state vertical-scroll-proportion="-2.7777777">
+              <caret line="186" column="25" selection-start-line="186" selection-start-column="25" selection-end-line="186" selection-end-column="25" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#OpenerExtensions#0;class#OpenerExtensions#0" expanded="false" />
-                <element signature="method#openCroppedStackOffsetSize#0;class#OpenerExtensions#0" expanded="false" />
-                <element signature="method#openCroppedH5stack#0;class#OpenerExtensions#0" expanded="false" />
-                <element signature="method#openCroppedTiffStackUsingIFDs#0;class#OpenerExtensions#0" expanded="false" />
                 <element signature="method#process2stack#0;class#process2stack#0" expanded="false" />
                 <element signature="method#setShortPixelsCropXY#0;class#process2stack#0" expanded="false" />
                 <element signature="class#ByteVector#0" expanded="false" />
@@ -252,9 +225,9 @@
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Track.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
       </list>
     </option>
   </component>
@@ -282,9 +255,9 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="69" />
-    <option name="y" value="39" />
-    <option name="width" value="1322" />
+    <option name="x" value="93" />
+    <option name="y" value="54" />
+    <option name="width" value="1213" />
     <option name="height" value="819" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
@@ -598,8 +571,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="69" y="39" width="1322" height="819" extended-state="0" />
-    <editor active="true" />
+    <frame x="93" y="54" width="1213" height="819" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -616,8 +589,8 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299373" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2359375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.14305365" sideWeight="0.60943854" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12211785" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2861073" sideWeight="0.60943854" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -752,9 +725,6 @@
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#OpenerExtensions#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedStackOffsetSize#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedH5stack#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedTiffStackUsingIFDs#0;class#OpenerExtensions#0" expanded="false" />
             <element signature="method#process2stack#0;class#process2stack#0" expanded="false" />
             <element signature="method#setShortPixelsCropXY#0;class#process2stack#0" expanded="false" />
             <element signature="class#ByteVector#0" expanded="false" />
@@ -775,40 +745,39 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#2082#2184#0" expanded="true" />
-            <element signature="e#2183#2184#0" expanded="true" />
-            <element signature="e#8400#8408#0" expanded="true" />
-            <element signature="e#9450#9467#0" expanded="true" />
-            <element signature="e#9536#9553#0" expanded="true" />
-            <element signature="e#9618#9635#0" expanded="true" />
-            <element signature="e#15322#15448#0" expanded="true" />
-            <element signature="e#15447#15448#0" expanded="true" />
-            <element signature="e#20949#21142#0" expanded="true" />
-            <element signature="e#21141#21142#0" expanded="true" />
-            <element signature="e#32227#32355#0" expanded="true" />
-            <element signature="e#32354#32355#0" expanded="true" />
-            <element signature="e#37242#37250#0" expanded="true" />
-            <element signature="e#39879#40039#0" expanded="true" />
-            <element signature="e#40038#40039#0" expanded="true" />
-            <element signature="e#41885#42161#0" expanded="true" />
-            <element signature="e#42160#42161#0" expanded="true" />
-            <element signature="e#42265#42501#0" expanded="true" />
-            <element signature="e#42500#42501#0" expanded="true" />
-            <element signature="e#43945#44142#0" expanded="true" />
-            <element signature="e#44141#44142#0" expanded="true" />
-            <element signature="e#44246#44477#0" expanded="true" />
-            <element signature="e#44476#44477#0" expanded="true" />
-            <element signature="e#46524#46780#0" expanded="true" />
-            <element signature="e#46779#46780#0" expanded="true" />
-            <element signature="e#46851#47009#0" expanded="true" />
-            <element signature="e#47008#47009#0" expanded="true" />
-            <element signature="e#48279#48287#0" expanded="true" />
-            <element signature="e#49744#49745#0" expanded="true" />
-            <element signature="e#49765#49766#0" expanded="true" />
-            <element signature="e#49811#49812#0" expanded="true" />
-            <element signature="e#49832#49833#0" expanded="true" />
-            <element signature="e#49878#49879#0" expanded="true" />
-            <element signature="e#49899#49900#0" expanded="true" />
+            <element signature="e#2110#2212#0" expanded="true" />
+            <element signature="e#2211#2212#0" expanded="true" />
+            <element signature="e#8461#8469#0" expanded="true" />
+            <element signature="e#9511#9528#0" expanded="true" />
+            <element signature="e#9679#9696#0" expanded="true" />
+            <element signature="e#15422#15548#0" expanded="true" />
+            <element signature="e#15547#15548#0" expanded="true" />
+            <element signature="e#21049#21242#0" expanded="true" />
+            <element signature="e#21241#21242#0" expanded="true" />
+            <element signature="e#32428#32556#0" expanded="true" />
+            <element signature="e#32555#32556#0" expanded="true" />
+            <element signature="e#37443#37451#0" expanded="true" />
+            <element signature="e#40080#40240#0" expanded="true" />
+            <element signature="e#40239#40240#0" expanded="true" />
+            <element signature="e#42086#42362#0" expanded="true" />
+            <element signature="e#42361#42362#0" expanded="true" />
+            <element signature="e#42466#42702#0" expanded="true" />
+            <element signature="e#42701#42702#0" expanded="true" />
+            <element signature="e#44146#44343#0" expanded="true" />
+            <element signature="e#44342#44343#0" expanded="true" />
+            <element signature="e#44447#44678#0" expanded="true" />
+            <element signature="e#44677#44678#0" expanded="true" />
+            <element signature="e#46725#46981#0" expanded="true" />
+            <element signature="e#46980#46981#0" expanded="true" />
+            <element signature="e#47052#47210#0" expanded="true" />
+            <element signature="e#47209#47210#0" expanded="true" />
+            <element signature="e#48480#48488#0" expanded="true" />
+            <element signature="e#49945#49946#0" expanded="true" />
+            <element signature="e#49966#49967#0" expanded="true" />
+            <element signature="e#50012#50013#0" expanded="true" />
+            <element signature="e#50033#50034#0" expanded="true" />
+            <element signature="e#50079#50080#0" expanded="true" />
+            <element signature="e#50100#50101#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -826,29 +795,33 @@
           <caret line="128" column="34" selection-start-line="128" selection-start-column="34" selection-end-line="128" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1511#1518#0" expanded="true" />
+            <element signature="e#1481#1488#0" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />
-            <element signature="method#Registration#1;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#6107#6115#0" expanded="true" />
+            <element signature="e#6077#6085#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#10818#10963#0" expanded="true" />
-            <element signature="e#10962#10963#0" expanded="true" />
-            <element signature="e#14645#14653#0" expanded="true" />
+            <element signature="e#10871#11016#0" expanded="true" />
+            <element signature="e#11015#11016#0" expanded="true" />
+            <element signature="e#14698#14706#0" expanded="true" />
             <element signature="method#logIfTrackingFinished#0;class#Registration#0" expanded="false" />
             <element signature="method#run#0;class#Registration#0" expanded="false" />
-            <element signature="e#15870#15972#0" expanded="true" />
-            <element signature="e#15971#15972#0" expanded="true" />
+            <element signature="e#15923#16025#0" expanded="true" />
+            <element signature="e#16024#16025#0" expanded="true" />
             <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
-            <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="e#25302#26381#0" expanded="true" />
-            <element signature="e#26380#26381#0" expanded="true" />
+            <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
+            <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
+            <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
+            <element signature="e#25332#26411#0" expanded="true" />
+            <element signature="e#26410#26411#0" expanded="true" />
             <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeCenter#0;class#Registration#0" expanded="false" />
             <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeShift16bitUsingPhaseCorrelation#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -903,9 +876,6 @@
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#OpenerExtensions#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedStackOffsetSize#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedH5stack#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedTiffStackUsingIFDs#0;class#OpenerExtensions#0" expanded="false" />
             <element signature="method#process2stack#0;class#process2stack#0" expanded="false" />
             <element signature="method#setShortPixelsCropXY#0;class#process2stack#0" expanded="false" />
             <element signature="class#ByteVector#0" expanded="false" />
@@ -926,40 +896,39 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#2082#2184#0" expanded="true" />
-            <element signature="e#2183#2184#0" expanded="true" />
-            <element signature="e#8400#8408#0" expanded="true" />
-            <element signature="e#9450#9467#0" expanded="true" />
-            <element signature="e#9536#9553#0" expanded="true" />
-            <element signature="e#9618#9635#0" expanded="true" />
-            <element signature="e#15322#15448#0" expanded="true" />
-            <element signature="e#15447#15448#0" expanded="true" />
-            <element signature="e#20949#21142#0" expanded="true" />
-            <element signature="e#21141#21142#0" expanded="true" />
-            <element signature="e#32227#32355#0" expanded="true" />
-            <element signature="e#32354#32355#0" expanded="true" />
-            <element signature="e#37242#37250#0" expanded="true" />
-            <element signature="e#39879#40039#0" expanded="true" />
-            <element signature="e#40038#40039#0" expanded="true" />
-            <element signature="e#41885#42161#0" expanded="true" />
-            <element signature="e#42160#42161#0" expanded="true" />
-            <element signature="e#42265#42501#0" expanded="true" />
-            <element signature="e#42500#42501#0" expanded="true" />
-            <element signature="e#43945#44142#0" expanded="true" />
-            <element signature="e#44141#44142#0" expanded="true" />
-            <element signature="e#44246#44477#0" expanded="true" />
-            <element signature="e#44476#44477#0" expanded="true" />
-            <element signature="e#46524#46780#0" expanded="true" />
-            <element signature="e#46779#46780#0" expanded="true" />
-            <element signature="e#46851#47009#0" expanded="true" />
-            <element signature="e#47008#47009#0" expanded="true" />
-            <element signature="e#48279#48287#0" expanded="true" />
-            <element signature="e#49744#49745#0" expanded="true" />
-            <element signature="e#49765#49766#0" expanded="true" />
-            <element signature="e#49811#49812#0" expanded="true" />
-            <element signature="e#49832#49833#0" expanded="true" />
-            <element signature="e#49878#49879#0" expanded="true" />
-            <element signature="e#49899#49900#0" expanded="true" />
+            <element signature="e#2110#2212#0" expanded="true" />
+            <element signature="e#2211#2212#0" expanded="true" />
+            <element signature="e#8461#8469#0" expanded="true" />
+            <element signature="e#9511#9528#0" expanded="true" />
+            <element signature="e#9679#9696#0" expanded="true" />
+            <element signature="e#15422#15548#0" expanded="true" />
+            <element signature="e#15547#15548#0" expanded="true" />
+            <element signature="e#21049#21242#0" expanded="true" />
+            <element signature="e#21241#21242#0" expanded="true" />
+            <element signature="e#32428#32556#0" expanded="true" />
+            <element signature="e#32555#32556#0" expanded="true" />
+            <element signature="e#37443#37451#0" expanded="true" />
+            <element signature="e#40080#40240#0" expanded="true" />
+            <element signature="e#40239#40240#0" expanded="true" />
+            <element signature="e#42086#42362#0" expanded="true" />
+            <element signature="e#42361#42362#0" expanded="true" />
+            <element signature="e#42466#42702#0" expanded="true" />
+            <element signature="e#42701#42702#0" expanded="true" />
+            <element signature="e#44146#44343#0" expanded="true" />
+            <element signature="e#44342#44343#0" expanded="true" />
+            <element signature="e#44447#44678#0" expanded="true" />
+            <element signature="e#44677#44678#0" expanded="true" />
+            <element signature="e#46725#46981#0" expanded="true" />
+            <element signature="e#46980#46981#0" expanded="true" />
+            <element signature="e#47052#47210#0" expanded="true" />
+            <element signature="e#47209#47210#0" expanded="true" />
+            <element signature="e#48480#48488#0" expanded="true" />
+            <element signature="e#49945#49946#0" expanded="true" />
+            <element signature="e#49966#49967#0" expanded="true" />
+            <element signature="e#50012#50013#0" expanded="true" />
+            <element signature="e#50033#50034#0" expanded="true" />
+            <element signature="e#50079#50080#0" expanded="true" />
+            <element signature="e#50100#50101#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -977,29 +946,33 @@
           <caret line="27" column="13" selection-start-line="27" selection-start-column="11" selection-end-line="27" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1511#1518#0" expanded="true" />
+            <element signature="e#1481#1488#0" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />
-            <element signature="method#Registration#1;class#Registration#0" expanded="false" />
             <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#6107#6115#0" expanded="true" />
+            <element signature="e#6077#6085#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#10818#10963#0" expanded="true" />
-            <element signature="e#10962#10963#0" expanded="true" />
-            <element signature="e#14645#14653#0" expanded="true" />
+            <element signature="e#10871#11016#0" expanded="true" />
+            <element signature="e#11015#11016#0" expanded="true" />
+            <element signature="e#14698#14706#0" expanded="true" />
             <element signature="method#logIfTrackingFinished#0;class#Registration#0" expanded="false" />
             <element signature="method#run#0;class#Registration#0" expanded="false" />
-            <element signature="e#15870#15972#0" expanded="true" />
-            <element signature="e#15971#15972#0" expanded="true" />
+            <element signature="e#15923#16025#0" expanded="true" />
+            <element signature="e#16024#16025#0" expanded="true" />
             <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
-            <element signature="method#initialize#0;class#Registration#0" expanded="false" />
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="e#25302#26381#0" expanded="true" />
-            <element signature="e#26380#26381#0" expanded="true" />
+            <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
+            <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
+            <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
+            <element signature="e#25332#26411#0" expanded="true" />
+            <element signature="e#26410#26411#0" expanded="true" />
             <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeCenter#0;class#Registration#0" expanded="false" />
             <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeShift16bitUsingPhaseCorrelation#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1054,9 +1027,6 @@
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#OpenerExtensions#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedStackOffsetSize#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedH5stack#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedTiffStackUsingIFDs#0;class#OpenerExtensions#0" expanded="false" />
             <element signature="method#process2stack#0;class#process2stack#0" expanded="false" />
             <element signature="method#setShortPixelsCropXY#0;class#process2stack#0" expanded="false" />
             <element signature="class#ByteVector#0" expanded="false" />
@@ -1262,9 +1232,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Track.java">
+    <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
+          <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Track.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.65882355">
           <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
           <folding>
             <element signature="e#768#769#0" expanded="true" />
@@ -1279,14 +1257,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.888889">
-          <caret line="190" column="118" selection-start-line="190" selection-start-column="118" selection-end-line="190" selection-end-column="118" />
+        <state vertical-scroll-proportion="-2.7777777">
+          <caret line="186" column="25" selection-start-line="186" selection-start-column="25" selection-end-line="186" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#OpenerExtensions#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedStackOffsetSize#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedH5stack#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedTiffStackUsingIFDs#0;class#OpenerExtensions#0" expanded="false" />
             <element signature="method#process2stack#0;class#process2stack#0" expanded="false" />
             <element signature="method#setShortPixelsCropXY#0;class#process2stack#0" expanded="false" />
             <element signature="class#ByteVector#0" expanded="false" />
@@ -1297,7 +1272,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="362" column="8" selection-start-line="362" selection-start-column="8" selection-end-line="362" selection-end-column="8" />
+          <caret line="23" column="13" selection-start-line="23" selection-start-column="13" selection-end-line="23" selection-end-column="13" />
           <folding>
             <element signature="method#VirtualStackOfStacks#1;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#addSlice#2;class#VirtualStackOfStacks#0" expanded="false" />
@@ -1314,87 +1289,82 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="30.296297">
-          <caret line="295" column="0" selection-start-line="295" selection-start-column="0" selection-end-line="295" selection-end-column="0" />
+        <state vertical-scroll-proportion="-9.096774">
+          <caret line="1155" column="10" selection-start-line="1155" selection-start-column="10" selection-end-line="1155" selection-end-column="10" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#2082#2184#0" expanded="true" />
-            <element signature="e#2183#2184#0" expanded="true" />
-            <element signature="e#8400#8408#0" expanded="true" />
-            <element signature="e#9450#9467#0" expanded="true" />
-            <element signature="e#9536#9553#0" expanded="true" />
-            <element signature="e#9618#9635#0" expanded="true" />
-            <element signature="e#15322#15448#0" expanded="true" />
-            <element signature="e#15447#15448#0" expanded="true" />
-            <element signature="e#20949#21142#0" expanded="true" />
-            <element signature="e#21141#21142#0" expanded="true" />
-            <element signature="e#32227#32355#0" expanded="true" />
-            <element signature="e#32354#32355#0" expanded="true" />
-            <element signature="e#37242#37250#0" expanded="true" />
-            <element signature="e#39879#40039#0" expanded="true" />
-            <element signature="e#40038#40039#0" expanded="true" />
-            <element signature="e#41885#42161#0" expanded="true" />
-            <element signature="e#42160#42161#0" expanded="true" />
-            <element signature="e#42265#42501#0" expanded="true" />
-            <element signature="e#42500#42501#0" expanded="true" />
-            <element signature="e#43945#44142#0" expanded="true" />
-            <element signature="e#44141#44142#0" expanded="true" />
-            <element signature="e#44246#44477#0" expanded="true" />
-            <element signature="e#44476#44477#0" expanded="true" />
-            <element signature="e#46524#46780#0" expanded="true" />
-            <element signature="e#46779#46780#0" expanded="true" />
-            <element signature="e#46851#47009#0" expanded="true" />
-            <element signature="e#47008#47009#0" expanded="true" />
-            <element signature="e#48279#48287#0" expanded="true" />
-            <element signature="e#49744#49745#0" expanded="true" />
-            <element signature="e#49765#49766#0" expanded="true" />
-            <element signature="e#49811#49812#0" expanded="true" />
-            <element signature="e#49832#49833#0" expanded="true" />
-            <element signature="e#49878#49879#0" expanded="true" />
-            <element signature="e#49899#49900#0" expanded="true" />
+            <element signature="e#1481#1488#0" expanded="true" />
+            <element signature="method#Registration#0;class#Registration#0" expanded="false" />
+            <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="e#6077#6085#0" expanded="true" />
+            <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
+            <element signature="e#10871#11016#0" expanded="true" />
+            <element signature="e#11015#11016#0" expanded="true" />
+            <element signature="e#14698#14706#0" expanded="true" />
+            <element signature="method#logIfTrackingFinished#0;class#Registration#0" expanded="false" />
+            <element signature="method#run#0;class#Registration#0" expanded="false" />
+            <element signature="e#15923#16025#0" expanded="true" />
+            <element signature="e#16024#16025#0" expanded="true" />
+            <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
+            <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
+            <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
+            <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
+            <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
+            <element signature="e#25332#26411#0" expanded="true" />
+            <element signature="e#26410#26411#0" expanded="true" />
+            <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeCenter#0;class#Registration#0" expanded="false" />
+            <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
+            <element signature="method#computeShift16bitUsingPhaseCorrelation#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4007092">
-          <caret line="1139" column="33" selection-start-line="1139" selection-start-column="33" selection-end-line="1139" selection-end-column="33" />
+        <state vertical-scroll-proportion="-2.200431">
+          <caret line="285" column="71" selection-start-line="285" selection-start-column="71" selection-end-line="285" selection-end-column="71" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1511#1518#0" expanded="true" />
-            <element signature="method#Registration#0;class#Registration#0" expanded="false" />
-            <element signature="method#Registration#1;class#Registration#0" expanded="false" />
-            <element signature="method#TrackingGUI#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#6107#6115#0" expanded="true" />
-            <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="method#focusLost#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#10818#10963#0" expanded="true" />
-            <element signature="e#10962#10963#0" expanded="true" />
-            <element signature="e#14645#14653#0" expanded="true" />
-            <element signature="method#logIfTrackingFinished#0;class#Registration#0" expanded="false" />
-            <element signature="method#run#0;class#Registration#0" expanded="false" />
-            <element signature="e#15870#15972#0" expanded="true" />
-            <element signature="e#15971#15972#0" expanded="true" />
-            <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
-            <element signature="method#initialize#0;class#Registration#0" expanded="false" />
-            <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="e#25302#26381#0" expanded="true" />
-            <element signature="e#26380#26381#0" expanded="true" />
-            <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
-            <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
+            <element signature="e#2110#2212#0" expanded="true" />
+            <element signature="e#2211#2212#0" expanded="true" />
+            <element signature="e#8461#8469#0" expanded="true" />
+            <element signature="e#9511#9528#0" expanded="true" />
+            <element signature="e#9679#9696#0" expanded="true" />
+            <element signature="e#15422#15548#0" expanded="true" />
+            <element signature="e#15547#15548#0" expanded="true" />
+            <element signature="e#21049#21242#0" expanded="true" />
+            <element signature="e#21241#21242#0" expanded="true" />
+            <element signature="e#32428#32556#0" expanded="true" />
+            <element signature="e#32555#32556#0" expanded="true" />
+            <element signature="e#37443#37451#0" expanded="true" />
+            <element signature="e#40080#40240#0" expanded="true" />
+            <element signature="e#40239#40240#0" expanded="true" />
+            <element signature="e#42086#42362#0" expanded="true" />
+            <element signature="e#42361#42362#0" expanded="true" />
+            <element signature="e#42466#42702#0" expanded="true" />
+            <element signature="e#42701#42702#0" expanded="true" />
+            <element signature="e#44146#44343#0" expanded="true" />
+            <element signature="e#44342#44343#0" expanded="true" />
+            <element signature="e#44447#44678#0" expanded="true" />
+            <element signature="e#44677#44678#0" expanded="true" />
+            <element signature="e#46725#46981#0" expanded="true" />
+            <element signature="e#46980#46981#0" expanded="true" />
+            <element signature="e#47052#47210#0" expanded="true" />
+            <element signature="e#47209#47210#0" expanded="true" />
+            <element signature="e#48480#48488#0" expanded="true" />
+            <element signature="e#49945#49946#0" expanded="true" />
+            <element signature="e#49966#49967#0" expanded="true" />
+            <element signature="e#50012#50013#0" expanded="true" />
+            <element signature="e#50033#50034#0" expanded="true" />
+            <element signature="e#50079#50080#0" expanded="true" />
+            <element signature="e#50100#50101#0" expanded="true" />
           </folding>
         </state>
       </provider>
