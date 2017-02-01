@@ -414,7 +414,7 @@ public class VirtualStackOfStacks extends ImageStack {
 
         if (dz > 1) { // adapt for sub-sampling in z
             sz = (int) (1.0 * sz / dz + 0.5); // final stack size
-            finalStackOffsetZ = (int) (1.0 * finalStackOffsetZ / dz + 0.5); // final stack offset
+            finalStackOffsetZ = (int) (1.0 * finalStackOffsetZ / dz); // final stack offset
         }
 
         ImageStack finalStack = ImageStack.create(sx, sy, sz, fi.bytesPerPixel*8);
@@ -425,6 +425,9 @@ public class VirtualStackOfStacks extends ImageStack {
                 ImageProcessor ip = loadedStack.getProcessor(z + 1); // one-based
                 ImageProcessor ip2 = ip.createProcessor(sx, sy);
                 ip2.insert(ip, finalStackOffsetX, finalStackOffsetY);
+                if((z + 1) + finalStackOffsetZ > finalStack.size()) {
+                    IJ.showMessage("Error due to z-subsampling");
+                }
                 finalStack.setProcessor(ip2, (z + 1) + finalStackOffsetZ);
             }
         }
