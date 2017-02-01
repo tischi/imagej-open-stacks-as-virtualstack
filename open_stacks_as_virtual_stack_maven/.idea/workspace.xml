@@ -28,13 +28,20 @@
             <state vertical-scroll-proportion="0.0">
               <caret line="724" column="28" selection-start-line="724" selection-start-column="28" selection-end-line="724" selection-end-column="28" />
               <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#49906#49907#0" expanded="true" />
-                <element signature="e#49927#49928#0" expanded="true" />
-                <element signature="e#49973#49974#0" expanded="true" />
-                <element signature="e#49994#49995#0" expanded="true" />
-                <element signature="e#50040#50041#0" expanded="true" />
-                <element signature="e#50061#50062#0" expanded="true" />
+                <element signature="e#2157#2158#0" expanded="false" />
+                <element signature="e#2201#2202#0" expanded="false" />
+                <element signature="e#15430#15431#0" expanded="false" />
+                <element signature="e#15498#15499#0" expanded="false" />
+                <element signature="e#21107#21108#0" expanded="false" />
+                <element signature="e#21183#21184#0" expanded="false" />
+                <element signature="e#32436#32437#0" expanded="false" />
+                <element signature="e#32506#32507#0" expanded="false" />
+                <element signature="e#40096#40097#0" expanded="false" />
+                <element signature="e#40182#40183#0" expanded="false" />
+                <element signature="e#44166#44167#0" expanded="false" />
+                <element signature="e#44281#44282#0" expanded="false" />
+                <element signature="e#47068#47069#0" expanded="false" />
+                <element signature="e#47152#47153#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -46,7 +53,35 @@
             <state vertical-scroll-proportion="0.0">
               <caret line="42" column="0" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
               <folding>
-                <element signature="e#864#865#0" expanded="true" />
+                <element signature="imports" expanded="false" />
+                <element signature="e#768#769#0" expanded="false" />
+                <element signature="e#803#804#0" expanded="false" />
+                <element signature="e#890#891#0" expanded="false" />
+                <element signature="e#921#922#0" expanded="false" />
+                <element signature="e#959#960#0" expanded="false" />
+                <element signature="e#998#999#0" expanded="false" />
+                <element signature="e#1025#1026#0" expanded="false" />
+                <element signature="e#1051#1052#0" expanded="false" />
+                <element signature="e#1089#1090#0" expanded="false" />
+                <element signature="e#1114#1115#0" expanded="false" />
+                <element signature="e#1150#1151#0" expanded="false" />
+                <element signature="e#1178#1179#0" expanded="false" />
+                <element signature="e#1211#1212#0" expanded="false" />
+                <element signature="e#1246#1247#0" expanded="false" />
+                <element signature="e#1279#1280#0" expanded="false" />
+                <element signature="e#1314#1315#0" expanded="false" />
+                <element signature="e#1347#1348#0" expanded="false" />
+                <element signature="e#1382#1383#0" expanded="false" />
+                <element signature="e#1412#1413#0" expanded="false" />
+                <element signature="e#1440#1441#0" expanded="false" />
+                <element signature="e#1470#1471#0" expanded="false" />
+                <element signature="e#1498#1499#0" expanded="false" />
+                <element signature="e#1526#1527#0" expanded="false" />
+                <element signature="e#1554#1555#0" expanded="false" />
+                <element signature="e#1582#1583#0" expanded="false" />
+                <element signature="e#1637#1638#0" expanded="false" />
+                <element signature="e#1667#1668#0" expanded="false" />
+                <element signature="e#1692#1693#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -62,11 +97,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="85" column="0" selection-start-line="85" selection-start-column="0" selection-end-line="85" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.5613682">
+              <caret line="804" column="0" selection-start-line="804" selection-start-column="0" selection-end-line="804" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#Registration#0;class#Registration#0" expanded="false" />
@@ -79,10 +114,7 @@
                 <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
                 <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
                 <element signature="method#computeCenter#0;class#Registration#0" expanded="false" />
-                <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="false" />
                 <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
-                <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
-                <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -93,16 +125,20 @@
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
               <caret line="13" column="23" selection-start-line="13" selection-start-column="23" selection-end-line="13" selection-end-column="23" />
-              <folding />
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#361#362#0" expanded="false" />
+                <element signature="e#401#402#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="VirtualStackOfStacks.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="VirtualStackOfStacks.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5057252">
-              <caret line="428" column="54" selection-start-line="428" selection-start-column="54" selection-end-line="428" selection-end-column="54" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="425" column="37" selection-start-line="425" selection-start-column="37" selection-end-line="425" selection-end-column="37" />
               <folding>
                 <element signature="e#2739#2740#0" expanded="true" />
                 <element signature="e#2771#2772#0" expanded="true" />
@@ -121,10 +157,13 @@
             <state vertical-scroll-proportion="0.0">
               <caret line="205" column="0" selection-start-line="202" selection-start-column="8" selection-end-line="205" selection-end-column="0" />
               <folding>
-                <element signature="imports" expanded="true" />
                 <element signature="method#OpenerExtensions#0;class#OpenerExtensions#0" expanded="false" />
                 <element signature="method#setShortPixelsCropXY#0;class#process2stack#0" expanded="false" />
                 <element signature="class#ByteVector#0" expanded="false" />
+                <element signature="e#30247#30248#0" expanded="false" />
+                <element signature="e#30274#30275#0" expanded="false" />
+                <element signature="e#30734#30735#0" expanded="false" />
+                <element signature="e#30758#30759#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -135,7 +174,13 @@
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
               <caret line="39" column="28" selection-start-line="39" selection-start-column="21" selection-end-line="39" selection-end-column="28" />
-              <folding />
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#4382#4383#0" expanded="false" />
+                <element signature="e#4465#4466#0" expanded="false" />
+                <element signature="e#4501#4502#0" expanded="false" />
+                <element signature="e#4578#4579#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -185,8 +230,8 @@
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
         <option value="$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html" />
-        <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
       </list>
     </option>
   </component>
@@ -214,9 +259,9 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="68" />
-    <option name="y" value="58" />
-    <option name="width" value="1326" />
+    <option name="x" value="10" />
+    <option name="y" value="35" />
+    <option name="width" value="1403" />
     <option name="height" value="819" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
@@ -535,8 +580,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="68" y="58" width="1326" height="819" extended-state="0" />
-    <editor active="true" />
+    <frame x="10" y="35" width="1403" height="819" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -553,8 +598,8 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299373" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.10202492" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24071527" sideWeight="0.60943854" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.096252754" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24071527" sideWeight="0.60943854" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -637,7 +682,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="241" />
+      <option name="time" value="242" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -651,10 +696,13 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="790" column="61" selection-start-line="790" selection-start-column="61" selection-end-line="790" selection-end-column="61" />
           <folding>
-            <element signature="imports" expanded="true" />
             <element signature="method#OpenerExtensions#0;class#OpenerExtensions#0" expanded="false" />
             <element signature="method#setShortPixelsCropXY#0;class#process2stack#0" expanded="false" />
             <element signature="class#ByteVector#0" expanded="false" />
+            <element signature="e#30247#30248#0" expanded="false" />
+            <element signature="e#30274#30275#0" expanded="false" />
+            <element signature="e#30734#30735#0" expanded="false" />
+            <element signature="e#30758#30759#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -671,13 +719,20 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#49906#49907#0" expanded="true" />
-            <element signature="e#49927#49928#0" expanded="true" />
-            <element signature="e#49973#49974#0" expanded="true" />
-            <element signature="e#49994#49995#0" expanded="true" />
-            <element signature="e#50040#50041#0" expanded="true" />
-            <element signature="e#50061#50062#0" expanded="true" />
+            <element signature="e#2157#2158#0" expanded="false" />
+            <element signature="e#2201#2202#0" expanded="false" />
+            <element signature="e#15430#15431#0" expanded="false" />
+            <element signature="e#15498#15499#0" expanded="false" />
+            <element signature="e#21107#21108#0" expanded="false" />
+            <element signature="e#21183#21184#0" expanded="false" />
+            <element signature="e#32436#32437#0" expanded="false" />
+            <element signature="e#32506#32507#0" expanded="false" />
+            <element signature="e#40096#40097#0" expanded="false" />
+            <element signature="e#40182#40183#0" expanded="false" />
+            <element signature="e#44166#44167#0" expanded="false" />
+            <element signature="e#44281#44282#0" expanded="false" />
+            <element signature="e#47068#47069#0" expanded="false" />
+            <element signature="e#47152#47153#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -705,10 +760,7 @@
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
-            <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -747,10 +799,13 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="199" column="0" selection-start-line="199" selection-start-column="0" selection-end-line="199" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
             <element signature="method#OpenerExtensions#0;class#OpenerExtensions#0" expanded="false" />
             <element signature="method#setShortPixelsCropXY#0;class#process2stack#0" expanded="false" />
             <element signature="class#ByteVector#0" expanded="false" />
+            <element signature="e#30247#30248#0" expanded="false" />
+            <element signature="e#30274#30275#0" expanded="false" />
+            <element signature="e#30734#30735#0" expanded="false" />
+            <element signature="e#30758#30759#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -767,13 +822,20 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#49906#49907#0" expanded="true" />
-            <element signature="e#49927#49928#0" expanded="true" />
-            <element signature="e#49973#49974#0" expanded="true" />
-            <element signature="e#49994#49995#0" expanded="true" />
-            <element signature="e#50040#50041#0" expanded="true" />
-            <element signature="e#50061#50062#0" expanded="true" />
+            <element signature="e#2157#2158#0" expanded="false" />
+            <element signature="e#2201#2202#0" expanded="false" />
+            <element signature="e#15430#15431#0" expanded="false" />
+            <element signature="e#15498#15499#0" expanded="false" />
+            <element signature="e#21107#21108#0" expanded="false" />
+            <element signature="e#21183#21184#0" expanded="false" />
+            <element signature="e#32436#32437#0" expanded="false" />
+            <element signature="e#32506#32507#0" expanded="false" />
+            <element signature="e#40096#40097#0" expanded="false" />
+            <element signature="e#40182#40183#0" expanded="false" />
+            <element signature="e#44166#44167#0" expanded="false" />
+            <element signature="e#44281#44282#0" expanded="false" />
+            <element signature="e#47068#47069#0" expanded="false" />
+            <element signature="e#47152#47153#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -801,10 +863,7 @@
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
-            <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -843,10 +902,13 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="200" column="0" selection-start-line="200" selection-start-column="0" selection-end-line="200" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
             <element signature="method#OpenerExtensions#0;class#OpenerExtensions#0" expanded="false" />
             <element signature="method#setShortPixelsCropXY#0;class#process2stack#0" expanded="false" />
             <element signature="class#ByteVector#0" expanded="false" />
+            <element signature="e#30247#30248#0" expanded="false" />
+            <element signature="e#30274#30275#0" expanded="false" />
+            <element signature="e#30734#30735#0" expanded="false" />
+            <element signature="e#30758#30759#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -980,7 +1042,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="39" column="28" selection-start-line="39" selection-start-column="21" selection-end-line="39" selection-end-column="28" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#4382#4383#0" expanded="false" />
+            <element signature="e#4465#4466#0" expanded="false" />
+            <element signature="e#4501#4502#0" expanded="false" />
+            <element signature="e#4578#4579#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1009,7 +1077,11 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="13" column="23" selection-start-line="13" selection-start-column="23" selection-end-line="13" selection-end-column="23" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#361#362#0" expanded="false" />
+            <element signature="e#401#402#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1054,10 +1126,13 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="205" column="0" selection-start-line="202" selection-start-column="8" selection-end-line="205" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
             <element signature="method#OpenerExtensions#0;class#OpenerExtensions#0" expanded="false" />
             <element signature="method#setShortPixelsCropXY#0;class#process2stack#0" expanded="false" />
             <element signature="class#ByteVector#0" expanded="false" />
+            <element signature="e#30247#30248#0" expanded="false" />
+            <element signature="e#30274#30275#0" expanded="false" />
+            <element signature="e#30734#30735#0" expanded="false" />
+            <element signature="e#30758#30759#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1067,7 +1142,35 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="42" column="0" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
           <folding>
-            <element signature="e#864#865#0" expanded="true" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#768#769#0" expanded="false" />
+            <element signature="e#803#804#0" expanded="false" />
+            <element signature="e#890#891#0" expanded="false" />
+            <element signature="e#921#922#0" expanded="false" />
+            <element signature="e#959#960#0" expanded="false" />
+            <element signature="e#998#999#0" expanded="false" />
+            <element signature="e#1025#1026#0" expanded="false" />
+            <element signature="e#1051#1052#0" expanded="false" />
+            <element signature="e#1089#1090#0" expanded="false" />
+            <element signature="e#1114#1115#0" expanded="false" />
+            <element signature="e#1150#1151#0" expanded="false" />
+            <element signature="e#1178#1179#0" expanded="false" />
+            <element signature="e#1211#1212#0" expanded="false" />
+            <element signature="e#1246#1247#0" expanded="false" />
+            <element signature="e#1279#1280#0" expanded="false" />
+            <element signature="e#1314#1315#0" expanded="false" />
+            <element signature="e#1347#1348#0" expanded="false" />
+            <element signature="e#1382#1383#0" expanded="false" />
+            <element signature="e#1412#1413#0" expanded="false" />
+            <element signature="e#1440#1441#0" expanded="false" />
+            <element signature="e#1470#1471#0" expanded="false" />
+            <element signature="e#1498#1499#0" expanded="false" />
+            <element signature="e#1526#1527#0" expanded="false" />
+            <element signature="e#1554#1555#0" expanded="false" />
+            <element signature="e#1582#1583#0" expanded="false" />
+            <element signature="e#1637#1638#0" expanded="false" />
+            <element signature="e#1667#1668#0" expanded="false" />
+            <element signature="e#1692#1693#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1077,13 +1180,20 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="724" column="28" selection-start-line="724" selection-start-column="28" selection-end-line="724" selection-end-column="28" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#49906#49907#0" expanded="true" />
-            <element signature="e#49927#49928#0" expanded="true" />
-            <element signature="e#49973#49974#0" expanded="true" />
-            <element signature="e#49994#49995#0" expanded="true" />
-            <element signature="e#50040#50041#0" expanded="true" />
-            <element signature="e#50061#50062#0" expanded="true" />
+            <element signature="e#2157#2158#0" expanded="false" />
+            <element signature="e#2201#2202#0" expanded="false" />
+            <element signature="e#15430#15431#0" expanded="false" />
+            <element signature="e#15498#15499#0" expanded="false" />
+            <element signature="e#21107#21108#0" expanded="false" />
+            <element signature="e#21183#21184#0" expanded="false" />
+            <element signature="e#32436#32437#0" expanded="false" />
+            <element signature="e#32506#32507#0" expanded="false" />
+            <element signature="e#40096#40097#0" expanded="false" />
+            <element signature="e#40182#40183#0" expanded="false" />
+            <element signature="e#44166#44167#0" expanded="false" />
+            <element signature="e#44281#44282#0" expanded="false" />
+            <element signature="e#47068#47069#0" expanded="false" />
+            <element signature="e#47152#47153#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1096,10 +1206,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="85" column="0" selection-start-line="85" selection-start-column="0" selection-end-line="85" selection-end-column="0" />
+          <caret line="425" column="37" selection-start-line="425" selection-start-column="37" selection-end-line="425" selection-end-column="37" />
+          <folding>
+            <element signature="e#2739#2740#0" expanded="true" />
+            <element signature="e#2771#2772#0" expanded="true" />
+            <element signature="method#resizeWidthAndHeight#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#setSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#trim#0;class#VirtualStackOfStacks#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5613682">
+          <caret line="804" column="0" selection-start-line="804" selection-start-column="0" selection-end-line="804" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />
@@ -1112,25 +1237,7 @@
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="false" />
             <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeMean16bit#0;class#Registration#0" expanded="false" />
-            <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5057252">
-          <caret line="428" column="54" selection-start-line="428" selection-start-column="54" selection-end-line="428" selection-end-column="54" />
-          <folding>
-            <element signature="e#2739#2740#0" expanded="true" />
-            <element signature="e#2771#2772#0" expanded="true" />
-            <element signature="method#resizeWidthAndHeight#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#setSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#trim#0;class#VirtualStackOfStacks#0" expanded="false" />
           </folding>
         </state>
       </provider>

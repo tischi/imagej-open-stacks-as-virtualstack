@@ -45,7 +45,7 @@ public class Registration implements PlugIn {
     private final static Point3D pOnes = new Point3D(1,1,1);
     // gui variables
     int gui_ntTracking, gui_bg;
-    int gui_iterations = 6;
+    int gui_iterations = 10;
     Point3D gui_pTrackingSize;
     Point3D gui_pSubSample = new Point3D(1,1,1);
     int gui_tSubSample = 1;
@@ -496,7 +496,7 @@ public class Registration implements PlugIn {
             );
         }
 
-        gui_pTrackingSize = new Point3D(20,20,30);
+        gui_pTrackingSize = new Point3D(55,55,40);
         gui_ntTracking = imp.getNFrames();
         gui_bg = (int) imp.getProcessor().getMin();
         trackTable = new TrackTable();
@@ -799,7 +799,7 @@ public class Registration implements PlugIn {
             this.pSubSample = pSubSample;
             this.iterations = iterations;
             this.bg = bg;
-            this.trackingFactor = 2; // todo: what to do here??
+            this.trackingFactor = 2.5; // todo: add to GUI
             this.imp = imp;
 
 
@@ -846,7 +846,7 @@ public class Registration implements PlugIn {
             if(Globals.verbose) log("measuring position of first time-point using center of mass...");
 
             startTime = System.currentTimeMillis();
-            pShift = computeIterativeCenterOfMassShift16bit(imp0.getStack(), 1/trackingFactor, iterations);
+            pShift = computeIterativeCenterOfMassShift16bit(imp0.getStack(), trackingFactor, iterations);
             elapsedProcessingTime = System.currentTimeMillis() - startTime;
 
             // correct for sub-sampling
@@ -945,7 +945,8 @@ public class Registration implements PlugIn {
                     // compute the different of the center of mass
                     // to the geometric center of imp1
                     startTime = System.currentTimeMillis();
-                    pLocalShift = computeIterativeCenterOfMassShift16bit(imp1.getStack(), 1/trackingFactor, iterations);
+                    //log("timepoint: "+it);
+                    pLocalShift = computeIterativeCenterOfMassShift16bit(imp1.getStack(), trackingFactor, iterations);
                     stopTime = System.currentTimeMillis();
                     elapsedProcessingTime = stopTime - startTime;
 
@@ -958,12 +959,13 @@ public class Registration implements PlugIn {
                     // the drift corrected position in the global coordinate system is: p1offset.add(pLocalShift)
                     // in center coordinates this is: computeCenter(p1offset.add(pShift),pSize)
                     // relative to previous tracking position:
+                    //log(""+track.getXYZ(itPrevious).toString());
+                    //log(""+computeCenter(p1offset.add(pLocalShift),pSize).toString());
+                    //log(""+p1offset.add(pLocalShift).toString());
                     pShift = computeCenter(p1offset.add(pLocalShift),pSize).subtract(track.getXYZ(itPrevious));
                     //log("Center of Mass Tracking Shift relative to previous position: "+pShift);
 
                     if(Globals.verbose) log("actual shift is "+pShift.toString());
-
-
 
                 }
 
@@ -1061,7 +1063,7 @@ public class Registration implements PlugIn {
 
     }
 
-    public Point3D computeIterativeCenterOfMassShift16bit(ImageStack stack, double trackingFraction, int iterations) {
+    public Point3D computeIterativeCenterOfMassShift16bit(ImageStack stack, double trackingFactor, int iterations) {
         Point3D pMin, pMax;
 
         // compute stack center and tracking radii
@@ -1070,10 +1072,15 @@ public class Registration implements PlugIn {
         Point3D pStackSize = new Point3D(stack.getWidth(), stack.getHeight(), stack.getSize() );
         Point3D pStackCenter = computeCenter(new Point3D(0,0,0), pStackSize);
         Point3D pCenter = pStackCenter;
+        double trackingFraction;
         for(int i=0; i<iterations; i++) {
-            pMin = pCenter.subtract(pStackSize.multiply(trackingFraction/2));
+            // trackingFraction = 1/trackingFactor is the user selected object size, because we are loading
+            // a portion of the data the is trackingFactor times larger than the object size
+            trackingFraction = 1.0 - Math.pow(1.0*i/(iterations-1.0),1.0/4.0)*(1.0-1.0/trackingFactor);
+            pMin = pCenter.subtract(pStackSize.multiply(trackingFraction/2)); // div 2 because it is radius
             pMax = pCenter.add(pStackSize.multiply(trackingFraction/2));
             pCenter = computeCenter16bit(stack, pMin, pMax);
+            //log("i "+i+" trackingFraction "+trackingFraction+" pCenter "+pCenter.toString());
         }
         return(pCenter.subtract(pStackCenter));
     }
