@@ -11,6 +11,7 @@ import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
 import mpicbg.imglib.algorithm.fft.PhaseCorrelation;
+import mpicbg.imglib.algorithm.fft.PhaseCorrelationPeak;
 import mpicbg.imglib.image.ImagePlusAdapter;
 
 import javax.swing.*;
@@ -1056,7 +1057,7 @@ public class Registration implements PlugIn {
     }
 
     public Point3D computeOffset(Point3D pCenter, Point3D pSize) {
-        return(pCenter.subtract(pSize.subtract(1,1,1).multiply(0.5)));
+        return(pCenter.subtract(pSize.subtract(1, 1, 1).multiply(0.5)));
     }
 
     public Point3D computeCenter(Point3D pOffset, Point3D pSize) {
@@ -1168,13 +1169,17 @@ public class Registration implements PlugIn {
         PhaseCorrelation phc = new PhaseCorrelation(ImagePlusAdapter.wrap(imp1), ImagePlusAdapter.wrap(imp0), 5, true);
         if(Globals.verbose) log("phc.process()... ");
         phc.process();
-        int[] shift = phc.getShift().getPosition();
-        if(Math.abs(shift[0])>10) {
-            //if(Globals.verbose)
-            imp1.show();
-            imp0.show();
-            log("");
+        // get the first peak that is not a clean 1.0,
+        // because 1.0 crosscorrelation typically is an artifact of too much shift into black areas of both images
+        ArrayList<PhaseCorrelationPeak> pcp = phc.getAllShifts();
+        float ccPeak = 0;
+        int iPeak = 0;
+        for(iPeak = pcp.size()-1; iPeak>=0; iPeak--) {
+            ccPeak = pcp.get(iPeak).getCrossCorrelationPeak();
+            if (ccPeak < 0.999) break;
         }
+        log(""+ccPeak);
+        int[] shift = pcp.get(iPeak).getPosition();
         return(new Point3D(shift[0],shift[1],shift[2]));
     }
 
