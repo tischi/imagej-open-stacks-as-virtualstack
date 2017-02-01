@@ -677,10 +677,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     }
 
-    public static Point3D curatePositionOffsetSize(ImagePlus imp, Point3D po, Point3D ps) {
-        boolean[] shifted = new boolean[1];
-        return(curatePositionOffsetSize(imp, po, ps, shifted));
-    }
+    //public static Point3D curatePositionOffsetSize(ImagePlus imp, Point3D po, Point3D ps) {
+    //    boolean[] shifted = new boolean[1];
+    //    return(curatePositionOffsetSize(imp, po, ps, shifted));
+    //}
 
     public static Point3D curatePositionOffsetSize(ImagePlus imp, Point3D po, Point3D ps, boolean[] shifted) {
         shifted[0] = false;
@@ -920,9 +920,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        //final String directory = "/Users/tischi/Desktop/example-data/Ashna_119series/";
+        final String directory = "/Users/tischi/Desktop/example-data/Ashna_119series/";
         // final String directory = "/Volumes/USB DISK/Ashna -test/";
-        final String directory = "/Users/tischi/Desktop/example-data/Ashna-Leica-Target-LSEA/";
+        // final String directory = "/Users/tischi/Desktop/example-data/Ashna-Leica-Target-LSEA/";
 
 
 

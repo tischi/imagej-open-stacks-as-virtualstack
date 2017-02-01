@@ -1,15 +1,16 @@
 <html>
-<h3>Tracking window</h3>
+<h3>Object size</h3>
 <p width=400>
     The tracking is based on computing the center of mass in a region whose
-    size you can adjust here. The "Tracking window" should be large enough <b>to readily enclose one</b> of
+    size you can adjust here.<br>
+    The "Object size" should be large enough <b>to enclose one</b> of
     your objects of interest, but small enough <b>not to enclose two</b> objects
-    as this can cause the algorithm to 'switch' objects during tracking. In addition, the "Tracking window"
-    needs to be large enough to cover the distance that the object moves between subsequent time-points.
-    If the objects moves out of the "Tracking window" the algorithm will no find it anymore.
-    Please note that you can change the object size at any point; the 'Object size' is  read again any time you
-    click the 'Track selected object' button. This means that you can subsequently track objects of
-    different sizes.
+    as this can cause the algorithm to 'switch' objects during tracking.<br>
+    In addition, the "Tracking window" (= object size * 2) needs to be large enough to cover the distance that the object moves
+    between subsequent time-points. If the objects moves out of the "Tracking window" the algorithm will
+    not find it anymore.<br>
+    The 'Tracking window' is read each time you click the 'Track selected object' button.
+    This means that you can subsequently track objects of different sizes.
 </p>
 </html>
 ###

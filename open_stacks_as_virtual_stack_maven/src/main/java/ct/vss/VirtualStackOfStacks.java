@@ -279,25 +279,19 @@ public class VirtualStackOfStacks extends ImageStack {
 
         FileInfoSer fi = infos[c][t][0];
 
-        if(fi.isCropped) {
-            // load cropped slice
-            po = new Point3D(fi.pCropOffset[0],fi.pCropOffset[1],fi.pCropOffset[2]+z);;
-            ps = new Point3D(fi.pCropSize[0],fi.pCropSize[1],1);
+        po = new Point3D(0,0,z);
 
+        if(fi.isCropped) {
+            // offset for cropping is added in  getCubeByTimeOffsetAndSize
+            ps = new Point3D(fi.pCropSize[0],fi.pCropSize[1],1);
         } else {
-            // load full slice
-            po = new Point3D(0,0,z);
             ps = new Point3D(fi.width,fi.height,1);
         }
 
         // todo: call the getCube... method from here
 
-        imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);
-
-        if (imp==null) {
-            log("Error: loading failed!");
-            return null;
-        }
+        // imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);
+        imp = getCubeByTimeOffsetAndSize(t, c, po, ps, new Point3D(1,1,1));
 
         return imp.getProcessor();
 
@@ -333,7 +327,9 @@ public class VirtualStackOfStacks extends ImageStack {
         }
     }
 
-    public ImagePlus getCubeByTimeOffsetAndSize(int t, int c, Point3D po, Point3D pSize, Point3D pSubSample) {
+    public ImagePlus getCubeByTimeOffsetAndSize(int t, int c, Point3D po, Point3D ps, Point3D pSubSample) {
+
+        ImagePlus impLoaded = null;
 
         if (Globals.verbose) {
             log("# VirtualStackOfStacks.getCroppedFrameOffsetSize");
@@ -341,7 +337,7 @@ public class VirtualStackOfStacks extends ImageStack {
             log("c: " + c);
         }
 
-        FileInfoSer fi = infos[0][0][0];
+        FileInfoSer fi = infos[c][t][0];
 
         if (fi.isCropped) {
             po = po.add(fi.getCropOffset());
@@ -352,21 +348,88 @@ public class VirtualStackOfStacks extends ImageStack {
             setStackFromFile(t, c);
         }
 
-        // todo: load less if out-of-bounds
-        ImagePlus imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], (int) pSubSample.getZ(), po, pSize);
+        int dz = (int) pSubSample.getZ();
 
-        if (imp == null) {
-            log("Error: loading failed!");
-            return null;
+        // compute ranges to be loaded
+        int ox = (int) (po.getX() + 0.5);
+        int oy = (int) (po.getY() + 0.5);
+        int oz = (int) (po.getZ() + 0.5);
+        int sx = (int) (ps.getX() + 0.5);
+        int sy = (int) (ps.getY() + 0.5);
+        int sz = (int) (ps.getZ() + 0.5);
+
+
+        // adjust ranges for loading to stay within the image bounds
+
+        //
+        // adjust for negative offsets
+        //
+
+        // set negative offsets to zero
+        int ox2 = (ox < 0) ? 0 : ox;
+        int oy2 = (oy < 0) ? 0 : oy;
+        int oz2 = (oz < 0) ? 0 : oz;
+
+        // adjust the loaded sizes accordingly
+        int sx2 = sx - (ox2-ox);
+        int sy2 = sy - (oy2-oy);
+        int sz2 = sz - (oz2-oz);
+
+        //
+        // adjust for too large loading ranges due to high offsets
+        // - note: ox2=ox and sx2=sx if ox was positive
+        int nX = fi.width;
+        int nY = fi.height;
+        int nZ = infos[c][t].length;
+
+        sx2 = (ox2+sx2-1 > nX-1) ? nX-ox2 : sx2;
+        sy2 = (oy2+sy2-1 > nY-1) ? nY-oy2 : sy2;
+        sz2 = (oz2+sz2-1 > nZ-1) ? nZ-oz2 : sz2;
+
+        if (fi.isCropped) {
+            ps = ps; // just for debugging
         }
 
-        // todo: pad with zeros if loaded less
+
+        if(sx2>0 && sy2>0 && sz2>0) {
+            Point3D po2 = new Point3D(ox2, oy2, oz2);
+            Point3D ps2 = new Point3D(sx2, sy2, sz2);
+            impLoaded = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po2, ps2);
+
+            if (impLoaded == null) {
+                log("Error: loading failed!");
+                return null;
+            }
+
+        }
 
 
+
+        // put the potentially smaller loaded stack into the full stack
+
+        if (dz > 1) sz = (int) (1.0 * sz / dz + 0.5); // correct final stack size for sub-sampling in z
+        ImageStack finalStack = ImageStack.create(sx, sy, sz, fi.bytesPerPixel*8);
+        if(sx2>0 && sy2>0 && sz2>0) {
+            // something was actually loaded
+            ImageStack loadedStack = impLoaded.getStack();
+            for (int z = 0; z < loadedStack.size(); z++) {
+                ImageProcessor ip = loadedStack.getProcessor(z + 1); // one-based
+                ImageProcessor ip2 = ip.createProcessor(sx, sy);
+                ip2.insert(ip, ox2 - ox, oy2 - oy);
+                finalStack.setProcessor(ip2, (z + 1) + (oz2 - oz));
+            }
+        }
+
+        // todo: if this is called from "getProcessor" I need different logic because
+        // it should only return one plane
+
+        ImagePlus finalImp = new ImagePlus("", finalStack);
+
+        // subsample in x and y
         if ((int) pSubSample.getX() > 1 || (int) pSubSample.getY() > 1) {
-            return (resizeWidthAndHeight(imp, (int) pSubSample.getX(), (int) pSubSample.getY()));
+            return (resizeWidthAndHeight(finalImp, (int) pSubSample.getX(), (int) pSubSample.getY()));
         } else {
-            return (imp);
+            return (finalImp);
         }
     }
 

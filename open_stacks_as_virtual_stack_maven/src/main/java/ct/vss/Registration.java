@@ -79,7 +79,7 @@ public class Registration implements PlugIn {
         JFrame frame;
 
         String[] texts = {
-                "Tracking window: nx, ny, nz [pixels]",
+                "Object size: nx, ny, nz [pixels]",
                 "Sub-sampling: dx, dy, dz, dt [pixels, frames]",
                 "Track length [frames]"
         };
@@ -728,16 +728,16 @@ public class Registration implements PlugIn {
                 // convert track center coordinates to curated bounding box offsets
                 //
 
-                boolean[] shifted = new boolean[1];
+                //boolean[] shifted = new boolean[1];
                 Point3D[] trackOffsets = new Point3D[track.getLength()];
                 for(int iPosition=0; iPosition<track.getLength(); iPosition++) {
                     Point3D offset = computeOffset(track.getXYZ(iPosition), track.getObjectSize());
-                    Point3D offsetCurated = osv.curatePositionOffsetSize(imp, offset, track.getObjectSize(), shifted);
-                    if(shifted[0]) {
-                        log("Track_"+track.getID()+" was out of image bounds at frame "+iPosition+
-                                " (frame "+track.getT(iPosition)+" in original image)");
-                    };
-                    trackOffsets[iPosition] = offsetCurated;
+                    //Point3D offsetCurated = osv.curatePositionOffsetSize(imp, offset, track.getObjectSize(), shifted);
+                    //if(shifted[0]) {
+                    //    log("Track_"+track.getID()+" was out of image bounds at frame "+iPosition+
+                    //            " (frame "+track.getT(iPosition)+" in original image)");
+                    //};
+                    trackOffsets[iPosition] = offset;
                 }
 
                 impA[i] = OpenStacksAsVirtualStack.makeCroppedVirtualStack(imp, trackOffsets, track.getObjectSize(), track.getTmin(), track.getTmax());
@@ -790,7 +790,7 @@ public class Registration implements PlugIn {
     class Tracking implements Runnable {
         int iTrack, dt, bg, iterations;
         Point3D pSubSample;
-        double centerOfMassFractionOfImage;
+        double trackingFactor;
         ImagePlus imp;
 
         Tracking(ImagePlus imp, int iTrack, Point3D pSubSample, int gui_tSubSample, int bg, int iterations) {
@@ -799,7 +799,7 @@ public class Registration implements PlugIn {
             this.pSubSample = pSubSample;
             this.iterations = iterations;
             this.bg = bg;
-            this.centerOfMassFractionOfImage = 0.5; // todo: what to do here??
+            this.trackingFactor = 2; // todo: what to do here??
             this.imp = imp;
 
 
@@ -827,15 +827,17 @@ public class Registration implements PlugIn {
             //
 
             // get selected track coordinates
-            pSize = track.getObjectSize();
+            // load more data that the user selected
+            pSize = track.getObjectSize().multiply(trackingFactor);
             p0offset = computeOffset(track.getXYZ(0), pSize);
 
             //
             // read data
             //
 
-            p0offset = OpenStacksAsVirtualStack.curatePositionOffsetSize(imp, p0offset, pSize);
+            //p0offset = OpenStacksAsVirtualStack.curatePositionOffsetSize(imp, p0offset, pSize);
             imp0 = vss.getCubeByTimeOffsetAndSize(tStart, channel, p0offset, pSize, pSubSample);
+            //imp0.show();
             IJ.run(imp0, "Subtract...", "value="+computeMean16bit(imp0.getStack()));
 
             // iteratively compute the shift of the center of mass relative to the center of the image stack
@@ -844,7 +846,7 @@ public class Registration implements PlugIn {
             if(Globals.verbose) log("measuring position of first time-point using center of mass...");
 
             startTime = System.currentTimeMillis();
-            pShift = computeIterativeCenterOfMassShift16bit(imp0.getStack(), centerOfMassFractionOfImage, iterations);
+            pShift = computeIterativeCenterOfMassShift16bit(imp0.getStack(), 1/trackingFactor, iterations);
             elapsedProcessingTime = System.currentTimeMillis() - startTime;
 
             // correct for sub-sampling
@@ -902,8 +904,9 @@ public class Registration implements PlugIn {
                 // but curate this position according to the image bounds
                 //log("Position where previous image was loaded: " + p0offset);
                 //log("Position where previous image was loaded plus shift: " + p0offset.add(pShift));
-                p1offset = OpenStacksAsVirtualStack.curatePositionOffsetSize(imp, p0offset.add(pShift), pSize);
-                //log("Curated position where this image is loaded: " + p1offset);
+                //p1offset = OpenStacksAsVirtualStack.curatePositionOffsetSize(imp, p0offset.add(pShift), pSize);
+                p1offset = p0offset.add(pShift);
+                //log("Curatep0offset.add(pShift)d position where this image is loaded: " + p1offset);
 
                 // load image
                 startTime = System.currentTimeMillis();
@@ -942,7 +945,7 @@ public class Registration implements PlugIn {
                     // compute the different of the center of mass
                     // to the geometric center of imp1
                     startTime = System.currentTimeMillis();
-                    pLocalShift = computeIterativeCenterOfMassShift16bit(imp1.getStack(), centerOfMassFractionOfImage, iterations);
+                    pLocalShift = computeIterativeCenterOfMassShift16bit(imp1.getStack(), 1/trackingFactor, iterations);
                     stopTime = System.currentTimeMillis();
                     elapsedProcessingTime = stopTime - startTime;
 
