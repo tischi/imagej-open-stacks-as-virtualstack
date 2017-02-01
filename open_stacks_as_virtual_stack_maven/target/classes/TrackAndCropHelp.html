@@ -117,17 +117,21 @@ Saves the table as a text file for further processing, e.g. in R or Excel.
 ###
 <html>
 <h3>Tracking Method</h3>
-<p width=400>
+    <p width=400>
     You can choose between 'center of mass' and 'correlation'.
-    For both methods, the **mean intensity** within the current tracking window **is subtracted**
+    For both methods, the mean intensity within the current tracking window **is subtracted**
     from each pixel as a background removal strategy.
+    </p>
     <h4>center of mass</h4>
+    <p width=400>
     The center of mass is very fast to compute.
-    ...
-    For 'center of mass' the position at each time-point is determined by an **iterative** (n=6) center-of-mass
-    computation in a region of **half the tracking window's size**.
-    <h4>correlation</h4>
-    For 'correlation' the position of the first time-point is determined as its center of mass.
+    For 'center of mass' the position at each time-point is determined by an iterative (n=10) center-of-mass
+    computation, where the size of the region in which the computation happens gradually shrinks from
+        "Object size * Tracking factor" to "Object size".
+    </p>
+<h4>correlation</h4>
+<p width=400>
+For 'correlation' the position of the first time-point is determined as its center of mass.
     The position of subsequent time-points is determined relative to the previous time-point by
     computing the shift that yields the maximal cross-correlation between the signals.
 </p>

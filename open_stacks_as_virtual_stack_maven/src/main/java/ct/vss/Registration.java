@@ -80,9 +80,9 @@ public class Registration implements PlugIn {
         JFrame frame;
 
         String[] texts = {
-                "Object size: nx, ny, nz [pixels]",
+                "Object size [pixels]: nx, ny, nz",
                 "Tracking factor",
-                "Sub-sampling: dx, dy, dz, dt [pixels, frames]",
+                "Sub-sampling [pixels, frames]: dx, dy, dz, dt",
                 "Track length [frames]"
         };
 
@@ -192,10 +192,10 @@ public class Registration implements PlugIn {
 
             int k = 0;
             panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
+            panels.get(iPanel).add(buttons[i++]);
+            panels.get(iPanel).add(buttons[i++]);
             panels.get(iPanel).add(labels[k]);
             panels.get(iPanel).add(textFields[k]);
-            panels.get(iPanel).add(buttons[i++]);
-            panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
             for (k = 1; k < textFields.length; k++) {
