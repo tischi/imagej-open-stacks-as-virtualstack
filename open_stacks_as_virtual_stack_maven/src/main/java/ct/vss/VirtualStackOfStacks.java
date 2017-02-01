@@ -407,7 +407,16 @@ public class VirtualStackOfStacks extends ImageStack {
 
         // put the potentially smaller loaded stack into the full stack
 
-        if (dz > 1) sz = (int) (1.0 * sz / dz + 0.5); // correct final stack size for sub-sampling in z
+
+        int finalStackOffsetX = (ox2 - ox);
+        int finalStackOffsetY = (oy2 - oy);
+        int finalStackOffsetZ = (oz2 - oz);
+
+        if (dz > 1) { // adapt for sub-sampling in z
+            sz = (int) (1.0 * sz / dz + 0.5); // final stack size
+            finalStackOffsetZ = (int) (1.0 * finalStackOffsetZ / dz + 0.5); // final stack offset
+        }
+
         ImageStack finalStack = ImageStack.create(sx, sy, sz, fi.bytesPerPixel*8);
         if(sx2>0 && sy2>0 && sz2>0) {
             // something was actually loaded
@@ -415,8 +424,8 @@ public class VirtualStackOfStacks extends ImageStack {
             for (int z = 0; z < loadedStack.size(); z++) {
                 ImageProcessor ip = loadedStack.getProcessor(z + 1); // one-based
                 ImageProcessor ip2 = ip.createProcessor(sx, sy);
-                ip2.insert(ip, ox2 - ox, oy2 - oy);
-                finalStack.setProcessor(ip2, (z + 1) + (oz2 - oz));
+                ip2.insert(ip, finalStackOffsetX, finalStackOffsetY);
+                finalStack.setProcessor(ip2, (z + 1) + finalStackOffsetZ);
             }
         }
 
