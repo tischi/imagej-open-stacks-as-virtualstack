@@ -47,6 +47,7 @@ public class Registration implements PlugIn {
     int gui_ntTracking, gui_bg;
     int gui_iterations = 10;
     Point3D gui_pTrackingSize;
+    double gui_trackingFactor = 2.5;
     Point3D gui_pSubSample = new Point3D(1,1,1);
     int gui_tSubSample = 1;
     ArrayList<Track> Tracks = new ArrayList<Track>();
@@ -80,6 +81,7 @@ public class Registration implements PlugIn {
 
         String[] texts = {
                 "Object size: nx, ny, nz [pixels]",
+                "Tracking factor",
                 "Sub-sampling: dx, dy, dz, dt [pixels, frames]",
                 "Track length [frames]"
         };
@@ -98,6 +100,7 @@ public class Registration implements PlugIn {
 
         String[] defaults = {
                 String.valueOf((int) gui_pTrackingSize.getX()) + "," + (int) gui_pTrackingSize.getY() + "," +String.valueOf((int) gui_pTrackingSize.getZ()),
+                String.valueOf(gui_trackingFactor),
                 String.valueOf((int) gui_pSubSample.getX() + "," + (int) gui_pSubSample.getY() + "," + (int) gui_pSubSample.getZ() + "," + gui_tSubSample),
                 String.valueOf(imp.getNFrames())
         };
@@ -304,7 +307,7 @@ public class Registration implements PlugIn {
                 if( iNewTrack >= 0 ) {
                     trackStatsLastTrackStarted = System.currentTimeMillis();
                     trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
-                    es.execute(new Registration.Tracking(imp, iNewTrack, gui_pSubSample, gui_tSubSample, gui_bg, gui_iterations));
+                    es.execute(new Registration.Tracking(imp, iNewTrack, gui_pSubSample, gui_tSubSample, gui_iterations));
                 }
 
                 Thread t = new Thread(new Runnable() {
@@ -381,7 +384,7 @@ public class Registration implements PlugIn {
                     }
                 } else { /* TODO: error handling */ }
 
-            }  else if (e.getActionCommand().equals(texts[k++])) {
+            } else if (e.getActionCommand().equals(texts[k++])) {
 
                 //
                 // Tracking object size
@@ -390,6 +393,16 @@ public class Registration implements PlugIn {
                 JTextField source = (JTextField) e.getSource();
                 String[] sA = source.getText().split(",");
                 gui_pTrackingSize = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
+
+            } else if (e.getActionCommand().equals(texts[k++])) {
+
+                //
+                // Tracking factor
+                //
+
+                JTextField source = (JTextField) e.getSource();
+                String[] sA = source.getText().split(",");
+                gui_trackingFactor = new Double(source.getText());
 
             } else if (e.getActionCommand().equals(texts[k++])) {
 
@@ -788,18 +801,17 @@ public class Registration implements PlugIn {
     }
 
     class Tracking implements Runnable {
-        int iTrack, dt, bg, iterations;
+        int iTrack, dt, iterations;
         Point3D pSubSample;
         double trackingFactor;
         ImagePlus imp;
 
-        Tracking(ImagePlus imp, int iTrack, Point3D pSubSample, int gui_tSubSample, int bg, int iterations) {
+        Tracking(ImagePlus imp, int iTrack, Point3D pSubSample, int gui_tSubSample, int iterations) {
             this.iTrack = iTrack;
             this.dt = gui_tSubSample;
             this.pSubSample = pSubSample;
             this.iterations = iterations;
-            this.bg = bg;
-            this.trackingFactor = 2.5; // todo: add to GUI
+            this.trackingFactor = gui_trackingFactor;
             this.imp = imp;
 
 
@@ -1077,8 +1089,8 @@ public class Registration implements PlugIn {
             // trackingFraction = 1/trackingFactor is the user selected object size, because we are loading
             // a portion of the data the is trackingFactor times larger than the object size
             trackingFraction = 1.0 - Math.pow(1.0*i/(iterations-1.0),1.0/4.0)*(1.0-1.0/trackingFactor);
-            pMin = pCenter.subtract(pStackSize.multiply(trackingFraction/2)); // div 2 because it is radius
-            pMax = pCenter.add(pStackSize.multiply(trackingFraction/2));
+            pMin = pCenter.subtract(pStackSize.multiply(trackingFraction / 2)); // div 2 because it is radius
+            pMax = pCenter.add(pStackSize.multiply(trackingFraction / 2));
             pCenter = computeCenter16bit(stack, pMin, pMax);
             //log("i "+i+" trackingFraction "+trackingFraction+" pCenter "+pCenter.toString());
         }

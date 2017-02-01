@@ -90,8 +90,8 @@
       <file leaf-file-name="TrackAndCropHelp.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="8" column="40" selection-start-line="8" selection-start-column="40" selection-end-line="8" selection-end-column="40" />
+            <state vertical-scroll-proportion="-5.625">
+              <caret line="9" column="4" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -100,8 +100,8 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5613682">
-              <caret line="804" column="0" selection-start-line="804" selection-start-column="0" selection-end-line="804" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.37022132">
+              <caret line="309" column="105" selection-start-line="309" selection-start-column="105" selection-end-line="309" selection-end-column="105" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#Registration#0;class#Registration#0" expanded="false" />
@@ -229,8 +229,8 @@
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
-        <option value="$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
       </list>
     </option>
@@ -259,8 +259,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="10" />
-    <option name="y" value="35" />
+    <option name="x" value="221" />
+    <option name="y" value="36" />
     <option name="width" value="1403" />
     <option name="height" value="819" />
   </component>
@@ -580,8 +580,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="10" y="35" width="1403" height="819" extended-state="0" />
-    <editor active="false" />
+    <frame x="221" y="36" width="1403" height="819" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -1198,14 +1198,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="8" column="40" selection-start-line="8" selection-start-column="40" selection-end-line="8" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1221,10 +1213,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-5.625">
+          <caret line="9" column="4" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5613682">
-          <caret line="804" column="0" selection-start-line="804" selection-start-column="0" selection-end-line="804" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.37022132">
+          <caret line="309" column="105" selection-start-line="309" selection-start-column="105" selection-end-line="309" selection-end-column="105" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />

@@ -6,11 +6,18 @@
     The "Object size" should be large enough <b>to enclose one</b> of
     your objects of interest, but small enough <b>not to enclose two</b> objects
     as this can cause the algorithm to 'switch' objects during tracking.<br>
-    In addition, the "Tracking window" (= object size * 2) needs to be large enough to cover the distance that the object moves
+
+</p>
+</html>
+###
+<html>
+<h3>Tracking factor</h3>
+<p width=400>
+    The factor determines the window in which the algorithm will search for the object in the next time-point.
+    The window size is (Object size * Tracking factor).
+    This needs to be large enough to cover the distance that the object moves
     between subsequent time-points. If the objects moves out of the "Tracking window" the algorithm will
-    not find it anymore.<br>
-    The 'Tracking window' is read each time you click the 'Track selected object' button.
-    This means that you can subsequently track objects of different sizes.
+    not find it anymore.
 </p>
 </html>
 ###
