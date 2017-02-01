@@ -364,6 +364,7 @@ public class Registration implements PlugIn {
                 // remove overlay
                 imp.setOverlay(new Overlay());
 
+                totalTimePointsTracked.set(0);
                 totalTimePointsToBeTracked = 0;
 
 
@@ -850,7 +851,7 @@ public class Registration implements PlugIn {
             //p0offset = OpenStacksAsVirtualStack.curatePositionOffsetSize(imp, p0offset, pSize);
             imp0 = vss.getCubeByTimeOffsetAndSize(tStart, channel, p0offset, pSize, pSubSample);
             //imp0.show();
-            IJ.run(imp0, "Subtract...", "value="+computeMean16bit(imp0.getStack()));
+            IJ.run(imp0, "Subtract...", "value="+computeMean16bit(imp0.getStack())+" stack");
 
             // iteratively compute the shift of the center of mass relative to the center of the image stack
             // using only half the image size for iteration
@@ -926,7 +927,7 @@ public class Registration implements PlugIn {
                 elapsedReadingTime = System.currentTimeMillis() - startTime;
 
                 // subtract mean intensity
-                IJ.run(imp1, "Subtract...", "value="+computeMean16bit(imp1.getStack()));
+                IJ.run(imp1, "Subtract...", "value="+computeMean16bit(imp1.getStack())+" stack");
 
                 if (gui_trackingMethod == "correlation") {
 
@@ -942,7 +943,6 @@ public class Registration implements PlugIn {
                     pShift = multiplyPoint3dComponents(pShift, pSubSample);
                     //log("Correlation Tracking Shift: "+pShift);
 
-                    if(Globals.verbose) log("shift after correction for sub-sampling is "+pShift.toString());
 
                     // take into account the different loading positions of this and the previous image
                     pShift = pShift.add(p1offset.subtract(p0offset));
@@ -1169,6 +1169,12 @@ public class Registration implements PlugIn {
         if(Globals.verbose) log("phc.process()... ");
         phc.process();
         int[] shift = phc.getShift().getPosition();
+        if(Math.abs(shift[0])>10) {
+            //if(Globals.verbose)
+            imp1.show();
+            imp0.show();
+            log("");
+        }
         return(new Point3D(shift[0],shift[1],shift[2]));
     }
 
