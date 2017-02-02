@@ -827,6 +827,7 @@ public class Registration implements PlugIn {
             Point3D pShift;
             Point3D pLocalShift;
             Point3D pSize;
+            boolean subtractMean = true;
 
             VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
 
@@ -849,24 +850,16 @@ public class Registration implements PlugIn {
             // read data
             //
 
-            //p0offset = OpenStacksAsVirtualStack.curatePositionOffsetSize(imp, p0offset, pSize);
-            imp0 = vss.getCubeByTimeOffsetAndSize(tStart, channel, p0offset, pSize, pSubSample);
-            //imp0.show();
-            IJ.run(imp0, "Subtract...", "value="+computeMean16bit(imp0.getStack())+" stack");
+            imp0 = vss.getCubeByTimeOffsetAndSize(tStart, channel, p0offset, pSize, pSubSample, subtractMean);
 
             // iteratively compute the shift of the center of mass relative to the center of the image stack
             // using only half the image size for iteration
-
-            if(Globals.verbose) log("measuring position of first time-point using center of mass...");
-
             startTime = System.currentTimeMillis();
             pShift = computeIterativeCenterOfMassShift16bit(imp0.getStack(), trackingFactor, iterations);
             elapsedProcessingTime = System.currentTimeMillis() - startTime;
 
             // correct for sub-sampling
             pShift = multiplyPoint3dComponents(pShift, pSubSample);
-
-            if(Globals.verbose) log("shift relative to where user clicked is "+pShift.toString());
 
             //
             // Add track location for first image
@@ -924,11 +917,8 @@ public class Registration implements PlugIn {
 
                 // load image
                 startTime = System.currentTimeMillis();
-                imp1 = vss.getCubeByTimeOffsetAndSize(itNow, channel, p1offset, pSize, pSubSample);
+                imp1 = vss.getCubeByTimeOffsetAndSize(itNow, channel, p1offset, pSize, pSubSample, subtractMean);
                 elapsedReadingTime = System.currentTimeMillis() - startTime;
-
-                // subtract mean intensity
-                IJ.run(imp1, "Subtract...", "value="+computeMean16bit(imp1.getStack())+" stack");
 
                 if (gui_trackingMethod == "correlation") {
 
@@ -1183,6 +1173,7 @@ public class Registration implements PlugIn {
         return(new Point3D(shift[0],shift[1],shift[2]));
     }
 
+    // todo: put in some utils class
     public int computeMean16bit(ImageStack stack) {
 
         //long startTime = System.currentTimeMillis();

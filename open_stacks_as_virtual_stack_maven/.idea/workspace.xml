@@ -26,22 +26,9 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="724" column="28" selection-start-line="724" selection-start-column="28" selection-end-line="724" selection-end-column="28" />
+              <caret line="533" column="38" selection-start-line="533" selection-start-column="38" selection-end-line="533" selection-end-column="38" />
               <folding>
-                <element signature="e#2157#2158#0" expanded="false" />
-                <element signature="e#2201#2202#0" expanded="false" />
-                <element signature="e#15430#15431#0" expanded="false" />
-                <element signature="e#15498#15499#0" expanded="false" />
-                <element signature="e#21107#21108#0" expanded="false" />
-                <element signature="e#21183#21184#0" expanded="false" />
-                <element signature="e#32436#32437#0" expanded="false" />
-                <element signature="e#32506#32507#0" expanded="false" />
-                <element signature="e#40096#40097#0" expanded="false" />
-                <element signature="e#40182#40183#0" expanded="false" />
-                <element signature="e#44166#44167#0" expanded="false" />
-                <element signature="e#44281#44282#0" expanded="false" />
-                <element signature="e#47068#47069#0" expanded="false" />
-                <element signature="e#47152#47153#0" expanded="false" />
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -97,11 +84,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5110664">
-              <caret line="1180" column="23" selection-start-line="1180" selection-start-column="23" selection-end-line="1180" selection-end-column="23" />
+            <state vertical-scroll-proportion="-6.111111">
+              <caret line="1049" column="27" selection-start-line="1049" selection-start-column="23" selection-end-line="1049" selection-end-column="27" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#Registration#0;class#Registration#0" expanded="false" />
@@ -114,39 +101,7 @@
                 <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
                 <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
                 <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
-                <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
                 <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PhaseCorrelation.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/legacy-imglib1/1.1.6/legacy-imglib1-1.1.6.jar!/mpicbg/imglib/algorithm/fft/PhaseCorrelation.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.8148148">
-              <caret line="129" column="59" selection-start-line="129" selection-start-column="59" selection-end-line="129" selection-end-column="59" />
-              <folding>
-                <element signature="method#setNormalizationThreshold#0;class#PhaseCorrelation#0" expanded="false" />
-                <element signature="method#setVerifyWithCrossCorrelation#0;class#PhaseCorrelation#0" expanded="false" />
-                <element signature="method#setMinimalPixelOverlap#1;class#PhaseCorrelation#0" expanded="false" />
-                <element signature="e#4374#4375#0" expanded="true" />
-                <element signature="method#process#0;class#PhaseCorrelation#0" expanded="false" />
-                <element signature="method#verifyWithCrossCorrelation#0;class#PhaseCorrelation#0" expanded="false" />
-                <element signature="method#extractPhaseCorrelationPeaks#0;class#PhaseCorrelation#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PhaseCorrelationPeak.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/legacy-imglib1/1.1.6/legacy-imglib1-1.1.6.jar!/mpicbg/imglib/algorithm/fft/PhaseCorrelationPeak.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="5.3703704">
-              <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-              <folding>
-                <element signature="e#2037#2038#0" expanded="true" />
-                <element signature="e#2088#2089#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -166,14 +121,18 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="VirtualStackOfStacks.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="VirtualStackOfStacks.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="425" column="37" selection-start-line="425" selection-start-column="37" selection-end-line="425" selection-end-column="37" />
+            <state vertical-scroll-proportion="0.6240458">
+              <caret line="432" column="12" selection-start-line="432" selection-start-column="12" selection-end-line="432" selection-end-column="12" />
               <folding>
+                <element signature="e#2674#2675#0" expanded="true" />
+                <element signature="e#2703#2704#0" expanded="true" />
                 <element signature="e#2739#2740#0" expanded="true" />
                 <element signature="e#2771#2772#0" expanded="true" />
+                <element signature="e#8812#8813#0" expanded="true" />
+                <element signature="e#8860#8861#0" expanded="true" />
                 <element signature="method#resizeWidthAndHeight#0;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#setSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -261,9 +220,9 @@
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java" />
         <option value="$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java" />
       </list>
     </option>
   </component>
@@ -291,8 +250,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="10" />
-    <option name="y" value="34" />
+    <option name="x" value="105" />
+    <option name="y" value="50" />
     <option name="width" value="1403" />
     <option name="height" value="819" />
   </component>
@@ -612,7 +571,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="10" y="34" width="1403" height="819" extended-state="1" />
+    <frame x="105" y="50" width="1403" height="819" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -697,12 +656,6 @@
           <properties />
           <option name="timeStamp" value="125" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java</url>
-          <line>428</line>
-          <properties />
-          <option name="timeStamp" value="240" />
-        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
@@ -728,20 +681,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#2157#2158#0" expanded="false" />
-            <element signature="e#2201#2202#0" expanded="false" />
-            <element signature="e#15430#15431#0" expanded="false" />
-            <element signature="e#15498#15499#0" expanded="false" />
-            <element signature="e#21107#21108#0" expanded="false" />
-            <element signature="e#21183#21184#0" expanded="false" />
-            <element signature="e#32436#32437#0" expanded="false" />
-            <element signature="e#32506#32507#0" expanded="false" />
-            <element signature="e#40096#40097#0" expanded="false" />
-            <element signature="e#40182#40183#0" expanded="false" />
-            <element signature="e#44166#44167#0" expanded="false" />
-            <element signature="e#44281#44282#0" expanded="false" />
-            <element signature="e#47068#47069#0" expanded="false" />
-            <element signature="e#47152#47153#0" expanded="false" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -769,7 +709,6 @@
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
             <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
@@ -787,8 +726,12 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="197" column="25" selection-start-line="197" selection-start-column="25" selection-end-line="197" selection-end-column="25" />
           <folding>
+            <element signature="e#2674#2675#0" expanded="true" />
+            <element signature="e#2703#2704#0" expanded="true" />
             <element signature="e#2739#2740#0" expanded="true" />
             <element signature="e#2771#2772#0" expanded="true" />
+            <element signature="e#8812#8813#0" expanded="true" />
+            <element signature="e#8860#8861#0" expanded="true" />
             <element signature="method#resizeWidthAndHeight#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#setSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -832,20 +775,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#2157#2158#0" expanded="false" />
-            <element signature="e#2201#2202#0" expanded="false" />
-            <element signature="e#15430#15431#0" expanded="false" />
-            <element signature="e#15498#15499#0" expanded="false" />
-            <element signature="e#21107#21108#0" expanded="false" />
-            <element signature="e#21183#21184#0" expanded="false" />
-            <element signature="e#32436#32437#0" expanded="false" />
-            <element signature="e#32506#32507#0" expanded="false" />
-            <element signature="e#40096#40097#0" expanded="false" />
-            <element signature="e#40182#40183#0" expanded="false" />
-            <element signature="e#44166#44167#0" expanded="false" />
-            <element signature="e#44281#44282#0" expanded="false" />
-            <element signature="e#47068#47069#0" expanded="false" />
-            <element signature="e#47152#47153#0" expanded="false" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -873,7 +803,6 @@
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
             <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="false" />
           </folding>
         </state>
@@ -891,8 +820,12 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="171" column="14" selection-start-line="171" selection-start-column="11" selection-end-line="171" selection-end-column="14" />
           <folding>
+            <element signature="e#2674#2675#0" expanded="true" />
+            <element signature="e#2703#2704#0" expanded="true" />
             <element signature="e#2739#2740#0" expanded="true" />
             <element signature="e#2771#2772#0" expanded="true" />
+            <element signature="e#8812#8813#0" expanded="true" />
+            <element signature="e#8860#8861#0" expanded="true" />
             <element signature="method#resizeWidthAndHeight#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#setSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -1046,6 +979,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.24568138">
           <caret line="1104" column="17" selection-start-line="1104" selection-start-column="17" selection-end-line="1104" selection-end-column="17" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1186,55 +1120,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="724" column="28" selection-start-line="724" selection-start-column="28" selection-end-line="724" selection-end-column="28" />
-          <folding>
-            <element signature="e#2157#2158#0" expanded="false" />
-            <element signature="e#2201#2202#0" expanded="false" />
-            <element signature="e#15430#15431#0" expanded="false" />
-            <element signature="e#15498#15499#0" expanded="false" />
-            <element signature="e#21107#21108#0" expanded="false" />
-            <element signature="e#21183#21184#0" expanded="false" />
-            <element signature="e#32436#32437#0" expanded="false" />
-            <element signature="e#32506#32507#0" expanded="false" />
-            <element signature="e#40096#40097#0" expanded="false" />
-            <element signature="e#40182#40183#0" expanded="false" />
-            <element signature="e#44166#44167#0" expanded="false" />
-            <element signature="e#44281#44282#0" expanded="false" />
-            <element signature="e#47068#47069#0" expanded="false" />
-            <element signature="e#47152#47153#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="425" column="37" selection-start-line="425" selection-start-column="37" selection-end-line="425" selection-end-column="37" />
-          <folding>
-            <element signature="e#2739#2740#0" expanded="true" />
-            <element signature="e#2771#2772#0" expanded="true" />
-            <element signature="method#resizeWidthAndHeight#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#setSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#trim#0;class#VirtualStackOfStacks#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/legacy-imglib1/1.1.6/legacy-imglib1-1.1.6.jar!/mpicbg/imglib/algorithm/fft/PhaseCorrelationPeak.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="5.3703704">
-          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-          <folding>
-            <element signature="e#2037#2038#0" expanded="true" />
-            <element signature="e#2088#2089#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-2.7083333">
@@ -1243,9 +1128,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/legacy-imglib1/1.1.6/legacy-imglib1-1.1.6.jar!/mpicbg/imglib/algorithm/fft/PhaseCorrelationPeak.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.2917505">
+          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+          <folding>
+            <element signature="e#2037#2038#0" expanded="true" />
+            <element signature="e#2088#2089#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/legacy-imglib1/1.1.6/legacy-imglib1-1.1.6.jar!/mpicbg/imglib/algorithm/fft/PhaseCorrelation.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.8148148">
+        <state vertical-scroll-proportion="0.32340425">
           <caret line="129" column="59" selection-start-line="129" selection-start-column="59" selection-end-line="129" selection-end-column="59" />
           <folding>
             <element signature="method#setNormalizationThreshold#0;class#PhaseCorrelation#0" expanded="false" />
@@ -1259,10 +1155,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="533" column="38" selection-start-line="533" selection-start-column="38" selection-end-line="533" selection-end-column="38" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5110664">
-          <caret line="1180" column="23" selection-start-line="1180" selection-start-column="23" selection-end-line="1180" selection-end-column="23" />
+        <state vertical-scroll-proportion="-6.111111">
+          <caret line="1049" column="27" selection-start-line="1049" selection-start-column="23" selection-end-line="1049" selection-end-column="27" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />
@@ -1275,8 +1181,26 @@
             <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
             <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
             <element signature="method#showCroppedTracks#0;class#Registration#0" expanded="false" />
-            <element signature="method#computeOffset#0;class#Registration#0" expanded="false" />
             <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6240458">
+          <caret line="432" column="12" selection-start-line="432" selection-start-column="12" selection-end-line="432" selection-end-column="12" />
+          <folding>
+            <element signature="e#2674#2675#0" expanded="true" />
+            <element signature="e#2703#2704#0" expanded="true" />
+            <element signature="e#2739#2740#0" expanded="true" />
+            <element signature="e#2771#2772#0" expanded="true" />
+            <element signature="e#8812#8813#0" expanded="true" />
+            <element signature="e#8860#8861#0" expanded="true" />
+            <element signature="method#resizeWidthAndHeight#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#setSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#trim#0;class#VirtualStackOfStacks#0" expanded="false" />
           </folding>
         </state>
       </provider>

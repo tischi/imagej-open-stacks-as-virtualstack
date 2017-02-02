@@ -291,7 +291,7 @@ public class VirtualStackOfStacks extends ImageStack {
         // todo: call the getCube... method from here
 
         // imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);
-        imp = getCubeByTimeOffsetAndSize(t, c, po, ps, new Point3D(1,1,1));
+        imp = getCubeByTimeOffsetAndSize(t, c, po, ps, new Point3D(1,1,1), false);
 
         return imp.getProcessor();
 
@@ -309,6 +309,7 @@ public class VirtualStackOfStacks extends ImageStack {
         return(new Point3D(infos[0][0][0].pCropSize[0], infos[0][0][0].pCropSize[1], infos[0][0][0].pCropSize[2]));
     }
 
+    //
     public ImagePlus getFullFrame(int t, int c, Point3D pSubSample) {
         Point3D po, ps;
 
@@ -319,7 +320,7 @@ public class VirtualStackOfStacks extends ImageStack {
             ps = new Point3D(nX, nY, nZ);
         }
 
-        ImagePlus imp = getCubeByTimeOffsetAndSize(t, c, po, ps, pSubSample);
+        ImagePlus imp = getCubeByTimeOffsetAndSize(t, c, po, ps, pSubSample, false);
         if( (int)pSubSample.getX()>1 || (int)pSubSample.getY()>1) {
             return(resizeWidthAndHeight(imp,(int)pSubSample.getX(),(int)pSubSample.getY()));
         } else {
@@ -327,7 +328,7 @@ public class VirtualStackOfStacks extends ImageStack {
         }
     }
 
-    public ImagePlus getCubeByTimeOffsetAndSize(int t, int c, Point3D po, Point3D ps, Point3D pSubSample) {
+    public ImagePlus getCubeByTimeOffsetAndSize(int t, int c, Point3D po, Point3D ps, Point3D pSubSample, boolean subtractMean) {
 
         ImagePlus impLoaded = null;
 
@@ -418,8 +419,15 @@ public class VirtualStackOfStacks extends ImageStack {
         }
 
         ImageStack finalStack = ImageStack.create(sx, sy, sz, fi.bytesPerPixel*8);
-        if(sx2>0 && sy2>0 && sz2>0) {
-            // something was actually loaded
+        if(sx2>0 && sy2>0 && sz2>0) { // something was actually loaded
+
+
+            if(subtractMean) { // subtract mean intensity
+                int mean = computeMean16bit(impLoaded.getStack());
+                //log("subtracting mean: " + mean);
+                IJ.run(impLoaded, "Subtract...", "value=" + mean + " stack");
+            }
+
             ImageStack loadedStack = impLoaded.getStack();
             for (int z = 0; z < loadedStack.size(); z++) {
                 ImageProcessor ip = loadedStack.getProcessor(z + 1); // one-based
@@ -444,6 +452,37 @@ public class VirtualStackOfStacks extends ImageStack {
             return (finalImp);
         }
     }
+
+    public int computeMean16bit(ImageStack stack) {
+
+        //long startTime = System.currentTimeMillis();
+        double sum = 0.0;
+        int i;
+        int width = stack.getWidth();
+        int height = stack.getHeight();
+        int depth = stack.getSize();
+        int xMin = 0;
+        int xMax = (width-1);
+        int yMin = 0;
+        int yMax = (height-1);
+        int zMin = 0;
+        int zMax = (depth-1);
+
+        for(int z=zMin; z<=zMax; z++) {
+            short[] pixels = (short[]) stack.getProcessor(z+1).getPixels();
+            for (int y = yMin; y<=yMax; y++) {
+                i = y * width + xMin;
+                for (int x = xMin; x <= xMax; x++) {
+                    sum += (pixels[i] & 0xffff);
+                    i++;
+                }
+            }
+        }
+
+        return((int) sum/(width*height*depth));
+
+    }
+
 
     public ImagePlus resizeWidthAndHeight(ImagePlus imp, int dx, int dy) {
         int nSlices = imp.getStackSize();
