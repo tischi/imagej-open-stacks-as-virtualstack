@@ -7,7 +7,6 @@ import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.gui.GenericDialog;
 import ij.gui.NonBlockingGenericDialog;
 import ij.gui.Roi;
 import ij.io.FileInfo;
@@ -26,6 +25,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +62,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     public int cropZmin = 0;
     public int cropZmax = 1;
     private String filenamePattern = "_Target--";
+    AtomicInteger totalTimePointsSaved = new AtomicInteger(0);
+    int totalTimePointsToBeSaved = 0;
 
     // todo: stop loading thread upon closing of image
 
@@ -521,30 +525,47 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         else return split[split.length];
     }
 
-    public void saveAsTiffStacks(ImagePlus imp, String path) {
-        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-        FileSaver fs;
+    class SaveToStacks implements Runnable {
+        ImagePlus imp;
+        String fileType, path;
 
-        log("Saving to: " + path);
-
-        for (int c = 0; c < imp.getNChannels(); c++) {
-
-            for (int t = 0; t < imp.getNFrames(); t++) {
-
-                ImagePlus impCT = vss.getFullFrame(t, c, new Point3D(1,1,1));
-                fs = new FileSaver(impCT);
-                String sC = String.format("%1$02d",c);
-                String sT = String.format("%1$05d",t);
-                String pathCT = path + "--C"+sC+"--T"+sT+".tif";
-                fs.saveAsTiffStack(pathCT);
-                nProgress = nT*nC;
-                iProgress = t+c*nT+1;
-
-            }
+        SaveToStacks(ImagePlus imp, String path, String fileType) {
+            this.imp = imp;
+            this.fileType = fileType;
+            this.path = path;
         }
 
-        iProgress = nProgress;
-        log("done!");
+        public void run() {
+
+            while(true) {
+
+                int t = totalTimePointsSaved.getAndAdd(1);
+
+                if ((t+1) > totalTimePointsToBeSaved) return;
+
+
+                VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+                FileSaver fs;
+
+                //log("Saving to: " + path);
+
+                // todo: zip-compression
+
+                for (int c = 0; c < imp.getNChannels(); c++) {
+                    ImagePlus impCT = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
+                    fs = new FileSaver(impCT);
+                    String sC = String.format("%1$02d", c);
+                    String sT = String.format("%1$05d", t);
+                    String pathCT = path + "--C" + sC + "--T" + sT + ".tif";
+                    fs.saveAsTiffStack(pathCT);
+                }
+
+
+                Globals.threadlog("saved time-point: " + (t+1) + " of " + totalTimePointsToBeSaved);
+
+            }
+
+        }
 
     }
 
@@ -1038,6 +1059,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         JCheckBox cbLog = new JCheckBox("Verbose logging");
         JTextField tfH5DataSet = new JTextField("Data111", 10);
         JTextField tfCropZminZmax = new JTextField("0,0", 7);
+        JTextField tfSavingThreads = new JTextField("10", 2);
+
 
         //JTextField tfFileNamePattern = new JTextField(".*LSEA00.*", 10);
 
@@ -1085,6 +1108,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             panels.add(new JPanel());
             panels.get(j).add(buttons[i++]);
             panels.get(j).add(buttons[i++]);
+            panels.get(j).add(new JLabel("Saving Threads"));
+            panels.get(j).add(tfSavingThreads);
             c.add(panels.get(j++));
 
             panels.add(new JPanel());
@@ -1150,6 +1175,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
             osv.h5DataSet = tfH5DataSet.getText();
             osv.filenamePattern = (String)fileNamePatternComboBox.getSelectedItem();
+            int nSavingThreads = new Integer(tfSavingThreads.getText());
+
 
             if (e.getActionCommand().equals(actions[i++])) {
 
@@ -1255,18 +1282,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     final File file = fc.getSelectedFile();
                     // do the job
-                    Thread t1 = new Thread(new Runnable() {
-                        public void run() {
-                            osv.saveAsTiffStacks(IJ.getImage(), file.getAbsolutePath());
-                        }
-                    }); t1.start();
-                    // update progress status
-                    Thread t2 = new Thread(new Runnable() {
-                        public void run() {
-                            osv.iProgress=0; osv.nProgress=1;
-                            osv.updateStatus("Saving file");
-                        }
-                    }); t2.start();
+                    ExecutorService es = Executors.newCachedThreadPool();
+                    imp = IJ.getImage();
+                    totalTimePointsToBeSaved = imp.getNFrames();
+                    for(int iThread=0; iThread<=nSavingThreads; iThread++) {
+                        es.execute(new SaveToStacks(imp, file.getAbsolutePath(), "tiffStacks"));
+                    }
+
 
                 } else {
                     log("Save command cancelled by user.");
@@ -1415,111 +1437,4 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
 }
-
-// todo: here the GUI class is outside of the other class, in Registration it is not, why?
-
-
-
-class VirtualOpenerDialog extends GenericDialog {
-	int fileCount;
-	boolean eightBits;
-	String saveFilter = "";
-	String[] list;
-
-	public VirtualOpenerDialog(String title, String[] list) {
-		super(title);
-		this.list = list;
-		this.fileCount = list.length;
-	}
-
-	protected void setup() {
-		setStackInfo();
-	}
-
-	public void itemStateChanged(ItemEvent e) {
-		setStackInfo();
-	}
-
-	public void textValueChanged(TextEvent e) {
-		setStackInfo();
-	}
-
-	void setStackInfo() {
-
-		int n = getNumber(numberField.elementAt(0));
-		int start = getNumber(numberField.elementAt(1));
-		int inc = getNumber(numberField.elementAt(2));
-
-		if (n<1)
-			n = fileCount;
-		if (start<1 || start>fileCount)
-			start = 1;
-		if (start+n-1>fileCount)
-			n = fileCount-start+1;
-		if (inc<1)
-			inc = 1;
-		TextField tf = (TextField)stringField.elementAt(0);
-		String filter = tf.getText();
-		// IJ.write(nImages+" "+startingImage);
-		if (!filter.equals("") && !filter.equals("*")) {
-			int n2 = n;
-			n = 0;
-			for (int i=start-1; i<start-1+n2; i++)
-				if (list[i].indexOf(filter)>=0) {
-					n++;
-					//IJ.write(n+" "+list[i]);
-				}
-			saveFilter = filter;
-		}
-		//((Label)theLabel).setText("Number of files:"+n);
-	}
-
-	public int getNumber(Object field) {
-		TextField tf = (TextField)field;
-		String theText = tf.getText();
-		double value;
-		Double d;
-		try {d = new Double(theText);}
-		catch (NumberFormatException e){
-			d = null;
-		}
-		if (d!=null)
-			return (int)d.doubleValue();
-		else
-			return 0;
-	  }
-
-}
-
-
-
-                /*
-                if (openingMethod == "tiffUseIFDsFirstFile") {
-
-                    if (count == 0) {
-                        log("Obtaining IFDs from first file and use for all.");
-                        info = Opener.getTiffFileInfo(directory + list[i]);
-                        fi = info[0];
-                        // Collect image stack information
-                        ColorModel cm = null;
-                        if (fi.nImages > 1) {
-                            nZ = fi.nImages;
-                            fi.nImages = 1;
-                        } else {
-                            nZ = info.length;
-                        }
-                        // Initialise stack
-                        stack = new VirtualStackOfStacks(new Point3D(fi.width, fi.height, nZ), nC, nT);
-                        stack.addStack(info);
-                    } else { // construct IFDs from first file
-                        FileInfo[] infoModified = new FileInfo[info.length];
-                        for (int j = 0; j < info.length; j++) {
-                            infoModified[j] = (FileInfo) info[j].clone();
-                            infoModified[j].fileName = list[i];
-                        }
-                        stack.addStack(infoModified);
-                    }
-
-                    count = stack.getNStacks();
-                }*/
 
