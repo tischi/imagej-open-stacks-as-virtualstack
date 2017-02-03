@@ -509,7 +509,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 if ((t+1) > nProgress) return;
 
-                for (int c = 0; c < nC; c++) {
+                for (int c = 0; c < vss.nC; c++) {
 
                     vss.setStackFromFile(t, c);
 
@@ -589,7 +589,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     String pathCT = path + "--C" + sC + "--T" + sT + ".tif";
                     fs.saveAsTiffStack(pathCT);
                 }
-                
+
                 Globals.threadlog("saved time-point: " + (t+1) + " of " + nProgress);
 
             }
@@ -1138,7 +1138,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             panels.add(new JPanel());
             panels.get(j).add(buttons[i++]);
             panels.get(j).add(buttons[i++]);
-            panels.get(j).add(new JLabel("Saving Threads"));
+            panels.get(j).add(new JLabel("I/O threads"));
             panels.get(j).add(tfSavingThreads);
             c.add(panels.get(j++));
 

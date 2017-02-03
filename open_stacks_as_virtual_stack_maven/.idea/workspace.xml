@@ -25,8 +25,8 @@
       <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.2555332">
-              <caret line="591" column="16" selection-start-line="591" selection-start-column="16" selection-end-line="591" selection-end-column="16" />
+            <state vertical-scroll-proportion="0.44668007">
+              <caret line="1143" column="0" selection-start-line="1143" selection-start-column="0" selection-end-line="1143" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -41,13 +41,13 @@
                 <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#22153#22346#0" expanded="true" />
-                <element signature="e#22345#22346#0" expanded="true" />
+                <element signature="e#22141#22334#0" expanded="true" />
+                <element signature="e#22333#22334#0" expanded="true" />
                 <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#33559#33736#0" expanded="true" />
-                <element signature="e#33735#33736#0" expanded="true" />
-                <element signature="e#45762#45926#0" expanded="true" />
-                <element signature="e#45925#45926#0" expanded="true" />
+                <element signature="e#33547#33724#0" expanded="true" />
+                <element signature="e#33723#33724#0" expanded="true" />
+                <element signature="e#45747#45911#0" expanded="true" />
+                <element signature="e#45910#45911#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -239,8 +239,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="47" />
-    <option name="y" value="80" />
+    <option name="x" value="66" />
+    <option name="y" value="38" />
     <option name="width" value="1403" />
     <option name="height" value="819" />
   </component>
@@ -560,7 +560,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="47" y="80" width="1403" height="819" extended-state="1" />
+    <frame x="66" y="38" width="1403" height="819" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -758,13 +758,13 @@
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#22153#22346#0" expanded="true" />
-            <element signature="e#22345#22346#0" expanded="true" />
+            <element signature="e#22141#22334#0" expanded="true" />
+            <element signature="e#22333#22334#0" expanded="true" />
             <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#33559#33736#0" expanded="true" />
-            <element signature="e#33735#33736#0" expanded="true" />
-            <element signature="e#45762#45926#0" expanded="true" />
-            <element signature="e#45925#45926#0" expanded="true" />
+            <element signature="e#33547#33724#0" expanded="true" />
+            <element signature="e#33723#33724#0" expanded="true" />
+            <element signature="e#45747#45911#0" expanded="true" />
+            <element signature="e#45910#45911#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1171,8 +1171,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.2555332">
-          <caret line="591" column="16" selection-start-line="591" selection-start-column="16" selection-end-line="591" selection-end-column="16" />
+        <state vertical-scroll-proportion="0.44668007">
+          <caret line="1143" column="0" selection-start-line="1143" selection-start-column="0" selection-end-line="1143" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -1187,13 +1187,13 @@
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#22153#22346#0" expanded="true" />
-            <element signature="e#22345#22346#0" expanded="true" />
+            <element signature="e#22141#22334#0" expanded="true" />
+            <element signature="e#22333#22334#0" expanded="true" />
             <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#33559#33736#0" expanded="true" />
-            <element signature="e#33735#33736#0" expanded="true" />
-            <element signature="e#45762#45926#0" expanded="true" />
-            <element signature="e#45925#45926#0" expanded="true" />
+            <element signature="e#33547#33724#0" expanded="true" />
+            <element signature="e#33723#33724#0" expanded="true" />
+            <element signature="e#45747#45911#0" expanded="true" />
+            <element signature="e#45910#45911#0" expanded="true" />
           </folding>
         </state>
       </provider>
