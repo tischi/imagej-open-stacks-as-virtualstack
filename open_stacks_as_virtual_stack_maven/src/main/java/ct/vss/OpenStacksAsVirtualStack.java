@@ -64,6 +64,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String filenamePattern = "_Target--";
     AtomicInteger totalTimePointsSaved = new AtomicInteger(0);
     int totalTimePointsToBeSaved = 0;
+    AtomicInteger totalTimePointsLoaded = new AtomicInteger(0);
+    int totalTimePointsToBeLoaded = 0;
 
     // todo: stop loading thread upon closing of image
 
@@ -136,7 +138,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
     }
 
-    public ImagePlus openFromDirectory(String directory, String filter) {
+    public ImagePlus openFromDirectory(String directory, String filter, int nIOthreads) {
         int iChannelFolder = 0;
         int t=0,z=0,c=0;
         ImagePlus imp = null;
@@ -453,59 +455,28 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         nProgress = nT*nC; iProgress = 0;
         Thread thread = new Thread(new Runnable() {
             public void run() {
-                updateStatus("Analyzed image stack");
+                updateStatus("Analyzed file");
             }
         });
         thread.start();
 
         // init the VSS
         VirtualStackOfStacks stack = new VirtualStackOfStacks(directory, channelFolders, ctzFileList, nC, nT, nX, nY, nZ, fileType, h5DataSet);
+        imp = new ImagePlus("stream", stack);
 
         // set the file information for each c, t, z
         try {
 
-            for (t = 0; t < nT; t++) {
 
-                for (c = 0; c < nC; c++) {
+            ExecutorService es = Executors.newCachedThreadPool();
+            totalTimePointsToBeLoaded = nT;
 
-                    stack.setStackFromFile(t, c);
+            for(int iThread=0; iThread<=nIOthreads; iThread++) {
 
-                    iProgress++;
+                es.execute(new AnalyzeStackFiles(imp));
 
-                } // c-loop
+            }
 
-                // show image window already after loading 1st time-point
-                if (t == 0) {
-
-                    if (stack != null && stack.getSize() > 0) {
-                        imp = makeImagePlus(stack);
-                    } else {
-                        IJ.showMessage("Something went wrong loading the first image stack!");
-                        return(null);
-                    }
-
-                    imp.show();
-
-                    if(fileType.equals("leica single tif")) {
-                        imp.setTitle(filenamePattern); //+getLastDir(directory));
-                    } else {
-                        imp.setTitle("image");
-                    }
-
-                    // show compression
-                    FileInfoSer[][][] infos = stack.getFileInfosSer();
-                    if(infos[0][0][0].compression == 1)
-                        log("Compression = None");
-                    else if(infos[0][0][0].compression == 2)
-                        log("Compression = LZW");
-                    else if(infos[0][0][0].compression == 6)
-                        log("Compression = ZIP");
-                    else
-                        log("Compression = "+infos[0][0][0].compression);
-
-                }
-
-            } // t-loop
 
         } catch(Exception e) {
             IJ.showMessage("Error: "+e.toString());
@@ -524,6 +495,72 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         if(endsWithSlash) return split[split.length-1];
         else return split[split.length];
     }
+
+    class AnalyzeStackFiles implements Runnable {
+        ImagePlus imp;
+
+        AnalyzeStackFiles(ImagePlus imp) {
+            this.imp = imp;
+        }
+
+        public void run() {
+
+            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+
+            while(true) {
+
+                int t = totalTimePointsLoaded.getAndAdd(1);
+
+                if ((t+1) > totalTimePointsToBeLoaded) return;
+
+                for (int c = 0; c < nC; c++) {
+
+                    vss.setStackFromFile(t, c);
+
+                }
+
+                // show image window once time-point 0 is loaded
+                if (t == 0) {
+
+                    if (vss != null && vss.getSize() > 0) {
+                        imp = makeImagePlus(vss);
+                    } else {
+                        IJ.showMessage("Something went wrong loading the first image stack!");
+                        return;
+                    }
+
+                    imp.show();
+
+                    if(fileType.equals("leica single tif")) {
+                        imp.setTitle(filenamePattern); //+getLastDir(directory));
+                    } else {
+                        imp.setTitle("image");
+                    }
+
+                    // show compression
+                    FileInfoSer[][][] infos = vss.getFileInfosSer();
+                    if(infos[0][0][0].compression == 1)
+                        log("Compression = None");
+                    else if(infos[0][0][0].compression == 2)
+                        log("Compression = LZW");
+                    else if(infos[0][0][0].compression == 6)
+                        log("Compression = ZIP");
+                    else
+                        log("Compression = "+infos[0][0][0].compression);
+
+                }
+
+                if(t%10 == 0) {
+                    Globals.threadlog("imported headers of time-point: " + (t + 1) + " of " + totalTimePointsToBeLoaded);
+                }
+
+            } // t-loop
+
+
+
+            }
+
+        }
 
     class SaveToStacks implements Runnable {
         ImagePlus imp;
@@ -960,7 +997,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         final OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
         Thread t1 = new Thread(new Runnable() {
             public void run() {
-                ovs.openFromDirectory(directory, null);
+                int nIOthreads = 10;
+                ovs.openFromDirectory(directory, null, nIOthreads);
             }
         });
         t1.start();
@@ -1175,7 +1213,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
             osv.h5DataSet = tfH5DataSet.getText();
             osv.filenamePattern = (String)fileNamePatternComboBox.getSelectedItem();
-            int nSavingThreads = new Integer(tfSavingThreads.getText());
+            final int nSavingThreads = new Integer(tfSavingThreads.getText());
 
 
             if (e.getActionCommand().equals(actions[i++])) {
@@ -1187,7 +1225,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 Thread t1 = new Thread(new Runnable() {
                     public void run() {
-                        osv.openFromDirectory(directory, null);
+                        osv.openFromDirectory(directory, null, nSavingThreads);
                     }
                 });
                 t1.start();
