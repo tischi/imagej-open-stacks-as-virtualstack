@@ -57,15 +57,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String fileOrder;
     private String fileType;
     private static NonBlockingGenericDialog gd;
-    public int iProgress=0, nProgress=100;
     public String h5DataSet = "Data111";
     public int cropZmin = 0;
     public int cropZmax = 1;
     private String filenamePattern = "_Target--";
-    AtomicInteger totalTimePointsSaved = new AtomicInteger(0);
-    int totalTimePointsToBeSaved = 0;
-    AtomicInteger totalTimePointsLoaded = new AtomicInteger(0);
-    int totalTimePointsToBeLoaded = 0;
+    AtomicInteger iProgress = new AtomicInteger(0);
+    int nProgress = 100;
 
     // todo: stop loading thread upon closing of image
 
@@ -452,13 +449,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         }
 
-        nProgress = nT*nC; iProgress = 0;
-        Thread thread = new Thread(new Runnable() {
-            public void run() {
-                updateStatus("Analyzed file");
-            }
-        });
-        thread.start();
 
         // init the VSS
         VirtualStackOfStacks stack = new VirtualStackOfStacks(directory, channelFolders, ctzFileList, nC, nT, nX, nY, nZ, fileType, h5DataSet);
@@ -467,9 +457,17 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         // set the file information for each c, t, z
         try {
 
+            nProgress = nT; iProgress.set(0);
+            Thread thread = new Thread(new Runnable() {
+                public void run() {
+                    updateStatus("Analyzed file");
+                }
+            });
+            thread.start();
+
 
             ExecutorService es = Executors.newCachedThreadPool();
-            totalTimePointsToBeLoaded = nT;
+            nProgress = nT;
 
             for(int iThread=0; iThread<=nIOthreads; iThread++) {
 
@@ -481,8 +479,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         } catch(Exception e) {
             IJ.showMessage("Error: "+e.toString());
         }
-
-        iProgress = nProgress;
 
         return(imp);
 
@@ -509,9 +505,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             while(true) {
 
-                int t = totalTimePointsLoaded.getAndAdd(1);
+                int t = iProgress.getAndAdd(1);
 
-                if ((t+1) > totalTimePointsToBeLoaded) return;
+                if ((t+1) > nProgress) return;
 
                 for (int c = 0; c < nC; c++) {
 
@@ -550,9 +546,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 }
 
-                if(t%10 == 0) {
-                    Globals.threadlog("imported headers of time-point: " + (t + 1) + " of " + totalTimePointsToBeLoaded);
-                }
 
             } // t-loop
 
@@ -576,9 +569,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             while(true) {
 
-                int t = totalTimePointsSaved.getAndAdd(1);
+                int t = iProgress.getAndAdd(1);
 
-                if ((t+1) > totalTimePointsToBeSaved) return;
+                if ((t+1) > nProgress) return;
 
 
                 VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
@@ -596,9 +589,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     String pathCT = path + "--C" + sC + "--T" + sT + ".tif";
                     fs.saveAsTiffStack(pathCT);
                 }
-
-
-                Globals.threadlog("saved time-point: " + (t+1) + " of " + totalTimePointsToBeSaved);
+                
+                Globals.threadlog("saved time-point: " + (t+1) + " of " + nProgress);
 
             }
 
@@ -692,9 +684,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
     public boolean updateStatus(String message) {
-        while(iProgress<nProgress) {
+        while(iProgress.get()<nProgress) {
             IJ.wait(50);
-            IJ.showStatus(message+" " + iProgress + "/" + nProgress);
+            IJ.showStatus(message+" " + iProgress.get() + "/" + nProgress);
         }
         IJ.showStatus(""+nProgress+"/"+nProgress);
         return true;
@@ -710,7 +702,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             oos.close();
             fout.close();
             log("Wrote: " + path);
-            iProgress = nProgress;
+            iProgress.set(nProgress);
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -930,7 +922,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         ImageStack stack2 = null;
         int n = stack.nSlices;
         for (int i=1; i<=n; i++) {
-            iProgress = i;
+            iProgress.set(i);
             ImageProcessor ip2 = stack.getProcessor(i);
             if (stack2==null)
                 stack2 = new ImageStack(ip2.getWidth(), ip2.getHeight(), imp.getProcessor().getColorModel());
@@ -1278,10 +1270,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             osv.writeFileInfosSer(vss.getFileInfosSer(), file.getAbsolutePath());
                         }
                     }); t1.start();
+
                     // update progress status
                     Thread t2 = new Thread(new Runnable() {
                         public void run() {
-                            osv.iProgress=0; osv.nProgress=1;
+                            osv.iProgress.set(0);
+                            osv.nProgress=1;
                             osv.updateStatus("Saving info file");
                         }
                     });
@@ -1320,9 +1314,18 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     final File file = fc.getSelectedFile();
                     // do the job
-                    ExecutorService es = Executors.newCachedThreadPool();
+
                     imp = IJ.getImage();
-                    totalTimePointsToBeSaved = imp.getNFrames();
+                    nProgress = imp.getNFrames();
+                    iProgress.set(0);
+                    Thread thread = new Thread(new Runnable() {
+                        public void run() {
+                            updateStatus("Saved file");
+                        }
+                    });
+                    thread.start();
+
+                    ExecutorService es = Executors.newCachedThreadPool();
                     for(int iThread=0; iThread<=nSavingThreads; iThread++) {
                         es.execute(new SaveToStacks(imp, file.getAbsolutePath(), "tiffStacks"));
                     }

@@ -25,30 +25,29 @@
       <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.41046277">
-              <caret line="75" column="35" selection-start-line="75" selection-start-column="35" selection-end-line="75" selection-end-column="35" />
+            <state vertical-scroll-proportion="0.2555332">
+              <caret line="591" column="16" selection-start-line="591" selection-start-column="16" selection-end-line="591" selection-end-column="16" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#checkIfHdf5DataSetExists#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="method#openFromDirectory#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="e#15830#15965#0" expanded="true" />
+                <element signature="e#15964#15965#0" expanded="true" />
                 <element signature="method#getLastDir#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="class#AnalyzeStackFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#16958#16959#0" expanded="true" />
-                <element signature="e#16996#16997#0" expanded="true" />
+                <element signature="e#16769#16770#0" expanded="true" />
+                <element signature="e#16807#16808#0" expanded="true" />
                 <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#22568#22761#0" expanded="true" />
-                <element signature="e#22760#22761#0" expanded="true" />
-                <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="e#22153#22346#0" expanded="true" />
+                <element signature="e#22345#22346#0" expanded="true" />
                 <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#33956#34133#0" expanded="true" />
-                <element signature="e#34132#34133#0" expanded="true" />
+                <element signature="e#33559#33736#0" expanded="true" />
+                <element signature="e#33735#33736#0" expanded="true" />
+                <element signature="e#45762#45926#0" expanded="true" />
+                <element signature="e#45925#45926#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -240,8 +239,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="114" />
-    <option name="y" value="40" />
+    <option name="x" value="47" />
+    <option name="y" value="80" />
     <option name="width" value="1403" />
     <option name="height" value="819" />
   </component>
@@ -561,7 +560,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="114" y="40" width="1403" height="819" extended-state="0" />
+    <frame x="47" y="80" width="1403" height="819" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -751,22 +750,21 @@
             <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#checkIfHdf5DataSetExists#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#openFromDirectory#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#15830#15965#0" expanded="true" />
+            <element signature="e#15964#15965#0" expanded="true" />
             <element signature="method#getLastDir#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="class#AnalyzeStackFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#16958#16959#0" expanded="true" />
-            <element signature="e#16996#16997#0" expanded="true" />
+            <element signature="e#16769#16770#0" expanded="true" />
+            <element signature="e#16807#16808#0" expanded="true" />
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#22568#22761#0" expanded="true" />
-            <element signature="e#22760#22761#0" expanded="true" />
-            <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#22153#22346#0" expanded="true" />
+            <element signature="e#22345#22346#0" expanded="true" />
             <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#33956#34133#0" expanded="true" />
-            <element signature="e#34132#34133#0" expanded="true" />
+            <element signature="e#33559#33736#0" expanded="true" />
+            <element signature="e#33735#33736#0" expanded="true" />
+            <element signature="e#45762#45926#0" expanded="true" />
+            <element signature="e#45925#45926#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1173,30 +1171,29 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.41046277">
-          <caret line="75" column="35" selection-start-line="75" selection-start-column="35" selection-end-line="75" selection-end-column="35" />
+        <state vertical-scroll-proportion="0.2555332">
+          <caret line="591" column="16" selection-start-line="591" selection-start-column="16" selection-end-line="591" selection-end-column="16" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#checkIfHdf5DataSetExists#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#openFromDirectory#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#15830#15965#0" expanded="true" />
+            <element signature="e#15964#15965#0" expanded="true" />
             <element signature="method#getLastDir#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="class#AnalyzeStackFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#16958#16959#0" expanded="true" />
-            <element signature="e#16996#16997#0" expanded="true" />
+            <element signature="e#16769#16770#0" expanded="true" />
+            <element signature="e#16807#16808#0" expanded="true" />
             <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#22568#22761#0" expanded="true" />
-            <element signature="e#22760#22761#0" expanded="true" />
-            <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#writeFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#22153#22346#0" expanded="true" />
+            <element signature="e#22345#22346#0" expanded="true" />
             <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#duplicateToRAM#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#33956#34133#0" expanded="true" />
-            <element signature="e#34132#34133#0" expanded="true" />
+            <element signature="e#33559#33736#0" expanded="true" />
+            <element signature="e#33735#33736#0" expanded="true" />
+            <element signature="e#45762#45926#0" expanded="true" />
+            <element signature="e#45925#45926#0" expanded="true" />
           </folding>
         </state>
       </provider>
