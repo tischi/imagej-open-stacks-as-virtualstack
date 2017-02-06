@@ -51,7 +51,7 @@ public class Registration implements PlugIn {
     double gui_trackingFactor = 2.5;
     Point3D gui_pSubSample = new Point3D(1,1,1);
     int gui_tSubSample = 1;
-    ArrayList<Track> Tracks = new ArrayList<Track>();
+    ArrayList<Track> tracks = new ArrayList<Track>();
     ArrayList<Roi> rTrackStarts = new ArrayList<Roi>();
     String gui_trackingMethod = "center of mass";
     String gui_centeringMethod = "center of mass";
@@ -322,10 +322,10 @@ public class Registration implements PlugIn {
             } else if (e.getActionCommand().equals(actions[i++])) {
 
                 //
-                // View Object Tracks
+                // View Object tracks
                 //
 
-                showCroppedTracks();
+                showTrackedObjects();
 
             }  else if (e.getActionCommand().equals(actions[i++])) {
 
@@ -359,7 +359,7 @@ public class Registration implements PlugIn {
                 //
 
                 trackTable.clear();
-                Tracks = new ArrayList<Track>();
+                tracks = new ArrayList<Track>();
                 rTrackStarts = new ArrayList<Roi>();
 
                 // remove overlay
@@ -593,7 +593,7 @@ public class Registration implements PlugIn {
 
         public void showTable() {
             //Create and set up the window.
-            frame = new JFrame("Tracks");
+            frame = new JFrame("tracks");
             //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
             //Create and set up the content pane.
@@ -608,11 +608,13 @@ public class Registration implements PlugIn {
 
         public void highlightSelectedTrack() {
             int rs = table.getSelectedRow();
-            int r = table.convertRowIndexToModel( rs );
+            int r = table.convertRowIndexToModel(rs);
             float x = new Float(table.getModel().getValueAt(r, 1).toString());
             float y = new Float(table.getModel().getValueAt(r, 2).toString());
             float z = new Float(table.getModel().getValueAt(r, 3).toString());
             int t = new Integer(table.getModel().getValueAt(r, 4).toString());
+            int id = new Integer(table.getModel().getValueAt(r, 5).toString());
+            ImagePlus imp = tracks.get(id).getImp();
             imp.setPosition(0,(int)z+1,t+1);
             Roi pr = new PointRoi(x,y);
             pr.setPosition(0,(int)z+1,t+1);
@@ -716,11 +718,12 @@ public class Registration implements PlugIn {
         }
 
         totalTimePointsToBeTracked += ntTracking;
-        int newTrackID = Tracks.size();
+        int newTrackID = tracks.size();
 
-        Tracks.add(new Track(ntTracking));
-        Track track = Tracks.get(newTrackID);
+        tracks.add(new Track(ntTracking));
+        Track track = tracks.get(newTrackID);
         track.setID(newTrackID);
+        track.setImp(imp);
         track.addLocation(pTrackCenter, t, imp.getC() - 1);
         track.setObjectSize(gui_pTrackingSize);
 
@@ -728,34 +731,27 @@ public class Registration implements PlugIn {
 
     }
 
-    public void showCroppedTracks() {
+    public void showTrackedObjects() {
 
-        ImagePlus[] impA = new ImagePlus[Tracks.size()];
-        OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
+        ImagePlus[] impA = new ImagePlus[tracks.size()];
 
-        for(int i=0; i<Tracks.size(); i++) {
+        for(int i=0; i< tracks.size(); i++) {
 
-            Track track = Tracks.get(i);
+            Track track = tracks.get(i);
 
             if (track.completed) {
 
                 //
-                // convert track center coordinates to curated bounding box offsets
+                // convert track center coordinates to bounding box offsets
                 //
 
                 //boolean[] shifted = new boolean[1];
                 Point3D[] trackOffsets = new Point3D[track.getLength()];
                 for(int iPosition=0; iPosition<track.getLength(); iPosition++) {
-                    Point3D offset = computeOffset(track.getXYZ(iPosition), track.getObjectSize());
-                    //Point3D offsetCurated = osv.curatePositionOffsetSize(imp, offset, track.getObjectSize(), shifted);
-                    //if(shifted[0]) {
-                    //    log("Track_"+track.getID()+" was out of image bounds at frame "+iPosition+
-                    //            " (frame "+track.getT(iPosition)+" in original image)");
-                    //};
-                    trackOffsets[iPosition] = offset;
+                    trackOffsets[iPosition] = computeOffset(track.getXYZ(iPosition), track.getObjectSize());;
                 }
 
-                impA[i] = OpenStacksAsVirtualStack.makeCroppedVirtualStack(imp, trackOffsets, track.getObjectSize(), track.getTmin(), track.getTmax());
+                impA[i] = OpenStacksAsVirtualStack.makeCroppedVirtualStack(track.getImp(), trackOffsets, track.getObjectSize(), track.getTmin(), track.getTmax());
                 if (impA[i] == null) {
                     log("..cropping failed.");
                 } else {
@@ -831,7 +827,7 @@ public class Registration implements PlugIn {
 
             VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
 
-            Track track = Tracks.get(iTrack);
+            Track track = tracks.get(iTrack);
             int tStart = track.getTmin();
             int channel = track.getC(0);
             int nt = track.getLength();
@@ -1253,10 +1249,10 @@ public class Registration implements PlugIn {
         }
 
         totalTimePointsToBeTracked += ntTracking;
-        int newTrackID = Tracks.size();
+        int newTrackID = tracks.size();
         //log("added new track start; id = "+newTrackID+"; starting [frame] = "+t+"; length [frames] = "+ntTracking);
-        Tracks.add(new Track(ntTracking));
-        Tracks.get(newTrackID).addLocation(new Point3D(0, 0, imp.getZ()-1), t, imp.getC()-1);
+        tracks.add(new Track(ntTracking));
+        tracks.get(newTrackID).addLocation(new Point3D(0, 0, imp.getZ()-1), t, imp.getC()-1);
 
         return(newTrackID);
 
@@ -1268,7 +1264,7 @@ public class Registration implements PlugIn {
 
     public int getNumberOfUncompletedTracks() {
         int uncomplete = 0;
-        for(Track t:Tracks) {
+        for(Track t:tracks) {
             if(!t.completed)
                 uncomplete++;
         }

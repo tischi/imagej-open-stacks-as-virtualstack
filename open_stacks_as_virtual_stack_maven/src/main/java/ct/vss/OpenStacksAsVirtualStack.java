@@ -239,11 +239,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             ctzFileList = new String[nC][nT][nZ];
 
-            for (iChannelFolder = 0; iChannelFolder < channelFolders.length; iChannelFolder++) {
-                for (t = 0; t < lists[iChannelFolder].length; t++) {
-                    c = iChannelFolder;
-                    z = 0; // everything in one stack
-                    ctzFileList[c][t][z] = lists[iChannelFolder][t];
+            for (c = 0; c < channelFolders.length; c++) {
+                for (t = 0; t < lists[c].length; t++) {
+                    for(z = 0; z < nZ; z++ ) {
+                        // all z with same file-name
+                        ctzFileList[c][t][z] = lists[c][t];
+                    }
                 }
             }
 
@@ -382,6 +383,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         }
 
                         ctzFileList[c][t][z] = fileName;
+                        log("");
 
                     }
                 }
@@ -433,11 +435,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             // sort into the final file list
             ctzFileList = new String[nC][nT][nZ];
 
-            for (iChannelFolder = 0; iChannelFolder < channelFolders.length; iChannelFolder++) {
-                for (t = 0; t < lists[iChannelFolder].length; t++) {
-                    c = iChannelFolder;
-                    z = 0; // everything in one stack
-                    ctzFileList[c][t][z] = lists[iChannelFolder][t];
+            for (c = 0; c < channelFolders.length; c++) {
+                for (t = 0; t < lists[c].length; t++) {
+                    for(z = 0; z < nZ; z++ ) {
+                        // all z with same file-name
+                        ctzFileList[c][t][z] = lists[c][t];
+                    }
                 }
             }
 
@@ -454,9 +457,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         VirtualStackOfStacks stack = new VirtualStackOfStacks(directory, channelFolders, ctzFileList, nC, nT, nX, nY, nZ, fileType, h5DataSet);
         imp = new ImagePlus("stream", stack);
 
+        //
         // set the file information for each c, t, z
-        try {
+        //
 
+        try {
             nProgress = nT; iProgress.set(0);
             Thread thread = new Thread(new Runnable() {
                 public void run() {
@@ -1089,8 +1094,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         JCheckBox cbLog = new JCheckBox("Verbose logging");
         JTextField tfH5DataSet = new JTextField("Data111", 10);
         JTextField tfCropZminZmax = new JTextField("0,0", 7);
-        JTextField tfSavingThreads = new JTextField("10", 2);
-
+        JTextField tfIOThreads = new JTextField("15", 2);
 
         //JTextField tfFileNamePattern = new JTextField(".*LSEA00.*", 10);
 
@@ -1139,7 +1143,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             panels.get(j).add(buttons[i++]);
             panels.get(j).add(buttons[i++]);
             panels.get(j).add(new JLabel("I/O threads"));
-            panels.get(j).add(tfSavingThreads);
+            panels.get(j).add(tfIOThreads);
             c.add(panels.get(j++));
 
             panels.add(new JPanel());
@@ -1205,7 +1209,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
             osv.h5DataSet = tfH5DataSet.getText();
             osv.filenamePattern = (String)fileNamePatternComboBox.getSelectedItem();
-            final int nSavingThreads = new Integer(tfSavingThreads.getText());
+            final int nSavingThreads = new Integer(tfIOThreads.getText());
 
 
             if (e.getActionCommand().equals(actions[i++])) {

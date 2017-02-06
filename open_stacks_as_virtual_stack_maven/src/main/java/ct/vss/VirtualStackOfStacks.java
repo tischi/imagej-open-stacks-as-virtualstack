@@ -138,6 +138,7 @@ public class VirtualStackOfStacks extends ImageStack {
                 infoSer = new FileInfoSer[nZ];
                 for (int z = 0; z < nZ; z++) {
                     infoSer[z] = new FileInfoSer(info[z]);
+                    infoSer[z].fileName = fileList[c][t][z]; // relative path to main directory
                     infoSer[z].directory = channelFolders[c] + "/"; // relative path to main directory
                     infoSer[z].fileTypeString = fileType;
                 }
@@ -171,15 +172,15 @@ public class VirtualStackOfStacks extends ImageStack {
                 // e.g. the nX, nY and bit depth
                 //
                 infoSer = new FileInfoSer[nZ];
-                for (int i = 0; i < nZ; i++) {
-                    infoSer[i] = new FileInfoSer();
-                    infoSer[i].fileName = fileList[c][t][0];
-                    infoSer[i].directory = channelFolders[c] + "/";
-                    infoSer[i].width = nX;
-                    infoSer[i].height = nY;
-                    infoSer[i].bytesPerPixel = 2; // todo: how to get the bit-depth from the info?
-                    infoSer[i].h5DataSet = h5DataSet;
-                    infoSer[i].fileTypeString = fileType;
+                for (int z = 0; z < nZ; z++) {
+                    infoSer[z] = new FileInfoSer();
+                    infoSer[z].fileName = fileList[c][t][z];
+                    infoSer[z].directory = channelFolders[c] + "/";
+                    infoSer[z].width = nX;
+                    infoSer[z].height = nY;
+                    infoSer[z].bytesPerPixel = 2; // todo: how to get the bit-depth from the info?
+                    infoSer[z].h5DataSet = h5DataSet;
+                    infoSer[z].fileTypeString = fileType;
                 }
 
             } // h5
@@ -263,10 +264,10 @@ public class VirtualStackOfStacks extends ImageStack {
             log("c [one-based]: "+ (c+1));
             log("z [one-based]: "+ (z+1));
             log("t [one-based]: "+ (t+1));
-            log("opening file: "+directory+infos[c][t][0].directory+infos[c][t][0].fileName);
+            log("opening file: "+directory+infos[c][t][z].directory+infos[c][t][z].fileName);
         }
 
-        int dz = 1;
+
         Point3D po, ps;
         if(infos[c][t] == null) {
             //ImagePlus imp0 = IJ.getImage();
@@ -287,8 +288,6 @@ public class VirtualStackOfStacks extends ImageStack {
         } else {
             ps = new Point3D(fi.width,fi.height,1);
         }
-
-        // todo: call the getCube... method from here
 
         // imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);
         imp = getCubeByTimeOffsetAndSize(t, c, po, ps, new Point3D(1,1,1), false);

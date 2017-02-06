@@ -1,6 +1,7 @@
 package ct.vss;
 
 import ij.IJ;
+import ij.ImagePlus;
 import javafx.geometry.Point3D;
 
 /**
@@ -15,6 +16,7 @@ public class Track {
     int n;
     boolean completed = false;
     int id;
+    private ImagePlus imp;
 
     Track(int n) {
         this.t = new int[n];
@@ -95,5 +97,11 @@ public class Track {
         return(n);
     }
 
+    public void setImp(ImagePlus imp) {
+        this.imp = imp;
+    }
 
+    public ImagePlus getImp() {
+        return imp;
+    }
 }
