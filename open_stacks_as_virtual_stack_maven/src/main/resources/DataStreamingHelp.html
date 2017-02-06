@@ -2,12 +2,15 @@
 <h3>Stream from folder</h3>
 <p width=400>
 Streams data from a folder containing multiple image stacks, each image stack
-containing the XYZ data for one channel and one time-point.
+    containing the XYZ data for one channel and one time-point.
+    If your folder contains <b>sub-folders</b> they will be interpreted as containing different channels.
+    Right now sub-folders are the only way to stream multi-channel data. Please raise an issue on github if
+    you'd like to import some other data.
 </p>
 <h4>Supported image stack formats</h4>
 <p width=400>
-- Multipage Tiff (LZW compression is supported) <br>
-- Hdf5 (please write the name of the data set into below text field) <br>
+- Multi-page Tiff (LZW compression is supported) <br>
+- Hdf5<br>
 </p>
 </html>
 ###
@@ -20,10 +23,10 @@ Loads an info file that you saved before using
 <h4>Idea behind this functionality</h4>
 <p width=400>
 Especially if your data format is compressed Tiff stacks
-it can take quite some time to parse all the files in a folder.
-Once all files are parsed you can save all the extracted information
-into one single Info file, which is much faster to load
-and thus gives you much faster full access to your data.
+    it can take quite some time to parse all the files in a folder.
+    Once all files are parsed you can save all the extracted information
+    into one single Info file, which is much faster to load
+    and thus gives you much faster full access to your data.
 </p>
 </html>
 ###
@@ -41,24 +44,34 @@ stream the same files faster the next time you start ImageJ.<br>
 2) You cropped your data stream, either using the 'Crop as new stream' function in this
 plugin or using the 'Crop along tracks' function in the 'Big data tracker' plugin,
 and want to save the cropped view without duplicating the data.<br>
-</p>
-<h4>Idea behind this functionality</h4>
-<p width=400>
-See 'Save as info file'
-</p>
 </html>
 ###
 <html>
-<h3>Save as Tiff stacks</h3>
+<h3>Save as tif stacks</h3>
 <p width=400>
     Saves the current stream as a sequence of multi-page Tiff files; one
     file per channel and time-point.
 </p>
 <h4>Idea behind this functionality</h4>
 <p width=400>
-    A sequence of Tiff stacks is a convenient and readily compatible format for storage and further processing.
+    A sequence of tif stacks is a convenient and readily compatible format for storage and further processing.
     For instance you might want to deconvolve each stack or register stacks against each other
-    using other software such as Huygens for deconvolution or Elastix for registration.
+    using other software such as Huygens for deconvolution or elastix for registration.
+</p>
+</html>
+###
+<html>
+<h3>Duplicate to RAM</h3>
+<p width=400>
+    Loads all images and copies them into RAM.
+    Make sure that you have <b>enough RAM</b> before doing this.
+    Also be prepared that this might <b>take quite some time</b>!
+</p>
+<h4>Idea behind this functionality</h4>
+<p width=400>
+    Some operations are very slow or not even
+    possible at all when the data is presented as a stream (i.e. virtual stack).
+    Thus it might be necessary to copy the whole data into RAM.
 </p>
 </html>
 ###
@@ -78,21 +91,7 @@ See 'Save as info file'
     further processing with other software.
 </p>
 </html>
-###
-<html>
-<h3>Duplicate to RAM</h3>
-<p width=400>
-    Loads all images and copies them into RAM.
-    Make sure that you have <b>enough RAM</b> before doing this.
-    Also be prepared that this might <b>take quite some time</b>!
-</p>
-<h4>Idea behind this functionality</h4>
-<p width=400>
-    Some operations are very slow or not even
-    possible at all when the data is presented as a stream (i.e. virtual stack).
-    Thus it might be necessary to copy the whole data into RAM.
-</p>
-</html>
+
 ###
 <html>
 <h3>Report issue</h3>

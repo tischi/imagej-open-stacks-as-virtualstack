@@ -201,7 +201,7 @@ public class Registration implements PlugIn {
 
 
             panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
-            panels.get(iPanel).add(new JLabel("--- Tracking ---"));
+            panels.get(iPanel).add(new JLabel("____ TRACKING ____"));
             c.add(panels.get(iPanel++));
 
             panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
@@ -233,7 +233,7 @@ public class Registration implements PlugIn {
             c.add(panels.get(iPanel++));
 
             panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
-            panels.get(iPanel).add(new JLabel("--- Results viewing ---"));
+            panels.get(iPanel).add(new JLabel("____ RESULTS VIEWING ____"));
             c.add(panels.get(iPanel++));
 
 
@@ -253,7 +253,7 @@ public class Registration implements PlugIn {
 
 
             panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
-            panels.get(iPanel).add(new JLabel("---"));
+            panels.get(iPanel).add(new JLabel("_____"));
             c.add(panels.get(iPanel++));
 
             panels.add(new JPanel());

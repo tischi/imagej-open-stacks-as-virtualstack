@@ -22,11 +22,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-5.148148">
-              <caret line="484" column="19" selection-start-line="484" selection-start-column="15" selection-end-line="484" selection-end-column="19" />
+            <state vertical-scroll-proportion="0.047029704">
+              <caret line="1164" column="35" selection-start-line="1164" selection-start-column="35" selection-end-line="1164" selection-end-column="35" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -45,38 +45,28 @@
                 <element signature="method#main#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="e#33536#33713#0" expanded="true" />
                 <element signature="e#33712#33713#0" expanded="true" />
-                <element signature="class#StackStreamToolsGUI#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#45723#45887#0" expanded="true" />
-                <element signature="e#45886#45887#0" expanded="true" />
+                <element signature="e#46254#46418#0" expanded="true" />
+                <element signature="e#46417#46418#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Track.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Track.java">
+      <file leaf-file-name="DataStreamingHelp.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/DataStreamingHelp.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
-              <folding>
-                <element signature="e#816#817#0" expanded="true" />
-                <element signature="e#851#852#0" expanded="true" />
-                <element signature="e#938#939#0" expanded="true" />
-                <element signature="e#969#970#0" expanded="true" />
-                <element signature="e#1781#1782#0" expanded="true" />
-                <element signature="e#1811#1812#0" expanded="true" />
-                <element signature="e#1844#1845#0" expanded="true" />
-                <element signature="e#1870#1871#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="-13.125">
+              <caret line="21" column="4" selection-start-line="21" selection-start-column="4" selection-end-line="21" selection-end-column="4" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TrackAndCropHelp.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="TrackAndCropHelp.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.15233415">
-              <caret line="87" column="13" selection-start-line="87" selection-start-column="13" selection-end-line="87" selection-end-column="13" />
+            <state vertical-scroll-proportion="-4.4583335">
+              <caret line="90" column="7" selection-start-line="90" selection-start-column="7" selection-end-line="90" selection-end-column="7" />
               <folding />
             </state>
           </provider>
@@ -85,8 +75,8 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.8888889">
-              <caret line="236" column="34" selection-start-line="236" selection-start-column="34" selection-end-line="236" selection-end-column="34" />
+            <state vertical-scroll-proportion="-1.5925926">
+              <caret line="254" column="15" selection-start-line="254" selection-start-column="15" selection-end-line="254" selection-end-column="15" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#Registration#0;class#Registration#0" expanded="false" />
@@ -94,8 +84,8 @@
                 <element signature="e#4056#4057#0" expanded="true" />
                 <element signature="e#4107#4108#0" expanded="true" />
                 <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-                <element signature="e#12020#12165#0" expanded="true" />
-                <element signature="e#12164#12165#0" expanded="true" />
+                <element signature="e#12026#12171#0" expanded="true" />
+                <element signature="e#12170#12171#0" expanded="true" />
                 <element signature="method#getToolTipFile#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
                 <element signature="method#run#0;class#Registration#0" expanded="false" />
                 <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
@@ -207,16 +197,16 @@
         <option value="$MAVEN_REPOSITORY$/net/imagej/ij/1.51f/ij-1.51f.jar!/ij/ImagePlus.class" />
         <option value="$PROJECT_DIR$/src/main/resources/plugins.config" />
         <option value="$PROJECT_DIR$/src/main/resources/DataStreamingToolTips.txt" />
-        <option value="$PROJECT_DIR$/src/main/resources/DataStreamingHelp.html" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/FileInfoSer.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/FastTiffDecoder.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Track.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
         <option value="$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html" />
+        <option value="$PROJECT_DIR$/src/main/resources/DataStreamingHelp.html" />
+        <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
       </list>
     </option>
   </component>
@@ -244,8 +234,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="45" />
-    <option name="y" value="77" />
+    <option name="x" value="143" />
+    <option name="y" value="86" />
     <option name="width" value="1369" />
     <option name="height" value="700" />
   </component>
@@ -569,8 +559,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="45" y="77" width="1369" height="700" extended-state="0" />
-    <editor active="true" />
+    <frame x="143" y="86" width="1369" height="700" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -589,7 +579,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299373" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.30595326" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2450658" sideWeight="0.60943854" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2450658" sideWeight="0.60943854" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -697,8 +687,8 @@
             <element signature="e#4056#4057#0" expanded="true" />
             <element signature="e#4107#4108#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#12020#12165#0" expanded="true" />
-            <element signature="e#12164#12165#0" expanded="true" />
+            <element signature="e#12026#12171#0" expanded="true" />
+            <element signature="e#12170#12171#0" expanded="true" />
             <element signature="method#getToolTipFile#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#run#0;class#Registration#0" expanded="false" />
             <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
@@ -791,9 +781,8 @@
             <element signature="method#main#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="e#33536#33713#0" expanded="true" />
             <element signature="e#33712#33713#0" expanded="true" />
-            <element signature="class#StackStreamToolsGUI#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#45723#45887#0" expanded="true" />
-            <element signature="e#45886#45887#0" expanded="true" />
+            <element signature="e#46254#46418#0" expanded="true" />
+            <element signature="e#46417#46418#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -816,8 +805,8 @@
             <element signature="e#4056#4057#0" expanded="true" />
             <element signature="e#4107#4108#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#12020#12165#0" expanded="true" />
-            <element signature="e#12164#12165#0" expanded="true" />
+            <element signature="e#12026#12171#0" expanded="true" />
+            <element signature="e#12170#12171#0" expanded="true" />
             <element signature="method#getToolTipFile#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#run#0;class#Registration#0" expanded="false" />
             <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
@@ -1126,14 +1115,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/DataStreamingHelp.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-11.25">
-          <caret line="18" column="4" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-13.333333">
@@ -1144,35 +1125,6 @@
             <element signature="e#30054#30055#0" expanded="false" />
             <element signature="e#30514#30515#0" expanded="false" />
             <element signature="e#30538#30539#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.148148">
-          <caret line="484" column="19" selection-start-line="484" selection-start-column="15" selection-end-line="484" selection-end-column="19" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#checkIfHdf5DataSetExists#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#15819#15954#0" expanded="true" />
-            <element signature="e#15953#15954#0" expanded="true" />
-            <element signature="method#getLastDir#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#16758#16759#0" expanded="true" />
-            <element signature="e#16796#16797#0" expanded="true" />
-            <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#22130#22323#0" expanded="true" />
-            <element signature="e#22322#22323#0" expanded="true" />
-            <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#main#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#33536#33713#0" expanded="true" />
-            <element signature="e#33712#33713#0" expanded="true" />
-            <element signature="class#StackStreamToolsGUI#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#45723#45887#0" expanded="true" />
-            <element signature="e#45886#45887#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1196,9 +1148,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.4583335">
+          <caret line="90" column="7" selection-start-line="90" selection-start-column="7" selection-end-line="90" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Track.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
+        <state vertical-scroll-proportion="0.65429235">
           <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
           <folding>
             <element signature="e#816#817#0" expanded="true" />
@@ -1213,10 +1173,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/DataStreamingHelp.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-13.125">
+          <caret line="21" column="4" selection-start-line="21" selection-start-column="4" selection-end-line="21" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.8888889">
-          <caret line="236" column="34" selection-start-line="236" selection-start-column="34" selection-end-line="236" selection-end-column="34" />
+        <state vertical-scroll-proportion="-1.5925926">
+          <caret line="254" column="15" selection-start-line="254" selection-start-column="15" selection-end-line="254" selection-end-column="15" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#Registration#0;class#Registration#0" expanded="false" />
@@ -1224,8 +1192,8 @@
             <element signature="e#4056#4057#0" expanded="true" />
             <element signature="e#4107#4108#0" expanded="true" />
             <element signature="method#focusGained#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="e#12020#12165#0" expanded="true" />
-            <element signature="e#12164#12165#0" expanded="true" />
+            <element signature="e#12026#12171#0" expanded="true" />
+            <element signature="e#12170#12171#0" expanded="true" />
             <element signature="method#getToolTipFile#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
             <element signature="method#run#0;class#Registration#0" expanded="false" />
             <element signature="method#showDialog#0;class#Registration#0" expanded="false" />
@@ -1242,11 +1210,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.15233415">
-          <caret line="87" column="13" selection-start-line="87" selection-start-column="13" selection-end-line="87" selection-end-column="13" />
-          <folding />
+        <state vertical-scroll-proportion="0.047029704">
+          <caret line="1164" column="35" selection-start-line="1164" selection-start-column="35" selection-end-line="1164" selection-end-column="35" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#checkIfHdf5DataSetExists#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#15819#15954#0" expanded="true" />
+            <element signature="e#15953#15954#0" expanded="true" />
+            <element signature="method#getLastDir#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#16758#16759#0" expanded="true" />
+            <element signature="e#16796#16797#0" expanded="true" />
+            <element signature="method#sortFileList#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#22130#22323#0" expanded="true" />
+            <element signature="e#22322#22323#0" expanded="true" />
+            <element signature="method#readFileInfosSer#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#main#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="e#33536#33713#0" expanded="true" />
+            <element signature="e#33712#33713#0" expanded="true" />
+            <element signature="e#46254#46418#0" expanded="true" />
+            <element signature="e#46417#46418#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

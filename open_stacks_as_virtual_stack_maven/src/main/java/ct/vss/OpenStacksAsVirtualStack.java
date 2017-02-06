@@ -1086,8 +1086,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 "Stream from info file",
                 "Save as info file",
                 "Save as tiff stacks",
-                "Crop as new stream",
                 "Duplicate to RAM",
+                "Crop as new stream",
                 "Report issue"};
 
 
@@ -1134,25 +1134,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             ArrayList<JPanel> panels = new ArrayList<JPanel>();
 
-            panels.add(new JPanel());
-            panels.get(j).add(buttons[i++]);
-            panels.get(j).add(buttons[i++]);
+            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
+            panels.get(j).add(new JLabel("____ STREAMING ____"));
             c.add(panels.get(j++));
 
             panels.add(new JPanel());
             panels.get(j).add(buttons[i++]);
-            panels.get(j).add(buttons[i++]);
-            panels.get(j).add(new JLabel("I/O threads"));
-            panels.get(j).add(tfIOThreads);
-            c.add(panels.get(j++));
-
-            panels.add(new JPanel());
-            panels.get(j).add(new JLabel("zMin, zMax:"));
-            panels.get(j).add(tfCropZminZmax);
-            panels.get(j).add(buttons[i++]);
-            c.add(panels.get(j++));
-
-            panels.add(new JPanel());
             panels.get(j).add(buttons[i++]);
             c.add(panels.get(j++));
 
@@ -1166,11 +1153,37 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             panels.get(j).add(fileNamePatternComboBox);
             c.add(panels.get(j++));
 
-            panels.add(new JPanel());
-            panels.get(j).add(cbLog);
+
+            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
+            panels.get(j).add(new JLabel("____ SAVING ____"));
             c.add(panels.get(j++));
 
             panels.add(new JPanel());
+            panels.get(j).add(buttons[i++]);
+            panels.get(j).add(buttons[i++]);
+            panels.get(j).add(buttons[i++]);
+            c.add(panels.get(j++));
+
+            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
+            panels.get(j).add(new JLabel("____ CROPPING ____"));
+            c.add(panels.get(j++));
+
+
+            panels.add(new JPanel());
+            panels.get(j).add(new JLabel("zMin, zMax:"));
+            panels.get(j).add(tfCropZminZmax);
+            panels.get(j).add(buttons[i++]);
+            c.add(panels.get(j++));
+
+
+            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
+            panels.get(j).add(new JLabel("_____"));
+            c.add(panels.get(j++));
+
+            panels.add(new JPanel());
+            panels.get(j).add(new JLabel("I/O threads"));
+            panels.get(j).add(tfIOThreads);
+            panels.get(j).add(cbLog);
             panels.get(j).add(buttons[i++]);
             c.add(panels.get(j++));
 
