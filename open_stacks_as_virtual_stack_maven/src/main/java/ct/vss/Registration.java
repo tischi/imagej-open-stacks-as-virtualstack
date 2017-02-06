@@ -39,6 +39,12 @@ import static ij.IJ.log;
     // - show only the minimal region that stays within the image bounds
 // todo: add unique track id to tracktable, track, and imageName of cropped track
 
+// todo: multi-point selection tool
+// todo: track-table: load button
+
+    // todo: make frames around buttons that belong together
+
+
 public class Registration implements PlugIn {
 
     ImagePlus imp;
@@ -81,20 +87,20 @@ public class Registration implements PlugIn {
         JFrame frame;
 
         String[] texts = {
-                "Object size [pixels]: nx, ny, nz",
-                "Tracking factor",
-                "Sub-sampling [pixels, frames]: dx, dy, dz, dt",
-                "Track length [frames]"
+                "Object size x,y,z [pixels]:",
+                "Window size [factor]",
+                "Sub-sampling dx, dy, dz, dt [pixels, frames]",
+                "Length [frames]"
         };
 
         String[] actions = {
-                "Set nx,ny",
-                "Set nz",
+                "Set x&y",
+                "Set z",
                 "Track selected object",
-                "Show tracked objects",
-                "Show",
-                "Save",
-                "Clear",
+                "Show table",
+                "Save table",
+                "Clear all tracks",
+                "View tracked objects",
                 "Report issue"
         };
 
@@ -107,7 +113,7 @@ public class Registration implements PlugIn {
         };
 
         String[] comboNames = {
-                "Tracking method"
+                "Method"
         };
 
         String[][] combos = {
@@ -192,6 +198,12 @@ public class Registration implements PlugIn {
             int iPanel = 0;
 
             int k = 0;
+
+
+            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
+            panels.get(iPanel).add(new JLabel("--- Tracking ---"));
+            c.add(panels.get(iPanel++));
+
             panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
             panels.get(iPanel).add(buttons[i++]);
             panels.get(iPanel).add(buttons[i++]);
@@ -199,10 +211,12 @@ public class Registration implements PlugIn {
             panels.get(iPanel).add(textFields[k]);
             c.add(panels.get(iPanel++));
 
+
             for (k = 1; k < textFields.length; k++) {
                 panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
                 panels.get(iPanel).add(labels[k]);
                 panels.get(iPanel).add(textFields[k]);
+                //trackingPanel.add(panels.get(iPanel));
                 c.add(panels.get(iPanel++));
             }
 
@@ -210,21 +224,36 @@ public class Registration implements PlugIn {
                 panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
                 panels.get(iPanel).add(comboLabels[k]);
                 panels.get(iPanel).add(comboBoxes[k]);
+                //trackingPanel.add(panels.get(iPanel));
                 c.add(panels.get(iPanel++));
             }
 
-            panels.add(new JPanel());
+            panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
+            panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
+
+            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
+            panels.get(iPanel).add(new JLabel("--- Results viewing ---"));
+            c.add(panels.get(iPanel++));
+
+
+            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
+            //JLabel labelTrackTable = new JLabel("  Track table: ");
+            //labelTrackTable.setLabelFor(buttons[i]);
+            //panels.get(iPanel).add(labelTrackTable);
+            panels.get(iPanel).add(buttons[i++]);
             panels.get(iPanel).add(buttons[i++]);
             panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
-            panels.add(new JPanel());
-            JLabel labelTrackTable = new JLabel("  Track table: ");
-            labelTrackTable.setLabelFor(buttons[i]);
-            panels.get(iPanel).add(labelTrackTable);
+
+            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
             panels.get(iPanel).add(buttons[i++]);
-            panels.get(iPanel).add(buttons[i++]);
-            panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
+
+
+            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
+            panels.get(iPanel).add(new JLabel("---"));
             c.add(panels.get(iPanel++));
 
             panels.add(new JPanel());
@@ -322,14 +351,6 @@ public class Registration implements PlugIn {
             } else if (e.getActionCommand().equals(actions[i++])) {
 
                 //
-                // View Object tracks
-                //
-
-                showTrackedObjects();
-
-            }  else if (e.getActionCommand().equals(actions[i++])) {
-
-                //
                 // Show Table
                 //
 
@@ -367,6 +388,15 @@ public class Registration implements PlugIn {
 
                 totalTimePointsTracked.set(0);
                 totalTimePointsToBeTracked = 0;
+
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // View Object tracks
+                //
+
+                showTrackedObjects();
 
 
             } else if (e.getActionCommand().equals(actions[i++])) {
