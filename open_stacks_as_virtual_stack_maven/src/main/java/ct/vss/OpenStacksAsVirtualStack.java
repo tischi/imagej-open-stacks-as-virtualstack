@@ -975,7 +975,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        final String directory = "/Users/tischi/Desktop/example-data/Ashna_119series/";
+        final String directory = "/Users/tischi/Desktop/example-data/Gustavo_Drift_Correction/";
         // final String directory = "/Volumes/USB DISK/Ashna -test/";
         // final String directory = "/Users/tischi/Desktop/example-data/Ashna-Leica-Target-LSEA/";
 
@@ -1134,8 +1134,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             ArrayList<JPanel> panels = new ArrayList<JPanel>();
 
-            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
-            panels.get(j).add(new JLabel("____ STREAMING ____"));
+            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+            panels.get(j).add(new JLabel("STREAMING"));
             c.add(panels.get(j++));
 
             panels.add(new JPanel());
@@ -1153,9 +1153,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             panels.get(j).add(fileNamePatternComboBox);
             c.add(panels.get(j++));
 
-
-            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
-            panels.get(j).add(new JLabel("____ SAVING ____"));
+            c.add(new JSeparator(SwingConstants.HORIZONTAL));
+            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+            panels.get(j).add(new JLabel("SAVING"));
             c.add(panels.get(j++));
 
             panels.add(new JPanel());
@@ -1164,8 +1164,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             panels.get(j).add(buttons[i++]);
             c.add(panels.get(j++));
 
-            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
-            panels.get(j).add(new JLabel("____ CROPPING ____"));
+            c.add(new JSeparator(SwingConstants.HORIZONTAL));
+            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+            panels.get(j).add(new JLabel("CROPPING"));
             c.add(panels.get(j++));
 
 
@@ -1175,9 +1176,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             panels.get(j).add(buttons[i++]);
             c.add(panels.get(j++));
 
-
-            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
-            panels.get(j).add(new JLabel("_____"));
+            c.add(new JSeparator(SwingConstants.HORIZONTAL));
+            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+            panels.get(j).add(new JLabel("OTHER"));
             c.add(panels.get(j++));
 
             panels.add(new JPanel());

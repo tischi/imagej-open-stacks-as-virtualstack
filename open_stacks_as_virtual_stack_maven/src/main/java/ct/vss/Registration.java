@@ -200,8 +200,9 @@ public class Registration implements PlugIn {
             int k = 0;
 
 
-            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
-            panels.get(iPanel).add(new JLabel("____ TRACKING ____"));
+
+            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+            panels.get(iPanel).add(new JLabel("TRACKING"));
             c.add(panels.get(iPanel++));
 
             panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
@@ -232,10 +233,10 @@ public class Registration implements PlugIn {
             panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
-            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
-            panels.get(iPanel).add(new JLabel("____ RESULTS VIEWING ____"));
+            c.add(new JSeparator(SwingConstants.HORIZONTAL));
+            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+            panels.get(iPanel).add(new JLabel("RESULTS"));
             c.add(panels.get(iPanel++));
-
 
             panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
             //JLabel labelTrackTable = new JLabel("  Track table: ");
@@ -251,9 +252,9 @@ public class Registration implements PlugIn {
             panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
-
-            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
-            panels.get(iPanel).add(new JLabel("_____"));
+            c.add(new JSeparator(SwingConstants.HORIZONTAL));
+            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+            panels.get(iPanel).add(new JLabel("OTHER"));
             c.add(panels.get(iPanel++));
 
             panels.add(new JPanel());
