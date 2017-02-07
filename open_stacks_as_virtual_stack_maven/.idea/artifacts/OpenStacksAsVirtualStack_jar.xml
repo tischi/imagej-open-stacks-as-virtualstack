@@ -3,6 +3,10 @@
     <output-path>$PROJECT_DIR$/../</output-path>
     <root id="archive" name="OpenStacksAsVirtualStack_.jar">
       <element id="module-output" name="OpenStacksAsVirtualStack" />
+      <element id="library" level="project" name="Maven: cisd:jhdf5:14.12.0" />
+      <element id="library" level="project" name="Maven: mpicbg:imglib-algorithms:2.0.0-beta6" />
+      <element id="library" level="project" name="Maven: mpicbg:imglib:2.0.0-beta6" />
+      <element id="library" level="project" name="Maven: mpicbg:imglib-ij:2.0.0-beta6" />
     </root>
   </artifact>
 </component>
