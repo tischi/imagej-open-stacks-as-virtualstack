@@ -1,5 +1,8 @@
 package ct.vss;
 
+import ij.IJ;
+import ij.ImagePlus;
+
 import javax.swing.*;
 
 import static ij.IJ.log;
@@ -18,4 +21,17 @@ public class Globals {
             }
         });
     }
+
+
+    public static VirtualStackOfStacks getVirtualStackOfStacks(ImagePlus imp) {
+        VirtualStackOfStacks vss = null;
+        try {
+            vss = (VirtualStackOfStacks) imp.getStack();
+            return (vss);
+        } catch (Exception e) {
+            IJ.showMessage("This is only implemented for images opened with the Data Streaming Tools plugin.");
+            return (null);
+        }
+    }
+
 }

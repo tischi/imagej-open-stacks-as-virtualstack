@@ -87,7 +87,7 @@ public class Registration implements PlugIn {
         JFrame frame;
 
         String[] texts = {
-                "Object size x,y,z [pixels]:",
+                "Object size x,y,z [pixels]",
                 "Window size [factor]",
                 "Sub-sampling dx, dy, dz, dt [pixels, frames]",
                 "Length [frames]"
@@ -283,9 +283,12 @@ public class Registration implements PlugIn {
             int i = 0, j = 0, k = 0;
             JFileChooser fc;
 
+
             // update current imp object
             imp = IJ.getImage();
-            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+            VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
+            if(vss==null) return;
+
 
             if (e.getActionCommand().equals(actions[i++])) {
 
@@ -530,10 +533,9 @@ public class Registration implements PlugIn {
 
     private void initialize() {
 
-        VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-        if(vss==null) {
-            throw new IllegalArgumentException("Registration only works with VirtualStackOfStacks");
-        }
+        VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
+        if(vss==null) return;
+
         FileInfoSer[][][] infos = vss.getFileInfosSer();
         if(infos[0][0][0].compression==6) {
             IJ.showMessage(

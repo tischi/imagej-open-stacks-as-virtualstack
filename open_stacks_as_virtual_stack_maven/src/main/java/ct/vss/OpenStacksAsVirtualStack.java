@@ -917,10 +917,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     public ImagePlus duplicateToRAM(ImagePlus imp) {
 
-        VirtualStackOfStacks stack = (VirtualStackOfStacks) imp.getStack();
-        if (stack == null) {
-            IJ.showMessage("Wrong image type.");
-        }
+        final VirtualStackOfStacks stack = Globals.getVirtualStackOfStacks(imp);
+        if(stack==null) return(null);
 
         nProgress = stack.nSlices;
 
@@ -1257,11 +1255,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 //
 
                 ImagePlus imp = IJ.getImage();
-                final VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-                if(vss==null) {
-                    IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
-                    return;
-                }
+                final VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
+                if(vss==null) return;
 
                 fc = new JFileChooser(vss.getDirectory());
                 int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
@@ -1309,11 +1304,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 // "Save as tiff stacks"
                 //
                 ImagePlus imp = IJ.getImage();
-                VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-                if(vss==null) {
-                    IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
-                    return;
-                }
+                final VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
+                if(vss==null) return;
 
                 //
                 // Check that all image files have been parsed
@@ -1365,11 +1357,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 //
 
                 ImagePlus imp = IJ.getImage();
-                VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-                if(vss==null) {
-                    IJ.showMessage("This is only implemented for a VirtualStacks of stacks");
-                    return;
-                }
+                final VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
+                if(vss==null) return;
 
                 //
                 // Check that all image files have been parsed
