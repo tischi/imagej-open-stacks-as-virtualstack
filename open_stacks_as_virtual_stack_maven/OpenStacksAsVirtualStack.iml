@@ -10,6 +10,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="jhdf5-14.12.0" level="project" />
+    <orderEntry type="library" name="imglib-algorithms-2.0.0-beta6" level="project" />
     <orderEntry type="library" name="Maven: net.imagej:ij:1.51f" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: com.sun:tools:1.4.2">
@@ -20,50 +22,49 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="Maven: sc.fiji:legacy-imglib1:1.1.6" level="project" />
-    <orderEntry type="library" name="Maven: net.imglib2:imglib2:2.2.1" level="project" />
-    <orderEntry type="library" name="Maven: net.imglib2:imglib2-ij:2.0.0-beta-30" level="project" />
-    <orderEntry type="library" name="Maven: net.imagej:imagej-common:0.14.0" level="project" />
-    <orderEntry type="library" name="Maven: net.imglib2:imglib2-roi:0.3.0" level="project" />
-    <orderEntry type="library" name="Maven: net.sf.trove4j:trove4j:3.0.3" level="project" />
-    <orderEntry type="library" name="Maven: org.scijava:scijava-common:2.40.0" level="project" />
-    <orderEntry type="library" name="Maven: com.googlecode.gentyref:gentyref:1.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.bushe:eventbus:1.4" level="project" />
-    <orderEntry type="library" name="Maven: edu.ucar:udunits:4.3.18" level="project" />
-    <orderEntry type="library" name="Maven: ome:formats-api:5.1.0" level="project" />
-    <orderEntry type="library" name="Maven: ome:formats-common:5.1.0" level="project" />
-    <orderEntry type="library" name="Maven: ome:ome-xml:5.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.6" level="project" />
-    <orderEntry type="library" name="Maven: ome:formats-bsd:5.1.0" level="project" />
-    <orderEntry type="library" name="Maven: ome:jai_imageio:5.1.0" level="project" />
-    <orderEntry type="library" name="Maven: ome:specification:5.1.0" level="project" />
-    <orderEntry type="library" name="Maven: ome:turbojpeg:5.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.scijava:native-lib-loader:2.0.3" level="project" />
-    <orderEntry type="library" name="Maven: com.jgoodies:jgoodies-forms:1.7.2" level="project" />
-    <orderEntry type="library" name="Maven: com.jgoodies:jgoodies-common:1.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.esotericsoftware.kryo:kryo:2.24.0" level="project" />
-    <orderEntry type="library" name="Maven: com.esotericsoftware.minlog:minlog:1.2" level="project" />
-    <orderEntry type="library" name="Maven: org.objenesis:objenesis:2.1" level="project" />
-    <orderEntry type="library" name="Maven: org.perf4j:perf4j:0.9.13" level="project" />
-    <orderEntry type="library" name="Maven: com.google.guava:guava:17.0" level="project" />
-    <orderEntry type="library" name="Maven: com.drewnoakes:metadata-extractor:2.6.2" level="project" />
-    <orderEntry type="library" name="Maven: com.adobe.xmp:xmpcore:5.1.2" level="project" />
-    <orderEntry type="library" name="Maven: xerces:xercesImpl:2.8.1" level="project" />
-    <orderEntry type="library" name="Maven: org.openmicroscopy:ome-common:5.3.1" level="project" />
-    <orderEntry type="library" name="Maven: joda-time:joda-time:2.3" level="project" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.1.1" level="project" />
-    <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.openmicroscopy:ome-xml:5.3.1" level="project" />
-    <orderEntry type="library" name="Maven: edu.mines:mines-jtk:20151125" level="project" />
-    <orderEntry type="library" name="Maven: gov.nist.math:jama:1.0.3" level="project" />
-    <orderEntry type="library" name="Maven: org.jfree:jfreechart:1.0.19" level="project" />
-    <orderEntry type="library" name="Maven: org.jfree:jcommon:1.0.23" level="project" />
-    <orderEntry type="library" name="Maven: org.scijava:vecmath:1.6.0-scijava-2" level="project" />
     <orderEntry type="library" name="Maven: cisd:jhdf5:14.12.0" level="project" />
-    <orderEntry type="library" name="Maven: mpicbg:mpicbg:1.0.1" level="project" />
-    <orderEntry type="library" name="Maven: mpicbg:imglib:2.0.0-beta6" level="project" />
-    <orderEntry type="library" name="Maven: mpicbg:imglib-ij:2.0.0-beta6" level="project" />
-    <orderEntry type="library" name="Maven: mpicbg:imglib-algorithms:2.0.0-beta6" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/mpicbg-1.0.1.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$MAVEN_REPOSITORY$/mpicbg/mpicbg/1.0.1/mpicbg-1.0.1-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$MAVEN_REPOSITORY$/mpicbg/mpicbg/1.0.1/mpicbg-1.0.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="Maven: gov.nist.math:jama:1.0.3" level="project" />
+    <orderEntry type="library" name="imglib-2.0.0-beta6" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/imglib-ij-2.0.0-beta6.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$MAVEN_REPOSITORY$/mpicbg/imglib-ij/2.0.0-beta6/imglib-ij-2.0.0-beta6-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$MAVEN_REPOSITORY$/mpicbg/imglib-ij/2.0.0-beta6/imglib-ij-2.0.0-beta6-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/imglib-algorithms-2.0.0-beta6.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$MAVEN_REPOSITORY$/mpicbg/imglib-algorithms/2.0.0-beta6/imglib-algorithms-2.0.0-beta6-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$MAVEN_REPOSITORY$/mpicbg/imglib-algorithms/2.0.0-beta6/imglib-algorithms-2.0.0-beta6-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="Maven: edu.mines:mines-jtk:20100113" level="project" />
     <orderEntry type="library" name="Maven: jama:jama:1.0.2" level="project" />
   </component>
 </module>

@@ -1350,7 +1350,30 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 // "Save as h5 stacks"
                 //    IJ.showMessage("Not yet implemented.");
 
-            }  else if (e.getActionCommand().equals(actions[i++])) {
+            } else if (e.getActionCommand().equals(actions[i++])) {
+
+                //
+                // duplicate to RAM
+                //
+
+                Thread t1 = new Thread(new Runnable() {
+                    public void run() {
+                        ImagePlus imp2 = osv.duplicateToRAM(IJ.getImage());
+                        if (imp2 != null)
+                            imp2.show();
+
+                    }
+                });
+                t1.start();
+
+                Thread t2 = new Thread(new Runnable() {
+                    public void run() {
+                        osv.updateStatus("Duplicated slice");
+                    }
+                });
+                t2.start();
+
+            } else if (e.getActionCommand().equals(actions[i++])) {
 
                 //
                 // Crop As New Stream
@@ -1386,30 +1409,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 if (imp2 != null)
                     imp2.show();
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
-
-                //
-                // duplicate to RAM
-                //
-
-                Thread t1 = new Thread(new Runnable() {
-                    public void run() {
-                        ImagePlus imp2 = osv.duplicateToRAM(IJ.getImage());
-                        if (imp2 != null)
-                            imp2.show();
-
-                    }
-                });
-                t1.start();
-
-                Thread t2 = new Thread(new Runnable() {
-                    public void run() {
-                        osv.updateStatus("Duplicated slice");
-                    }
-                });
-                t2.start();
-
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            }  else if (e.getActionCommand().equals(actions[i++])) {
 
                 //
                 // Report issue
