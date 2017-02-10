@@ -14,6 +14,16 @@ import ij.io.FileSaver;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 import javafx.geometry.Point3D;
+import loci.common.services.ServiceFactory;
+import loci.formats.meta.IMetadata;
+import loci.formats.out.TiffWriter;
+import loci.formats.services.OMEXMLService;
+import loci.formats.tiff.IFD;
+import loci.formats.tiff.TiffCompression;
+import loci.formats.tiff.TiffSaver;
+import ome.xml.model.enums.DimensionOrder;
+import ome.xml.model.enums.PixelType;
+import ome.xml.model.primitives.PositiveInteger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,21 +55,13 @@ import static ij.IJ.log;
 /** Opens a folder of stacks as a virtual stack. */
 public class OpenStacksAsVirtualStack implements PlugIn {
 
-    private static boolean grayscale;
-    private static double scale = 100.0;
-    private int n, start, increment;
     private int nC, nT, nZ, nX, nY;
-    private String filter;
-    private String info1;
     private String[] channelFolders;
     private String[][] lists; // c, t
     private String[][][] ctzFileList;
-    private String fileOrder;
     private String fileType;
     private static NonBlockingGenericDialog gd;
     public String h5DataSet = "Data111";
-    public int cropZmin = 0;
-    public int cropZmax = 1;
     private String filenamePattern = "_Target--";
     AtomicInteger iProgress = new AtomicInteger(0);
     int nProgress = 100;
@@ -563,36 +565,105 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     class SaveToStacks implements Runnable {
         ImagePlus imp;
         String fileType, path;
+        String compression;
+        int rowsPerStrip;
 
-        SaveToStacks(ImagePlus imp, String path, String fileType) {
+        SaveToStacks(ImagePlus imp, String path, String fileType, String compression, int rowsPerStrip) {
             this.imp = imp;
             this.fileType = fileType;
             this.path = path;
+            this.compression = compression;
+            this.rowsPerStrip = rowsPerStrip;
         }
 
         public void run() {
+
+            VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+            FileSaver fileSaver;
+            TiffWriter tiffWriter = null;
 
             while(true) {
 
                 int t = iProgress.getAndAdd(1);
 
+                log("timepoint "+(t+1)+" of "+nProgress);
+
                 if ((t+1) > nProgress) return;
 
+                if(compression.equals("LZW")) {
+                    log("LZW");
 
-                VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-                FileSaver fs;
+                    for (int c = 0; c < imp.getNChannels(); c++) {
+                        log("channel "+c);
 
-                //log("Saving to: " + path);
+                        ImagePlus impCT = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
+                        String sC = String.format("%1$02d", c);
+                        String sT = String.format("%1$05d", t);
+                        String pathCT = path + "--C" + sC + "--T" + sT + ".tif";
 
-                // todo: zip-compression
+                        try {
 
-                for (int c = 0; c < imp.getNChannels(); c++) {
-                    ImagePlus impCT = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
-                    fs = new FileSaver(impCT);
-                    String sC = String.format("%1$02d", c);
-                    String sT = String.format("%1$05d", t);
-                    String pathCT = path + "--C" + sC + "--T" + sT + ".tif";
-                    fs.saveAsTiffStack(pathCT);
+                            pathCT = path + "--C" + sC + "--T" + sT + ".ome.tif";
+
+                            ServiceFactory factory = new ServiceFactory();
+                            OMEXMLService service = factory.getInstance(OMEXMLService.class);
+                            IMetadata omexml = service.createOMEXMLMetadata();
+                            omexml.setImageID("Image:0", 0);
+                            omexml.setPixelsID("Pixels:0", 0);
+                            omexml.setPixelsBinDataBigEndian(Boolean.TRUE, 0, 0);
+                            omexml.setPixelsDimensionOrder(DimensionOrder.XYCZT, 0);
+                            omexml.setPixelsType(PixelType.UINT16, 0);
+                            omexml.setPixelsSizeX(new PositiveInteger(imp.getWidth()), 0);
+                            omexml.setPixelsSizeY(new PositiveInteger(imp.getHeight()), 0);
+                            omexml.setPixelsSizeZ(new PositiveInteger(imp.getNSlices()), 0);
+                            omexml.setPixelsSizeC(new PositiveInteger(1), 0);
+                            omexml.setPixelsSizeT(new PositiveInteger(1), 0);
+                            for (int channel=0; channel<1; channel++) {
+                                omexml.setChannelID("Channel:0:" + channel, 0, channel);
+                                omexml.setChannelSamplesPerPixel(new PositiveInteger(1), 0, channel);
+                            }
+
+                            TiffWriter writer = new TiffWriter();
+                            writer.setCompression(TiffWriter.COMPRESSION_LZW);
+                            writer.setValidBitsPerPixel(16);
+                            writer.setMetadataRetrieve(omexml);
+                            writer.setId(pathCT);
+
+                            log("aa");
+
+                            for (int z = 0; z < impCT.getNSlices(); z++) {
+                                log("slice "+z);
+
+                                IFD ifd = new IFD();
+                                ifd.put(IFD.IMAGE_WIDTH,  imp.getWidth());
+                                ifd.put(IFD.IMAGE_LENGTH,  imp.getHeight());
+                                ifd.put(IFD.COMPRESSION, TiffCompression.LZW);
+                                ifd.put(IFD.BITS_PER_SAMPLE, 16);
+
+                                impCT.setSlice(z+1);
+                                byte[] plane = (byte[]) impCT.getProcessor().getPixels();
+
+                                writer.saveBytes(z, plane, ifd);
+                            }
+                            writer.close();
+
+                        } catch (Exception e) {
+                            log("exception");
+                            IJ.showMessage(e.toString());
+                        }
+                    }
+
+                } else {  // no compression
+
+                    for (int c = 0; c < imp.getNChannels(); c++) {
+                        ImagePlus impCT = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
+                        fileSaver = new FileSaver(impCT);
+                        String sC = String.format("%1$02d", c);
+                        String sT = String.format("%1$05d", t);
+                        String pathCT = path + "--C" + sC + "--T" + sT + ".tif";
+                        fileSaver.saveAsTiffStack(pathCT);
+                    }
+
                 }
 
                 Globals.threadlog("saved time-point: " + (t+1) + " of " + nProgress);
@@ -973,7 +1044,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        final String directory = "/Users/tischi/Desktop/example-data/Gustavo_Drift_Correction/";
+        final String directory = "/Users/tischi/Desktop/example-data/Nils--MATLAB--Compressed/";
         // final String directory = "/Volumes/USB DISK/Ashna -test/";
         // final String directory = "/Users/tischi/Desktop/example-data/Ashna-Leica-Target-LSEA/";
 
@@ -1090,9 +1161,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 
         JCheckBox cbLog = new JCheckBox("Verbose logging");
+        JCheckBox cbLZW = new JCheckBox("LZW compression");
+
         JTextField tfH5DataSet = new JTextField("Data111", 10);
         JTextField tfCropZminZmax = new JTextField("0,0", 7);
-        JTextField tfIOThreads = new JTextField("15", 2);
+        JTextField tfIOThreads = new JTextField("1", 2);
 
         //JTextField tfFileNamePattern = new JTextField(".*LSEA00.*", 10);
 
@@ -1127,6 +1200,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             // Checkboxes
             cbLog.setSelected(false);
             cbLog.addItemListener(this);
+            cbLZW.setSelected(true);
 
             int i = 0, j = 0;
 
@@ -1162,11 +1236,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             panels.get(j).add(buttons[i++]);
             c.add(panels.get(j++));
 
+            panels.add(new JPanel());
+            panels.get(j).add(cbLZW);
+            c.add(panels.get(j++));
+
             c.add(new JSeparator(SwingConstants.HORIZONTAL));
             panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
             panels.get(j).add(new JLabel("CROPPING"));
             c.add(panels.get(j++));
-
 
             panels.add(new JPanel());
             panels.get(j).add(new JLabel("zMin, zMax:"));
@@ -1222,7 +1299,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             osv.h5DataSet = tfH5DataSet.getText();
             osv.filenamePattern = (String)fileNamePatternComboBox.getSelectedItem();
             final int nSavingThreads = new Integer(tfIOThreads.getText());
-
 
             if (e.getActionCommand().equals(actions[i++])) {
 
@@ -1323,11 +1399,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     final File file = fc.getSelectedFile();
-                    // do the job
 
                     imp = IJ.getImage();
+
                     nProgress = imp.getNFrames();
                     iProgress.set(0);
+
                     Thread thread = new Thread(new Runnable() {
                         public void run() {
                             updateStatus("Saved file");
@@ -1335,9 +1412,17 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     });
                     thread.start();
 
+                    String compression = "";
+
+                    if(cbLZW.isSelected()) compression="LZW";
+                    final int rowsPerStrip = 10;
+
+                    SaveToStacks saveToStacks = new SaveToStacks(imp, file.getAbsolutePath(), "tiffStacks", compression, rowsPerStrip);
+                    saveToStacks.run();
+
                     ExecutorService es = Executors.newCachedThreadPool();
-                    for(int iThread=0; iThread<=nSavingThreads; iThread++) {
-                        es.execute(new SaveToStacks(imp, file.getAbsolutePath(), "tiffStacks"));
+                    for(int iThread=0; iThread<nSavingThreads; iThread++) {
+                        es.execute(new SaveToStacks(imp, file.getAbsolutePath(), "tiffStacks", compression, rowsPerStrip));
                     }
 
 
@@ -1431,15 +1516,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 }
 
-            }  else if (e.getActionCommand().equals(tfCropZminZmax)) {
-
-                //
-                // Change of cropping size
-                //
-
-                // do nothing
             }
-
         }
 
         private String[] getToolTipFile(String fileName) {

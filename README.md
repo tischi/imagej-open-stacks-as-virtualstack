@@ -46,8 +46,7 @@ This plugin currently only supports a few file formats; it was tested for
 ## Installation in ImageJ
 
 1. Download https://github.com/tischi/imagej-open-stacks-as-virtualstack/raw/master/OpenStacksAsVirtualStack_.jar
-2. Download https://github.com/tischi/imagej-open-stacks-as-virtualstack/raw/master/jhdf5-14.12.0.jar
-3. Move both jars into your **ImageJ/plugins/jars** folder
+2. Download the whole repository and copy the .jar files in the open_stacks_as_virtual_stack_maven/lib/ folder into the plugins/jars folder of ImageJ
 
 ## Usage instructions
 

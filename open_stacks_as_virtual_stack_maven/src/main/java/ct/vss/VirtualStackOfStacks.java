@@ -267,7 +267,6 @@ public class VirtualStackOfStacks extends ImageStack {
             log("opening file: "+directory+infos[c][t][z].directory+infos[c][t][z].fileName);
         }
 
-
         Point3D po, ps;
         if(infos[c][t] == null) {
             //ImagePlus imp0 = IJ.getImage();

@@ -137,6 +137,19 @@ public class FastTiffDecoder {
         }
     }
 
+    final void convertToLong(int[] longs, byte[] bytes) {
+        if (littleEndian) {
+            for (int i = 0, j = 0; i < bytes.length; i += 4, j++) {
+                longs[j] = (((bytes[i+3]&0xff) << 24) + ((bytes[i+2]&0xff) << 16) + ((bytes[i+1]&0xff) << 8) + ((bytes[i]&0xff) << 0));
+            }
+        } else {
+            for (int i = 0, j = 0; i < bytes.length; i += 4, j++) {
+                longs[j] = (((bytes[i]&0xff) << 24) + ((bytes[i+1]&0xff) << 16) + ((bytes[i+2]&0xff) << 8) + (bytes[i+3]&0xff));
+            }
+        }
+    }
+
+
     final void convertToShort(int[] ints, byte[] bytes) {
         if (littleEndian) {
             for (int i = 0, j = 0; i < bytes.length; i += 2, j++) {
@@ -152,6 +165,11 @@ public class FastTiffDecoder {
 
     final long getUnsignedInt() throws IOException {
         return (long)getInt()&0xffffffffL;
+    }
+
+    final long convertToUnsignedLong(int integer) {
+        //(long)this.offset & 4294967295L;
+        return (long)integer&0xffffffffL;
     }
 
     final int getShort() throws IOException {
@@ -610,12 +628,12 @@ public class FastTiffDecoder {
                     break;
                 case STRIP_OFFSETS:
                     startTimeStrips = System.nanoTime();
-                    // store infos for faster reading of next IFDs
+                    // store the byte position of the stripInfos for faster reading of next IFDs
                     stripInfos[0] = count;
                     stripInfos[1] = in.getFilePointer()-4-ifdLoc; // store relative position of value information
                     // depending on count the information stored in "value"
-                    // either is the address of the stripOffset array (count>1)
-                    // or the location of the image data (count==1)
+                    // either is the address of the stripOffset array (count > 1)
+                    // or the location of the image data (count == 1)
                     if (count==1)
                         fi.stripOffsets = new int[] {value};
                     else {
@@ -855,9 +873,14 @@ public class FastTiffDecoder {
         return fi;
     }
 
+
+    //
+    // This is for reading the subsequent IFDs, where only the stripInfos are interesting
+    //
+
     FileInfo onlyReadStripsFromIFD(long[] stripInfos) throws IOException {
         FileInfo fi = new FileInfo();
-        long startLoc = in.getFilePointer();
+        long startLoc = in.getLongFilePointer();
         long stripLoc;
         byte[] buffer;
         int value;
@@ -882,7 +905,7 @@ public class FastTiffDecoder {
         } else {
             // the getInt() value is the location where the strips are stored
             in.seek(startLoc + stripInfos[1]);
-            stripLoc = ((long) getInt()) & 0xffffffffL;
+            stripLoc = getUnsignedInt();  // getUnsignedInt returns a long
             // go to where the actual strips are stored
             in.seek(stripLoc);
             buffer = new byte[count * 4];
@@ -1253,7 +1276,7 @@ public class FastTiffDecoder {
             }
             if (fi!=null) {
                 list.add(fi);
-                ifdOffset = ((long)getInt())&0xffffffffL;
+                ifdOffset = getUnsignedInt();
             } else
                 ifdOffset = 0L;
             if (debugMode && ifdCount<10) dInfo += "  nextIFD=" + ifdOffset + "\n";

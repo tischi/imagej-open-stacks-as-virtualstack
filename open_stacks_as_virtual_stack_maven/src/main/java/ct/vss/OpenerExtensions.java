@@ -125,7 +125,7 @@ class OpenerExtensions extends Opener {
                 int rps = fi0.rowsPerStrip;
                 int ss = (int) (1.0*ys/rps);
                 int se = (int) (1.0*ye/rps);
-                readStart = fi.stripOffsets[ss];
+                readStart = (long)fi.stripOffsets[ss] & 0xffffffffL; // interpret the int as unsigned
                 // 3rps 012,345,678   8/3
                 if(Globals.verbose) {
                     log("number of strips: "+fi.stripLengths.length);

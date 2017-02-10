@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-		http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>net.imagej</groupId>
-		<artifactId>pom-imagej</artifactId>
-		<version>7.0.0</version>
-		<relativePath />
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+		http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
 	<groupId>ct.vss</groupId>
 	<artifactId>OpenStacksAsVirtualStack</artifactId>
@@ -20,44 +14,58 @@
 	<description>A Maven project implementing an ImageJ 1.x plugin</description>
 
 
+    <developers>
+        <developer>
+            <id>tischi</id>
+            <name>Christian Tischer</name>
+            <email>tischitischer@gmail.com</email>
+            <url></url>
+            <organization>EMBL Heidelberg</organization>
+            <organizationUrl>http://www.embl.de</organizationUrl>
+            <roles>
+                <role>microscopy</role>
+                <role>image analysis</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+    <properties>
+        <main-class>ct.vss.OpenStacksAsVirtualStack</main-class>
+    </properties>
+
+
     <repositories>
-    <!--
-		<repository>
-        <id>imagej.public</id>
-        <url>http://maven.imagej.net/content/groups/public</url>
-    	</repository>
-    -->
 
-    <repository>
-        <id>imagej.releases</id>
-        <url>http://maven.imagej.net/content/repositories/releases</url>
-    </repository>
+        <repository>
+            <id>imagej.releases</id>
+            <url>http://maven.imagej.net/content/repositories/releases</url>
+        </repository>
 
-    <repository>
-        <id>imagej.snapshots</id>
-        <url>http://maven.imagej.net/content/repositories/snapshots</url>
-    </repository>
+        <repository>
+            <id>imagej.snapshots</id>
+            <url>http://maven.imagej.net/content/repositories/snapshots</url>
+        </repository>
+
+        <repository>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>http://repo.maven.apache.org/maven2</url>
+        </repository>
+
+        <repository>
+            <id>unidata</id>
+            <name>Unidata Repository</name>
+            <url>http://artifacts.unidata.ucar.edu/content/repositories/unidata-releases</url>
+        </repository>
+
+        <repository>
+            <id>ome</id>
+            <name>OME Artifactory</name>
+            <url>http://artifacts.openmicroscopy.org/artifactory/maven/</url>
+        </repository>
+
     </repositories>
-
-	<developers>
-		<developer>
-			<id>tischi</id>
-			<name>Christian Tischer</name>
-			<email>tischitischer@gmail.com</email>
-			<url></url>
-			<organization>EMBL Heidelberg</organization>
-			<organizationUrl>http://www.embl.de</organizationUrl>
-			<roles>
-				<role>microscopy</role>
-				<role>image analysis</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
-	</developers>
-
-	<properties>
-		<main-class>ct.vss.OpenStacksAsVirtualStack</main-class>
-	</properties>
 
 
 	<dependencies>
@@ -68,19 +76,17 @@
 			<version>1.51f</version>
 		</dependency>
 
-		<!--
         <dependency>
-            <groupId>sc.fiji</groupId>
-            <artifactId>legacy-imglib1</artifactId>
-            <version>1.1.6</version>
+            <groupId>ome</groupId>
+            <artifactId>formats-gpl</artifactId>
+            <version>5.2.4</version>
         </dependency>
-        -->
 
         <dependency>
 			<groupId>cisd</groupId>
 			<artifactId>jhdf5</artifactId>
+            <version>14.12.0</version>
 		</dependency>
-
 
         <dependency>
             <groupId>mpicbg</groupId>
@@ -105,7 +111,6 @@
             <artifactId>imglib-algorithms</artifactId>
             <version>2.0.0-beta6</version>
         </dependency>
-
 
 
     </dependencies>
