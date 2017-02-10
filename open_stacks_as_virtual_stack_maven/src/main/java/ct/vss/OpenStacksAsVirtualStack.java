@@ -591,8 +591,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 if ((t+1) > nProgress) return;
 
                 if(compression.equals("LZW")) {
-                    log("LZW");
-
+                    log("LZW not yet fully implemented; saving uncompressed...");
+                }
+                /*
                     for (int c = 0; c < imp.getNChannels(); c++) {
                         log("channel "+c);
 
@@ -629,8 +630,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             writer.setMetadataRetrieve(omexml);
                             writer.setId(pathCT);
 
-                            log("aa");
-
                             for (int z = 0; z < impCT.getNSlices(); z++) {
                                 log("slice "+z);
 
@@ -654,6 +653,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     }
 
                 } else {  // no compression
+                   */
 
                     for (int c = 0; c < imp.getNChannels(); c++) {
                         ImagePlus impCT = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
@@ -664,7 +664,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         fileSaver.saveAsTiffStack(pathCT);
                     }
 
-                }
+                //}
 
                 Globals.threadlog("saved time-point: " + (t+1) + " of " + nProgress);
 
@@ -1414,11 +1414,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     String compression = "";
 
-                    if(cbLZW.isSelected()) compression="LZW";
+                    if(cbLZW.isSelected())
+                        compression="LZW";
                     final int rowsPerStrip = 10;
 
-                    SaveToStacks saveToStacks = new SaveToStacks(imp, file.getAbsolutePath(), "tiffStacks", compression, rowsPerStrip);
-                    saveToStacks.run();
+                    //SaveToStacks saveToStacks = new SaveToStacks(imp, file.getAbsolutePath(), "tiffStacks", compression, rowsPerStrip);
+                    //saveToStacks.run();
 
                     ExecutorService es = Executors.newCachedThreadPool();
                     for(int iThread=0; iThread<nSavingThreads; iThread++) {
