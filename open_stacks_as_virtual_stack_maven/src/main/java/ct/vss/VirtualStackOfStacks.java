@@ -43,12 +43,7 @@ public class VirtualStackOfStacks extends ImageStack {
         this.nY = nY;
         this.nSlices = nC*nT*nZ;
         this.fileType = fileType;
-        if(channelFolders==null) {
-            this.channelFolders = new String[nC];
-            for(int ic=0; ic<nC; ic++) this.channelFolders[ic] = "";
-        } else {
-            this.channelFolders = channelFolders;
-        }
+        this.channelFolders = channelFolders;
         this.fileList = fileList;
         this.infos = new FileInfoSer[nC][nT][];
         this.h5DataSet = h5DataSet;
@@ -144,7 +139,6 @@ public class VirtualStackOfStacks extends ImageStack {
                 }
 
             } else if (fileType.equals("leica single tif")) {
-
 
                 infoSer = new FileInfoSer[nZ];
 

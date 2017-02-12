@@ -46,32 +46,23 @@ import static java.awt.Desktop.*;
 
 // todo: - find out why loading and saving info file is so slow
 // todo: - save smaller info files
-
 // todo: saving as tiff stacks does not always work, e.g. after object tracking
 // todo: check if all files are parsed before allowing to "crop as new stream"
-
 // todo: rearrange the GUI
+// todo: consistency check the list lengths with different folders
+// todo: remove version numbers from pom
+
 
 /** Opens a folder of stacks as a virtual stack. */
 public class OpenStacksAsVirtualStack implements PlugIn {
 
     private int nC, nT, nZ, nX, nY;
-    private String[] channelFolders;
-    private String[][] lists; // c, t
-    private String[][][] ctzFileList;
-    private String fileType;
-    final String LOAD_CHANNELS_FROM_FOLDERS = "ChannelFolders";
-    private static NonBlockingGenericDialog gd;
-    //public String h5DataSet = "Data111";
-    //private String filenamePattern = "_Target--";
+    final String LOAD_CHANNELS_FROM_FOLDERS = "Channel sub-folders";
     AtomicInteger iProgress = new AtomicInteger(0);
     int nProgress = 100;
 
     // todo: stop loading thread upon closing of image
-
     // todo: increase speed of Leica tif parsing, possible?
-
-    // todo: make an editable dropdown list for the fileNamePattern
 
     public OpenStacksAsVirtualStack() {
     }
@@ -142,16 +133,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     // todo: get rid of all the global variables
 
     public ImagePlus openFromDirectory(String directory, String channelTimePattern, String filterPattern, String hdf5DataSet, int nIOthreads) {
+        String[][] fileLists; // files in sub-folders
+        String[][][] ctzFileList;
         int t = 0, z = 0, c = 0;
-        ImagePlus imp = null;
-        fileType = "not determined";
+        ImagePlus imp;
+        String fileType = "not determined";
         FileInfo[] info;
         FileInfo fi0;
-
-        // todo: depending on the fileOrder do different things
-        // todo: add the filter to the getFilesInFolder function
-        // todo: find a clean solution for the channel folder presence or absence!
-        // todo: consistency check the list lengths
+        String[] channelFolders = null;
 
         if (channelTimePattern.equals(LOAD_CHANNELS_FROM_FOLDERS)) {
 
@@ -162,10 +151,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             log("checking for sub-folders...");
             channelFolders = getFoldersInFolder(directory);
             if (channelFolders != null) {
-                lists = new String[channelFolders.length][];
+                fileLists = new String[channelFolders.length][];
                 for (int i = 0; i < channelFolders.length; i++) {
-                    lists[i] = getFilesInFolder(directory + channelFolders[i], filterPattern);
-                    if (lists[i] == null) {
+                    fileLists[i] = getFilesInFolder(directory + channelFolders[i], filterPattern);
+                    if (fileLists[i] == null) {
                         log("no files found in folder: " + directory + channelFolders[i]);
                         return (null);
                     }
@@ -173,6 +162,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 log("found sub-folders => interpreting as channel folders.");
             } else {
                 log("no sub-folders found.");
+                IJ.showMessage("No sub-folders found; please specify a different options for loading " +
+                        "the channels");
+                return(null);
             }
 
         } else {
@@ -180,22 +172,30 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             //
             // Get files in main directory
             //
-            log("checking for files in folder: " + directory);
-            lists = new String[1][];
-            lists[0] = getFilesInFolder(directory, filterPattern);
 
-            if (lists[0] != null) {
+            log("checking for files in folder: " + directory);
+            fileLists = new String[1][];
+            fileLists[0] = getFilesInFolder(directory, filterPattern);
+
+            if (fileLists[0] != null) {
+
                 //
                 // check if it is Leica single tiff SPIM files
                 //
+
                 Pattern patternLeica = Pattern.compile("LightSheet 2.*");
-                for (String fileName : lists[0]) {
+                for (String fileName : fileLists[0]) {
                     if (patternLeica.matcher(fileName).matches()) {
                         fileType = "leica single tif";
                         log("detected fileType: " + fileType);
                         break;
                     }
                 }
+            }
+
+            if (fileLists[0] == null || fileLists[0].length == 0) {
+                IJ.showMessage("No files matching this pattern were found: " + filterPattern);
+                return null;
             }
 
         }
@@ -217,7 +217,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             Pattern patternT = Pattern.compile(".*--t(.*)--Z.*");
             Pattern patternID = Pattern.compile(".*?_(\\d+).*"); // is this correct?
 
-            if (lists[0].length == 0) {
+            if (fileLists[0].length == 0) {
                 IJ.showMessage("No files matching this pattern were found: " + filterPattern);
                 return null;
             }
@@ -226,7 +226,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             // those are three numbers after the first _
             // this happens due to restarting the imaging
             Set<String> fileIDset = new HashSet();
-            for (String fileName : lists[0]) {
+            for (String fileName : fileLists[0]) {
                 matcherID = patternID.matcher(fileName);
                 if (matcherID.matches()) {
                     fileIDset.add(matcherID.group(1));
@@ -241,8 +241,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             ArrayList<HashSet<String>> slices = new ArrayList<HashSet<String>>();
 
             //
-            // Deal with different file-names due to series being restarted during the imaging
+            // Deal with different file-names (fileIDs) due to
+            // series being restarted during the imaging
             //
+
             for (String fileID : fileIDs) {
                 channels.add(new HashSet<String>());
                 timepoints.add(new HashSet<String>());
@@ -254,7 +256,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 Pattern patternFileID = Pattern.compile(".*?_" + fileIDs[iFileID] + ".*");
 
-                for (String fileName : lists[0]) {
+                for (String fileName : fileLists[0]) {
 
                     if (patternFileID.matcher(fileName).matches()) {
 
@@ -311,7 +313,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 Pattern patternFileID = Pattern.compile(".*" + fileIDs[iFileID] + ".*");
 
-                for (String fileName : lists[0]) {
+                for (String fileName : fileLists[0]) {
 
                     if (patternFileID.matcher(fileName).matches()) {
 
@@ -358,18 +360,21 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             // either tif stacks or h5 stacks
             //
 
+            boolean hasCTPattern = false;
+
             if (channelTimePattern.equals(LOAD_CHANNELS_FROM_FOLDERS)) {
 
                 nC = channelFolders.length;
-                nT = lists[0].length;
+                nT = fileLists[0].length;
 
             } else if (channelTimePattern.equals("None")) {
 
                 nC = 1;
-                channelFolders = new String[]{""};
-                nT = lists[0].length; // todo: this would be wrong as well
+                nT = fileLists[0].length;
 
             } else {
+
+                hasCTPattern = true;
 
                 channelFolders = new String[]{""};
 
@@ -378,7 +383,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 Pattern patternCT = Pattern.compile(channelTimePattern);
 
-                for (String fileName : lists[0]) {
+                for (String fileName : fileLists[0]) {
 
                     Matcher matcherCT = patternCT.matcher(fileName);
                     if (matcherCT.matches()) {
@@ -394,14 +399,22 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             }
 
             //
-            // Get some infos from the first file
+            // Create dummy channel folders, if no real ones exist
             //
-            if (lists[0][0].endsWith(".tif")) {
+            if (!channelTimePattern.equals(LOAD_CHANNELS_FROM_FOLDERS) ) {
+                channelFolders = new String[nC];
+                for(int ic=0; ic<nC; ic++) channelFolders[ic] = "";
+            }
+
+            //
+            // Get nX,nY,nZ from first file
+            //
+            if (fileLists[0][0].endsWith(".tif")) {
 
                 fileType = "tif stacks";
 
                 try {
-                    FastTiffDecoder ftd = new FastTiffDecoder(directory + channelFolders[0], lists[0][0]);
+                    FastTiffDecoder ftd = new FastTiffDecoder(directory + channelFolders[0], fileLists[0][0]);
                     info = ftd.getTiffInfo();
                 } catch (Exception e) {
                     info = null;
@@ -418,11 +431,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 nX = fi0.width;
                 nY = fi0.height;
 
-            } else if (lists[0][0].endsWith(".h5")) {
+            } else if (fileLists[0][0].endsWith(".h5")) {
 
                 fileType = "h5";
 
-                IHDF5Reader reader = HDF5Factory.openForReading(directory + channelFolders[c] + "/" + lists[0][0]);
+                IHDF5Reader reader = HDF5Factory.openForReading(directory + channelFolders[c] + "/" + fileLists[0][0]);
 
                 if (!checkIfHdf5DataSetExists(reader, hdf5DataSet)) return null;
 
@@ -434,26 +447,51 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             } else {
 
-                IJ.showMessage("Unsupported file type: " + lists[0][0]);
+                IJ.showMessage("Unsupported file type: " + fileLists[0][0]);
                 return (null);
 
             }
 
             log("File type: "+fileType);
 
+
             //
-            // sort into the final file list
+            // create the final file list
             //
 
             ctzFileList = new String[nC][nT][nZ];
 
-            for (c = 0; c < channelFolders.length; c++) {
-                for (t = 0; t < lists[c].length; t++) {
+            if(hasCTPattern) {
+
+                // no sub-folders
+                // c and t determined by pattern matching
+
+                Pattern patternCT = Pattern.compile(channelTimePattern);
+
+                for (String fileName : fileLists[0]) {
+
+                    Matcher matcherCT = patternCT.matcher(fileName);
+                    if (matcherCT.matches()) {
+                        c = Integer.parseInt(matcherCT.group("C"));
+                        t = Integer.parseInt(matcherCT.group("T"));
+                    }
+
                     for (z = 0; z < nZ; z++) {
-                        // all z with same file-name
-                        ctzFileList[c][t][z] = lists[c][t];
+                        ctzFileList[c][t][z] = fileName; // all z with same file-name, because it is stacks
+                    }
+
+                }
+
+            } else {
+
+                for (c = 0; c < channelFolders.length; c++) {
+                    for (t = 0; t < fileLists[c].length; t++) {
+                        for (z = 0; z < nZ; z++) {
+                            ctzFileList[c][t][z] = fileLists[c][t]; // all z with same file-name, because it is stacks
+                        }
                     }
                 }
+
             }
 
         }
@@ -461,16 +499,17 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //
         // init the virtual stack
         //
-
         VirtualStackOfStacks stack = new VirtualStackOfStacks(directory, channelFolders, ctzFileList, nC, nT, nX, nY, nZ, fileType, hdf5DataSet);
         imp = new ImagePlus("stream", stack);
 
         //
-        // set file information for each c, t, z
+        // obtain file information for each c, t, z
         //
-
         try {
 
+            //
+            // Monitor progress
+            //
             nProgress = nT; iProgress.set(0);
             Thread thread = new Thread(new Runnable() {
                 public void run() {
@@ -479,15 +518,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             });
             thread.start();
 
-
+            //
+            // Spawn the jobs
+            //
             ExecutorService es = Executors.newCachedThreadPool();
-            nProgress = nT;
-
-            for(int iThread=0; iThread<=nIOthreads; iThread++) {
-
+            for(int iThread=0; iThread<=nIOthreads; iThread++)
                 es.execute(new AnalyzeStackFiles(imp));
-
-            }
 
 
         } catch(Exception e) {
@@ -540,15 +576,21 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     }
 
                     imp.show();
+                    imp.setPosition(1, nZ/2, 1);
+                    imp.updateAndDraw();
+                    imp.resetDisplayRange();
 
-                    // todo: get the selected directory as name
-                    imp.setTitle("image");
+                    // todo: get the selected directory as image name
+                    imp.setTitle("stream");
 
-                    // show compression
+                    //
+                    // log compression
+                    //
                     FileInfoSer[][][] infos = vss.getFileInfosSer();
-                    if(infos[0][0][0].compression == 1)
-                        log("Compression = None");
-                    else if(infos[0][0][0].compression == 2)
+
+                    if(infos[0][0][0].compression == 0)
+                        log("Compression = Unknown");
+                    else if(infos[0][0][0].compression == 1)
                         log("Compression = LZW");
                     else if(infos[0][0][0].compression == 6)
                         log("Compression = ZIP");
@@ -922,8 +964,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         ImagePlus imp = new ImagePlus("", stack);
 
+        // todo: what does this do?
         if (imp.getType()==ImagePlus.GRAY16 || imp.getType()==ImagePlus.GRAY32)
 			imp.getProcessor().setMinAndMax(min, max);
+
 		imp.setFileInfo(fi.getFileInfo()); // saves FileInfo of the first image
 
         if(Globals.verbose) {
@@ -935,10 +979,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         imp.setDimensions(nC, nZ, nT);
         imp.setOpenAsHyperStack(true);
-        //if(nC>1) imp.setDisplayMode(IJ.COMPOSITE);
-        imp.setPosition(1, (int) nZ/2, 1);
-		imp.resetDisplayRange();
-		return(imp);
+        return(imp);
 	}
 
     public static ImagePlus crop(ImagePlus imp, int zMin, int zMax) {
@@ -957,7 +998,12 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     );
             return null;
         }
-
+        if(zMin<1) {
+            IJ.showMessage(
+                    "zMin must be >= 1; please change the value."
+            );
+            return null;
+        }
         if(zMax-zMin+1 > vss.nZ) {
             IJ.showMessage(
                     "The z-cropping range is larger than the data; please change the values."
@@ -967,7 +1013,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         if(zMax<=zMin) {
             IJ.showMessage(
-                    "zMax of the cropping range needs to be larger than zMin; please change the values."
+                    "zMax of the cropping range needs to be larger than zMin; " +
+                            "please change the values."
             );
             return null;
         }
@@ -981,7 +1028,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             Point3D[] po = new Point3D[vss.nT];
             for (int t = 0; t < vss.nT; t++) {
-                po[t] = new Point3D(roi.getBounds().getX(), roi.getBounds().getY(), zMin);
+                po[t] = new Point3D(roi.getBounds().getX(), roi.getBounds().getY(), zMin-1);
             }
             Point3D ps = new Point3D(roi.getBounds().getWidth(), roi.getBounds().getHeight(), zMax-zMin+1);
 
@@ -1179,16 +1226,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         JCheckBox cbLog = new JCheckBox("Verbose logging");
         JCheckBox cbLZW = new JCheckBox("LZW compression");
 
-        JTextField tfCropZminZmax = new JTextField("0,0", 7);
+        JTextField tfCropZMinMax = new JTextField("1,all", 5);
         JTextField tfIOThreads = new JTextField("1", 2);
         JTextField tfRowsPerStrip = new JTextField("10", 3);
 
-        //JTextField tfFileNamePattern = new JTextField(".*LSEA00.*", 10);
-
-
         JComboBox filterPatternComboBox = new JComboBox(new String[] {".*",".*_Target--.*",".*--LSEA00--.*",".*--LSEA01--.*"});
         JComboBox channelTimePatternComboBox = new JComboBox(new String[] {"None",LOAD_CHANNELS_FROM_FOLDERS,".*_C(?<C>.*)_T(?<T>.*).ome.tif"});
-        JComboBox hdf5DataSetComboBox = new JComboBox(new String[] {"Data","Data111","Data222","Data444"});
+        JComboBox hdf5DataSetComboBox = new JComboBox(new String[] {"None","Data","Data111","Data222","Data444"});
 
         JFileChooser fc;
 
@@ -1225,30 +1269,38 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             ArrayList<JPanel> panels = new ArrayList<JPanel>();
 
             panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
-            panels.get(j).add(new JLabel("STREAMING"));
+            panels.get(j).add(new JLabel("STREAM FROM FOLDER"));
             c.add(panels.get(j++));
 
             panels.add(new JPanel());
-            panels.get(j).add(buttons[i++]);
-            panels.get(j).add(buttons[i++]);
-            c.add(panels.get(j++));
-
-            panels.add(new JPanel());
-            panels.get(j).add(new JLabel("Filename pattern:"));
+            panels.get(j).add(new JLabel("Only load files matching:"));
             panels.get(j).add(filterPatternComboBox);
             filterPatternComboBox.setEditable(true);
             c.add(panels.get(j++));
 
             panels.add(new JPanel());
-            panels.get(j).add(new JLabel("Pattern C T:"));
+            panels.get(j).add(new JLabel("Multi-channel loading:"));
             channelTimePatternComboBox.setEditable(true);
             panels.get(j).add(channelTimePatternComboBox);
             c.add(panels.get(j++));
 
             panels.add(new JPanel());
-            panels.get(j).add(new JLabel("HDF5 data set:"));
+            panels.get(j).add(new JLabel("Hdf5 data set:"));
             panels.get(j).add(hdf5DataSetComboBox);
             hdf5DataSetComboBox.setEditable(true);
+            c.add(panels.get(j++));
+
+            panels.add(new JPanel());
+            panels.get(j).add(buttons[i++]);
+            c.add(panels.get(j++));
+
+            c.add(new JSeparator(SwingConstants.HORIZONTAL));
+            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+            panels.get(j).add(new JLabel("STREAM FROM INFO FILE"));
+            c.add(panels.get(j++));
+
+            panels.add(new JPanel());
+            panels.get(j).add(buttons[i++]);
             c.add(panels.get(j++));
 
             c.add(new JSeparator(SwingConstants.HORIZONTAL));
@@ -1275,7 +1327,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             panels.add(new JPanel());
             panels.get(j).add(new JLabel("zMin, zMax:"));
-            panels.get(j).add(tfCropZminZmax);
+            panels.get(j).add(tfCropZMinMax);
             panels.get(j).add(buttons[i++]);
             c.add(panels.get(j++));
 
@@ -1323,8 +1375,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         public void actionPerformed(ActionEvent e) {
             int i = 0;
 
-            // todo: get rid of the global osv class variables.
-
             final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
             final String h5DataSet = (String)hdf5DataSetComboBox.getSelectedItem();
             final int nSavingThreads = new Integer(tfIOThreads.getText());
@@ -1355,6 +1405,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 File file = new File(filePath);
                 ImagePlus imp = osv.openFromInfoFile(file.getParent() + "/", file.getName());
                 imp.show();
+                imp.setPosition(1, imp.getNSlices()/2, 1);
+                imp.updateAndDraw();
+                imp.resetDisplayRange();
+
 
             } else if (e.getActionCommand().equals(actions[i++])) {
 
@@ -1518,13 +1572,20 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 // Get z cropping range
                 //
 
-                String[] sA = tfCropZminZmax.getText().split(",");
+                String[] sA = tfCropZMinMax.getText().split(",");
                 if(sA.length!=2) {
                     IJ.showMessage("Something went wrong parsing the zMin, zMax croppping values.\n" +
                             "Please check that there are two comma separated values.");
                     return;
                 }
-                ImagePlus imp2 = osv.crop(imp, new Integer(sA[0]), new Integer(sA[1]));
+
+                int zMin = new Integer(sA[0]), zMax;
+                if(sA[1].equals(("all"))) {
+                    zMax = imp.getNSlices();
+                } else {
+                    zMax = new Integer(sA[1]);
+                }
+                ImagePlus imp2 = osv.crop(imp, zMin, zMax);
                 if (imp2 != null)
                     imp2.show();
 

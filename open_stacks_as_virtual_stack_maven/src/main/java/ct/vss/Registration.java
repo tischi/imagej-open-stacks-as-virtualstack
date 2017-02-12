@@ -229,7 +229,7 @@ public class Registration implements PlugIn {
                 c.add(panels.get(iPanel++));
             }
 
-            panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
+            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
             panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
