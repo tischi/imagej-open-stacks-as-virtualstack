@@ -60,7 +60,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     private String[][] lists; // c, t
     private String[][][] ctzFileList;
     private String fileType;
-    final String LOAD_CHANNELS_FROM_FOLDERS = "Subfolders";
+    final String LOAD_CHANNELS_FROM_FOLDERS = "ChannelFolders";
     private static NonBlockingGenericDialog gd;
     //public String h5DataSet = "Data111";
     //private String filenamePattern = "_Target--";
@@ -141,7 +141,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     // todo: get rid of all the global variables
 
-    public ImagePlus openFromDirectory(String directory, String channelPattern, String filterPattern, String hdf5DataSet, int nIOthreads) {
+    public ImagePlus openFromDirectory(String directory, String channelTimePattern, String filterPattern, String hdf5DataSet, int nIOthreads) {
         int t = 0, z = 0, c = 0;
         ImagePlus imp = null;
         fileType = "not determined";
@@ -153,7 +153,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         // todo: find a clean solution for the channel folder presence or absence!
         // todo: consistency check the list lengths
 
-        if (channelPattern.equals(LOAD_CHANNELS_FROM_FOLDERS)) {
+        if (channelTimePattern.equals(LOAD_CHANNELS_FROM_FOLDERS)) {
 
             //
             // Check for sub-folders
@@ -358,17 +358,38 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             // either tif stacks or h5 stacks
             //
 
-            if (channelPattern.equals(LOAD_CHANNELS_FROM_FOLDERS)) {
+            if (channelTimePattern.equals(LOAD_CHANNELS_FROM_FOLDERS)) {
 
                 nC = channelFolders.length;
                 nT = lists[0].length;
 
-            } else {
+            } else if (channelTimePattern.equals("None")) {
 
-                // todo: this could be multiple channels
                 nC = 1;
                 channelFolders = new String[]{""};
                 nT = lists[0].length; // todo: this would be wrong as well
+
+            } else {
+
+                channelFolders = new String[]{""};
+
+                HashSet<String> channels = new HashSet();
+                HashSet<String> timepoints = new HashSet();
+
+                Pattern patternCT = Pattern.compile(channelTimePattern);
+
+                for (String fileName : lists[0]) {
+
+                    Matcher matcherCT = patternCT.matcher(fileName);
+                    if (matcherCT.matches()) {
+                        channels.add(matcherCT.group("C"));
+                        timepoints.add(matcherCT.group("T"));
+                    }
+
+                }
+
+                nC = channels.size();
+                nT = timepoints.size();
 
             }
 
@@ -1059,7 +1080,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         Thread t1 = new Thread(new Runnable() {
             public void run() {
                 int nIOthreads = 10;
-                ovs.openFromDirectory(directory, ".*", ".*", "Data", nIOthreads);
+                ovs.openFromDirectory(directory, "None", ".*", "Data", nIOthreads);
             }
         });
         t1.start();
@@ -1164,8 +1185,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //JTextField tfFileNamePattern = new JTextField(".*LSEA00.*", 10);
 
+
         JComboBox filterPatternComboBox = new JComboBox(new String[] {".*",".*_Target--.*",".*--LSEA00--.*",".*--LSEA01--.*"});
-        JComboBox channelPatternComboBox = new JComboBox(new String[] {"None",LOAD_CHANNELS_FROM_FOLDERS,"--C.*--"});
+        JComboBox channelTimePatternComboBox = new JComboBox(new String[] {"None",LOAD_CHANNELS_FROM_FOLDERS,".*_C(?<C>.*)_T(?<T>.*).ome.tif"});
         JComboBox hdf5DataSetComboBox = new JComboBox(new String[] {"Data","Data111","Data222","Data444"});
 
         JFileChooser fc;
@@ -1218,9 +1240,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             c.add(panels.get(j++));
 
             panels.add(new JPanel());
-            panels.get(j).add(new JLabel("Channel pattern:"));
-            channelPatternComboBox.setEditable(true);
-            panels.get(j).add(channelPatternComboBox);
+            panels.get(j).add(new JLabel("Pattern C T:"));
+            channelTimePatternComboBox.setEditable(true);
+            panels.get(j).add(channelTimePatternComboBox);
             c.add(panels.get(j++));
 
             panels.add(new JPanel());
@@ -1308,7 +1330,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             final int nSavingThreads = new Integer(tfIOThreads.getText());
             final int rowsPerStrip = new Integer(tfRowsPerStrip.getText());
             final String filterPattern = (String)filterPatternComboBox.getSelectedItem();
-            final String channelPattern = (String)channelPatternComboBox.getSelectedItem();
+            final String channelPattern = (String) channelTimePatternComboBox.getSelectedItem();
 
             if (e.getActionCommand().equals(actions[i++])) {
 

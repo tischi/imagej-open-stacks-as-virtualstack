@@ -28,7 +28,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Open_Stacks_As_VirtualStack" target="1.6" />
-      <module name="OpenStacksAsVirtualStack" target="1.5" />
+      <module name="OpenStacksAsVirtualStack" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -13,6 +13,12 @@
 	<name>plugins/OpenStacksAsVirtualStack.jar</name>
 	<description>A Maven project implementing an ImageJ 1.x plugin</description>
 
+    <parent>
+        <groupId>org.scijava</groupId>
+        <artifactId>pom-scijava</artifactId>
+        <version>13.0.0</version>
+        <relativePath />
+    </parent>
 
     <developers>
         <developer>
