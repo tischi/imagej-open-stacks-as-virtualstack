@@ -538,10 +538,8 @@ public class Registration implements PlugIn {
 
         FileInfoSer[][][] infos = vss.getFileInfosSer();
         if(infos[0][0][0].compression==6) {
-            IJ.showMessage(
-                    "This is a ZIP compressed data set." +
-                            "This will probably NOT WORK PROPERLY with this plugin!"
-            );
+            log("This is a ZIP compressed data set." +
+                    "The tracking might thus not be super fast.");
         }
 
         gui_pTrackingSize = new Point3D(55,55,40);

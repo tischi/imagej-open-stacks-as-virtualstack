@@ -32,15 +32,14 @@
       <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="251">
-              <caret line="1409" column="40" selection-start-line="1409" selection-start-column="40" selection-end-line="1409" selection-end-column="40" />
+            <state relative-caret-position="227">
+              <caret line="1591" column="45" selection-start-line="1591" selection-start-column="45" selection-end-line="1591" selection-end-column="45" />
               <folding>
                 <element signature="e#7969#7986#0" expanded="true" />
                 <element signature="e#8055#8072#0" expanded="true" />
                 <element signature="e#8137#8154#0" expanded="true" />
-                <element signature="class#AnalyzeStackFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#18188#18189#0" expanded="true" />
-                <element signature="e#18226#18227#0" expanded="true" />
+                <element signature="e#18189#18190#0" expanded="true" />
+                <element signature="e#18227#18228#0" expanded="true" />
                 <element signature="class#SaveToStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
               </folding>
             </state>
@@ -60,10 +59,10 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="319">
-              <caret line="231" column="63" selection-start-line="231" selection-start-column="63" selection-end-line="231" selection-end-column="63" />
+            <state relative-caret-position="181">
+              <caret line="544" column="31" selection-start-line="544" selection-start-column="31" selection-end-line="544" selection-end-column="31" />
               <folding>
-                <marker date="1486939787000" expanded="false" signature="24:27" ph="..." />
+                <marker date="1486978369000" expanded="false" signature="24:27" ph="..." />
               </folding>
             </state>
           </provider>
@@ -86,8 +85,8 @@
       <file leaf-file-name="VirtualStackOfStacks.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="293">
-              <caret line="46" column="8" selection-start-line="46" selection-start-column="8" selection-end-line="46" selection-end-column="8" />
+            <state relative-caret-position="-66">
+              <caret line="116" column="16" selection-start-line="116" selection-start-column="16" selection-end-line="116" selection-end-column="16" />
               <folding>
                 <element signature="method#VirtualStackOfStacks#1;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#logStatus#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -99,38 +98,12 @@
       <file leaf-file-name="OpenerExtensions.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="159">
-              <caret line="29" column="18" selection-start-line="29" selection-start-column="7" selection-end-line="29" selection-end-column="18" />
+            <state relative-caret-position="226">
+              <caret line="587" column="57" selection-start-line="587" selection-start-column="57" selection-end-line="587" selection-end-column="57" />
               <folding>
                 <element signature="method#start#0;class#process2stack#0;class#OpenerExtensions#0" expanded="false" />
                 <element signature="class#ByteVector#0" expanded="false" />
-                <marker date="1486731587000" expanded="false" signature="24:302" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FastTiffDecoder.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/FastTiffDecoder.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="219">
-              <caret line="1277" column="29" selection-start-line="1277" selection-start-column="29" selection-end-line="1277" selection-end-column="29" />
-              <folding>
-                <element signature="imports" expanded="false" />
-                <element signature="method#getInt#0;class#FastTiffDecoder#0" expanded="false" />
-                <element signature="method#convertToShort#0;class#FastTiffDecoder#0" expanded="false" />
-                <element signature="method#getShort#0;class#FastTiffDecoder#0" expanded="false" />
-                <element signature="method#readLong#0;class#FastTiffDecoder#0" expanded="false" />
-                <element signature="method#readDouble#0;class#FastTiffDecoder#0" expanded="false" />
-                <element signature="method#OpenImageFileHeader#0;class#FastTiffDecoder#0" expanded="false" />
-                <element signature="method#getValue#0;class#FastTiffDecoder#0" expanded="false" />
-                <element signature="method#getColorMap#0;class#FastTiffDecoder#0" expanded="false" />
-                <element signature="method#getString#0;class#FastTiffDecoder#0" expanded="false" />
-                <element signature="e#21395#21396#0" expanded="false" />
-                <element signature="e#21427#21428#0" expanded="false" />
-                <element signature="method#getGapInfo#0;class#FastTiffDecoder#0" expanded="false" />
-                <marker date="1486731735000" expanded="true" signature="4557:5048" ph="{...}" />
-                <marker date="1486731735000" expanded="true" signature="34734:37089" ph="{...}" />
+                <marker date="1486979313000" expanded="false" signature="24:302" ph="..." />
               </folding>
             </state>
           </provider>
@@ -177,11 +150,11 @@
         <option value="$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html" />
         <option value="$PROJECT_DIR$/src/main/resources/DataStreamingHelp.html" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Globals.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/FastTiffDecoder.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
       </list>
     </option>
@@ -202,10 +175,10 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="483" />
-    <option name="y" value="58" />
-    <option name="width" value="1390" />
-    <option name="height" value="739" />
+    <option name="x" value="127" />
+    <option name="y" value="31" />
+    <option name="width" value="1381" />
+    <option name="height" value="802" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -672,27 +645,27 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="483" y="58" width="1390" height="739" extended-state="1" />
-    <editor active="false" />
+    <frame x="127" y="31" width="1381" height="802" extended-state="1" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.4974656" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29211748" sideWeight="0.54970324" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2915493" sideWeight="0.54667664" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26738796" sideWeight="0.2596439" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.35211268" sideWeight="0.26811054" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299373" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26738796" sideWeight="0.7403561" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.35211268" sideWeight="0.7318895" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.14931507" sideWeight="0.4974656" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19510385" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.10530247" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32921174" sideWeight="0.6913947" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26712328" sideWeight="0.6002835" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25492957" sideWeight="0.59671396" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -765,27 +738,39 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java</url>
-          <line>722</line>
+          <line>723</line>
           <properties />
           <option name="timeStamp" value="316" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java</url>
-          <line>719</line>
+          <line>720</line>
           <properties />
           <option name="timeStamp" value="318" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java</url>
-          <line>502</line>
+          <line>503</line>
           <properties />
-          <option name="timeStamp" value="351" />
+          <option name="timeStamp" value="355" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java</url>
-          <line>501</line>
+          <url>file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java</url>
+          <line>504</line>
           <properties />
-          <option name="timeStamp" value="352" />
+          <option name="timeStamp" value="358" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java</url>
+          <line>492</line>
+          <properties />
+          <option name="timeStamp" value="359" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java</url>
+          <line>495</line>
+          <properties />
+          <option name="timeStamp" value="360" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -798,7 +783,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="353" />
+      <option name="time" value="363" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -832,7 +817,7 @@
           <folding>
             <element signature="method#start#0;class#process2stack#0;class#OpenerExtensions#0" expanded="false" />
             <element signature="class#ByteVector#0" expanded="false" />
-            <marker date="1486731587000" expanded="false" signature="24:302" ph="..." />
+            <marker date="1486979313000" expanded="false" signature="24:302" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1063,30 +1048,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/FastTiffDecoder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="219">
-          <caret line="1277" column="29" selection-start-line="1277" selection-start-column="29" selection-end-line="1277" selection-end-column="29" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="method#getInt#0;class#FastTiffDecoder#0" expanded="false" />
-            <element signature="method#convertToShort#0;class#FastTiffDecoder#0" expanded="false" />
-            <element signature="method#getShort#0;class#FastTiffDecoder#0" expanded="false" />
-            <element signature="method#readLong#0;class#FastTiffDecoder#0" expanded="false" />
-            <element signature="method#readDouble#0;class#FastTiffDecoder#0" expanded="false" />
-            <element signature="method#OpenImageFileHeader#0;class#FastTiffDecoder#0" expanded="false" />
-            <element signature="method#getValue#0;class#FastTiffDecoder#0" expanded="false" />
-            <element signature="method#getColorMap#0;class#FastTiffDecoder#0" expanded="false" />
-            <element signature="method#getString#0;class#FastTiffDecoder#0" expanded="false" />
-            <element signature="e#21395#21396#0" expanded="false" />
-            <element signature="e#21427#21428#0" expanded="false" />
-            <element signature="method#getGapInfo#0;class#FastTiffDecoder#0" expanded="false" />
-            <marker date="1486731735000" expanded="true" signature="4557:5048" ph="{...}" />
-            <marker date="1486731735000" expanded="true" signature="34734:37089" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/src.zip!/java/util/HashMap.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
@@ -1188,39 +1149,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="319">
-          <caret line="231" column="63" selection-start-line="231" selection-start-column="63" selection-end-line="231" selection-end-column="63" />
-          <folding>
-            <marker date="1486939787000" expanded="false" signature="24:27" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="293">
-          <caret line="46" column="8" selection-start-line="46" selection-start-column="8" selection-end-line="46" selection-end-column="8" />
-          <folding>
-            <element signature="method#VirtualStackOfStacks#1;class#VirtualStackOfStacks#0" expanded="false" />
-            <element signature="method#logStatus#0;class#VirtualStackOfStacks#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="159">
-          <caret line="29" column="18" selection-start-line="29" selection-start-column="7" selection-end-line="29" selection-end-column="18" />
-          <folding>
-            <element signature="method#start#0;class#process2stack#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="class#ByteVector#0" expanded="false" />
-            <marker date="1486731587000" expanded="false" signature="24:302" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -1229,17 +1157,68 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="544" column="31" selection-start-line="544" selection-start-column="31" selection-end-line="544" selection-end-column="31" />
+          <folding>
+            <marker date="1486978369000" expanded="false" signature="24:27" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/FastTiffDecoder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="1135" column="33" selection-start-line="1135" selection-start-column="21" selection-end-line="1135" selection-end-column="33" />
+          <folding>
+            <element signature="method#getInt#0;class#FastTiffDecoder#0" expanded="false" />
+            <element signature="method#convertToShort#0;class#FastTiffDecoder#0" expanded="false" />
+            <element signature="method#getShort#0;class#FastTiffDecoder#0" expanded="false" />
+            <element signature="method#readLong#0;class#FastTiffDecoder#0" expanded="false" />
+            <element signature="method#readDouble#0;class#FastTiffDecoder#0" expanded="false" />
+            <element signature="method#OpenImageFileHeader#0;class#FastTiffDecoder#0" expanded="false" />
+            <element signature="method#getValue#0;class#FastTiffDecoder#0" expanded="false" />
+            <element signature="method#getColorMap#0;class#FastTiffDecoder#0" expanded="false" />
+            <element signature="method#getString#0;class#FastTiffDecoder#0" expanded="false" />
+            <element signature="method#getGapInfo#0;class#FastTiffDecoder#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="587" column="57" selection-start-line="587" selection-start-column="57" selection-end-line="587" selection-end-column="57" />
+          <folding>
+            <element signature="method#start#0;class#process2stack#0;class#OpenerExtensions#0" expanded="false" />
+            <element signature="class#ByteVector#0" expanded="false" />
+            <marker date="1486979313000" expanded="false" signature="24:302" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-66">
+          <caret line="116" column="16" selection-start-line="116" selection-start-column="16" selection-end-line="116" selection-end-column="16" />
+          <folding>
+            <element signature="method#VirtualStackOfStacks#1;class#VirtualStackOfStacks#0" expanded="false" />
+            <element signature="method#logStatus#0;class#VirtualStackOfStacks#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="251">
-          <caret line="1409" column="40" selection-start-line="1409" selection-start-column="40" selection-end-line="1409" selection-end-column="40" />
+        <state relative-caret-position="227">
+          <caret line="1591" column="45" selection-start-line="1591" selection-start-column="45" selection-end-line="1591" selection-end-column="45" />
           <folding>
             <element signature="e#7969#7986#0" expanded="true" />
             <element signature="e#8055#8072#0" expanded="true" />
             <element signature="e#8137#8154#0" expanded="true" />
-            <element signature="class#AnalyzeStackFiles#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#18188#18189#0" expanded="true" />
-            <element signature="e#18226#18227#0" expanded="true" />
+            <element signature="e#18189#18190#0" expanded="true" />
+            <element signature="e#18227#18228#0" expanded="true" />
             <element signature="class#SaveToStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
           </folding>
         </state>

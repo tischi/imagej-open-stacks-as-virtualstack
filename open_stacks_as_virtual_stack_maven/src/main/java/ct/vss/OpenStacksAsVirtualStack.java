@@ -431,6 +431,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 nX = fi0.width;
                 nY = fi0.height;
 
+
             } else if (fileLists[0][0].endsWith(".h5")) {
 
                 fileType = "h5";
@@ -993,10 +994,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         FileInfoSer[][][] infos = vss.getFileInfosSer();
         if(infos[0][0][0].compression==6) {
-            IJ.showMessage(
-                    "Cropping functionality is currently not supported for ZIP compressed data."
-                    );
-            return null;
+            log("Zip-compressed tiff files do not support chuncked loading " +
+                    "=> the cropped stream will not be streamed faster");
         }
         if(zMin<1) {
             IJ.showMessage(
@@ -1586,8 +1585,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     zMax = new Integer(sA[1]);
                 }
                 ImagePlus imp2 = osv.crop(imp, zMin, zMax);
-                if (imp2 != null)
+                if (imp2 != null) {
                     imp2.show();
+                    imp2.setPosition(1, nZ/2, 1);
+                    imp2.updateAndDraw();
+                    imp2.resetDisplayRange();
+                }
+
 
             }  else if (e.getActionCommand().equals(actions[i++])) {
 

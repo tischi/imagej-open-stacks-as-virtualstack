@@ -560,19 +560,6 @@ class OpenerExtensions extends Opener {
 
             } else { // no strips
 
-                if(Globals.verbose) {
-                    log("z: " + z);
-                    log("zs: " + zs);
-                    log("dz: " + dz);
-                    log("(z - zs)/dz: "+(z - zs)/dz);
-                    log("buffer.length : " + buffer.length);
-                    log("buffer[z-zs].length : " + buffer[z - zs].length);
-                    log("imWidth [bytes] : " + imByteWidth);
-                    log("ny [#] : " + ny);
-                    short[] pixels = (short[]) stack.getPixels((z - zs)/dz + 1);
-                    log("stack.getPixels((z - zs)/dz + 1).length: "+pixels.length);
-                }
-
                 if (fi0.compression == ZIP) {
 
                     /** TIFF Adobe ZIP support contributed by Jason Newton. */
@@ -593,10 +580,28 @@ class OpenerExtensions extends Opener {
 
                     buffer[(z - zs)/dz] = imageBuffer.toByteArray();
 
+                    setShortPixelsCropXY((short[]) stack.getPixels((z - zs)/dz + 1), ys, ny, xs, nx, imByteWidth, buffer[(z - zs)/dz]);
+
+                } else {
+
+                    ys = 0; // the buffer contains only the correct y-range
+                    setShortPixelsCropXY((short[]) stack.getPixels((z - zs)/dz + 1), ys, ny, xs, nx, imByteWidth, buffer[(z - zs)/dz]);
+
                 }
 
-                ys = 0; // the buffer contains only the correct y-range
-                setShortPixelsCropXY((short[]) stack.getPixels((z - zs)/dz + 1), ys, ny, xs, nx, imByteWidth, buffer[(z - zs)/dz]);
+                if(Globals.verbose) {
+                    log("z: " + z);
+                    log("zs: " + zs);
+                    log("dz: " + dz);
+                    log("(z - zs)/dz: "+(z - zs)/dz);
+                    log("buffer.length : " + buffer.length);
+                    log("buffer[z-zs].length : " + buffer[z - zs].length);
+                    log("imWidth [bytes] : " + imByteWidth);
+                    log("ny [#] : " + ny);
+                    short[] pixels = (short[]) stack.getPixels((z - zs)/dz + 1);
+                    log("stack.getPixels((z - zs)/dz + 1).length: "+pixels.length);
+                }
+
 
             }
 
