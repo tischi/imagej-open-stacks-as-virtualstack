@@ -592,6 +592,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     if(infos[0][0][0].compression == 0)
                         log("Compression = Unknown");
                     else if(infos[0][0][0].compression == 1)
+                        log("Compression = None");
+                    else if(infos[0][0][0].compression == 2)
                         log("Compression = LZW");
                     else if(infos[0][0][0].compression == 6)
                         log("Compression = ZIP");
@@ -1226,7 +1228,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         JCheckBox cbLZW = new JCheckBox("LZW compression");
 
         JTextField tfCropZMinMax = new JTextField("1,all", 5);
-        JTextField tfIOThreads = new JTextField("1", 2);
+        JTextField tfIOThreads = new JTextField("10", 2);
         JTextField tfRowsPerStrip = new JTextField("10", 3);
 
         JComboBox filterPatternComboBox = new JComboBox(new String[] {".*",".*_Target--.*",".*--LSEA00--.*",".*--LSEA01--.*"});
@@ -1587,7 +1589,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 ImagePlus imp2 = osv.crop(imp, zMin, zMax);
                 if (imp2 != null) {
                     imp2.show();
-                    imp2.setPosition(1, nZ/2, 1);
+                    imp2.setPosition(1, imp.getCurrentSlice(), 1);
                     imp2.updateAndDraw();
                     imp2.resetDisplayRange();
                 }
