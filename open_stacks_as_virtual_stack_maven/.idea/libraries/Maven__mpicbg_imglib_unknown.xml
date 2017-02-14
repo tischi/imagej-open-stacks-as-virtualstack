@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: mpicbg:imglib:unknown">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/mpicbg/imglib/unknown/imglib-unknown.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/mpicbg/imglib/unknown/imglib-unknown-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/mpicbg/imglib/unknown/imglib-unknown-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

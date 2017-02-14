@@ -7,7 +7,6 @@ import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.gui.NonBlockingGenericDialog;
 import ij.gui.Roi;
 import ij.io.FileInfo;
 import ij.io.FileSaver;
@@ -41,9 +40,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static ij.IJ.log;
-import static java.awt.Desktop.*;
+import static java.awt.Desktop.getDesktop;
+import static java.awt.Desktop.isDesktopSupported;
 
+import org.scijava.util.Bytes;
 
+// todo: can only some combobox fields be editable?
 // todo: - find out why loading and saving info file is so slow
 // todo: - save smaller info files
 // todo: saving as tiff stacks does not always work, e.g. after object tracking
@@ -57,7 +59,7 @@ import static java.awt.Desktop.*;
 public class OpenStacksAsVirtualStack implements PlugIn {
 
     private int nC, nT, nZ, nX, nY;
-    final String LOAD_CHANNELS_FROM_FOLDERS = "Channel sub-folders";
+    final String LOAD_CHANNELS_FROM_FOLDERS = "sub-folders";
     AtomicInteger iProgress = new AtomicInteger(0);
     int nProgress = 100;
 
@@ -376,6 +378,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 hasCTPattern = true;
 
+                if(! (channelTimePattern.contains("<c>") &&  channelTimePattern.contains("<t>")) ) {
+                    IJ.showMessage("The pattern for multi-channel loading must" +
+                            "contain  <c> and <t> to match channels and time in the filenames.");
+                    return (null);
+                }
+
+                // replace shortcuts by actual regexp
+                channelTimePattern = channelTimePattern.replace("<c>","(?<C>.*)");
+                channelTimePattern = channelTimePattern.replace("<t>","(?<T>.*)");
+
                 channelFolders = new String[]{""};
 
                 HashSet<String> channels = new HashSet();
@@ -473,8 +485,16 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     Matcher matcherCT = patternCT.matcher(fileName);
                     if (matcherCT.matches()) {
-                        c = Integer.parseInt(matcherCT.group("C"));
-                        t = Integer.parseInt(matcherCT.group("T"));
+                        try {
+                            c = Integer.parseInt(matcherCT.group("C"));
+                            t = Integer.parseInt(matcherCT.group("T"));
+                        } catch (Exception e) {
+                            IJ.showMessage("The multi-channel loading did not match the filenames.\n" +
+                                    "Please change the pattern.\n\n" +
+                                    "The Java error message was:\n" +
+                                    e.toString());
+                            return(null);
+                        }
                     }
 
                     for (z = 0; z < nZ; z++) {
@@ -611,6 +631,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         }
 
+    // todo: make an own class file for saving
     class SaveToStacks implements Runnable {
         ImagePlus imp;
         String fileType, path;
@@ -677,7 +698,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                             for (int z = 0; z < impCT.getNSlices(); z++) {
                                 IFD ifd = new IFD();
                                 ifd.put(IFD.ROWS_PER_STRIP, rowsPerStripArray);
-                                tiffWriter.saveBytes(z, shortToByteBigEndian((short[])impCT.getStack().getProcessor(z+1).getPixels()),ifd);
+                                tiffWriter.saveBytes(z, Bytes.fromShorts((short[])impCT.getStack().getProcessor(z+1).getPixels(), false), ifd);
                             }
 
                             writer.close();
@@ -707,25 +728,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         }
 
-    }
-
-    byte[] shortToByteBigEndian(short[] input)
-    {
-        int short_index, byte_index;
-        int iterations = input.length;
-
-        byte[] buffer = new byte[input.length * 2];
-
-        short_index = byte_index = 0;
-
-        for(/*NOP*/; short_index != iterations; /*NOP*/)
-        {
-            buffer[byte_index] = (byte) ((input[short_index] & 0xFF00) >> 8);
-            buffer[byte_index + 1]  = (byte) (input[short_index] & 0x00FF);
-            ++short_index; byte_index += 2;
-        }
-
-        return buffer;
     }
 
     String[] sortAndFilterFileList(String[] rawlist, String filterPattern) {
@@ -1232,8 +1234,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         JTextField tfRowsPerStrip = new JTextField("10", 3);
 
         JComboBox filterPatternComboBox = new JComboBox(new String[] {".*",".*_Target--.*",".*--LSEA00--.*",".*--LSEA01--.*"});
-        JComboBox channelTimePatternComboBox = new JComboBox(new String[] {"None",LOAD_CHANNELS_FROM_FOLDERS,".*_C(?<C>.*)_T(?<T>.*).ome.tif"});
+        JComboBox channelTimePatternComboBox = new JComboBox(new String[] {"None",LOAD_CHANNELS_FROM_FOLDERS,".*_C<c>_T<t>.tif"});
         JComboBox hdf5DataSetComboBox = new JComboBox(new String[] {"None","Data","Data111","Data222","Data444"});
+
 
         JFileChooser fc;
 
