@@ -589,7 +589,7 @@ public class FastTiffDecoder {
         debugMode = true;
     }
 
-    FileInfo fullyReadFirstIFD(long[] stripInfos) throws IOException {
+    FileInfo fullyReadIFD(long[] stripInfos) throws IOException {
 
         long ifdLoc = in.getFilePointer();
 
@@ -879,6 +879,7 @@ public class FastTiffDecoder {
     //
 
     FileInfo onlyReadStripsFromIFD(long[] stripInfos) throws IOException {
+
         FileInfo fi = new FileInfo();
         long startLoc = in.getLongFilePointer();
         long stripLoc;
@@ -895,13 +896,14 @@ public class FastTiffDecoder {
         //
         // stripOffsets
         //
-
         in.seek(startLoc + stripInfos[1]);
 
         if(count==1) {
+
             // the getInt() value is the location where the image is stored
             value = getInt();
             fi.stripOffsets[0] = value;
+
         } else {
             // the getInt() value is the location where the strips are stored
             in.seek(startLoc + stripInfos[1]);
@@ -949,6 +951,7 @@ public class FastTiffDecoder {
                 in.readFully(buffer);
                 convertToInt(fi.stripLengths, buffer);
             }
+
         }
         //
         // go to end of this IFD
@@ -1254,16 +1257,21 @@ public class FastTiffDecoder {
         if (debugMode) dInfo = "\n  " + name + ": opening\n";
         while (ifdOffset>0L) {
             in.seek(ifdOffset);
-            if(list.size()==0) {
-                fi = fullyReadFirstIFD(stripInfos);
-                //log("stripOffsetsRelativeLoc " + stripInfos[0]);
-                //log("stripLengthsRelativeLoc " + stripInfos[1]);
-                //log("stripLengthFieldType " + stripInfos[2]);
+            //
+            // below is a hack that only works for some tiff formats!!!
+            //
+            if(list.size() < 3) {  // somehow the first ones are sometimes different...
+                fi = fullyReadIFD(stripInfos);
+                /*
+                log("list.size() "+list.size());
+                log("strip count " + stripInfos[0]);
+                log("stripOffsetsRelativeLoc " + stripInfos[1]);
+                log("stripLengthsRelativeLoc " + stripInfos[2]);
+                log("stripLengthFieldType " + stripInfos[3]);
+                log("ifdSize " + stripInfos[4]);
+                */
             } else {
-                fi = onlyReadStripsFromIFD(stripInfos);
-                //log("stripOffsetsRelativeLoc " + stripInfos[0]);
-                //log("stripLengthsRelativeLoc " + stripInfos[1]);
-                //log("stripLengthFieldType " + stripInfos[2]);
+               fi = onlyReadStripsFromIFD(stripInfos);
             }
             fi.longOffset = (long)fi.offset & 4294967295L;
             if(Globals.verbose) {
@@ -1278,7 +1286,7 @@ public class FastTiffDecoder {
                 list.add(fi);
                 ifdOffset = getUnsignedInt();
             } else
-                ifdOffset = 0L;
+                ifdOffset = 0L;   // exit while loop
             if (debugMode && ifdCount<10) dInfo += "  nextIFD=" + ifdOffset + "\n";
             if (fi!=null && fi.nImages>1) {
                 // set offsets of the following IFDs
