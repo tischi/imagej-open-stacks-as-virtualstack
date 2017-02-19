@@ -32,8 +32,8 @@
       <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="125">
-              <caret line="764" column="17" selection-start-line="764" selection-start-column="17" selection-end-line="764" selection-end-column="17" />
+            <state relative-caret-position="163">
+              <caret line="1513" column="16" selection-start-line="1513" selection-start-column="16" selection-end-line="1513" selection-end-column="16" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -41,13 +41,11 @@
                 <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#checkIfHdf5DataSetExists#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#8629#8646#0" expanded="true" />
-                <element signature="e#8715#8732#0" expanded="true" />
-                <element signature="e#8797#8814#0" expanded="true" />
                 <element signature="method#getLastDir#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-                <element signature="e#20041#20042#0" expanded="true" />
-                <element signature="e#20079#20080#0" expanded="true" />
+                <element signature="e#20382#20383#0" expanded="true" />
+                <element signature="e#20420#20421#0" expanded="true" />
                 <element signature="class#SaveToStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+                <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
                 <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
               </folding>
@@ -200,10 +198,10 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="168" />
-    <option name="y" value="103" />
+    <option name="x" value="536" />
+    <option name="y" value="59" />
     <option name="width" value="1274" />
-    <option name="height" value="645" />
+    <option name="height" value="833" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -640,17 +638,17 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="168" y="103" width="1274" height="645" extended-state="0" />
-    <editor active="true" />
+    <frame x="536" y="59" width="1274" height="833" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.4974656" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28390595" sideWeight="0.4688057" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21592443" sideWeight="0.4688057" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28994083" sideWeight="0.53119427" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299373" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23303457" sideWeight="0.688196" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23076923" sideWeight="0.688196" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.14931507" sideWeight="0.4974656" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -660,7 +658,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3833635" sideWeight="0.8693393" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30499324" sideWeight="0.8693393" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -742,7 +740,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="457" />
+      <option name="time" value="460" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1201,8 +1199,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="125">
-          <caret line="764" column="17" selection-start-line="764" selection-start-column="17" selection-end-line="764" selection-end-column="17" />
+        <state relative-caret-position="163">
+          <caret line="1513" column="16" selection-start-line="1513" selection-start-column="16" selection-end-line="1513" selection-end-column="16" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#OpenStacksAsVirtualStack#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
@@ -1210,13 +1208,11 @@
             <element signature="method#showDialog#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#checkIfHdf5DataSetExists#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#openFromInfoFile#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#8629#8646#0" expanded="true" />
-            <element signature="e#8715#8732#0" expanded="true" />
-            <element signature="e#8797#8814#0" expanded="true" />
             <element signature="method#getLastDir#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="e#20041#20042#0" expanded="true" />
-            <element signature="e#20079#20080#0" expanded="true" />
+            <element signature="e#20382#20383#0" expanded="true" />
+            <element signature="e#20420#20421#0" expanded="true" />
             <element signature="class#SaveToStacks#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
+            <element signature="method#getFilesInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#getFoldersInFolder#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
             <element signature="method#updateStatus#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
           </folding>

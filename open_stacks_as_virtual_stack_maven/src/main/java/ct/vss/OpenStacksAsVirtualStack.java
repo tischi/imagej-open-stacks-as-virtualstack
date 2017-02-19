@@ -42,6 +42,7 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -49,6 +50,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static ij.IJ.log;
+import static ij.IJ.time;
 import static java.awt.Desktop.getDesktop;
 import static java.awt.Desktop.isDesktopSupported;
 
@@ -60,7 +62,6 @@ import net.imglib2.img.display.imagej.ImageJFunctions;
 import org.scijava.util.Bytes;
 
 //import net.imagej.ImageJ;
-
 
 // todo: can only some combobox fields be editable?
 // todo: - find out why loading and saving info file is so slow
@@ -159,6 +160,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         FileInfo[] info;
         FileInfo fi0;
         String[] channelFolders = null;
+        List<String> channels = null, timepoints = null;
 
         if (channelTimePattern.equals(LOAD_CHANNELS_FROM_FOLDERS)) {
 
@@ -254,9 +256,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             // check which different C, T and Z there are for each FileID
 
-            ArrayList<HashSet<String>> channels = new ArrayList<HashSet<String>>();
-            ArrayList<HashSet<String>> timepoints = new ArrayList<HashSet<String>>();
-            ArrayList<HashSet<String>> slices = new ArrayList<HashSet<String>>();
+            ArrayList<HashSet<String>> channelsHS = new ArrayList();
+            ArrayList<HashSet<String>> timepointsHS = new ArrayList();
+            ArrayList<HashSet<String>> slicesHS = new ArrayList();
 
             //
             // Deal with different file-names (fileIDs) due to
@@ -264,9 +266,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             //
 
             for (String fileID : fileIDs) {
-                channels.add(new HashSet<String>());
-                timepoints.add(new HashSet<String>());
-                slices.add(new HashSet<String>());
+                channelsHS.add(new HashSet());
+                timepointsHS.add(new HashSet());
+                slicesHS.add(new HashSet());
             }
 
             for (int iFileID = 0; iFileID < fileIDs.length; iFileID++) {
@@ -280,22 +282,22 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                         matcherC = patternC.matcher(fileName);
                         if (matcherC.matches()) {
                             // has multi-channels
-                            channels.get(iFileID).add(matcherC.group(1));
+                            channelsHS.get(iFileID).add(matcherC.group(1));
                             matcherZ = patternZwithC.matcher(fileName);
                             if (matcherZ.matches()) {
-                                slices.get(iFileID).add(matcherZ.group(1));
+                                slicesHS.get(iFileID).add(matcherZ.group(1));
                             }
                         } else {
                             // has only one channel
                             matcherZ = patternZnoC.matcher(fileName);
                             if (matcherZ.matches()) {
-                                slices.get(iFileID).add(matcherZ.group(1));
+                                slicesHS.get(iFileID).add(matcherZ.group(1));
                             }
                         }
 
                         matcherT = patternT.matcher(fileName);
                         if (matcherT.matches()) {
-                            timepoints.get(iFileID).add(matcherT.group(1));
+                            timepointsHS.get(iFileID).add(matcherT.group(1));
                         }
                     }
                 }
@@ -308,15 +310,15 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             for (int iFileID = 0; iFileID < fileIDs.length; iFileID++) {
 
-                nC = Math.max(1, channels.get(iFileID).size());
-                nZ = slices.get(iFileID).size(); // must be the same for all fileIDs
+                nC = Math.max(1, channelsHS.get(iFileID).size());
+                nZ = slicesHS.get(iFileID).size(); // must be the same for all fileIDs
 
                 log("FileID: " + fileIDs[iFileID]);
                 log("  Channels: " + nC);
-                log("  TimePoints: " + timepoints.get(iFileID).size());
+                log("  TimePoints: " + timepointsHS.get(iFileID).size());
                 log("  Slices: " + nZ);
 
-                nT += timepoints.get(iFileID).size();
+                nT += timepointsHS.get(iFileID).size();
                 tOffsets[iFileID + 1] = nT;
             }
 
@@ -413,8 +415,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 channelFolders = new String[]{""};
 
-                HashSet<String> channels = new HashSet();
-                HashSet<String> timepoints = new HashSet();
+                HashSet<String> channelsHS = new HashSet();
+                HashSet<String> timepointsHS = new HashSet();
 
                 Pattern patternCT = Pattern.compile(channelTimePattern);
 
@@ -422,13 +424,20 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     Matcher matcherCT = patternCT.matcher(fileName);
                     if (matcherCT.matches()) {
-                        channels.add(matcherCT.group("C"));
-                        timepoints.add(matcherCT.group("T"));
+                        channelsHS.add(matcherCT.group("C"));
+                        timepointsHS.add(matcherCT.group("T"));
                     }
 
                 }
 
+                // convert HashLists to sorted Lists
+
+                channels = new ArrayList<String>(channelsHS);
+                Collections.sort(channels);
                 nC = channels.size();
+
+                timepoints = new ArrayList<String>(timepointsHS);
+                Collections.sort(timepoints);
                 nT = timepoints.size();
 
             }
@@ -509,8 +518,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     Matcher matcherCT = patternCT.matcher(fileName);
                     if (matcherCT.matches()) {
                         try {
-                            c = Integer.parseInt(matcherCT.group("C"));
-                            t = Integer.parseInt(matcherCT.group("T"));
+                            c = channels.indexOf(matcherCT.group("C"));
+                            t = timepoints.indexOf(matcherCT.group("T"));
                         } catch (Exception e) {
                             IJ.showMessage("The multi-channel loading did not match the filenames.\n" +
                                     "Please change the pattern.\n\n" +
