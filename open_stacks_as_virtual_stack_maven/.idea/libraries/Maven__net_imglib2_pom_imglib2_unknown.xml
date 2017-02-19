@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: net.imglib2:pom-imglib2:unknown">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/imglib2/pom-imglib2/unknown/pom-imglib2-unknown.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/net/imglib2/pom-imglib2/unknown/pom-imglib2-unknown-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/imglib2/pom-imglib2/unknown/pom-imglib2-unknown-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

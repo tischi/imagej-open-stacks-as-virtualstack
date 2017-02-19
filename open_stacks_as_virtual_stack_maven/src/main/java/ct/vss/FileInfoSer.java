@@ -43,6 +43,8 @@ public class FileInfoSer implements Cloneable, Serializable {
 
     // todo: there is a lot of duplicated information that would only be needed once
 
+    //
+
     public FileInfoSer() {
 
     }

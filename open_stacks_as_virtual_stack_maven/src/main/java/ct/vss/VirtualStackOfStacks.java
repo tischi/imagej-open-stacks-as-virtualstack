@@ -238,8 +238,7 @@ public class VirtualStackOfStacks extends ImageStack {
 
     /** Returns an ImageProcessor for the specified slice,
      were 1<=n<=nslices. Returns null if the stack is empty.
-     */
-    /* the n is computed by IJ assuming the czt ordering
+    N is computed by IJ assuming the czt ordering, with
     n = ( c + z*nC + t*nZ*nC ) + 1
     */
     public ImageProcessor getProcessor(int n) {
@@ -262,11 +261,6 @@ public class VirtualStackOfStacks extends ImageStack {
 
         Point3D po, ps;
         if(infos[c][t] == null) {
-            //ImagePlus imp0 = IJ.getImage();
-            //imp0.setPosition(1,(int)imp0.getNSlices()/2,1);
-            //imp0.updateAndDraw();
-            //IJ.showMessage("The file corresponding to this time point has not been analyzed yet.\n" +
-            //        "Please wait...");
             setStackFromFile(t, c);
         }
 
@@ -300,7 +294,10 @@ public class VirtualStackOfStacks extends ImageStack {
         return(new Point3D(infos[0][0][0].pCropSize[0], infos[0][0][0].pCropSize[1], infos[0][0][0].pCropSize[2]));
     }
 
-    //
+    public ImagePlus getFullFrame(int t, int c) {
+        return(getFullFrame(t, c, new Point3D(1,1,1)));
+    }
+
     public ImagePlus getFullFrame(int t, int c, Point3D pSubSample) {
         Point3D po, ps;
 
@@ -473,7 +470,6 @@ public class VirtualStackOfStacks extends ImageStack {
         return((int) sum/(width*height*depth));
 
     }
-
 
     public ImagePlus resizeWidthAndHeight(ImagePlus imp, int dx, int dy) {
         int nSlices = imp.getStackSize();

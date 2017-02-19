@@ -1,10 +1,11 @@
 package ct.vss;
 
+import bdv.util.BdvFunctions;
+import bdv.util.BdvSource;
 import ch.systemsx.cisd.hdf5.HDF5DataSetInformation;
 import ch.systemsx.cisd.hdf5.HDF5Factory;
 import ch.systemsx.cisd.hdf5.IHDF5Reader;
 import ij.IJ;
-import ij.ImageJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.gui.Roi;
@@ -12,6 +13,9 @@ import ij.io.FileInfo;
 import ij.io.FileSaver;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
+import io.scif.config.SCIFIOConfig;
+import io.scif.img.ImgIOException;
+import io.scif.img.SCIFIOImgPlus;
 import javafx.geometry.Point3D;
 import loci.common.services.ServiceFactory;
 import loci.formats.ImageWriter;
@@ -19,6 +23,14 @@ import loci.formats.meta.IMetadata;
 import loci.formats.out.TiffWriter;
 import loci.formats.services.OMEXMLService;
 import loci.formats.tiff.IFD;
+//import mpicbg.imglib.image.ImagePlusAdapter;
+//import mpicbg.imglib.image.display.imagej.ImageJFunctions;
+//import mpicbg.imglib.type.numeric.integer.UnsignedShortType;
+import net.imglib2.img.Img;
+import net.imglib2.type.NativeType;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.integer.UnsignedShortType;
+import net.imglib2.util.Pair;
 import ome.xml.model.enums.DimensionOrder;
 import ome.xml.model.enums.PixelType;
 import ome.xml.model.primitives.PositiveInteger;
@@ -29,10 +41,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,7 +52,15 @@ import static ij.IJ.log;
 import static java.awt.Desktop.getDesktop;
 import static java.awt.Desktop.isDesktopSupported;
 
+import io.scif.img.ImgOpener;
+
+import java.io.File;
+
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import org.scijava.util.Bytes;
+
+//import net.imagej.ImageJ;
+
 
 // todo: can only some combobox fields be editable?
 // todo: - find out why loading and saving info file is so slow
@@ -130,7 +147,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             return (null);
         }
     }
-
 
     // todo: get rid of all the global variables
 
@@ -251,7 +267,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 channels.add(new HashSet<String>());
                 timepoints.add(new HashSet<String>());
                 slices.add(new HashSet<String>());
-                log("FileID: " + fileID);
             }
 
             for (int iFileID = 0; iFileID < fileIDs.length; iFileID++) {
@@ -304,6 +319,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 nT += timepoints.get(iFileID).size();
                 tOffsets[iFileID + 1] = nT;
             }
+
+
+            //
+            // Create dummy channel folders, because no real ones exist
+            //
+
+            channelFolders = new String[nC];
+            for(int ic=0; ic<nC; ic++) channelFolders[ic] = "";
 
             //
             // sort into the final file list
@@ -544,7 +567,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             //
             ExecutorService es = Executors.newCachedThreadPool();
             for(int iThread=0; iThread<=nIOthreads; iThread++)
-                es.execute(new AnalyzeStackFiles(imp));
+                es.execute(new SetFilesInVirtualStack(imp));
 
 
         } catch(Exception e) {
@@ -555,7 +578,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     }
 
-
     public static String getLastDir(String fileOrDirPath) {
         boolean endsWithSlash = fileOrDirPath.endsWith(File.separator);
         String[] split = fileOrDirPath.split(File.separator);
@@ -563,10 +585,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         else return split[split.length];
     }
 
-    class AnalyzeStackFiles implements Runnable {
+    class SetFilesInVirtualStack implements Runnable {
         ImagePlus imp;
 
-        AnalyzeStackFiles(ImagePlus imp) {
+        SetFilesInVirtualStack(ImagePlus imp) {
             this.imp = imp;
         }
 
@@ -737,12 +759,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         for (int i = 0; i < rawlist.length; i++) {
             String name = rawlist[i];
-            if (name.endsWith(".tif") || name.endsWith(".h5") )
-                count++;
-            else if (!patternFilter.matcher(name).matches())
+            if (!patternFilter.matcher(name).matches())
+                rawlist[i] = null;
+            else if (name.endsWith(".tif") || name.endsWith(".h5") )
                 count++;
             else
                 rawlist[i] = null;
+
 
         }
         if (count == 0) return null;
@@ -1079,8 +1102,55 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     }
 
+    public < T extends RealType< T > & NativeType< T > >
+            void openUsingSCIFIO(String path)
+            throws ImgIOException
+    {
+        // Mouse over: intensity?
+
+        //
+        // Test SCIFIO and BIGDATAVIEWER
+        //
+
+        ImgOpener imgOpener = new ImgOpener();
+
+        // Open as ArrayImg
+        java.util.List<SCIFIOImgPlus<?>> imgs = imgOpener.openImgs( path );
+        Img<T> img = (Img<T>) imgs.get(0);
+        BdvSource bdv = BdvFunctions.show(img, "RAM");
+        bdv.setDisplayRange(0,1000);
+
+        // Open as CellImg
+        SCIFIOConfig config = new SCIFIOConfig();
+        config.imgOpenerSetImgModes( SCIFIOConfig.ImgMode.CELL );
+        java.util.List<SCIFIOImgPlus<?>> cellImgs = imgOpener.openImgs( path, config );
+        Img<T> cellImg = (Img<T>) cellImgs.get(0);
+        BdvSource bdv2 = BdvFunctions.show(cellImg, "STREAM");
+        bdv2.setDisplayRange(0,1000);
+
+        /*
+        First of all it is awesome that all of that works!
+        As to be expected the visualisation of the of the cellImg is much slower.
+        To be honest I was a bit surprised as to how slow it is given that it is only 2.8 MB and
+        was stored on SSD on my MacBook Air.
+        I was wondering about a really simple caching strategy for the BDV, in pseudo code:
+
+        t = timePointToBeDisplayed
+        taskRender(cellImg(t)).start()
+        if(cellImg(t) fits in RAM):
+          arrayImgThisTimePoint = cellImg(t).loadAsArrayImg()
+          taskRender(cellImg(t)).end()
+          taskRender(arrayImgThisTimePoint).start()
+
+        Would that make any sense?
+
+         */
+
+
+    }
+
 	// main method for debugging
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ImgIOException {
 		// set the plugins.dir property to make the plugin appear in the Plugins menu
 		Class<?> clazz = OpenStacksAsVirtualStack.class;
 		String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
@@ -1088,8 +1158,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 		System.setProperty("plugins.dir", pluginsDir);
 
 		// start ImageJ
-		new ImageJ();
+		new ij.ImageJ();
+        IJ.wait(1000);
+
+        final OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
+
         //IJ.run("Memory & Threads...", "maximum=3000 parallel=4 run");
+        //String path = "/Users/tischi/Desktop/example-data/T88200-OMEtiff/T0006.ome.tif";
+        //ovs.openUsingSCIFIO(path);
 
         // todo: remove the initialisation from the constructor and put it into openFromDirectory
 
@@ -1126,7 +1202,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //OpenHDF5test oh5 = new OpenHDF5test();
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         //Globals.verbose = true;
-        final OpenStacksAsVirtualStack ovs = new OpenStacksAsVirtualStack();
+
         Thread t1 = new Thread(new Runnable() {
             public void run() {
                 int nIOthreads = 10;
@@ -1134,7 +1210,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             }
         });
         t1.start();
-        IJ.wait(3000);
+        IJ.wait(1000);
         ovs.showDialog();
         Registration register = new Registration(IJ.getImage());
         register.run("");
@@ -1237,6 +1313,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         JComboBox channelTimePatternComboBox = new JComboBox(new String[] {"None",LOAD_CHANNELS_FROM_FOLDERS,".*_C<c>_T<t>.tif"});
         JComboBox hdf5DataSetComboBox = new JComboBox(new String[] {"None","Data","Data111","Data222","Data444"});
 
+        final String BDV = "Big Data Viewer";
+        JButton viewInBigDataViewer =  new JButton(BDV);
 
         JFileChooser fc;
 
@@ -1262,6 +1340,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 buttons[i].addActionListener(this);
                 buttons[i].setToolTipText(toolTipTexts[i]);
             }
+
+            viewInBigDataViewer.setActionCommand(BDV);
+            viewInBigDataViewer.addActionListener(this);
 
             // Checkboxes
             cbLog.setSelected(false);
@@ -1335,6 +1416,17 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             panels.get(j).add(buttons[i++]);
             c.add(panels.get(j++));
 
+
+            c.add(new JSeparator(SwingConstants.HORIZONTAL));
+            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+            panels.get(j).add(new JLabel("VIEWING"));
+            c.add(panels.get(j++));
+
+            panels.add(new JPanel());
+            panels.get(j).add(viewInBigDataViewer);
+            c.add(panels.get(j++));
+
+
             c.add(new JSeparator(SwingConstants.HORIZONTAL));
             panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
             panels.get(j).add(new JLabel("OTHER"));
@@ -1400,7 +1492,24 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 });
                 t1.start();
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            }  else if (e.getActionCommand().equals(BDV)) {
+
+                //
+                // View current channel and time-point in BigDataViewer
+                //
+                final net.imagej.ImageJ ij = new net.imagej.ImageJ();
+
+                final ImagePlus imp = IJ.getImage();
+                VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
+                ImagePlus impCT = vss.getFullFrame(imp.getT()-1, imp.getC()-1);
+                final Img<UnsignedShortType> image = ImageJFunctions.wrapShort( impCT );
+                BdvSource bdv = BdvFunctions.show(image, "time point "+imp.getT());
+                Pair<? extends RealType,? extends RealType> minMax = ij.op().stats().minMax( image );
+                bdv.setDisplayRange(minMax.getA().getRealDouble(), minMax.getB().getRealDouble());
+
+            }
+
+            else if (e.getActionCommand().equals(actions[i++])) {
 
                 // Open from file
                 String filePath = IJ.getFilePath("Select *.ser file");
