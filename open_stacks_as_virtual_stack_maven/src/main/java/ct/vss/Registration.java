@@ -1,3 +1,15 @@
+/* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*/
+
+
 package ct.vss;
 
 import ij.IJ;
@@ -31,12 +43,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static ij.IJ.log;
 
 
-/**
- * Created by tischi on 31/10/16.
- */
-
 // todo: how to behave when the track is leaving the image bounds?
-    // - show only the minimal region that stays within the image bounds
+// - show only the minimal region that stays within the image bounds
 // todo: add unique track id to tracktable, track, and imageName of cropped track
 
 // todo: multi-point selection tool
