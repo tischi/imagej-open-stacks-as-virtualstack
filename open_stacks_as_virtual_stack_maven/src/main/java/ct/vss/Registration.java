@@ -379,7 +379,9 @@ public class Registration implements PlugIn {
                 t.start();
 
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            }
+            else if ( e.getActionCommand().equals(actions[i++]) )
+            {
 
                 //
                 // Show Table
@@ -387,7 +389,9 @@ public class Registration implements PlugIn {
 
                 showTrackTable();
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            }
+            else if (e.getActionCommand().equals(actions[i++]))
+            {
 
                 //
                 // Save Table
@@ -404,7 +408,9 @@ public class Registration implements PlugIn {
                     saveTrackTable(file);
                 }
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            }
+            else if ( e.getActionCommand().equals(actions[i++]) )
+            {
 
                 //
                 // Clear Table and all tracks

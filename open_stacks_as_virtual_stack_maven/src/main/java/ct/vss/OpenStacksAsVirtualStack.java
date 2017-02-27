@@ -28,13 +28,18 @@
  * #L%
  */
 
+
+
+/*
+- This code contains modified parts of the HDF5 plugin from the Ronneberger group in Freiburg
+ */
+
 package ct.vss;
 
 import bdv.util.BdvFunctions;
 import bdv.util.BdvSource;
-import ch.systemsx.cisd.hdf5.HDF5DataSetInformation;
-import ch.systemsx.cisd.hdf5.HDF5Factory;
-import ch.systemsx.cisd.hdf5.IHDF5Reader;
+import ch.systemsx.cisd.base.mdarray.MDShortArray;
+import ch.systemsx.cisd.hdf5.*;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
@@ -56,6 +61,7 @@ import loci.formats.tiff.IFD;
 //import mpicbg.imglib.image.ImagePlusAdapter;
 //import mpicbg.imglib.image.display.imagej.ImageJFunctions;
 //import mpicbg.imglib.type.numeric.integer.UnsignedShortType;
+import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
 import net.imglib2.img.Img;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
@@ -80,7 +86,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static ij.IJ.log;
-import static ij.IJ.time;
 import static java.awt.Desktop.getDesktop;
 import static java.awt.Desktop.isDesktopSupported;
 
@@ -700,91 +705,265 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         int rowsPerStrip;
 
         SaveToStacks(ImagePlus imp, String path, String fileType, String compression, int rowsPerStrip) {
+
             this.imp = imp;
             this.fileType = fileType;
             this.path = path;
             this.compression = compression;
             this.rowsPerStrip = rowsPerStrip;
+
         }
 
         public void run() {
 
+
             VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
-            ImagePlus impCT = null;
+            ImagePlus impChannelTime = null;
 
             while(true) {
 
                 int t = iProgress.getAndAdd(1);
-                if ((t+1) > nProgress) return;
+                if ((t + 1) > nProgress) return;
 
-                if(compression.equals("LZW")) {
+                for (int c = 0; c < imp.getNChannels(); c++) {
 
-                    for (int c = 0; c < imp.getNChannels(); c++) {
+                    impChannelTime = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
 
-                        impCT = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
-                        String sC = String.format("%1$02d", c);
-                        String sT = String.format("%1$05d", t);
-                        String pathCT = path + "--C" + sC + "--T" + sT + ".ome.tif";
+                    if (fileType.equals("TIFF")) {
 
-                        try {
+                        saveAsTiffStacks(impChannelTime, c, t, compression, path);
 
-                            ServiceFactory factory = new ServiceFactory();
-                            OMEXMLService service = factory.getInstance(OMEXMLService.class);
-                            IMetadata omexml = service.createOMEXMLMetadata();
-                            omexml.setImageID("Image:0", 0);
-                            omexml.setPixelsID("Pixels:0", 0);
-                            omexml.setPixelsBinDataBigEndian(Boolean.TRUE, 0, 0);
-                            omexml.setPixelsDimensionOrder(DimensionOrder.XYZCT, 0);
-                            omexml.setPixelsType(PixelType.UINT16, 0);
-                            omexml.setPixelsSizeX(new PositiveInteger(impCT.getWidth()), 0);
-                            omexml.setPixelsSizeY(new PositiveInteger(impCT.getHeight()), 0);
-                            omexml.setPixelsSizeZ(new PositiveInteger(impCT.getNSlices()), 0);
-                            omexml.setPixelsSizeC(new PositiveInteger(1), 0);
-                            omexml.setPixelsSizeT(new PositiveInteger(1), 0);
+                    } else if (fileType.equals("HDF5")) {
 
-                            int channel = 0;
-                            omexml.setChannelID("Channel:0:" + channel, 0, channel);
-                            omexml.setChannelSamplesPerPixel(new PositiveInteger(1), 0, channel);
+                        int compressionLevel = 0;
+                        saveAsHDF5(impChannelTime, c, t, compressionLevel, path);
 
-                            ImageWriter writer = new ImageWriter();
-                            writer.setCompression(TiffWriter.COMPRESSION_LZW);
-                            writer.setValidBitsPerPixel(impCT.getBytesPerPixel()*8);
-                            writer.setMetadataRetrieve(omexml);
-                            writer.setId(pathCT);
-                            writer.setWriteSequentially(true); // ? is this necessary
-                            TiffWriter tiffWriter = (TiffWriter) writer.getWriter();
-                            long[] rowsPerStripArray = new long[1];
-                            rowsPerStripArray[0] = rowsPerStrip;
-
-                            for (int z = 0; z < impCT.getNSlices(); z++) {
-                                IFD ifd = new IFD();
-                                ifd.put(IFD.ROWS_PER_STRIP, rowsPerStripArray);
-                                tiffWriter.saveBytes(z, Bytes.fromShorts((short[])impCT.getStack().getProcessor(z+1).getPixels(), false), ifd);
-                            }
-
-                            writer.close();
-
-                        } catch (Exception e) {
-                            log("exception");
-                            IJ.showMessage(e.toString());
-                        }
-                    }
-
-                } else {  // no compression: use ImageJ's FileSaver
-
-                    for (int c = 0; c < imp.getNChannels(); c++) {
-                        impCT = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
-                        FileSaver fileSaver = new FileSaver(impCT);
-                        String sC = String.format("%1$02d", c);
-                        String sT = String.format("%1$05d", t);
-                        String pathCT = path + "--C" + sC + "--T" + sT + ".tif";
-                        fileSaver.saveAsTiffStack(pathCT);
                     }
 
                 }
 
-                Globals.threadlog("saved time-point: " + (t+1) + " of " + nProgress);
+            }
 
+        }
+
+        public void saveAsHDF5( ImagePlus imp, int c, int t, int compressionLevel, String path )
+        {
+            int nZ     = imp.getNSlices();
+            int nY     = imp.getHeight();
+            int nX     = imp.getWidth();
+
+            //
+            //  Open output file
+            //
+
+            if (! (imp.getType() == ImagePlus.GRAY16) )
+            {
+                IJ.showMessage("Sorry, only 16bit images are currently supported.");
+                return;
+            }
+
+            try
+            {
+                String sC = String.format("%1$02d", c);
+                String sT = String.format("%1$05d", t);
+                String pathCT = path + "--C" + sC + "--T" + sT + ".h5";
+
+
+                IHDF5Writer writer;
+                writer = HDF5Factory.configure(pathCT).useSimpleDataSpaceForAttributes().overwrite().writer();
+
+                //  get element_size_um
+                //
+                // todo: this is never used...?
+                ij.measure.Calibration cal = imp.getCalibration();
+                float[] element_size_um = new float[3];
+                element_size_um[0] = (float) cal.pixelDepth;
+                element_size_um[1] = (float) cal.pixelHeight;
+                element_size_um[2] = (float) cal.pixelWidth;
+
+                //  create channelDims vector for MDxxxArray
+                //
+                int[] channelDims = null;
+                if (nZ > 1)
+                {
+                    channelDims = new int[3];
+                    channelDims[0] = nZ;
+                    channelDims[1] = nY;
+                    channelDims[2] = nX;
+                }
+                else
+                {
+                    channelDims = new int[2];
+                    channelDims[0] = nY;
+                    channelDims[1] = nX;
+                }
+
+                // take care of data sets with more than 2^31 elements
+                //
+                long   maxSaveBlockSize = (1L<<31) - 1;
+                long[] saveBlockDimensions = new long[channelDims.length];
+                long[] saveBlockOffset = new long[channelDims.length];
+                int    nSaveBlocks = 1;
+                long   levelsPerWriteOperation = nZ;
+
+                for( int d = 0; d < channelDims.length; ++d) {
+                    saveBlockDimensions[d] = channelDims[d];
+                    saveBlockOffset[d] = 0;
+                }
+
+                long channelSize = (long)nZ * (long)nY * (long)nX;
+                if( channelSize >= maxSaveBlockSize) {
+                    if( nZ == 1) {
+                        IJ.error( "maxSaveBlockSize must not be smaller than a single slice!");
+                    } else {
+                        long minBlockSize = nY * nX;
+                        levelsPerWriteOperation = maxSaveBlockSize / minBlockSize;
+                        saveBlockDimensions[0] = (int)levelsPerWriteOperation;
+                        nSaveBlocks = (int)((nZ - 1) / levelsPerWriteOperation + 1); // integer version for ceil(a/b)
+                        IJ.log("Data set has " + channelSize + " elements (more than 2^31). Saving in " + nSaveBlocks + " blocks with maximum of " + levelsPerWriteOperation + " levels");
+                    }
+                }
+
+
+                String dsetName = "data";
+
+                for( int block = 0; block < nSaveBlocks; ++block) {
+                    // compute offset and size of next block, that is saved
+                    //
+                    saveBlockOffset[0] = (long)block * levelsPerWriteOperation;
+                    int remainingLevels = (int)(nZ - saveBlockOffset[0]);
+                    if( remainingLevels < saveBlockDimensions[0] ) {
+                        // last block is smaller
+                        saveBlockDimensions[0] = remainingLevels;
+                    }
+                    // compute start level in image processor
+                    int srcLevel = (int)saveBlockOffset[0];
+                    //IJ.log( "source level = " +srcLevel);
+                    // write Stack according to data type
+                    //
+                    int imgColorType = imp.getType();
+
+                    if (imgColorType == ImagePlus.GRAY16)
+                    {
+                        // Save as Short Array
+                        //
+                        MDShortArray arr = new MDShortArray( channelDims);
+
+                        // copy data
+                        //
+                        ImageStack stack = imp.getStack();
+                        short[] flatArr   = arr.getAsFlatArray();
+                        int sliceSize    = nY*nX;
+
+                        for(int lev = 0; lev < nZ; ++lev)
+                        {
+                            int stackIndex = imp.getStackIndex(c + 1,
+                                    lev + 1,
+                                    t + 1);
+                            System.arraycopy( stack.getPixels(stackIndex), 0,
+                                    flatArr, lev*sliceSize,
+                                    sliceSize);
+                        }
+
+                        // save it
+                        //
+                        writer.uint16().writeMDArray( dsetName, arr, HDF5IntStorageFeatures.createDeflationDelete(compressionLevel));
+                    }
+                    else
+                    {
+                        // other image bit-depths....
+                    }
+
+                    //  add element_size_um attribute
+                    //
+                    writer.float32().setArrayAttr( dsetName, "element_size_um",
+                            element_size_um);
+
+                }
+                writer.close();
+            }
+            catch (HDF5Exception err)
+            {
+                IJ.error("Error while saving '" + path + "':\n"
+                        + err);
+            }
+            catch (Exception err)
+            {
+                IJ.error("Error while saving '" + path + "':\n"
+                        + err);
+            }
+            catch (OutOfMemoryError o)
+            {
+                IJ.outOfMemory("Error while saving '" + path + "'");
+            }
+
+        }
+
+
+        public void saveAsTiffStacks( ImagePlus imp, int c, int t, String compression, String path )
+        {
+
+            if( compression.equals("LZW") )
+            {
+
+                // Using BioFormats for LZA compression
+                //
+
+                String sC = String.format("%1$02d", c);
+                String sT = String.format("%1$05d", t);
+                String pathCT = path + "--C" + sC + "--T" + sT + ".ome.tif";
+
+                try
+                {
+                    ServiceFactory factory = new ServiceFactory();
+                    OMEXMLService service = factory.getInstance(OMEXMLService.class);
+                    IMetadata omexml = service.createOMEXMLMetadata();
+                    omexml.setImageID("Image:0", 0);
+                    omexml.setPixelsID("Pixels:0", 0);
+                    omexml.setPixelsBinDataBigEndian(Boolean.TRUE, 0, 0);
+                    omexml.setPixelsDimensionOrder(DimensionOrder.XYZCT, 0);
+                    omexml.setPixelsType(PixelType.UINT16, 0);
+                    omexml.setPixelsSizeX(new PositiveInteger(imp.getWidth()), 0);
+                    omexml.setPixelsSizeY(new PositiveInteger(imp.getHeight()), 0);
+                    omexml.setPixelsSizeZ(new PositiveInteger(imp.getNSlices()), 0);
+                    omexml.setPixelsSizeC(new PositiveInteger(1), 0);
+                    omexml.setPixelsSizeT(new PositiveInteger(1), 0);
+
+                    int channel = 0;
+                    omexml.setChannelID("Channel:0:" + channel, 0, channel);
+                    omexml.setChannelSamplesPerPixel(new PositiveInteger(1), 0, channel);
+
+                    ImageWriter writer = new ImageWriter();
+                    writer.setCompression(TiffWriter.COMPRESSION_LZW);
+                    writer.setValidBitsPerPixel(imp.getBytesPerPixel()*8);
+                    writer.setMetadataRetrieve(omexml);
+                    writer.setId(pathCT);
+                    writer.setWriteSequentially(true); // ? is this necessary
+                    TiffWriter tiffWriter = (TiffWriter) writer.getWriter();
+                    long[] rowsPerStripArray = new long[1];
+                    rowsPerStripArray[0] = rowsPerStrip;
+
+                    for (int z = 0; z < imp.getNSlices(); z++) {
+                        IFD ifd = new IFD();
+                        ifd.put(IFD.ROWS_PER_STRIP, rowsPerStripArray);
+                        tiffWriter.saveBytes(z, Bytes.fromShorts((short[])imp.getStack().getProcessor(z+1).getPixels(), false), ifd);
+                    }
+
+                    writer.close();
+
+                } catch (Exception e) {
+                    log("exception");
+                    IJ.showMessage(e.toString());
+                }
+
+            }
+            else  // no compression: use ImageJ's FileSaver
+            {
+                FileSaver fileSaver = new FileSaver(imp);
+                String sC = String.format("%1$02d", c);
+                String sT = String.format("%1$05d", t);
+                String pathCT = path + "--C" + sC + "--T" + sT + ".tif";
+                fileSaver.saveAsTiffStack(pathCT);
             }
 
         }
@@ -1330,22 +1509,15 @@ public class OpenStacksAsVirtualStack implements PlugIn {
     }
 
 
-    class StackStreamToolsGUI extends JPanel implements ActionListener, FocusListener, ItemListener {
+    class StackStreamToolsGUI extends JFrame implements ActionListener, FocusListener, ItemListener {
 
-        String[] actions = {"Stream from folder",
-                "Stream from info file",
-                "Save as info file",
-                "Save as tiff stacks",
-                "Duplicate to RAM",
-                "Crop as new stream",
-                "Report issue"};
 
 
         JCheckBox cbLog = new JCheckBox("Verbose logging");
         JCheckBox cbLZW = new JCheckBox("LZW compression");
 
         JTextField tfCropZMinMax = new JTextField("1,all", 5);
-        JTextField tfIOThreads = new JTextField("1", 2);
+        JTextField tfIOThreads = new JTextField("10", 2);
         JTextField tfRowsPerStrip = new JTextField("10", 3);
 
         JComboBox filterPatternComboBox = new JComboBox(new String[] {".*",".*_Target--.*",".*--LSEA00--.*",".*--LSEA01--.*"});
@@ -1355,6 +1527,31 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         final String BDV = "Big Data Viewer";
         JButton viewInBigDataViewer =  new JButton(BDV);
 
+        final String SAVEasH5 = "Save as HDF5 stacks";
+        JButton saveAsH5 =  new JButton(SAVEasH5);
+
+        final String SAVEasTiff = "Save as tiff stacks";
+        JButton saveAsTIFF =  new JButton(SAVEasTiff);
+
+        final String STREAMfromFolder = "Stream from folder";
+        JButton streamFromFolder =  new JButton(STREAMfromFolder);
+
+        final String STREAMfromInfoFile = "Stream from info file";
+        JButton streamFromInfoFile =  new JButton(STREAMfromInfoFile);
+
+        final String SAVEasInfoFile = "Save as info file";
+        JButton saveAsInfoFile =  new JButton(SAVEasInfoFile);
+
+        final String DUPLICATEtoRAM = "Duplicate to RAM";
+        JButton duplicateToRAM =  new JButton(DUPLICATEtoRAM);
+
+        final String CROPasNewStream = "Crop as new stream";
+        JButton cropAsNewStream =  new JButton(CROPasNewStream);
+
+        final String REPORTissue = "Report an issue";
+        JButton reportIssue =  new JButton(REPORTissue);
+
+
         JFileChooser fc;
 
         public void StackStreamToolsGUI() {
@@ -1362,125 +1559,163 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         public void showDialog() {
 
-            JFrame frame = new JFrame("Data Streaming Tools");
-            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-            Container c = frame.getContentPane();
-            c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+            JTabbedPane jtp = new JTabbedPane();
 
             String[] toolTipTexts = getToolTipFile("DataStreamingHelp.html");
             ToolTipManager.sharedInstance().setDismissDelay(10000000);
 
-            // Buttons
-            JButton[] buttons = new JButton[actions.length];
-            for (int i = 0; i < buttons.length; i++) {
-                buttons[i] = new JButton(actions[i]);
-                buttons[i].setActionCommand(actions[i]);
-                buttons[i].addActionListener(this);
-                buttons[i].setToolTipText(toolTipTexts[i]);
-            }
-
-            viewInBigDataViewer.setActionCommand(BDV);
-            viewInBigDataViewer.addActionListener(this);
 
             // Checkboxes
             cbLog.setSelected(false);
             cbLog.addItemListener(this);
-            cbLZW.setSelected(true);
+            cbLZW.setSelected(false);
 
-            int i = 0, j = 0;
+            int i = 0, j = 0, k = 0;
 
-            ArrayList<JPanel> panels = new ArrayList<JPanel>();
+            ArrayList<JPanel> mainPanels = new ArrayList<>();
+            ArrayList<JPanel> panels = new ArrayList();
+
+            // Streaming
+            //
+
+            mainPanels.add( new JPanel() );
+            mainPanels.get(k).setLayout(new BoxLayout(mainPanels.get(k), BoxLayout.PAGE_AXIS));
 
             panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
             panels.get(j).add(new JLabel("STREAM FROM FOLDER"));
-            c.add(panels.get(j++));
+            mainPanels.get(k).add(panels.get(j++));
 
             panels.add(new JPanel());
             panels.get(j).add(new JLabel("Only load files matching:"));
             panels.get(j).add(filterPatternComboBox);
             filterPatternComboBox.setEditable(true);
-            c.add(panels.get(j++));
+            mainPanels.get(k).add(panels.get(j++));
 
             panels.add(new JPanel());
             panels.get(j).add(new JLabel("Multi-channel loading:"));
             channelTimePatternComboBox.setEditable(true);
             panels.get(j).add(channelTimePatternComboBox);
-            c.add(panels.get(j++));
+            mainPanels.get(k).add(panels.get(j++));
 
             panels.add(new JPanel());
             panels.get(j).add(new JLabel("Hdf5 data set:"));
             panels.get(j).add(hdf5DataSetComboBox);
             hdf5DataSetComboBox.setEditable(true);
-            c.add(panels.get(j++));
+            mainPanels.get(k).add(panels.get(j++));
 
             panels.add(new JPanel());
-            panels.get(j).add(buttons[i++]);
-            c.add(panels.get(j++));
+            streamFromFolder.setActionCommand(STREAMfromFolder);
+            streamFromFolder.addActionListener(this);
+            panels.get(j).add(streamFromFolder);
+            mainPanels.get(k).add(panels.get(j++));
 
-            c.add(new JSeparator(SwingConstants.HORIZONTAL));
+            mainPanels.get(k).add(new JSeparator(SwingConstants.HORIZONTAL));
             panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
             panels.get(j).add(new JLabel("STREAM FROM INFO FILE"));
-            c.add(panels.get(j++));
+            mainPanels.get(k).add(panels.get(j++));
 
             panels.add(new JPanel());
-            panels.get(j).add(buttons[i++]);
-            c.add(panels.get(j++));
+            streamFromInfoFile.setActionCommand(STREAMfromInfoFile);
+            streamFromInfoFile.addActionListener(this);
+            panels.get(j).add(streamFromInfoFile);
+            mainPanels.get(k).add(panels.get(j++));
 
-            c.add(new JSeparator(SwingConstants.HORIZONTAL));
-            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
-            panels.get(j).add(new JLabel("SAVING"));
-            c.add(panels.get(j++));
+            jtp.add("Streaming", mainPanels.get(k++));
+
+            // Saving
+            //
+
+            mainPanels.add( new JPanel() );
+            mainPanels.get(k).setLayout(new BoxLayout(mainPanels.get(k), BoxLayout.PAGE_AXIS));
 
             panels.add(new JPanel());
-            panels.get(j).add(buttons[i++]);
-            panels.get(j).add(buttons[i++]);
-            panels.get(j).add(buttons[i++]);
-            c.add(panels.get(j++));
+            saveAsInfoFile.setActionCommand(SAVEasInfoFile);
+            saveAsInfoFile.addActionListener(this);
+            panels.get(j).add(saveAsInfoFile);
+            mainPanels.get(k).add(panels.get(j++));
 
             panels.add(new JPanel());
+            saveAsTIFF.setActionCommand(SAVEasTiff);
+            saveAsTIFF.addActionListener(this);
+            panels.get(j).add(saveAsTIFF);
+            mainPanels.get(k).add(panels.get(j++));
+
+            panels.add(new JPanel());
+            panels.get(j).add(cbLZW);
             panels.get(j).add(new JLabel("LZW chunks [ny]"));
             panels.get(j).add(tfRowsPerStrip);
-            panels.get(j).add(cbLZW);
-            c.add(panels.get(j++));
+            mainPanels.get(k).add(panels.get(j++));
 
-            c.add(new JSeparator(SwingConstants.HORIZONTAL));
-            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
-            panels.get(j).add(new JLabel("CROPPING"));
-            c.add(panels.get(j++));
+            panels.add(new JPanel());
+            saveAsH5.setActionCommand(SAVEasH5);
+            saveAsH5.addActionListener(this);
+            panels.get(j).add(saveAsH5);
+            mainPanels.get(k).add(panels.get(j++));
+
+            panels.add(new JPanel());
+            duplicateToRAM.setActionCommand(DUPLICATEtoRAM);
+            duplicateToRAM.addActionListener(this);
+            panels.get(j).add(duplicateToRAM);
+            mainPanels.get(k).add(panels.get(j++));
+
+            jtp.add("Saving", mainPanels.get(k++));
+
+            // Cropping
+            //
+
+            mainPanels.add( new JPanel() );
+            mainPanels.get(k).setLayout(new BoxLayout(mainPanels.get(k), BoxLayout.PAGE_AXIS));
 
             panels.add(new JPanel());
             panels.get(j).add(new JLabel("zMin, zMax:"));
             panels.get(j).add(tfCropZMinMax);
-            panels.get(j).add(buttons[i++]);
-            c.add(panels.get(j++));
-
-
-            c.add(new JSeparator(SwingConstants.HORIZONTAL));
-            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
-            panels.get(j).add(new JLabel("VIEWING"));
-            c.add(panels.get(j++));
+            mainPanels.get(k).add(panels.get(j++));
 
             panels.add(new JPanel());
+            cropAsNewStream.setActionCommand(CROPasNewStream);
+            cropAsNewStream.addActionListener(this);
+            panels.get(j).add(cropAsNewStream);
+            mainPanels.get(k).add(panels.get(j++));
+
+            jtp.add("Cropping", mainPanels.get(k++));
+
+            // Viewing
+            //
+            mainPanels.add( new JPanel() );
+            mainPanels.get(k).setLayout(new BoxLayout(mainPanels.get(k), BoxLayout.PAGE_AXIS));
+
+            panels.add(new JPanel());
+            viewInBigDataViewer.setActionCommand(BDV);
+            viewInBigDataViewer.addActionListener(this);
             panels.get(j).add(viewInBigDataViewer);
-            c.add(panels.get(j++));
+            mainPanels.get(k).add(panels.get(j++));
 
+            jtp.add("Viewing", mainPanels.get(k++));
 
-            c.add(new JSeparator(SwingConstants.HORIZONTAL));
-            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
-            panels.get(j).add(new JLabel("OTHER"));
-            c.add(panels.get(j++));
+            // Misc
+            //
+            mainPanels.add( new JPanel() );
+            mainPanels.get(k).setLayout(new BoxLayout(mainPanels.get(k), BoxLayout.PAGE_AXIS));
 
             panels.add(new JPanel());
             panels.get(j).add(new JLabel("I/O threads"));
             panels.get(j).add(tfIOThreads);
             panels.get(j).add(cbLog);
-            panels.get(j).add(buttons[i++]);
-            c.add(panels.get(j++));
+            mainPanels.get(k).add(panels.get(j++));
 
-            frame.pack();
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
+            panels.add(new JPanel());
+            reportIssue.setActionCommand(REPORTissue);
+            reportIssue.addActionListener(this);
+            panels.get(j).add(reportIssue);
+            mainPanels.get(k).add(panels.get(j++));
+
+            jtp.add("Misc", mainPanels.get(k++));
+
+            // Show the GUI
+            add(jtp);
+            setVisible(true);
+            pack();
 
         }
 
@@ -1517,7 +1752,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             final String filterPattern = (String)filterPatternComboBox.getSelectedItem();
             final String channelPattern = (String) channelTimePatternComboBox.getSelectedItem();
 
-            if (e.getActionCommand().equals(actions[i++])) {
+            if (e.getActionCommand().equals(STREAMfromFolder)) {
 
                 // Open from folder
                 final String directory = IJ.getDirectory("Select a Directory");
@@ -1531,7 +1766,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 });
                 t1.start();
 
-            }  else if (e.getActionCommand().equals(BDV)) {
+            }
+            else if (e.getActionCommand().equals(BDV))
+            {
 
                 //
                 // View current channel and time-point in BigDataViewer
@@ -1547,10 +1784,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 bdv.setDisplayRange(minMax.getA().getRealDouble(), minMax.getB().getRealDouble());
 
             }
-
-            else if (e.getActionCommand().equals(actions[i++])) {
-
+            else if (e.getActionCommand().equals(STREAMfromInfoFile))
+            {
                 // Open from file
+                //
                 String filePath = IJ.getFilePath("Select *.ser file");
                 if (filePath == null)
                     return;
@@ -1560,14 +1797,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 imp.setPosition(1, imp.getNSlices()/2, 1);
                 imp.updateAndDraw();
                 imp.resetDisplayRange();
-
-
-            } else if (e.getActionCommand().equals(actions[i++])) {
-
-                //
+            }
+            else if (e.getActionCommand().equals(SAVEasInfoFile))
+            {
                 // "Save as info file"
                 //
-
                 ImagePlus imp = IJ.getImage();
                 final VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
                 if(vss==null) return;
@@ -1608,14 +1842,18 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     });
                     t2.start();
 
-                } else {
+                }
+                else
+                {
                     log("Save command cancelled by user.");
                 }
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
-
+            }
+            else if ( e.getActionCommand().equals(SAVEasTiff)
+                    || e.getActionCommand().equals(SAVEasH5) )
+            {
                 //
-                // "Save as tiff stacks"
+                // Save to stacks
                 //
                 ImagePlus imp = IJ.getImage();
                 final VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
@@ -1651,18 +1889,20 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     thread.start();
 
                     String compression = "";
-
                     if(cbLZW.isSelected())
                         compression="LZW";
 
-                    // Normal sequential saving (for debugging)
-                    //SaveToStacks saveToStacks = new SaveToStacks(imp, file.getAbsolutePath(), "tiffStacks", compression, rowsPerStrip);
-                    //saveToStacks.run();
 
-                    // Multi-threaded saving (for speed)
+                    String fileType = "";
+                    if(e.getActionCommand().equals(SAVEasH5))
+                        fileType = "HDF5";
+                    else if(e.getActionCommand().equals(SAVEasTiff))
+                        fileType = "TIFF";
+
+                    // Multi-threaded saving (for speed if SSDs are available)
                     ExecutorService es = Executors.newCachedThreadPool();
                     for(int iThread=0; iThread<nSavingThreads; iThread++) {
-                        es.execute(new SaveToStacks(imp, file.getAbsolutePath(), "tiffStacks", compression, rowsPerStrip));
+                        es.execute(new SaveToStacks(imp, file.getAbsolutePath(), fileType, compression, rowsPerStrip));
                     }
 
 
@@ -1675,7 +1915,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 // "Save as h5 stacks"
                 //    IJ.showMessage("Not yet implemented.");
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            } else if (e.getActionCommand().equals(DUPLICATEtoRAM)) {
 
                 //
                 // duplicate to RAM
@@ -1698,7 +1938,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 });
                 t2.start();
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            } else if (e.getActionCommand().equals(CROPasNewStream)) {
 
                 //
                 // Crop As New Stream
@@ -1746,7 +1986,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 }
 
 
-            }  else if (e.getActionCommand().equals(actions[i++])) {
+            }  else if (e.getActionCommand().equals(REPORTissue)) {
 
                 //
                 // Report issue
