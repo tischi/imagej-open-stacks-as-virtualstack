@@ -1623,6 +1623,25 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             jtp.add("Streaming", mainPanels.get(k++));
 
+            // Cropping
+            //
+
+            mainPanels.add( new JPanel() );
+            mainPanels.get(k).setLayout(new BoxLayout(mainPanels.get(k), BoxLayout.PAGE_AXIS));
+
+            panels.add(new JPanel());
+            panels.get(j).add(new JLabel("zMin, zMax:"));
+            panels.get(j).add(tfCropZMinMax);
+            mainPanels.get(k).add(panels.get(j++));
+
+            panels.add(new JPanel());
+            cropAsNewStream.setActionCommand(CROPasNewStream);
+            cropAsNewStream.addActionListener(this);
+            panels.get(j).add(cropAsNewStream);
+            mainPanels.get(k).add(panels.get(j++));
+
+            jtp.add("Cropping", mainPanels.get(k++));
+
             // Saving
             //
 
@@ -1661,24 +1680,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             jtp.add("Saving", mainPanels.get(k++));
 
-            // Cropping
-            //
 
-            mainPanels.add( new JPanel() );
-            mainPanels.get(k).setLayout(new BoxLayout(mainPanels.get(k), BoxLayout.PAGE_AXIS));
-
-            panels.add(new JPanel());
-            panels.get(j).add(new JLabel("zMin, zMax:"));
-            panels.get(j).add(tfCropZMinMax);
-            mainPanels.get(k).add(panels.get(j++));
-
-            panels.add(new JPanel());
-            cropAsNewStream.setActionCommand(CROPasNewStream);
-            cropAsNewStream.addActionListener(this);
-            panels.get(j).add(cropAsNewStream);
-            mainPanels.get(k).add(panels.get(j++));
-
-            jtp.add("Cropping", mainPanels.get(k++));
 
             // Viewing
             //
@@ -1713,26 +1715,30 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             jtp.add("Misc", mainPanels.get(k++));
 
             // Show the GUI
+            setTitle("Data Streaming Tools");
             add(jtp);
             setVisible(true);
             pack();
 
         }
 
-        public void focusGained(FocusEvent e) {
+        public void focusGained( FocusEvent e )
+        {
             //
         }
 
-        public void focusLost(FocusEvent e) {
+        public void focusLost( FocusEvent e )
+        {
             JTextField tf = (JTextField) e.getSource();
-            if (!(tf == null)) {
+            if ( tf != null )
+            {
                 tf.postActionEvent();
             }
         }
 
-        public void itemStateChanged(ItemEvent e) {
+        public void itemStateChanged( ItemEvent e )
+        {
             Object source = e.getItemSelectable();
-
             if (source == cbLog) {
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
                     Globals.verbose = false;
@@ -1742,7 +1748,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             }
         }
 
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed( ActionEvent e )
+        {
             int i = 0;
 
             final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
