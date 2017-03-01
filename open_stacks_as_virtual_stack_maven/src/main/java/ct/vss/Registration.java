@@ -98,6 +98,7 @@ public class Registration implements PlugIn {
     long trackStatsLastTrackStarted;
     int trackStatsTotalPointsTrackedAtLastStart;
     TrackingGUI trackingGUI;
+    private Double gui_croppingFactor = 1.0;
 
     // todo: put actual tracking into different class
 
@@ -117,7 +118,8 @@ public class Registration implements PlugIn {
                 "Object size x,y,z [pixels]",
                 "Window size [factor]",
                 "Sub-sampling dx, dy, dz, dt [pixels, frames]",
-                "Length [frames]"
+                "Length [frames]",
+                "Crop size [factor]"
         };
 
         String[] actions = {
@@ -136,7 +138,8 @@ public class Registration implements PlugIn {
                 String.valueOf((int) gui_pTrackingSize.getX()) + "," + (int) gui_pTrackingSize.getY() + "," +String.valueOf((int) gui_pTrackingSize.getZ()),
                 String.valueOf(gui_trackingFactor),
                 String.valueOf((int) gui_pSubSample.getX() + "," + (int) gui_pSubSample.getY() + "," + (int) gui_pSubSample.getZ() + "," + gui_tSubSample),
-                String.valueOf(imp.getNFrames())
+                String.valueOf(imp.getNFrames()),
+                String.valueOf(gui_croppingFactor)
         };
 
         String[] comboNames = {
@@ -171,14 +174,13 @@ public class Registration implements PlugIn {
             ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 
             String[] toolTipTexts = getToolTipFile("TrackAndCropHelp.html");
-
-            //
-            // TextFields
-            //
-
             int iToolTipText = 0;
 
-            for (int i = 0; i < textFields.length; i++, iToolTipText++) {
+            //
+            // Configure all TextFields
+            //
+            for (int i = 0; i < textFields.length; i++, iToolTipText++)
+            {
                 textFields[i] = new JTextField(12);
                 textFields[i].setActionCommand(texts[i]);
                 textFields[i].addActionListener(this);
@@ -219,75 +221,89 @@ public class Registration implements PlugIn {
             //
             // Panels
             //
-
             int i = 0;
             ArrayList<JPanel> panels = new ArrayList<JPanel>();
             int iPanel = 0;
-
             int k = 0;
-
-
-
+            int iComboBox = 0;
+            //
+            // TRACKING
+            //
             panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
             panels.get(iPanel).add(new JLabel("TRACKING"));
             c.add(panels.get(iPanel++));
-
+            // Object size
             panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
             panels.get(iPanel).add(buttons[i++]);
             panels.get(iPanel).add(buttons[i++]);
             panels.get(iPanel).add(labels[k]);
-            panels.get(iPanel).add(textFields[k]);
+            panels.get(iPanel).add(textFields[k++]);
             c.add(panels.get(iPanel++));
-
-
-            for (k = 1; k < textFields.length; k++) {
-                panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
-                panels.get(iPanel).add(labels[k]);
-                panels.get(iPanel).add(textFields[k]);
-                //trackingPanel.add(panels.get(iPanel));
-                c.add(panels.get(iPanel++));
-            }
-
-            for (k = 0; k < comboNames.length; k++) {
-                panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
-                panels.get(iPanel).add(comboLabels[k]);
-                panels.get(iPanel).add(comboBoxes[k]);
-                //trackingPanel.add(panels.get(iPanel));
-                c.add(panels.get(iPanel++));
-            }
-
+            // Window size
+            panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
+            panels.get(iPanel).add(labels[k]);
+            panels.get(iPanel).add(textFields[k++]);
+            c.add(panels.get(iPanel++));
+            // Subsampling
+            panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
+            panels.get(iPanel).add(labels[k]);
+            panels.get(iPanel).add(textFields[k++]);
+            c.add(panels.get(iPanel++));
+            // Length
+            panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
+            panels.get(iPanel).add(labels[k]);
+            panels.get(iPanel).add(textFields[k++]);
+            c.add(panels.get(iPanel++));
+            // Method
+            panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
+            panels.get(iPanel).add(comboLabels[iComboBox]);
+            panels.get(iPanel).add(comboBoxes[iComboBox++]);
+            c.add(panels.get(iPanel++));
+            // Tracking button
             panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
             panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
-
+            //
+            // RESULTS TABLE
+            //
             c.add(new JSeparator(SwingConstants.HORIZONTAL));
             panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
-            panels.get(iPanel).add(new JLabel("RESULTS"));
+            panels.get(iPanel).add(new JLabel("RESULTS TABLE"));
             c.add(panels.get(iPanel++));
-
-            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
-            //JLabel labelTrackTable = new JLabel("  Track table: ");
-            //labelTrackTable.setLabelFor(buttons[i]);
-            //panels.get(iPanel).add(labelTrackTable);
-            panels.get(iPanel).add(buttons[i++]);
-            panels.get(iPanel).add(buttons[i++]);
-            panels.get(iPanel).add(buttons[i++]);
-            c.add(panels.get(iPanel++));
-
-
+            // Table buttons
             panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
             panels.get(iPanel).add(buttons[i++]);
+            panels.get(iPanel).add(buttons[i++]);
+            panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
-
+            //
+            // CROPPING
+            //
             c.add(new JSeparator(SwingConstants.HORIZONTAL));
             panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
-            panels.get(iPanel).add(new JLabel("OTHER"));
+            panels.get(iPanel).add(new JLabel("CROPPING"));
+            c.add(panels.get(iPanel++));
+
+            panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
+            panels.get(iPanel).add(labels[k]);
+            panels.get(iPanel).add(textFields[k++]);
+            panels.get(iPanel).add(buttons[i++]);
+            c.add(panels.get(iPanel++));
+            //
+            // MISCELLANEOUS
+            //
+            c.add(new JSeparator(SwingConstants.HORIZONTAL));
+            panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+            panels.get(iPanel).add(new JLabel("MISCELLANEOUS"));
             c.add(panels.get(iPanel++));
 
             panels.add(new JPanel());
             panels.get(iPanel).add(buttons[i++]);
             c.add(panels.get(iPanel++));
 
+            //
+            // Show the GUI
+            //
             frame.pack();
             frame.setLocation(imp.getWindow().getX() + imp.getWindow().getWidth(), imp.getWindow().getY());
             frame.setVisible(true);
@@ -463,45 +479,48 @@ public class Registration implements PlugIn {
                 String[] sA = source.getText().split(",");
                 gui_pTrackingSize = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
 
-            } else if (e.getActionCommand().equals(texts[k++])) {
-
+            }
+            else if (e.getActionCommand().equals(texts[k++]))
+            {
                 //
                 // Tracking factor
                 //
-
                 JTextField source = (JTextField) e.getSource();
-                String[] sA = source.getText().split(",");
                 gui_trackingFactor = new Double(source.getText());
-
-            } else if (e.getActionCommand().equals(texts[k++])) {
-
+            }
+            else if (e.getActionCommand().equals(texts[k++]))
+            {
                 //
                 // Tracking sub-sampling
                 //
-
                 JTextField source = (JTextField) e.getSource();
                 String[] sA = source.getText().split(",");
                 gui_pSubSample = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
                 gui_tSubSample = new Integer(sA[3]);
-
-            } else if (e.getActionCommand().equals(texts[k++])) {
-
+            }
+            else if ( e.getActionCommand().equals(texts[k++]) )
+            {
                 //
                 // Track length
                 //
-
                 JTextField source = (JTextField) e.getSource();
                 gui_ntTracking = new Integer(source.getText());
-
-            } else if (e.getActionCommand().equals(comboNames[j++])) {
-
+            }
+            else if (e.getActionCommand().equals(texts[k++]))
+            {
+                //
+                // Cropping factor
+                //
+                JTextField source = (JTextField) e.getSource();
+                gui_croppingFactor = new Double(source.getText());
+            }
+             else if (e.getActionCommand().equals(comboNames[j++]))
+            {
                 //
                 // Tracking method
                 //
-
                 JComboBox cb = (JComboBox)e.getSource();
                 gui_trackingMethod = (String)cb.getSelectedItem();
-
             }
         }
 
@@ -811,14 +830,19 @@ public class Registration implements PlugIn {
 
                 //boolean[] shifted = new boolean[1];
                 Point3D[] trackOffsets = new Point3D[track.getLength()];
-                for(int iPosition=0; iPosition<track.getLength(); iPosition++) {
-                    trackOffsets[iPosition] = computeOffset(track.getXYZ(iPosition), track.getObjectSize());;
+                for(int iPosition=0; iPosition<track.getLength(); iPosition++)
+                {
+                    trackOffsets[iPosition] = computeOffset(track.getXYZ(iPosition),
+                            track.getObjectSize().multiply(gui_croppingFactor));
                 }
-
-                impA[i] = OpenStacksAsVirtualStack.makeCroppedVirtualStack(track.getImp(), trackOffsets, track.getObjectSize(), track.getTmin(), track.getTmax());
-                if (impA[i] == null) {
+                impA[i] = OpenStacksAsVirtualStack.makeCroppedVirtualStack(track.getImp(), trackOffsets,
+                                    track.getObjectSize().multiply(gui_croppingFactor), track.getTmin(), track.getTmax());
+                if (impA[i] == null)
+                {
                     log("..cropping failed.");
-                } else {
+                }
+                else
+                {
                     impA[i].setTitle(imp.getTitle()+"Track_" + track.getID());
                     impA[i].show();
                     impA[i].setPosition(0, (int) (impA[i].getNSlices() / 2 + 0.5), 0);
