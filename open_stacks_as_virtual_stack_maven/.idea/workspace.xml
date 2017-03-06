@@ -30,11 +30,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="725" column="45" selection-start-line="725" selection-start-column="45" selection-end-line="725" selection-end-column="45" />
+            <state vertical-scroll-proportion="0.5369863">
+              <caret line="729" column="59" selection-start-line="729" selection-start-column="59" selection-end-line="729" selection-end-column="59" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -46,8 +46,12 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="338" column="0" selection-start-line="338" selection-start-column="0" selection-end-line="338" selection-end-column="0" />
+              <caret line="426" column="25" selection-start-line="426" selection-start-column="25" selection-end-line="426" selection-end-column="25" />
               <folding>
+                <element signature="e#3980#3981#0" expanded="true" />
+                <element signature="e#4012#4013#0" expanded="true" />
+                <element signature="e#10197#10198#0" expanded="true" />
+                <element signature="e#10259#10260#0" expanded="true" />
                 <element signature="method#resizeWidthAndHeight#0;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
                 <element signature="method#setSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -57,15 +61,25 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="OpenerExtensions.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="OpenerExtensions.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.10918114">
-              <caret line="112" column="48" selection-start-line="112" selection-start-column="48" selection-end-line="112" selection-end-column="48" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="279" column="124" selection-start-line="279" selection-start-column="20" selection-end-line="279" selection-end-column="124" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#start#0;class#process2stack#0;class#OpenerExtensions#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="IJ.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51h/ij-1.51h.jar!/ij/IJ.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-9.185185">
+              <caret line="792" column="38" selection-start-line="792" selection-start-column="23" selection-end-line="792" selection-end-column="38" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -130,7 +144,6 @@
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Point5D.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Track.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Globals.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/FileInfoSer.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/FastTiffDecoder.java" />
@@ -139,6 +152,7 @@
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/Registration.java" />
         <option value="$PROJECT_DIR$/OpenStacksAsVirtualStack.iml" />
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java" />
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java" />
       </list>
     </option>
@@ -162,8 +176,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="72" />
-    <option name="y" value="99" />
+    <option name="x" value="319" />
+    <option name="y" value="90" />
     <option name="width" value="1145" />
     <option name="height" value="740" />
   </component>
@@ -453,7 +467,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="72" y="99" width="1145" height="740" extended-state="0" />
+    <frame x="319" y="90" width="1145" height="740" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -462,17 +476,17 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.14819278" sideWeight="0.4974656" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30499324" sideWeight="0.8693393" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.35185185" sideWeight="0.8693393" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28994083" sideWeight="0.53119427" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25421688" sideWeight="0.4688057" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25308642" sideWeight="0.4688057" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32771084" sideWeight="0.4974656" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299373" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.5086129" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33487654" sideWeight="0.688196" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.11242067" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.36419752" sideWeight="0.688196" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -517,6 +531,18 @@
           <properties />
           <option name="timeStamp" value="313" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java</url>
+          <line>411</line>
+          <properties />
+          <option name="timeStamp" value="460" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java</url>
+          <line>422</line>
+          <properties />
+          <option name="timeStamp" value="462" />
+        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
@@ -528,7 +554,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="460" />
+      <option name="time" value="463" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -537,13 +563,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51f/ij-1.51f.jar!/ij/gui/NewImage.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="314" column="28" selection-start-line="314" selection-start-column="28" selection-end-line="314" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51f/ij-1.51f.jar!/ij/IJ.class">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -867,14 +886,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="59" column="0" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-6.851852">
@@ -885,29 +896,50 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51h/ij-1.51h.jar!/ij/IJ.class">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.185185">
-          <caret line="792" column="23" selection-start-line="792" selection-start-column="23" selection-end-line="792" selection-end-column="23" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="279" column="124" selection-start-line="279" selection-start-column="20" selection-end-line="279" selection-end-column="124" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#start#0;class#process2stack#0;class#OpenerExtensions#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/src.zip!/java/lang/Runtime.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33333334">
+          <caret line="51" column="62" selection-start-line="51" selection-start-column="55" selection-end-line="51" selection-end-column="62" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
+    <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="725" column="45" selection-start-line="725" selection-start-column="45" selection-end-line="725" selection-end-column="45" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <caret line="59" column="0" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51h/ij-1.51h.jar!/ij/IJ.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-9.185185">
+          <caret line="792" column="38" selection-start-line="792" selection-start-column="23" selection-end-line="792" selection-end-column="38" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/VirtualStackOfStacks.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="338" column="0" selection-start-line="338" selection-start-column="0" selection-end-line="338" selection-end-column="0" />
+          <caret line="426" column="25" selection-start-line="426" selection-start-column="25" selection-end-line="426" selection-end-column="25" />
           <folding>
+            <element signature="e#3980#3981#0" expanded="true" />
+            <element signature="e#4012#4013#0" expanded="true" />
+            <element signature="e#10197#10198#0" expanded="true" />
+            <element signature="e#10259#10260#0" expanded="true" />
             <element signature="method#resizeWidthAndHeight#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#getSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
             <element signature="method#setSliceLabel#0;class#VirtualStackOfStacks#0" expanded="false" />
@@ -916,13 +948,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ct/vss/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.10918114">
-          <caret line="112" column="48" selection-start-line="112" selection-start-column="48" selection-end-line="112" selection-end-column="48" />
+        <state vertical-scroll-proportion="0.5369863">
+          <caret line="729" column="59" selection-start-line="729" selection-start-column="59" selection-end-line="729" selection-end-column="59" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#start#0;class#process2stack#0;class#OpenerExtensions#0" expanded="false" />
           </folding>
         </state>
       </provider>

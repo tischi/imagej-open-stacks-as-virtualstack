@@ -721,10 +721,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 for (int c = 0; c < imp.getNChannels(); c++) {
 
-                    Globals.threadlog("Loading into RAM: timepoint "+t+", channel "+c);
-                    Globals.threadlog("Memory before loading " + IJ.freeMemory());
+                    Globals.threadlog("Loading... timepoint "+t+", channel "+c+"; memory: "+IJ.freeMemory());
                     impChannelTime = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
-                    Globals.threadlog("Memory after loading " + IJ.freeMemory());
+                    Globals.threadlog("Loading finished. timepoint "+t+", channel "+c+"; memory: "+IJ.freeMemory());
 
                     if (fileType.equals("TIFF")) {
 

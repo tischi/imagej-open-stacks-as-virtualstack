@@ -404,17 +404,38 @@ public class VirtualStackOfStacks extends ImageStack {
         sy2 = (oy2+sy2-1 > nY-1) ? nY-oy2 : sy2;
         sz2 = (oz2+sz2-1 > nZ-1) ? nZ-oz2 : sz2;
 
-        if (fi.isCropped) {
-            ps = ps; // just for debugging
+        //
+        // check that the data cube is not too large for the java indexing
+        //
+        long maxSize = (1L<<31) - 1;
+        long size = (long)sx2 * sy2 * sz2;
+        if( size > maxSize )
+        {
+            IJ.showMessage("The size of the requested data cube is "+size +" (larger than 2^31) " +
+                    "and can thus not be loaded as one array into RAM.");
+            return(null);
+        }
+
+        //
+        // check that the data cube fits into the RAM
+        //
+        long freeMemory = IJ.maxMemory() - IJ.currentMemory();
+        if( size*2 > freeMemory )
+        {
+            IJ.showMessage("The size of the requested data cube is "+ size + " bytes " +
+                    "but the free memory is only "+freeMemory+"; thus the data cannot be loaded.");
+            return(null);
         }
 
 
-        if(sx2>0 && sy2>0 && sz2>0) {
+        if( sx2>0 && sy2>0 && sz2>0 )
+        {
             Point3D po2 = new Point3D(ox2, oy2, oz2);
             Point3D ps2 = new Point3D(sx2, sy2, sz2);
             impLoaded = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po2, ps2);
 
-            if (impLoaded == null) {
+            if (impLoaded == null)
+            {
                 log("Error: loading failed!");
                 return null;
             }
