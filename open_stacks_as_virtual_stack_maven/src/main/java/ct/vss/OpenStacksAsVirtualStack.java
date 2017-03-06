@@ -51,6 +51,8 @@ package ct.vss;
 //import org.scijava.util.Bytes;
 
 
+import ch.systemsx.cisd.base.mdarray.MDShortArray;
+import ch.systemsx.cisd.hdf5.*;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
@@ -59,10 +61,6 @@ import ij.io.FileInfo;
 import ij.io.FileSaver;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
-
-import ch.systemsx.cisd.base.mdarray.MDShortArray;
-import ch.systemsx.cisd.hdf5.*;
-
 import javafx.geometry.Point3D;
 import loci.common.services.ServiceFactory;
 import loci.formats.ImageWriter;
@@ -71,7 +69,6 @@ import loci.formats.out.TiffWriter;
 import loci.formats.services.OMEXMLService;
 import loci.formats.tiff.IFD;
 import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
-
 import ome.xml.model.enums.DimensionOrder;
 import ome.xml.model.enums.PixelType;
 import ome.xml.model.primitives.PositiveInteger;
@@ -93,8 +90,6 @@ import java.util.regex.Pattern;
 import static ij.IJ.log;
 import static java.awt.Desktop.getDesktop;
 import static java.awt.Desktop.isDesktopSupported;
-
-import java.io.File;
 
 
 //import net.imagej.ImageJ;
@@ -726,7 +721,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 for (int c = 0; c < imp.getNChannels(); c++) {
 
+                    Globals.threadlog("Loading into RAM: timepoint "+t+", channel "+c);
+                    Globals.threadlog("Memory before loading " + IJ.freeMemory());
                     impChannelTime = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
+                    Globals.threadlog("Memory after loading " + IJ.freeMemory());
 
                     if (fileType.equals("TIFF")) {
 
@@ -964,6 +962,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 String sC = String.format("%1$02d", c);
                 String sT = String.format("%1$05d", t);
                 String pathCT = path + "--C" + sC + "--T" + sT + ".tif";
+                Globals.threadlog("Saving " + pathCT);
                 fileSaver.saveAsTiffStack(pathCT);
             }
 
