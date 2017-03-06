@@ -36,10 +36,21 @@
 
 package ct.vss;
 
-import bdv.util.BdvFunctions;
-import bdv.util.BdvSource;
-import ch.systemsx.cisd.base.mdarray.MDShortArray;
-import ch.systemsx.cisd.hdf5.*;
+//import bdv.util.BdvFunctions;
+//import bdv.util.BdvSource;
+//import io.scif.config.SCIFIOConfig;
+//import io.scif.img.ImgIOException;
+//import io.scif.img.SCIFIOImgPlus;
+//import net.imglib2.img.Img;
+//import net.imglib2.type.NativeType;
+//import net.imglib2.type.numeric.RealType;
+//import net.imglib2.type.numeric.integer.UnsignedShortType;
+//import net.imglib2.util.Pair;
+//import io.scif.img.ImgOpener;
+//import net.imglib2.img.display.imagej.ImageJFunctions;
+//import org.scijava.util.Bytes;
+
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
@@ -48,9 +59,10 @@ import ij.io.FileInfo;
 import ij.io.FileSaver;
 import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
-import io.scif.config.SCIFIOConfig;
-import io.scif.img.ImgIOException;
-import io.scif.img.SCIFIOImgPlus;
+
+import ch.systemsx.cisd.base.mdarray.MDShortArray;
+import ch.systemsx.cisd.hdf5.*;
+
 import javafx.geometry.Point3D;
 import loci.common.services.ServiceFactory;
 import loci.formats.ImageWriter;
@@ -58,15 +70,8 @@ import loci.formats.meta.IMetadata;
 import loci.formats.out.TiffWriter;
 import loci.formats.services.OMEXMLService;
 import loci.formats.tiff.IFD;
-//import mpicbg.imglib.image.ImagePlusAdapter;
-//import mpicbg.imglib.image.display.imagej.ImageJFunctions;
-//import mpicbg.imglib.type.numeric.integer.UnsignedShortType;
 import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
-import net.imglib2.img.Img;
-import net.imglib2.type.NativeType;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.integer.UnsignedShortType;
-import net.imglib2.util.Pair;
+
 import ome.xml.model.enums.DimensionOrder;
 import ome.xml.model.enums.PixelType;
 import ome.xml.model.primitives.PositiveInteger;
@@ -89,12 +94,8 @@ import static ij.IJ.log;
 import static java.awt.Desktop.getDesktop;
 import static java.awt.Desktop.isDesktopSupported;
 
-import io.scif.img.ImgOpener;
-
 import java.io.File;
 
-import net.imglib2.img.display.imagej.ImageJFunctions;
-import org.scijava.util.Bytes;
 
 //import net.imagej.ImageJ;
 
@@ -704,19 +705,17 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         String compression;
         int rowsPerStrip;
 
-        SaveToStacks(ImagePlus imp, String path, String fileType, String compression, int rowsPerStrip) {
-
+        SaveToStacks(ImagePlus imp, String path, String fileType, String compression, int rowsPerStrip)
+        {
             this.imp = imp;
             this.fileType = fileType;
             this.path = path;
             this.compression = compression;
             this.rowsPerStrip = rowsPerStrip;
-
         }
 
-        public void run() {
-
-
+        public void run()
+        {
             VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
             ImagePlus impChannelTime = null;
 
@@ -946,7 +945,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     for (int z = 0; z < imp.getNSlices(); z++) {
                         IFD ifd = new IFD();
                         ifd.put(IFD.ROWS_PER_STRIP, rowsPerStripArray);
-                        tiffWriter.saveBytes(z, Bytes.fromShorts((short[])imp.getStack().getProcessor(z+1).getPixels(), false), ifd);
+                        //tiffWriter.saveBytes(z, Bytes.fromShorts((short[])imp.getStack().getProcessor(z+1).getPixels(), false), ifd);
+                        tiffWriter.saveBytes(z, ShortToByteBigEndian((short[]) imp.getStack().getProcessor(z + 1).getPixels()), ifd);
+
                     }
 
                     writer.close();
@@ -968,6 +969,28 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         }
 
+    }
+
+
+    byte [] ShortToByteBigEndian(short [] input)
+    {
+        int short_index, byte_index;
+        int iterations = input.length;
+
+        byte [] buffer = new byte[input.length * 2];
+
+        short_index = byte_index = 0;
+
+        for(/*NOP*/; short_index != iterations; /*NOP*/)
+        {
+            // Big Endian: store higher byte first
+            buffer[byte_index] = (byte) ((input[short_index] & 0xFF00) >> 8);
+            buffer[byte_index + 1]     = (byte) (input[short_index] & 0x00FF);
+
+            ++short_index; byte_index += 2;
+        }
+
+        return buffer;
     }
 
     String[] sortAndFilterFileList(String[] rawlist, String filterPattern) {
@@ -1320,6 +1343,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     }
 
+    /*
     public < T extends RealType< T > & NativeType< T > >
             void openUsingSCIFIO(String path)
             throws ImgIOException
@@ -1361,14 +1385,14 @@ public class OpenStacksAsVirtualStack implements PlugIn {
           taskRender(arrayImgThisTimePoint).start()
 
         Would that make any sense?
-
-         */
-
-
     }
+       */
+
+
 
 	// main method for debugging
-    public static void main(String[] args) throws ImgIOException {
+    // throws ImgIOException
+    public static void main(String[] args)  {
 		// set the plugins.dir property to make the plugin appear in the Plugins menu
 		Class<?> clazz = OpenStacksAsVirtualStack.class;
 		String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
@@ -1573,7 +1597,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             int i = 0, j = 0, k = 0;
 
-            ArrayList<JPanel> mainPanels = new ArrayList<>();
+            ArrayList<JPanel> mainPanels = new ArrayList();
             ArrayList<JPanel> panels = new ArrayList();
 
             // Streaming
@@ -1780,6 +1804,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 //
                 // View current channel and time-point in BigDataViewer
                 //
+                /*
                 final net.imagej.ImageJ ij = new net.imagej.ImageJ();
 
                 final ImagePlus imp = IJ.getImage();
@@ -1789,6 +1814,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 BdvSource bdv = BdvFunctions.show(image, "time point "+imp.getT());
                 Pair<? extends RealType,? extends RealType> minMax = ij.op().stats().minMax( image );
                 bdv.setDisplayRange(minMax.getA().getRealDouble(), minMax.getB().getRealDouble());
+                */
+                IJ.showMessage("Currently not implemented.");
 
             }
             else if (e.getActionCommand().equals(STREAMfromInfoFile))
