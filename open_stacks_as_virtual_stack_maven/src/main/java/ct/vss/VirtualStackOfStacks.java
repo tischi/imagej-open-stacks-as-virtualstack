@@ -53,6 +53,7 @@ import static ij.IJ.log;
 public class VirtualStackOfStacks extends ImageStack {
     int nSlices;
     int nX, nY, nZ, nC, nT;
+    int bitDepth = 0;
     FileInfoSer[][][] infos;  // c, t, z
     String fileType = "tiff"; // h5
     String directory = "";
@@ -61,7 +62,7 @@ public class VirtualStackOfStacks extends ImageStack {
     String h5DataSet;
 
     /** Creates a new, empty virtual stack of required size */
-    public VirtualStackOfStacks(String directory, String[] channelFolders, String[][][] fileList, int nC, int nT, int nX, int nY, int nZ, String fileType, String h5DataSet) {
+    public VirtualStackOfStacks(String directory, String[] channelFolders, String[][][] fileList, int nC, int nT, int nX, int nY, int nZ, int bitDepth, String fileType, String h5DataSet) {
         super();
 
         this.directory = directory;
@@ -70,6 +71,7 @@ public class VirtualStackOfStacks extends ImageStack {
         this.nZ = nZ;
         this.nX = nX;
         this.nY = nY;
+        this.bitDepth = bitDepth;
         this.nSlices = nC*nT*nZ;
         this.fileType = fileType;
         this.channelFolders = channelFolders;
@@ -90,6 +92,7 @@ public class VirtualStackOfStacks extends ImageStack {
         this.directory = directory;
         nC = infos.length;
         nT = infos[0].length;
+        bitDepth = infos[0][0][0].bytesPerPixel*8;
 
         if(infos[0][0][0].isCropped) {
             nX = (int) infos[0][0][0].pCropSize[0];
@@ -228,6 +231,12 @@ public class VirtualStackOfStacks extends ImageStack {
 
     /** Does noting. */
     public void addSlice(String sliceLabel, ImageProcessor ip, int n) {
+    }
+
+    /** Overrides the super method */
+    public int getBitDepth()
+    {
+        return( bitDepth );
     }
 
     /** Does noting. */
@@ -405,28 +414,21 @@ public class VirtualStackOfStacks extends ImageStack {
         sz2 = (oz2+sz2-1 > nZ-1) ? nZ-oz2 : sz2;
 
         //
-        // check that the data cube is not too large for the java indexing
+        // check memory requirements
         //
-        long maxSize = (1L<<31) - 1;
-        long size = (long)sx2 * sy2 * sz2;
-        if( size > maxSize )
+
+        long numPixels = (long) sx2 * sy2 * sz2;
+        int numStacks = 1;
+        int bitDepth = this.getBitDepth();
+
+        if( ! OpenStacksAsVirtualStack.checkMemoryRequirements(numPixels, bitDepth, numStacks) )
         {
-            IJ.showMessage("The size of the requested data cube is "+size +" (larger than 2^31) " +
-                    "and can thus not be loaded as one array into RAM.");
             return(null);
         }
 
         //
-        // check that the data cube fits into the RAM
+        // load the requested data into RAM
         //
-        long freeMemory = IJ.maxMemory() - IJ.currentMemory();
-        if( size*2 > freeMemory )
-        {
-            IJ.showMessage("The size of the requested data cube is "+ size + " bytes " +
-                    "but the free memory is only "+freeMemory+"; thus the data cannot be loaded.");
-            return(null);
-        }
-
 
         if( sx2>0 && sy2>0 && sz2>0 )
         {
@@ -442,10 +444,7 @@ public class VirtualStackOfStacks extends ImageStack {
 
         }
 
-
-
         // put the potentially smaller loaded stack into the full stack
-
 
         int finalStackOffsetX = (ox2 - ox);
         int finalStackOffsetY = (oy2 - oy);

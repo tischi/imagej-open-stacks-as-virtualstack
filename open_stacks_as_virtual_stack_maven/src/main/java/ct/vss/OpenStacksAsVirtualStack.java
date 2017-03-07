@@ -583,7 +583,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //
         // init the virtual stack
         //
-        VirtualStackOfStacks stack = new VirtualStackOfStacks(directory, channelFolders, ctzFileList, nC, nT, nX, nY, nZ, fileType, hdf5DataSet);
+        int bitDepth = 16; // todo: determine from files
+        VirtualStackOfStacks stack = new VirtualStackOfStacks(directory, channelFolders, ctzFileList, nC, nT, nX, nY, nZ, bitDepth, fileType, hdf5DataSet);
         imp = new ImagePlus("stream", stack);
 
         //
@@ -617,6 +618,62 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         return(imp);
 
     }
+
+    public static boolean checkMemoryRequirements(ImagePlus imp, int nThreads)
+    {
+        long numPixels = (long)imp.getWidth()*imp.getHeight()*imp.getNSlices();
+        boolean ok = checkMemoryRequirements(numPixels, imp.getBitDepth(), nThreads);
+        return(ok);
+    }
+
+    public static boolean checkMemoryRequirements(long numPixels, int bitDepth, int nThreads)
+    {
+        //
+        // check that the data cube is not too large for the java indexing
+        //
+        long maxSize = (1L<<31) - 1;
+        if( numPixels > maxSize )
+        {
+
+            log("Warning: "+"The size of one requested data cube is "+numPixels +" (larger than 2^31)\n");
+            //IJ.showMessage("The size of one requested data cube is "+numPixels +" (larger than 2^31)\n" +
+            //        "and can thus not be loaded as one java array into RAM.\n" +
+            //        "Please crop a smaller region.");
+            //return(false);
+        }
+
+        //
+        // check that the data cube(s) fits into the RAM
+        //
+        double GIGA = 1000000000.0;
+        long freeMemory = IJ.maxMemory() - IJ.currentMemory();
+        double maxMemoryGB = IJ.maxMemory()/GIGA;
+        double freeMemoryGB = freeMemory/GIGA;
+        double requestedMemoryGB = numPixels*bitDepth/8*nThreads/GIGA;
+
+        if( requestedMemoryGB > freeMemoryGB )
+        {
+            IJ.showMessage("The size of the requested data cube(s) is "+ requestedMemoryGB + " GB.\n" +
+                    "The free memory is only "+freeMemoryGB+" GB.\n" +
+                    "Please consider cropping a smaller region \n" +
+                    "and/or reducing the number of I/O threads \n" +
+                    "(you are currently using " + nThreads + ").");
+            return(false);
+        }
+        else
+        {
+            if( requestedMemoryGB > 0.1 ) {
+                Globals.threadlog("Memory [GB]: Max=" + maxMemoryGB + "; Free=" + freeMemoryGB + "; Requested=" + requestedMemoryGB);
+            }
+
+        }
+
+
+
+        return(true);
+
+    }
+
 
     public static String getLastDir(String fileOrDirPath) {
         boolean endsWithSlash = fileOrDirPath.endsWith(File.separator);
@@ -721,9 +778,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 for (int c = 0; c < imp.getNChannels(); c++) {
 
-                    Globals.threadlog("Loading... timepoint "+t+", channel "+c+"; memory: "+IJ.freeMemory());
+                    Globals.threadlog("Loading timepoint "+t+", channel "+c+"; memory: "+IJ.freeMemory());
                     impChannelTime = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
-                    Globals.threadlog("Loading finished. timepoint "+t+", channel "+c+"; memory: "+IJ.freeMemory());
+                    Globals.threadlog("Loading finished: timepoint "+t+", channel "+c+"; memory: "+IJ.freeMemory());
 
                     if (fileType.equals("TIFF")) {
 
@@ -899,11 +956,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         public void saveAsTiffStacks( ImagePlus imp, int c, int t, String compression, String path )
         {
 
-            if( compression.equals("LZW") )
+            if( compression.equals("LZW") ) // Use BioFormats
             {
-
-                // Using BioFormats for LZA compression
-                //
 
                 String sC = String.format("%1$02d", c);
                 String sT = String.format("%1$05d", t);
@@ -953,9 +1007,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     log("exception");
                     IJ.showMessage(e.toString());
                 }
-
             }
-            else  // no compression: use ImageJ's FileSaver
+            else  // no compression: use ImageJ's FileSaver, as it is faster than BioFormats
             {
                 FileSaver fileSaver = new FileSaver(imp);
                 String sC = String.format("%1$02d", c);
@@ -964,9 +1017,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 Globals.threadlog("Saving " + pathCT);
                 fileSaver.saveAsTiffStack(pathCT);
             }
-
         }
-
     }
 
 
@@ -1887,32 +1938,44 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 //
                 // Save to stacks
                 //
+
+                // Get handle on the currently active image
+                //
                 ImagePlus imp = IJ.getImage();
                 final VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
                 if(vss==null) return;
 
-                //
                 // Check that all image files have been parsed
                 //
                 int numberOfUnparsedFiles = vss.numberOfUnparsedFiles();
-                if(numberOfUnparsedFiles > 0) {
+                if( numberOfUnparsedFiles > 0 )
+                {
                     IJ.showMessage("There are still "+numberOfUnparsedFiles+
                             " files in the folder that have not been parsed yet.\n" +
                             "Please try again later (check ImageJ's status bar).");
                     return;
                 }
 
+                // Check that there is enough memory to load all time-points into RAM
+                //
+                if( ! checkMemoryRequirements( imp, Math.min(nSavingThreads, imp.getNFrames()) ) )
+                {
+                    return;
+                }
 
+                //
+                // Load and save the data
+                //
                 fc = new JFileChooser(vss.getDirectory());
                 int returnVal = fc.showSaveDialog(StackStreamToolsGUI.this);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
+
                     final File file = fc.getSelectedFile();
 
-                    imp = IJ.getImage();
-
+                    // Initiate progress report
+                    //
                     nProgress = imp.getNFrames();
                     iProgress.set(0);
-
                     Thread thread = new Thread(new Runnable() {
                         public void run() {
                             updateStatus("Saved file");
@@ -1924,14 +1987,13 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     if(cbLZW.isSelected())
                         compression="LZW";
 
-
                     String fileType = "";
                     if(e.getActionCommand().equals(SAVEasH5))
                         fileType = "HDF5";
                     else if(e.getActionCommand().equals(SAVEasTiff))
                         fileType = "TIFF";
 
-                    // Multi-threaded saving (for speed if SSDs are available)
+                    // Multi-threaded saving (increases speed if SSDs are available)
                     ExecutorService es = Executors.newCachedThreadPool();
                     for(int iThread=0; iThread<nSavingThreads; iThread++) {
                         es.execute(new SaveToStacks(imp, file.getAbsolutePath(), fileType, compression, rowsPerStrip));
