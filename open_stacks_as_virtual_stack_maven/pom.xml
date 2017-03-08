@@ -38,7 +38,7 @@
             </developer>
         </developers>
 
-        <properties><main-class>ct.vss.OpenStacksAsVirtualStack</main-class>
+        <properties><main-class>bigDataTools.OpenStacksAsVirtualStack</main-class>
         </properties>
 
     <repositories>
