@@ -83,6 +83,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -716,7 +717,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     }
 
                     imp.show();
-                    imp.setPosition(1, nZ/2, 1);
+                    imp.setPosition(1, nZ / 2, 1);
                     imp.updateAndDraw();
                     IJ.wait(100); imp.resetDisplayRange();
 
@@ -1020,7 +1021,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
     }
 
-
     byte [] ShortToByteBigEndian(short [] input)
     {
         int short_index, byte_index;
@@ -1042,7 +1042,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         return buffer;
     }
 
-    String[] sortAndFilterFileList(String[] rawlist, String filterPattern) {
+    String[] sortAndFilterFileList(String[] rawlist, String filterPattern)
+    {
         int count = 0;
 
         Pattern patternFilter = Pattern.compile(filterPattern);
@@ -1363,8 +1364,96 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
     }
 
-    public ImagePlus duplicateToRAM(ImagePlus imp) {
 
+    // todo: make an own class file for saving
+    class LoadFrameIntoRAM implements Runnable
+    {
+        ImagePlus imp;
+        ImagePlus impRAM;
+
+        LoadFrameIntoRAM(ImagePlus imp, ImagePlus impRAM)
+        {
+            this.imp = imp;
+            this.impRAM = impRAM;
+        }
+
+        public void run() {
+
+            VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
+
+            while (true) {
+
+                int t = iProgress.getAndAdd(1);
+                if ((t + 1) > nProgress) return;
+
+                for (int c = 0; c < imp.getNChannels(); c++) {
+
+                    // Load time-point and channel
+
+                    Globals.threadlog("Loading timepoint " + t + ", channel " + c + "; memory: " + IJ.freeMemory());
+                    ImagePlus impChannelTime = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
+                    //Globals.threadlog("Loading finished: timepoint " + t + ", channel " + c + "; memory: " + IJ.freeMemory());
+
+                    // Copy time-point and channel at the right place into impOut
+
+                    ImageStack stack = impChannelTime.getStack();
+                    ImageStack stackOut = impRAM.getStack();
+
+                    int iStart = impRAM.getStackIndex(1,1,t+1);
+                    int iEnd = iStart + impRAM.getNSlices() - 1;
+
+                    for ( int i = iStart; i <= iEnd; i++ )
+                    {
+                        ImageProcessor ip = stack.getProcessor(i - iStart + 1);
+                        stackOut.setPixels(ip.getPixels(), i);
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+    // todo: make multi-threaded version
+    public ImagePlus duplicateToRAM(ImagePlus imp, int nIOthreads) {
+
+        // Init and start progress report
+        //
+        nProgress = imp.getNFrames();
+        iProgress.set(0);
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                updateStatus("Loaded file");
+            }
+        });
+        thread.start();
+
+        // Init the output image
+        ImageStack stack = imp.getStack();
+        ImageStack stackRAM = ImageStack.create(stack.getWidth(), stack.getHeight(), stack.getSize(), stack.getBitDepth());
+        ImagePlus impRAM = new ImagePlus("RAM", stackRAM);
+        int[] dim = imp.getDimensions();
+        impRAM.setDimensions(dim[2], dim[3], dim[4]);
+
+        // Multi-threaded loading into RAM (increases speed if SSDs are available)
+        ExecutorService es = Executors.newCachedThreadPool();
+        for( int iThread=0; iThread<nIOthreads; iThread++ )
+        {
+            es.execute(new LoadFrameIntoRAM(imp, impRAM));
+        }
+
+        // Wait until all images are loaded into RAM
+        try {
+            es.shutdown();
+            while(!es.awaitTermination(1, TimeUnit.MINUTES));
+        }
+        catch (InterruptedException e) {
+            System.err.println("tasks interrupted");
+        }
+
+
+        /*
         final VirtualStackOfStacks stack = Globals.getVirtualStackOfStacks(imp);
         if(stack==null) return(null);
 
@@ -1381,14 +1470,15 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         }
         ImagePlus imp2 = imp.createImagePlus();
         imp2.setStack("DUP_"+imp.getTitle(), stack2);
+        */
+
         String info = (String)imp.getProperty("Info");
         if (info!=null)
-            imp2.setProperty("Info", info);
-        int[] dim = imp.getDimensions();
-        imp2.setDimensions(dim[2], dim[3], dim[4]);
+            impRAM.setProperty("Info", info);
         if (imp.isHyperStack())
-            imp2.setOpenAsHyperStack(true);
-        return(imp2);
+            impRAM.setOpenAsHyperStack(true);
+
+        return(impRAM);
 
     }
 
@@ -1475,7 +1565,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        final String directory = "/Users/tischi/Desktop/example-data/bbb/";
+        final String directory = "/Users/tischi/Desktop/example-data/tif-stacks/";
         //final String directory = "/Users/tischi/Desktop/example-data/Nils--MATLAB--Compressed/";
 
         // final String directory = "/Volumes/USB DISK/Ashna -test/";
@@ -1584,8 +1674,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
     class StackStreamToolsGUI extends JFrame implements ActionListener, FocusListener, ItemListener {
 
-
-
         JCheckBox cbLog = new JCheckBox("Verbose logging");
         JCheckBox cbLZW = new JCheckBox("LZW compression");
 
@@ -1595,7 +1683,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         JComboBox filterPatternComboBox = new JComboBox(new String[] {".*",".*_Target--.*",".*--LSEA00--.*",".*--LSEA01--.*"});
         JComboBox channelTimePatternComboBox = new JComboBox(new String[] {"None",LOAD_CHANNELS_FROM_FOLDERS,".*_C<c>_T<t>.tif"});
-        JComboBox hdf5DataSetComboBox = new JComboBox(new String[] {"None","Data","Data111","Data222","Data444"});
+        JComboBox hdf5DataSetComboBox = new JComboBox(new String[] {"None","Data","Data111","ITKImage/0/VoxelData","Data222","Data444"});
 
         final String BDV = "Big Data Viewer";
         JButton viewInBigDataViewer =  new JButton(BDV);
@@ -1827,7 +1915,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
             final OpenStacksAsVirtualStack osv = new OpenStacksAsVirtualStack();
             final String h5DataSet = (String)hdf5DataSetComboBox.getSelectedItem();
-            final int nSavingThreads = new Integer(tfIOThreads.getText());
+            final int nIOthreads = new Integer(tfIOThreads.getText());
             final int rowsPerStrip = new Integer(tfRowsPerStrip.getText());
             final String filterPattern = (String)filterPatternComboBox.getSelectedItem();
             final String channelPattern = (String) channelTimePatternComboBox.getSelectedItem();
@@ -1841,7 +1929,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 Thread t1 = new Thread(new Runnable() {
                     public void run() {
-                        osv.openFromDirectory(directory, channelPattern, filterPattern, h5DataSet, nSavingThreads);
+                        osv.openFromDirectory(directory, channelPattern, filterPattern, h5DataSet, nIOthreads);
                     }
                 });
                 t1.start();
@@ -1958,7 +2046,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 // Check that there is enough memory to load all time-points into RAM
                 //
-                if( ! checkMemoryRequirements( imp, Math.min(nSavingThreads, imp.getNFrames()) ) )
+                if( ! checkMemoryRequirements( imp, Math.min(nIOthreads, imp.getNFrames()) ) )
                 {
                     return;
                 }
@@ -1995,7 +2083,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     // Multi-threaded saving (increases speed if SSDs are available)
                     ExecutorService es = Executors.newCachedThreadPool();
-                    for(int iThread=0; iThread<nSavingThreads; iThread++) {
+                    for(int iThread=0; iThread<nIOthreads; iThread++) {
                         es.execute(new SaveToStacks(imp, file.getAbsolutePath(), fileType, compression, rowsPerStrip));
                     }
 
@@ -2017,9 +2105,11 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 Thread t1 = new Thread(new Runnable() {
                     public void run() {
-                        ImagePlus imp2 = osv.duplicateToRAM(IJ.getImage());
+                        ImagePlus imp2 = osv.duplicateToRAM(IJ.getImage(), nIOthreads);
                         if (imp2 != null)
+                        {
                             imp2.show();
+                        }
 
                     }
                 });
