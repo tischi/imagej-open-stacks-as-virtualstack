@@ -243,7 +243,6 @@ class OpenerExtensions extends Opener {
         long allocationTime = 0;
         short[] asFlatArray = null, pixels;
         MDShortArray block;
-        boolean dataSetExists = false;
         ImagePlus imp;
 
         if (info == null) {
@@ -283,6 +282,9 @@ class OpenerExtensions extends Opener {
 
         startTime = System.currentTimeMillis();
         IHDF5Reader reader = HDF5Factory.openForReading(directory + fi.directory + fi.fileName);
+        HDF5DataSetInformation dsInfo = reader.getDataSetInformation(fi.h5DataSet);
+        String dsTypeString = dsInfoToTypeString(dsInfo);
+        log("Data type: " + dsTypeString);
 
         if (dz == 1 && readInOneGo) {
 
@@ -295,8 +297,21 @@ class OpenerExtensions extends Opener {
             int nFrames = 1;
             int nChannels = 1;
             */
+            if ( dsTypeString.equals("int16") )
+            {
+                block = reader.int16().readMDArrayBlockWithOffset(fi.h5DataSet, new int[]{nz, ny, nx}, new long[]{zs, ys, xs});
+            }
+            else if ( dsTypeString.equals("uint16") )
+            {
+                block = reader.uint16().readMDArrayBlockWithOffset(fi.h5DataSet, new int[]{nz, ny, nx}, new long[]{zs, ys, xs});
 
-            block = reader.uint16().readMDArrayBlockWithOffset(fi.h5DataSet, new int[]{nz, ny, nx}, new long[]{zs, ys, xs});
+            }
+            else
+            {
+                IJ.showMessage( "Data type "+dsTypeString+" is currently not supported" );
+                return ( null );
+            }
+
             asFlatArray = block.getAsFlatArray();
 
             // put plane-wise into stack

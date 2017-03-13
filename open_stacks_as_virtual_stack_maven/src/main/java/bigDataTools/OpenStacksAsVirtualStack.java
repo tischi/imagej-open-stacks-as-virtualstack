@@ -136,10 +136,17 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         String dataSets = "";
         boolean dataSetExists = false;
 
+        if( reader.object().isDataSet(hdf5DataSet) )
+        {
+            return true;
+        }
+
         for (String dataSet : reader.getGroupMembers("/")) {
+            /*
             if (dataSet.equals(hdf5DataSet)) {
                 dataSetExists = true;
             }
+            */
             dataSets += "- " + dataSet + "\n";
         }
 
