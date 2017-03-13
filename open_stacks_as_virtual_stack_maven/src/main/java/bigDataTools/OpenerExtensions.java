@@ -284,7 +284,7 @@ class OpenerExtensions extends Opener {
         IHDF5Reader reader = HDF5Factory.openForReading(directory + fi.directory + fi.fileName);
         HDF5DataSetInformation dsInfo = reader.getDataSetInformation(fi.h5DataSet);
         String dsTypeString = dsInfoToTypeString(dsInfo);
-        log("Data type: " + dsTypeString);
+        //log("Data type: " + dsTypeString);
 
         if (dz == 1 && readInOneGo) {
 
