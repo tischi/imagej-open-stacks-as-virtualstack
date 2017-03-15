@@ -62,8 +62,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static ij.IJ.log;
 
 
-// todo: how to behave when the track is leaving the image bounds?
-// - show only the minimal region that stays within the image bounds
+
+// todo: expose the number of iterations for the center of mass to the gui
+// todo: correlation tracking: it did not show an error when no object was selected
+
 // todo: add unique track id to tracktable, track, and imageName of cropped track
 
 // todo: multi-point selection tool
@@ -79,7 +81,7 @@ public class Registration implements PlugIn {
     private final static Point3D pOnes = new Point3D(1,1,1);
     // gui variables
     int gui_ntTracking, gui_bg;
-    int gui_iterations = 10;
+    int gui_iterations = 6;
     Point3D gui_pTrackingSize;
     double gui_trackingFactor = 2.5;
     Point3D gui_pSubSample = new Point3D(1,1,1);
@@ -377,6 +379,12 @@ public class Registration implements PlugIn {
                     return;
                 }
 
+                //
+                // adjust the number of iterations for the center of mass
+                //
+
+                gui_iterations = (int) Math.ceil(Math.pow(gui_trackingFactor, 2)); // this purely gut-feeling
+
                 // Add track start ...
                 int iNewTrack = addTrackStart(imp);
 
@@ -384,7 +392,7 @@ public class Registration implements PlugIn {
                 if( iNewTrack >= 0 ) {
                     trackStatsLastTrackStarted = System.currentTimeMillis();
                     trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
-                    es.execute(new Registration.Tracking(imp, iNewTrack, gui_pSubSample, gui_tSubSample, gui_iterations));
+                    es.execute(new Registration.Tracking(imp, iNewTrack, gui_pSubSample, gui_tSubSample, gui_iterations, gui_trackingFactor));
                 }
 
                 Thread t = new Thread(new Runnable() {
@@ -537,7 +545,8 @@ public class Registration implements PlugIn {
             Scanner scanner = new Scanner(input);
             StringBuilder sb = new StringBuilder("");
 
-            while (scanner.hasNextLine()) {
+            while ( scanner.hasNextLine() )
+            {
                 String line = scanner.nextLine();
                 if(line.equals("###")) {
                     toolTipTexts.add(sb.toString());
@@ -892,12 +901,12 @@ public class Registration implements PlugIn {
         double trackingFactor;
         ImagePlus imp;
 
-        Tracking(ImagePlus imp, int iTrack, Point3D pSubSample, int gui_tSubSample, int iterations) {
+        Tracking(ImagePlus imp, int iTrack, Point3D pSubSample, int gui_tSubSample, int iterations, double trackingFactor) {
             this.iTrack = iTrack;
             this.dt = gui_tSubSample;
             this.pSubSample = pSubSample;
             this.iterations = iterations;
-            this.trackingFactor = gui_trackingFactor;
+            this.trackingFactor = trackingFactor;
             this.imp = imp;
 
 
@@ -1162,8 +1171,9 @@ public class Registration implements PlugIn {
         double trackingFraction;
         for(int i=0; i<iterations; i++) {
             // trackingFraction = 1/trackingFactor is the user selected object size, because we are loading
-            // a portion of the data the is trackingFactor times larger than the object size
-            trackingFraction = 1.0 - Math.pow(1.0*i/(iterations-1.0),1.0/4.0)*(1.0-1.0/trackingFactor);
+            // a portion of the data, which is trackingFactor times larger than the object size
+            // below formula makes the region in which the center of mass is compute go from 1 to 1/trackingfactor
+            trackingFraction = 1.0 - Math.pow(1.0*(i+1)/iterations,1.0/4.0)*(1.0-1.0/trackingFactor);
             pMin = pCenter.subtract(pStackSize.multiply(trackingFraction / 2)); // div 2 because it is radius
             pMax = pCenter.add(pStackSize.multiply(trackingFraction / 2));
             pCenter = computeCenter16bit(stack, pMin, pMax);
@@ -1197,7 +1207,7 @@ public class Registration implements PlugIn {
                     i = (y - 1) * width + xmin; // zero-based location in pixel array
                     for (int x = xmin + 1; x <= xmax + 1; x++) {
                         v = pixels[i] & 0xffff;
-                        // v=0 is ignored automatially
+                        // v=0 is ignored automatically in below formulas
                         sum += v;
                         xsum += x * v;
                         ysum += y * v;
@@ -1244,7 +1254,7 @@ public class Registration implements PlugIn {
         if(Globals.verbose) log("phc.process()... ");
         phc.process();
         // get the first peak that is not a clean 1.0,
-        // because 1.0 crosscorrelation typically is an artifact of too much shift into black areas of both images
+        // because 1.0 cross-correlation typically is an artifact of too much shift into black areas of both images
         ArrayList<PhaseCorrelationPeak> pcp = phc.getAllShifts();
         float ccPeak = 0;
         int iPeak = 0;
@@ -1252,7 +1262,7 @@ public class Registration implements PlugIn {
             ccPeak = pcp.get(iPeak).getCrossCorrelationPeak();
             if (ccPeak < 0.999) break;
         }
-        log(""+ccPeak);
+        //log(""+ccPeak);
         int[] shift = pcp.get(iPeak).getPosition();
         return(new Point3D(shift[0],shift[1],shift[2]));
     }

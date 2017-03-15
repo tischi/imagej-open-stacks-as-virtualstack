@@ -33,10 +33,10 @@
       <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/OpenStacksAsVirtualStack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.555555">
-              <caret line="1697" column="13" selection-start-line="1697" selection-start-column="13" selection-end-line="1697" selection-end-column="13" />
+            <state vertical-scroll-proportion="-92.0">
+              <caret line="1564" column="11" selection-start-line="1564" selection-start-column="11" selection-end-line="1564" selection-end-column="11" />
               <folding>
-                <element signature="e#0#80814#0" expanded="true" />
+                <element signature="e#0#80809#0" expanded="true" />
                 <element signature="imports" expanded="true" />
                 <element signature="e#21113#21114#0" expanded="true" />
                 <element signature="e#21182#21183#0" expanded="true" />
@@ -49,16 +49,6 @@
                 <element signature="e#50329#50330#0" expanded="true" />
                 <element signature="e#50388#50389#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ImageStack.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51h/ij-1.51h.jar!/ij/ImageStack.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="81.703705">
-              <caret line="31" column="26" selection-start-line="31" selection-start-column="26" selection-end-line="31" selection-end-column="26" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -106,10 +96,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="OpenerExtensions.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="OpenerExtensions.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/OpenerExtensions.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.8492462">
+            <state vertical-scroll-proportion="-12.777778">
               <caret line="293" column="14" selection-start-line="293" selection-start-column="14" selection-end-line="293" selection-end-column="14" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -124,37 +114,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="59" column="0" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="564" column="26" selection-start-line="564" selection-start-column="8" selection-end-line="564" selection-end-column="26" />
+            <state vertical-scroll-proportion="0.6595289">
+              <caret line="397" column="12" selection-start-line="396" selection-start-column="0" selection-end-line="397" selection-end-column="12" />
               <folding>
-                <element signature="e#0#49908#0" expanded="false" />
-                <element signature="e#5577#5578#0" expanded="false" />
-                <element signature="e#5628#5629#0" expanded="false" />
-                <element signature="e#14565#14566#0" expanded="false" />
-                <element signature="e#14636#14637#0" expanded="false" />
-                <element signature="e#18958#18959#0" expanded="false" />
-                <element signature="e#18994#18995#0" expanded="false" />
-                <element signature="e#20386#20387#0" expanded="false" />
-                <element signature="e#20430#20431#0" expanded="false" />
-                <element signature="e#22458#22459#0" expanded="false" />
-                <element signature="e#22494#22495#0" expanded="false" />
-                <element signature="e#24944#24945#0" expanded="false" />
-                <element signature="e#24992#24993#0" expanded="false" />
-                <element signature="e#25521#25522#0" expanded="false" />
-                <element signature="e#25569#25570#0" expanded="false" />
+                <element signature="e#0#50347#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+                <element signature="e#3121#3128#0" expanded="true" />
+                <element signature="e#5601#5602#0" expanded="true" />
+                <element signature="e#5652#5653#0" expanded="true" />
+                <element signature="e#7961#7969#0" expanded="true" />
+                <element signature="e#14833#14834#0" expanded="true" />
+                <element signature="e#14904#14905#0" expanded="true" />
+                <element signature="e#19226#19227#0" expanded="true" />
+                <element signature="e#19262#19263#0" expanded="true" />
+                <element signature="e#19382#19390#0" expanded="true" />
+                <element signature="e#20668#20669#0" expanded="true" />
+                <element signature="e#20712#20713#0" expanded="true" />
+                <element signature="e#22740#22741#0" expanded="true" />
+                <element signature="e#22776#22777#0" expanded="true" />
+                <element signature="e#25226#25227#0" expanded="true" />
+                <element signature="e#25274#25275#0" expanded="true" />
+                <element signature="e#25803#25804#0" expanded="true" />
+                <element signature="e#25851#25852#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -210,8 +194,9 @@
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Globals.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/VirtualStackOfStacks.java" />
         <option value="$PROJECT_DIR$/src/main/resources/plugins.config" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/OpenStacksAsVirtualStack.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/OpenerExtensions.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/OpenStacksAsVirtualStack.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java" />
       </list>
     </option>
   </component>
@@ -234,8 +219,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="236" />
-    <option name="y" value="32" />
+    <option name="x" value="375" />
+    <option name="y" value="33" />
     <option name="width" value="1379" />
     <option name="height" value="848" />
   </component>
@@ -364,36 +349,6 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="bigDataTools" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="OpenStacksAsVirtualStack" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="open_stacks_as_virtual_stack_maven" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bigDataTools" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="OpenerExtensions.java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
@@ -618,7 +573,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="236" y="32" width="1379" height="848" extended-state="0" />
+    <frame x="375" y="33" width="1379" height="848" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -628,7 +583,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.14819278" sideWeight="0.4974656" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17724867" sideWeight="0.6913947" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30952382" sideWeight="0.8693393" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.30952382" sideWeight="0.8693393" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28994083" sideWeight="0.53119427" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -637,8 +592,8 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299373" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25355273" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.40079364" sideWeight="0.688196" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19296934" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25661376" sideWeight="0.688196" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -700,6 +655,12 @@
           <properties />
           <option name="timeStamp" value="476" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java</url>
+          <line>388</line>
+          <properties />
+          <option name="timeStamp" value="477" />
+        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
@@ -711,7 +672,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="477" />
+      <option name="time" value="478" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1008,30 +969,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="564" column="26" selection-start-line="564" selection-start-column="8" selection-end-line="564" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#49908#0" expanded="false" />
-            <element signature="e#5577#5578#0" expanded="false" />
-            <element signature="e#5628#5629#0" expanded="false" />
-            <element signature="e#14565#14566#0" expanded="false" />
-            <element signature="e#14636#14637#0" expanded="false" />
-            <element signature="e#18958#18959#0" expanded="false" />
-            <element signature="e#18994#18995#0" expanded="false" />
-            <element signature="e#20386#20387#0" expanded="false" />
-            <element signature="e#20430#20431#0" expanded="false" />
-            <element signature="e#22458#22459#0" expanded="false" />
-            <element signature="e#22494#22495#0" expanded="false" />
-            <element signature="e#24944#24945#0" expanded="false" />
-            <element signature="e#24992#24993#0" expanded="false" />
-            <element signature="e#25521#25522#0" expanded="false" />
-            <element signature="e#25569#25570#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/src.zip!/java/lang/Runtime.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33333334">
@@ -1078,14 +1015,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51h/ij-1.51h.jar!/ij/ImageStack.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="81.703705">
-          <caret line="31" column="26" selection-start-line="31" selection-start-column="26" selection-end-line="31" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/VirtualStackOfStacks.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1107,12 +1036,44 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/cisd/jhdf5/14.12.5/jhdf5-14.12.5.jar!/ch/systemsx/cisd/hdf5/IHDF5SimpleReader.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.35427135">
+          <caret line="24" column="27" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/OpenerExtensions.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-12.777778">
+          <caret line="293" column="14" selection-start-line="293" selection-start-column="14" selection-end-line="293" selection-end-column="14" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#OpenerExtensions#0;class#OpenerExtensions#0" expanded="false" />
+            <element signature="method#loadDataSetsToHyperStack#0;class#OpenerExtensions#0" expanded="false" />
+            <element signature="method#dsInfoToTypeString#0;class#OpenerExtensions#0" expanded="false" />
+            <element signature="method#assignHDF5TypeToImagePlusBitdepth#0;class#OpenerExtensions#0" expanded="false" />
+            <element signature="method#openCroppedTiffStackUsingIFDs#0;class#OpenerExtensions#0" expanded="false" />
+            <element signature="class#process2stack#0;class#OpenerExtensions#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51h/ij-1.51h.jar!/ij/ImageStack.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-5.5427136">
+          <caret line="31" column="26" selection-start-line="31" selection-start-column="26" selection-end-line="31" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/OpenStacksAsVirtualStack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.555555">
-          <caret line="1697" column="13" selection-start-line="1697" selection-start-column="13" selection-end-line="1697" selection-end-column="13" />
+        <state vertical-scroll-proportion="-92.0">
+          <caret line="1564" column="11" selection-start-line="1564" selection-start-column="11" selection-end-line="1564" selection-end-column="11" />
           <folding>
-            <element signature="e#0#80814#0" expanded="true" />
+            <element signature="e#0#80809#0" expanded="true" />
             <element signature="imports" expanded="true" />
             <element signature="e#21113#21114#0" expanded="true" />
             <element signature="e#21182#21183#0" expanded="true" />
@@ -1128,26 +1089,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/cisd/jhdf5/14.12.5/jhdf5-14.12.5.jar!/ch/systemsx/cisd/hdf5/IHDF5SimpleReader.class">
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.35427135">
-          <caret line="24" column="27" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/OpenerExtensions.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8492462">
-          <caret line="293" column="14" selection-start-line="293" selection-start-column="14" selection-end-line="293" selection-end-column="14" />
+        <state vertical-scroll-proportion="0.6595289">
+          <caret line="397" column="12" selection-start-line="396" selection-start-column="0" selection-end-line="397" selection-end-column="12" />
           <folding>
+            <element signature="e#0#50347#0" expanded="true" />
             <element signature="imports" expanded="true" />
-            <element signature="method#OpenerExtensions#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#loadDataSetsToHyperStack#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#dsInfoToTypeString#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#assignHDF5TypeToImagePlusBitdepth#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="method#openCroppedTiffStackUsingIFDs#0;class#OpenerExtensions#0" expanded="false" />
-            <element signature="class#process2stack#0;class#OpenerExtensions#0" expanded="false" />
+            <element signature="e#3121#3128#0" expanded="true" />
+            <element signature="e#5601#5602#0" expanded="true" />
+            <element signature="e#5652#5653#0" expanded="true" />
+            <element signature="e#7961#7969#0" expanded="true" />
+            <element signature="e#14833#14834#0" expanded="true" />
+            <element signature="e#14904#14905#0" expanded="true" />
+            <element signature="e#19226#19227#0" expanded="true" />
+            <element signature="e#19262#19263#0" expanded="true" />
+            <element signature="e#19382#19390#0" expanded="true" />
+            <element signature="e#20668#20669#0" expanded="true" />
+            <element signature="e#20712#20713#0" expanded="true" />
+            <element signature="e#22740#22741#0" expanded="true" />
+            <element signature="e#22776#22777#0" expanded="true" />
+            <element signature="e#25226#25227#0" expanded="true" />
+            <element signature="e#25274#25275#0" expanded="true" />
+            <element signature="e#25803#25804#0" expanded="true" />
+            <element signature="e#25851#25852#0" expanded="true" />
           </folding>
         </state>
       </provider>

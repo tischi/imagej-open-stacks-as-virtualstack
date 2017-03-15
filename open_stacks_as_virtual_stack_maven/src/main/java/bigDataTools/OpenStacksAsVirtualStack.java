@@ -1572,7 +1572,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        final String directory = "/Users/tischi/Desktop/example-data/tif-stacks/";
+        final String directory = "/Users/tischi/Desktop/example-data/3d-embryo/";
         //final String directory = "/Users/tischi/Desktop/example-data/Nils--MATLAB--Compressed/";
 
         // final String directory = "/Volumes/USB DISK/Ashna -test/";
@@ -1600,8 +1600,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         t1.start();
         IJ.wait(1000);
         ovs.showDialog();
-        //Registration register = new Registration(IJ.getImage());
-        //register.run("");
+        Registration register = new Registration(IJ.getImage());
+        register.run("");
 
 
         /*
