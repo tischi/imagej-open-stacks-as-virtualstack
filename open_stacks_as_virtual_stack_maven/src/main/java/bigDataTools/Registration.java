@@ -1058,7 +1058,7 @@ public class Registration implements PlugIn {
                     //log(""+track.getXYZ(itPrevious).toString());
                     //log(""+computeCenter(p1offset.add(pLocalShift),pSize).toString());
                     //log(""+p1offset.add(pLocalShift).toString());
-                    pShift = computeCenter(p1offset.add(pLocalShift),pSize).subtract(track.getXYZ(itPrevious));
+                    pShift = computeCenter(p1offset.add(pLocalShift),pSize).subtract(track.getXYZ(itPrevious-tStart));
                     //log("Center of Mass Tracking Shift relative to previous position: "+pShift);
 
                     if(Globals.verbose) log("actual shift is "+pShift.toString());
@@ -1074,7 +1074,7 @@ public class Registration implements PlugIn {
 
                 for (int itUpdate = itPrevious + 1; itUpdate <= itMaxUpdate; itUpdate++) {
 
-                    Point3D pPrevious = track.getXYZ(itPrevious);
+                    Point3D pPrevious = track.getXYZ(itPrevious-tStart);
                     double interpolation = (double) (itUpdate - itPrevious) / (double) (itNow - itPrevious);
                     pUpdate = pPrevious.add(pShift.multiply(interpolation));
 
