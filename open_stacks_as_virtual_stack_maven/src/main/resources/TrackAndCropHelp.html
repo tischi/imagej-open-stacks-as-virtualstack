@@ -11,10 +11,11 @@
 </html>
 ###
 <html>
-<h3>Tracking factor</h3>
+<h3>Window size</h3>
 <p width=400>
     The factor determines the window in which the algorithm will search for the object in the next time-point.
-    The window size is (Object size * Tracking factor).
+    The window size is:<br>
+    <b>Object size * Tracking factor</b><br>
     This needs to be large enough to cover the distance that the object moves
     between subsequent time-points. If the objects moves out of the "Tracking window" the algorithm will
     not find it anymore.
@@ -52,7 +53,7 @@
 </html>
 ###
 <html>
-<h3>Cropping factor</h3>
+<h3>Cropping size</h3>
 <p width=400>
     The factor determines the size of cropped object view.
     The size is: Object size * Cropping factor.
@@ -136,10 +137,9 @@ Saves the table as a text file for further processing, e.g. in R or Excel.
 <h3>Tracking Method</h3>
     <p width=400>
     You can choose between 'center of mass' and 'correlation'.
-    For both methods, the mean intensity within the current tracking window **is subtracted**
-    from each pixel as a background removal strategy.
+    For both methods, the manually entered background intensity is subtracted before the computations are done.
     </p>
-    <h4>center of mass</h4>
+<h4>center of mass</h4>
     <p width=400>
     The center of mass is very fast to compute.
     For 'center of mass' the position at each time-point is determined by an iterative (n=10) center-of-mass
