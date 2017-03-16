@@ -101,6 +101,7 @@ public class Registration implements PlugIn {
     int trackStatsTotalPointsTrackedAtLastStart;
     TrackingGUI trackingGUI;
     private Double gui_croppingFactor = 1.0;
+    private int gui_background = 0;
 
     // todo: put actual tracking into different class
 
@@ -121,10 +122,11 @@ public class Registration implements PlugIn {
                 "Window size [factor]",
                 "Sub-sampling dx, dy, dz, dt [pixels, frames]",
                 "Length [frames]",
+                "Background value [gray values]",
                 "Crop size [factor]"
         };
 
-        String[] actions = {
+        String[] buttonActions = {
                 "Set x&y",
                 "Set z",
                 "Track selected object",
@@ -141,6 +143,7 @@ public class Registration implements PlugIn {
                 String.valueOf(gui_trackingFactor),
                 String.valueOf((int) gui_pSubSample.getX() + "," + (int) gui_pSubSample.getY() + "," + (int) gui_pSubSample.getZ() + "," + gui_tSubSample),
                 String.valueOf(imp.getNFrames()),
+                String.valueOf(gui_background),
                 String.valueOf(gui_croppingFactor)
         };
 
@@ -148,7 +151,7 @@ public class Registration implements PlugIn {
                 "Method"
         };
 
-        String[][] combos = {
+        String[][] comboChoices = {
                 {"center of mass","correlation"}
         };
 
@@ -196,11 +199,11 @@ public class Registration implements PlugIn {
             //
             // Buttons
             //
-            JButton[] buttons = new JButton[actions.length];
+            JButton[] buttons = new JButton[buttonActions.length];
 
             for (int i = 0; i < buttons.length; i++, iToolTipText++) {
-                buttons[i] = new JButton(actions[i]);
-                buttons[i].setActionCommand(actions[i]);
+                buttons[i] = new JButton(buttonActions[i]);
+                buttons[i].setActionCommand(buttonActions[i]);
                 buttons[i].addActionListener(this);
                 buttons[i].setToolTipText(toolTipTexts[iToolTipText]);
             }
@@ -211,8 +214,8 @@ public class Registration implements PlugIn {
             JComboBox[] comboBoxes = new JComboBox[comboNames.length];
             JLabel[] comboLabels = new JLabel[comboNames.length];
 
-            for (int i = 0; i < combos.length; i++, iToolTipText++) {
-                comboBoxes[i] = new JComboBox(combos[i]);
+            for (int i = 0; i < comboChoices.length; i++, iToolTipText++) {
+                comboBoxes[i] = new JComboBox(comboChoices[i]);
                 comboBoxes[i].setActionCommand(comboNames[i]);
                 comboBoxes[i].addActionListener(this);
                 comboBoxes[i].setToolTipText(toolTipTexts[iToolTipText]);
@@ -260,6 +263,11 @@ public class Registration implements PlugIn {
             panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
             panels.get(iPanel).add(comboLabels[iComboBox]);
             panels.get(iPanel).add(comboBoxes[iComboBox++]);
+            c.add(panels.get(iPanel++));
+            // Background value (this will be subtracted from the image)
+            panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
+            panels.get(iPanel).add(labels[k]);
+            panels.get(iPanel).add(textFields[k++]);
             c.add(panels.get(iPanel++));
             // Tracking button
             panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
@@ -335,7 +343,7 @@ public class Registration implements PlugIn {
             if(vss==null) return;
 
 
-            if (e.getActionCommand().equals(actions[i++])) {
+            if (e.getActionCommand().equals(buttonActions[i++])) {
 
                 //
                 // Set nx, ny
@@ -352,7 +360,7 @@ public class Registration implements PlugIn {
                 trackingGUI.changeTextField(0, "" + (int) gui_pTrackingSize.getX() + "," + (int) gui_pTrackingSize.getY() + "," + (int) gui_pTrackingSize.getZ());
 
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            } else if (e.getActionCommand().equals(buttonActions[i++])) {
                 //
                 //  Set nz
                 //
@@ -367,7 +375,7 @@ public class Registration implements PlugIn {
                 }
                 previouslySelectedZ = z;
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            } else if (e.getActionCommand().equals(buttonActions[i++])) {
 
                 //
                 // Track selected object
@@ -380,7 +388,7 @@ public class Registration implements PlugIn {
                 }
 
                 //
-                // adjust the number of iterations for the center of mass
+                // automatically adjust the number of iterations for the center of mass
                 //
 
                 gui_iterations = (int) Math.ceil(Math.pow(gui_trackingFactor, 2)); // this purely gut-feeling
@@ -392,7 +400,7 @@ public class Registration implements PlugIn {
                 if( iNewTrack >= 0 ) {
                     trackStatsLastTrackStarted = System.currentTimeMillis();
                     trackStatsTotalPointsTrackedAtLastStart = totalTimePointsTracked.get();
-                    es.execute(new Registration.Tracking(imp, iNewTrack, gui_pSubSample, gui_tSubSample, gui_iterations, gui_trackingFactor));
+                    es.execute(new Registration.Tracking(imp, iNewTrack, gui_pSubSample, gui_tSubSample, gui_iterations, gui_trackingFactor, gui_background));
                 }
 
                 Thread t = new Thread(new Runnable() {
@@ -404,7 +412,7 @@ public class Registration implements PlugIn {
 
 
             }
-            else if ( e.getActionCommand().equals(actions[i++]) )
+            else if ( e.getActionCommand().equals(buttonActions[i++]) )
             {
 
                 //
@@ -414,7 +422,7 @@ public class Registration implements PlugIn {
                 showTrackTable();
 
             }
-            else if (e.getActionCommand().equals(actions[i++]))
+            else if (e.getActionCommand().equals(buttonActions[i++]))
             {
 
                 //
@@ -433,7 +441,7 @@ public class Registration implements PlugIn {
                 }
 
             }
-            else if ( e.getActionCommand().equals(actions[i++]) )
+            else if ( e.getActionCommand().equals(buttonActions[i++]) )
             {
 
                 //
@@ -451,7 +459,7 @@ public class Registration implements PlugIn {
                 totalTimePointsToBeTracked = 0;
 
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            } else if (e.getActionCommand().equals(buttonActions[i++])) {
 
                 //
                 // View Object tracks
@@ -460,7 +468,7 @@ public class Registration implements PlugIn {
                 showTrackedObjects();
 
 
-            } else if (e.getActionCommand().equals(actions[i++])) {
+            } else if (e.getActionCommand().equals(buttonActions[i++])) {
 
                 //
                 // Report issue
@@ -478,15 +486,12 @@ public class Registration implements PlugIn {
                 } else { /* TODO: error handling */ }
 
             } else if (e.getActionCommand().equals(texts[k++])) {
-
                 //
                 // Tracking object size
                 //
-
                 JTextField source = (JTextField) e.getSource();
                 String[] sA = source.getText().split(",");
                 gui_pTrackingSize = new Point3D(new Integer(sA[0]), new Integer(sA[1]), new Integer(sA[2]));
-
             }
             else if (e.getActionCommand().equals(texts[k++]))
             {
@@ -513,6 +518,14 @@ public class Registration implements PlugIn {
                 //
                 JTextField source = (JTextField) e.getSource();
                 gui_ntTracking = new Integer(source.getText());
+            }
+            else if ( e.getActionCommand().equals(texts[k++]) )
+            {
+                //
+                // Image background value
+                //
+                JTextField source = (JTextField) e.getSource();
+                gui_background = new Integer(source.getText());
             }
             else if (e.getActionCommand().equals(texts[k++]))
             {
@@ -896,20 +909,20 @@ public class Registration implements PlugIn {
     }
 
     class Tracking implements Runnable {
-        int iTrack, dt, iterations;
+        int iTrack, dt, iterations, background;
         Point3D pSubSample;
         double trackingFactor;
         ImagePlus imp;
 
-        Tracking(ImagePlus imp, int iTrack, Point3D pSubSample, int gui_tSubSample, int iterations, double trackingFactor) {
+        Tracking(ImagePlus imp, int iTrack, Point3D pSubSample, int gui_tSubSample, int iterations, double trackingFactor, int background)
+        {
             this.iTrack = iTrack;
             this.dt = gui_tSubSample;
             this.pSubSample = pSubSample;
             this.iterations = iterations;
             this.trackingFactor = trackingFactor;
+            this.background = background;
             this.imp = imp;
-
-
         }
 
         public void run() {
@@ -920,7 +933,7 @@ public class Registration implements PlugIn {
             Point3D pShift;
             Point3D pLocalShift;
             Point3D pSize;
-            boolean subtractMean = true;
+            //boolean subtractMean = true;
 
             VirtualStackOfStacks vss = (VirtualStackOfStacks) imp.getStack();
 
@@ -943,7 +956,7 @@ public class Registration implements PlugIn {
             // read data
             //
 
-            imp0 = vss.getCubeByTimeOffsetAndSize(tStart, channel, p0offset, pSize, pSubSample, subtractMean);
+            imp0 = vss.getCubeByTimeOffsetAndSize(tStart, channel, p0offset, pSize, pSubSample, background);
 
             // iteratively compute the shift of the center of mass relative to the center of the image stack
             // using only half the image size for iteration
@@ -1010,7 +1023,7 @@ public class Registration implements PlugIn {
 
                 // load image
                 startTime = System.currentTimeMillis();
-                imp1 = vss.getCubeByTimeOffsetAndSize(itNow, channel, p1offset, pSize, pSubSample, subtractMean);
+                imp1 = vss.getCubeByTimeOffsetAndSize(itNow, channel, p1offset, pSize, pSubSample, background);
                 elapsedReadingTime = System.currentTimeMillis() - startTime;
 
                 if (gui_trackingMethod == "correlation") {

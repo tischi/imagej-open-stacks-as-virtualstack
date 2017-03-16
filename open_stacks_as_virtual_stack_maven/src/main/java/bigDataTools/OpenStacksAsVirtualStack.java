@@ -2100,7 +2100,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     return;
                 }
 
-                //} else if (e.getActionCommand().equals(actions[i++])) {
+                //} else if (e.getActionCommand().equals(buttonActions[i++])) {
                 // "Save as h5 stacks"
                 //    IJ.showMessage("Not yet implemented.");
 

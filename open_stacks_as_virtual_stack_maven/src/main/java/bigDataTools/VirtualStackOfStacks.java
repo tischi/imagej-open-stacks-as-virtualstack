@@ -312,7 +312,7 @@ public class VirtualStackOfStacks extends ImageStack {
         }
 
         // imp = new OpenerExtensions().openCroppedStackOffsetSize(directory, infos[c][t], dz, po, ps);
-        imp = getCubeByTimeOffsetAndSize(t, c, po, ps, new Point3D(1,1,1), false);
+        imp = getCubeByTimeOffsetAndSize(t, c, po, ps, new Point3D(1,1,1), 0);
 
         return imp.getProcessor();
 
@@ -344,7 +344,7 @@ public class VirtualStackOfStacks extends ImageStack {
             ps = new Point3D(nX, nY, nZ);
         }
 
-        ImagePlus imp = getCubeByTimeOffsetAndSize(t, c, po, ps, pSubSample, false);
+        ImagePlus imp = getCubeByTimeOffsetAndSize(t, c, po, ps, pSubSample, 0);
         if( (int)pSubSample.getX()>1 || (int)pSubSample.getY()>1) {
             return(resizeWidthAndHeight(imp,(int)pSubSample.getX(),(int)pSubSample.getY()));
         } else {
@@ -352,7 +352,7 @@ public class VirtualStackOfStacks extends ImageStack {
         }
     }
 
-    public ImagePlus getCubeByTimeOffsetAndSize(int t, int c, Point3D po, Point3D ps, Point3D pSubSample, boolean subtractMean) {
+    public ImagePlus getCubeByTimeOffsetAndSize(int t, int c, Point3D po, Point3D ps, Point3D pSubSample, int background) {
 
         ImagePlus impLoaded = null;
 
@@ -454,24 +454,36 @@ public class VirtualStackOfStacks extends ImageStack {
         }
 
         ImageStack finalStack = ImageStack.create(sx, sy, sz, fi.bytesPerPixel*8);
-        if(sx2>0 && sy2>0 && sz2>0) { // something was actually loaded
 
+        if( sx2>0 && sy2>0 && sz2>0 )
+        { // something was actually loaded
 
-            if(subtractMean) { // subtract mean intensity
-                int mean = computeMean16bit(impLoaded.getStack());
-                //log("subtracting mean: " + mean);
-                IJ.run(impLoaded, "Subtract...", "value=" + mean + " stack");
+            // subtract an image background
+            // this helps both the center of mass and the correlation
+            if( background > 0 )
+            {
+                // an alternative here is to automatically determine the background, options are
+                // - subtract mean intensity (if the cropping region around the object is not much larger
+                // than the object itself this will highlight the bright regions in the object)
+                // int mean = computeMean16bit(impLoaded.getStack());
+                // log("subtracting mean: " + mean);
+                // - compute some lower percentile of the region
+                IJ.run(impLoaded, "Subtract...", "value=" + background + " stack");
             }
 
+            // put the loaded stack into a larger stack
+            // this deals with out-of-bounds issues
             ImageStack loadedStack = impLoaded.getStack();
-            for (int z = 0; z < loadedStack.size(); z++) {
-                ImageProcessor ip = loadedStack.getProcessor(z + 1); // one-based
+            for ( int z = 1; z <= loadedStack.size(); z++ ) // getProcessor is one-based
+            {
+                ImageProcessor ip = loadedStack.getProcessor(z);
                 ImageProcessor ip2 = ip.createProcessor(sx, sy);
                 ip2.insert(ip, finalStackOffsetX, finalStackOffsetY);
-                if((z + 1) + finalStackOffsetZ > finalStack.size()) {
+                if( z + finalStackOffsetZ > finalStack.size() )
+                {
                     IJ.showMessage("Error due to z-subsampling");
                 }
-                finalStack.setProcessor(ip2, (z + 1) + finalStackOffsetZ);
+                finalStack.setProcessor(ip2, z + finalStackOffsetZ);
             }
         }
 
@@ -503,11 +515,14 @@ public class VirtualStackOfStacks extends ImageStack {
         int zMin = 0;
         int zMax = (depth-1);
 
-        for(int z=zMin; z<=zMax; z++) {
+        for( int z=zMin; z<=zMax; z++ )
+        {
             short[] pixels = (short[]) stack.getProcessor(z+1).getPixels();
-            for (int y = yMin; y<=yMax; y++) {
+            for ( int y = yMin; y<=yMax; y++ )
+            {
                 i = y * width + xMin;
-                for (int x = xMin; x <= xMax; x++) {
+                for ( int x = xMin; x <= xMax; x++ )
+                {
                     sum += (pixels[i] & 0xffff);
                     i++;
                 }
