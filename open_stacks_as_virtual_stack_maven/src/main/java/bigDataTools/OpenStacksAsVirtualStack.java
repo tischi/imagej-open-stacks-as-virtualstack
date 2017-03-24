@@ -1572,7 +1572,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        final String directory = "/Users/tischi/Desktop/example-data/3d-embryo/";
+        final String directory = "/Users/tischi/Desktop/example-data/Alexis/";
         //final String directory = "/Users/tischi/Desktop/example-data/Nils--MATLAB--Compressed/";
 
         // final String directory = "/Volumes/USB DISK/Ashna -test/";
@@ -1594,7 +1594,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         Thread t1 = new Thread(new Runnable() {
             public void run() {
                 int nIOthreads = 10;
-                ovs.openFromDirectory(directory, "None", ".*", "Data", nIOthreads);
+                ovs.openFromDirectory(directory, "None", ".*", "data", nIOthreads);
             }
         });
         t1.start();
@@ -1847,8 +1847,6 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             mainPanels.get(k).add(panels.get(j++));
 
             jtp.add("Saving", mainPanels.get(k++));
-
-
 
             // Viewing
             //

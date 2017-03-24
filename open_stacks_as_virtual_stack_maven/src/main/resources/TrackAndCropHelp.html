@@ -15,7 +15,7 @@
 <p width=400>
     The factor determines the window in which the algorithm will search for the object in the next time-point.
     The window size is:<br>
-    <b>Object size * Tracking factor</b><br>
+    <b>Object size * Window size</b><br>
     This needs to be large enough to cover the distance that the object moves
     between subsequent time-points. If the objects moves out of the "Tracking window" the algorithm will
     not find it anymore.
@@ -25,10 +25,10 @@
 <html>
 <h3>Tracking sub-sampling</h3>
 <p width=400>
-    To increase the tracking speed you can analyse only every dx,dy,dz data point.
-    Especially when working with Tiff stacks this will help as loading only every dz plane will be much faster.
-    Center of mass computation is so fast that dx and dy sub-sampling do not help much.
-    However, for the correlation-based tracking dx and dy sub-sampling makes a big difference in speed.
+    You can specify binning (linear interpolation) in x and y, as well as sub-sampling in z and t.
+    Especially when working with Tiff stacks sub-sampling in z will help as only every zth plane will be loaded from disc to RAM.
+    Center of mass computation is so fast that binning in x and y makes no sense.
+    For correlation-based tracking however x and y binning helps both in terms of speed and also for noise reduction.
 </p>
 </html>
 ###

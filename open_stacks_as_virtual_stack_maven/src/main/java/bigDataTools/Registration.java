@@ -100,7 +100,7 @@ public class Registration implements PlugIn {
     long trackStatsLastTrackStarted;
     int trackStatsTotalPointsTrackedAtLastStart;
     TrackingGUI trackingGUI;
-    private Double gui_croppingFactor = 1.0;
+    private String gui_croppingFactor = "1.0";
     private int gui_background = 0;
 
     // todo: put actual tracking into different class
@@ -118,9 +118,9 @@ public class Registration implements PlugIn {
         JFrame frame;
 
         String[] texts = {
-                "Object size x,y,z [pixels]",
+                "Object size: x,y,z [pixels]",
                 "Window size [factor]",
-                "Sub-sampling dx, dy, dz, dt [pixels, frames]",
+                "Binning/Subsampling: dx, dy, dz, dt [pixels, frames]",
                 "Length [frames]",
                 "Background value [gray values]",
                 "Crop size [factor]"
@@ -533,7 +533,7 @@ public class Registration implements PlugIn {
                 // Cropping factor
                 //
                 JTextField source = (JTextField) e.getSource();
-                gui_croppingFactor = new Double(source.getText());
+                gui_croppingFactor = source.getText();
             }
              else if (e.getActionCommand().equals(comboNames[j++]))
             {
@@ -846,19 +846,54 @@ public class Registration implements PlugIn {
 
             if (track.completed) {
 
+
                 //
                 // convert track center coordinates to bounding box offsets
                 //
-
-                //boolean[] shifted = new boolean[1];
                 Point3D[] trackOffsets = new Point3D[track.getLength()];
-                for(int iPosition=0; iPosition<track.getLength(); iPosition++)
-                {
-                    trackOffsets[iPosition] = computeOffset(track.getXYZ(iPosition),
-                            track.getObjectSize().multiply(gui_croppingFactor));
+                if( ! gui_croppingFactor.equals("all") ) {
+
+                    //  only crop around the object
+
+                    double croppingFactor;
+
+                    try
+                    {
+                        croppingFactor = Double.parseDouble(gui_croppingFactor);
+                    }
+                    catch(NumberFormatException nfe)
+                    {
+                        IJ.showMessage("Please either enter 'all' or a number as the Cropping Factor");
+                        return;
+                    }
+
+                    Point3D pObjectSize = track.getObjectSize().multiply(croppingFactor);
+
+                    for (int iPosition = 0; iPosition < track.getLength(); iPosition++)
+                    {
+                        trackOffsets[iPosition] = computeOffset(track.getXYZ(iPosition), pObjectSize);
+                    }
+                    impA[i] = OpenStacksAsVirtualStack.makeCroppedVirtualStack(track.getImp(), trackOffsets, pObjectSize, track.getTmin(), track.getTmax());
+
                 }
-                impA[i] = OpenStacksAsVirtualStack.makeCroppedVirtualStack(track.getImp(), trackOffsets,
-                                    track.getObjectSize().multiply(gui_croppingFactor), track.getTmin(), track.getTmax());
+                else
+                {
+                    // the object was only used to "drift correct" the whole image
+                    // thus, show the whole image
+                    ImagePlus imp = track.getImp();
+                    Point3D pImageSize = new Point3D(imp.getWidth(), imp.getHeight(), imp.getNSlices());
+                    Point3D pImageCenter = pImageSize.multiply(0.5);
+                    Point3D offsetToImageCenter = track.getXYZ(0).subtract(pImageCenter);
+                    for ( int iPosition = 0; iPosition < track.getLength(); iPosition++ )
+                    {
+                        Point3D correctedImageCenter = track.getXYZ(iPosition).subtract(offsetToImageCenter);
+                        trackOffsets[iPosition] = computeOffset(correctedImageCenter, pImageSize);
+                    }
+                    impA[i] = OpenStacksAsVirtualStack.makeCroppedVirtualStack(track.getImp(), trackOffsets, pImageSize, track.getTmin(), track.getTmax());
+
+
+                }
+
                 if (impA[i] == null)
                 {
                     log("..cropping failed.");

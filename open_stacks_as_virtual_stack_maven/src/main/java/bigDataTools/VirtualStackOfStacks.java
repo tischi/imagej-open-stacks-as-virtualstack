@@ -540,7 +540,7 @@ public class VirtualStackOfStacks extends ImageStack {
         ImageStack stack1 = imp.getStack();
         ImageStack stack2 = new ImageStack(nx/dx, ny/dy);
         ImageProcessor ip1, ip2;
-        int method = ImageProcessor.NEAREST_NEIGHBOR;
+        int method = ImageProcessor.BILINEAR; // ImageProcessor.NEAREST_NEIGHBOR;
         if (nx == 1 || ny == 1)
             method = ImageProcessor.NONE;
         for (int i = 1; i <= nSlices; i++) {
