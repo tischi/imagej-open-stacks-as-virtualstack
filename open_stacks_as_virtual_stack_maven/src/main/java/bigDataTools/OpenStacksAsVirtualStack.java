@@ -1591,6 +1591,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
         //Globals.verbose = true;
 
+        /*
         Thread t1 = new Thread(new Runnable() {
             public void run() {
                 int nIOthreads = 10;
@@ -1602,6 +1603,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         ovs.showDialog();
         Registration register = new Registration(IJ.getImage());
         register.run("");
+        */
+
+        AnalyzeFishSpots afs =  new AnalyzeFishSpots("/Users/tischi/Desktop/FISH_01_Crop.tif");
+        afs.run("");
 
 
         /*
@@ -2098,7 +2103,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     return;
                 }
 
-                //} else if (e.getActionCommand().equals(buttonActions[i++])) {
+                //} else if (e.getActionCommand().equals(Actions[i++])) {
                 // "Save as h5 stacks"
                 //    IJ.showMessage("Not yet implemented.");
 

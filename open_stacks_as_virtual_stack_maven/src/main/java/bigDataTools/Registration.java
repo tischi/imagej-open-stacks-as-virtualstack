@@ -851,9 +851,26 @@ public class Registration implements PlugIn {
                 // convert track center coordinates to bounding box offsets
                 //
                 Point3D[] trackOffsets = new Point3D[track.getLength()];
-                if( ! gui_croppingFactor.equals("all") ) {
 
-                    //  only crop around the object
+                if( gui_croppingFactor.equals("all") ) {
+
+                    // the object was used to "drift correct" the whole image
+                    // thus, show the whole image
+                    ImagePlus imp = track.getImp();
+                    Point3D pImageSize = new Point3D(imp.getWidth(), imp.getHeight(), imp.getNSlices());
+                    Point3D pImageCenter = pImageSize.multiply(0.5);
+                    Point3D offsetToImageCenter = track.getXYZ(0).subtract(pImageCenter);
+                    for( int iPosition = 0; iPosition < track.getLength(); iPosition++ )
+                    {
+                        Point3D correctedImageCenter = track.getXYZ(iPosition).subtract(offsetToImageCenter);
+                        trackOffsets[iPosition] = computeOffset(correctedImageCenter, pImageSize);
+                    }
+                    impA[i] = OpenStacksAsVirtualStack.makeCroppedVirtualStack(track.getImp(), trackOffsets, pImageSize, track.getTmin(), track.getTmax());
+
+                }
+                else
+                {
+                    //  crop around the object
 
                     double croppingFactor;
 
@@ -876,27 +893,10 @@ public class Registration implements PlugIn {
                     impA[i] = OpenStacksAsVirtualStack.makeCroppedVirtualStack(track.getImp(), trackOffsets, pObjectSize, track.getTmin(), track.getTmax());
 
                 }
-                else
+
+                if( impA[i] == null )
                 {
-                    // the object was only used to "drift correct" the whole image
-                    // thus, show the whole image
-                    ImagePlus imp = track.getImp();
-                    Point3D pImageSize = new Point3D(imp.getWidth(), imp.getHeight(), imp.getNSlices());
-                    Point3D pImageCenter = pImageSize.multiply(0.5);
-                    Point3D offsetToImageCenter = track.getXYZ(0).subtract(pImageCenter);
-                    for ( int iPosition = 0; iPosition < track.getLength(); iPosition++ )
-                    {
-                        Point3D correctedImageCenter = track.getXYZ(iPosition).subtract(offsetToImageCenter);
-                        trackOffsets[iPosition] = computeOffset(correctedImageCenter, pImageSize);
-                    }
-                    impA[i] = OpenStacksAsVirtualStack.makeCroppedVirtualStack(track.getImp(), trackOffsets, pImageSize, track.getTmin(), track.getTmax());
-
-
-                }
-
-                if (impA[i] == null)
-                {
-                    log("..cropping failed.");
+                    log("The cropping failed!");
                 }
                 else
                 {
