@@ -1605,7 +1605,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         register.run("");
         */
 
-        AnalyzeFishSpots afs =  new AnalyzeFishSpots("/Users/tischi/Desktop/FISH_01_Crop.tif");
+        AnalyzeFishSpotsPlugIn afs =  new AnalyzeFishSpotsPlugIn("/Users/tischi/Desktop/FISH_01_Crop.tif");
         afs.run("");
 
 
