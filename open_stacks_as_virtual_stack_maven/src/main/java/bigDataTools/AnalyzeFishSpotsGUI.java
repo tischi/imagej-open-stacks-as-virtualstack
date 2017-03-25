@@ -2,7 +2,6 @@ package bigDataTools;
 
 import ij.IJ;
 import ij.ImagePlus;
-import javafx.geometry.Point3D;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +48,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
             imp = IJ.getImage();
 
-            frame = new JFrame("Analyze Spots");
+            frame = new JFrame("Spot Segmentation");
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
             Container c = frame.getContentPane();
@@ -73,7 +72,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
             // action
             addButton(panels, iPanel++, c, buttonSegmentSpots, buttonSegmentSpotsText);
             addComboBox(panels, iPanel++, c, comboBoxSegmentationMethod, comboBoxSegmentationMethodLabel);
-            addTextField(panels, iPanel++, c, textFieldSpotSize, textFieldSpotSizeLabel, "5.0");
+            addTextField(panels, iPanel++, c, textFieldSpotSize, textFieldSpotSizeLabel, "1.0");
             addTextField(panels, iPanel++, c, textFieldSpotThreshold, textFieldSpotThresholdLabel, "1.0");
 
             //
@@ -128,8 +127,6 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         }
 
 
-
-
         public void focusGained(FocusEvent e) {
             //
         }
@@ -146,7 +143,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
             // update current imp object
             imp = IJ.getImage();
 
-            if (e.getActionCommand().equals(buttonSegmentSpotsText)) {
+            if ( e.getActionCommand().equals(buttonSegmentSpotsText) ) {
 
                 segmentationSettings.trackMateSpotSize = new Double(textFieldSpotSize.getText());
                 segmentationSettings.trackMateSpotThreshold = new Double(textFieldSpotThreshold.getText());
@@ -155,20 +152,16 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
                 int[] channels = new int[]{2}; // one-based
                 int[] frames = new int[]{1}; // one-based
 
-                Point3D regionOffset = null;
-                Point3D regionSize = null;
-
                 segmentationResults = SegmentObjects.run(imp,
                         segmentationResults,
                         segmentationSettings,
                         channels,
-                        frames,
-                        regionOffset,
-                        regionSize);
+                        frames);
             }
 
-            if (e.getActionCommand().equals(buttonShowSpotsText)) {
-                IJ.showMessage("Not implemented");
+            if ( e.getActionCommand().equals(buttonShowSpotsText) )
+            {
+                segmentationResults.showAsOverlay(imp);
             }
         }
 
