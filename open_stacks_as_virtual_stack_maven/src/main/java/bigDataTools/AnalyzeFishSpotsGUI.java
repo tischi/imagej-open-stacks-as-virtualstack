@@ -12,25 +12,27 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
 
+
 public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 {
 
         // GUI
         JFrame frame;
 
-        final String buttonShowSpotsText = "Show Spots";
-        JButton buttonShowSpots =  new JButton();
         final String buttonSegmentSpotsText = "Find Spots";
         JButton buttonSegmentSpots =  new JButton();
 
+        final String buttonShowSpotsText = "Show Spots";
+        JButton buttonShowSpots =  new JButton();
+
         final String textFieldSpotSizeLabel = "Spot size";
-        JTextField textFieldSpotSize = new JTextField("10", 3);
+        JTextField textFieldSpotSize = new JTextField(3);
 
         final String textFieldSpotThresholdLabel = "Spot threshold";
-        JTextField textFieldSpotThreshold = new JTextField("10", 3);
+        JTextField textFieldSpotThreshold = new JTextField(3);
 
         final String comboBoxSegmentationMethodLabel = "Segmentation method";
-        JComboBox comboBoxSegmentationMethod = new JComboBox(new String[] {"TrackMate DoG","Other"});
+        JComboBox comboBoxSegmentationMethod = new JComboBox(new String[] {Globals.TRACKMATEDOG,Globals.IMAGESUITE3D});
 
         SegmentationResults segmentationResults = new SegmentationResults();
         SegmentationSettings segmentationSettings = new SegmentationSettings();
@@ -71,9 +73,8 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
             // action
             addButton(panels, iPanel++, c, buttonSegmentSpots, buttonSegmentSpotsText);
             addComboBox(panels, iPanel++, c, comboBoxSegmentationMethod, comboBoxSegmentationMethodLabel);
-            addTextField(panels, iPanel++, c, textFieldSpotSize, textFieldSpotSizeLabel, "5");
-            addTextField(panels, iPanel++, c, textFieldSpotThreshold, textFieldSpotThresholdLabel, "5");
-
+            addTextField(panels, iPanel++, c, textFieldSpotSize, textFieldSpotSizeLabel, "5.0");
+            addTextField(panels, iPanel++, c, textFieldSpotThreshold, textFieldSpotThresholdLabel, "1.0");
 
             //
             // Spot visualisation
@@ -85,7 +86,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
             c.add(panels.get(iPanel++));
 
             // show spots button
-            addButton(panels, iPanel++, c, buttonShowSpots, buttonSegmentSpotsText);
+            addButton(panels, iPanel++, c, buttonShowSpots, buttonShowSpotsText);
 
             //
             // Show the GUI
@@ -104,7 +105,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
             textField.addFocusListener(this);
             textField.setText(textFieldDefault);
             panels.get(iPanel).add(new JLabel(textFieldLabel));
-            panels.get(iPanel).add(textFieldSpotSize);
+            panels.get(iPanel).add(textField);
             c.add(panels.get(iPanel));
         }
 
@@ -113,7 +114,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
             panels.add(new JPanel(new FlowLayout(FlowLayout.RIGHT)));
             button.setActionCommand(buttonLabel);
             button.addActionListener(this);
-            button.setName(buttonLabel);
+            button.setText(buttonLabel);
             panels.get(iPanel).add(button);
             c.add(panels.get(iPanel));
         }
@@ -129,8 +130,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
 
 
-
-    public void focusGained(FocusEvent e) {
+        public void focusGained(FocusEvent e) {
             //
         }
 
@@ -146,29 +146,30 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
             // update current imp object
             imp = IJ.getImage();
 
-            if (e.getActionCommand().equals(findSpotsButtonName))
-            {
-                int[] channels = new int[1];
-                channels[0] = 1;
-                int[] frames = new int[1];
-                channels[0] = 0;
+            if (e.getActionCommand().equals(buttonSegmentSpotsText)) {
+
+                segmentationSettings.trackMateSpotSize = new Double(textFieldSpotSize.getText());
+                segmentationSettings.trackMateSpotThreshold = new Double(textFieldSpotThreshold.getText());
+                segmentationSettings.method = (String) comboBoxSegmentationMethod.getSelectedItem();
+
+                int[] channels = new int[]{2}; // one-based
+                int[] frames = new int[]{1}; // one-based
 
                 Point3D regionOffset = null;
                 Point3D regionSize = null;
 
                 segmentationResults = SegmentObjects.run(imp,
                         segmentationResults,
-                        (String) segmentationMethodComboBox.getSelectedItem(),
-
+                        segmentationSettings,
                         channels,
                         frames,
                         regionOffset,
                         regionSize);
             }
 
-            if (e.getActionCommand().equals(showSpotsButtonName))
-            {
-
-
+            if (e.getActionCommand().equals(buttonShowSpotsText)) {
+                IJ.showMessage("Not implemented");
             }
+        }
+
 }

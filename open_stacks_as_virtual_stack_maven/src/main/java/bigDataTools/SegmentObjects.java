@@ -1,6 +1,5 @@
 package bigDataTools;
 
-import fiji.plugin.trackmate.Model;
 import fiji.plugin.trackmate.Settings;
 import fiji.plugin.trackmate.TrackMate;
 import fiji.plugin.trackmate.detection.DetectorKeys;
@@ -9,9 +8,11 @@ import fiji.plugin.trackmate.detection.LogDetectorFactory;
 import fiji.plugin.trackmate.tracking.LAPUtils;
 import fiji.plugin.trackmate.tracking.TrackerKeys;
 import fiji.plugin.trackmate.tracking.sparselap.SparseLAPTrackerFactory;
+import fiji.plugin.trackmate.Model;
+
+import ij.IJ;
 import ij.ImagePlus;
 import javafx.geometry.Point3D;
-
 
 import static ij.IJ.log;
 
@@ -20,43 +21,43 @@ import static ij.IJ.log;
  */
 public class SegmentObjects {
 
-    public void SegmentObjects()
-    {
-    }
 
     public static SegmentationResults run(ImagePlus imp,
-                                              SegmentationResults segmentationResults,
-                                              String method,
-                                              int[] channels,
-                                              int[] frames,
-                                              Point3D regionOffset,
-                                              Point3D regionSize)
+                                          SegmentationResults segmentationResults,
+                                          SegmentationSettings segmentationSettings,
+                                          int[] channels,
+                                          int[] frames,
+                                          Point3D regionOffset,
+                                          Point3D regionSize)
     {
 
-        if( method.equals("TrackMate DoG") )
+        if( segmentationSettings.method.equals(Globals.TRACKMATEDOG) )
         {
 
             segmentationResults = segmentUsingTrackMate(imp,
                                                         segmentationResults,
-                                                        method,
+                                                        segmentationSettings,
                                                         channels,
                                                         frames,
                                                         regionOffset,
                                                         regionSize);
         }
-
+        else if ( segmentationSettings.method.equals(Globals.IMAGESUITE3D))
+        {
+            IJ.showMessage( segmentationSettings.method + " is not yet implemented." );
+        }
 
         return segmentationResults;
     }
 
 
     private static SegmentationResults segmentUsingTrackMate(ImagePlus imp,
-                                                      SegmentationResults segmentationResults,
-                                                      String method,
-                                                      int[] channels,
-                                                      int[] frames,
-                                                      Point3D regionOffset,
-                                                      Point3D regionSize)
+                                                             SegmentationResults segmentationResults,
+                                                             SegmentationSettings segmentationSettings,
+                                                             int[] channels,
+                                                             int[] frames,
+                                                             Point3D regionOffset,
+                                                             Point3D regionSize)
     {
 
         Model model = new Model();
@@ -65,19 +66,19 @@ public class SegmentObjects {
 
         settings.setFrom(imp);
 
-        if( method.equals("TrackMate LoG") )
+        if( segmentationSettings.method.equals(Globals.TRACKMATEDOG) )
         {
             settings.detectorFactory = new LogDetectorFactory<>();
         }
-        else if (method.equals("TrackMate DoG") )
+        else if (segmentationSettings.method.equals(Globals.IMAGESUITE3D) )
         {
             settings.detectorFactory = new DogDetectorFactory<>();
         }
 
         settings.detectorSettings = settings.detectorFactory.getDefaultSettings();
         settings.detectorSettings.put(DetectorKeys.KEY_DO_SUBPIXEL_LOCALIZATION, true);
-        settings.detectorSettings.put(DetectorKeys.KEY_RADIUS, spotSize);
-        settings.detectorSettings.put(DetectorKeys.KEY_THRESHOLD, spotThreshold);
+        settings.detectorSettings.put(DetectorKeys.KEY_RADIUS, segmentationSettings.trackMateSpotSize);
+        settings.detectorSettings.put(DetectorKeys.KEY_THRESHOLD, segmentationSettings.trackMateSpotThreshold);
 
         // TODO: Are the tracking settings necessary?
         settings.trackerFactory = new SparseLAPTrackerFactory();
@@ -100,10 +101,11 @@ public class SegmentObjects {
             return null;
         }
 
-        // Return summary values
-        log("Number of spots: "+model.getSpots().getNSpots(false));
-
-
+        //
+        // Store results in segmentationResults
+        //
+        log("Number of spots: " + model.getSpots().getNSpots(false));
+        segmentationResults.trackMateModel = model;
 
         return segmentationResults;
     }

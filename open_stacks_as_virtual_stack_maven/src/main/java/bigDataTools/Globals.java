@@ -43,6 +43,9 @@ import static ij.IJ.log;
 public class Globals {
     public static boolean verbose = false;
     public static String version = "2016-Nov-21a";
+    public static String TRACKMATEDOG = "TrackMate Dog";
+    public static String IMAGESUITE3D = "3D ImageSuite";
+
 
     public static void threadlog(final String log) {
         SwingUtilities.invokeLater(new Runnable() {

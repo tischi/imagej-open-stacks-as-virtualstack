@@ -7,6 +7,7 @@ public class SegmentationSettings {
 
     public double trackMateSpotSize;
     public double trackMateSpotThreshold;
+    public String method;
 
     public SegmentationSettings() {
 
