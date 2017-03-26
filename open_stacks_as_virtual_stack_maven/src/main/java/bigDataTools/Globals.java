@@ -30,6 +30,7 @@
 
 package bigDataTools;
 
+import fiji.plugin.trackmate.Spot;
 import ij.IJ;
 import ij.ImagePlus;
 
@@ -89,6 +90,14 @@ public class Globals {
         }
 
         return nums;
+    }
+
+    public static void logSpotCoordinates(String spotName, Spot spot)
+    {
+        log(spotName+": "+
+                +spot.getDoublePosition(0)+","
+                +spot.getDoublePosition(1)+","
+                +spot.getDoublePosition(2));
     }
 
 }

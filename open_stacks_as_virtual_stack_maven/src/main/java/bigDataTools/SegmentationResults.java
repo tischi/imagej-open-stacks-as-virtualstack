@@ -54,12 +54,12 @@ public class SegmentationResults {
         //for (int i=0; i<hyperStackDisplayers.length; i++)
         //{
 
-        int channel = channels[0];
+        int iChannel = 0;
 
-            SelectionModel selectionModel = new SelectionModel(models[channel]);
-            hyperStackDisplayers[channel] = new HyperStackDisplayer(models[channel], selectionModel, imp);
-            hyperStackDisplayers[channel].setDisplaySettings("Color", Color.green);
-            hyperStackDisplayers[channel].render();
+            SelectionModel selectionModel = new SelectionModel(models[iChannel]);
+            hyperStackDisplayers[iChannel] = new HyperStackDisplayer(models[iChannel], selectionModel, imp);
+            hyperStackDisplayers[iChannel].setDisplaySettings("Color", Color.green);
+            hyperStackDisplayers[iChannel].render();
 
         //}
 
