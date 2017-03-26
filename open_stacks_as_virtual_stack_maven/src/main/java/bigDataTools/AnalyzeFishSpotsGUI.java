@@ -12,6 +12,15 @@ import java.awt.event.FocusListener;
 import java.util.ArrayList;
 
 
+// Notes:
+// - See: https://imagej.net/TrackMate_Algorithms#Spot_features_generated_by_the_spot_detectors
+// - The Quality feature of the DoG is the actual maximal DoG signal
+// - We hope that TrackMate will be used in experiments requiring Sub-pixel localization, such as following motor proteins in biophysical experiments, so we added schemes to achieve this. The one currently implemented uses a quadratic fitting scheme (made by Stephan Saalfeld and Stephan Preibisch) based on David Lowe SIFT work[1]. It has the advantage of being very quick, compared to the segmentation time itself.
+//     - See: http://www.cs.ubc.ca/~lowe/keypoints/
+
+// Ideas:
+// - maybe bin the data in z to have it isotropic in terms sigmas?
+
 public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 {
 
@@ -23,6 +32,12 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
     final String buttonShowSpotsText = "Show Spots";
     JButton buttonShowSpots =  new JButton();
+
+    final String buttonAnalyzeSelectedRegionsText = "Analyze Selected Regions";
+    JButton buttonAnalyzeSelectedRegions =  new JButton();
+
+    final String textFieldRegionSizeLabel = "Region size [pixels]";
+    JTextField textFieldRegionSize = new JTextField(12);
 
     final String textFieldChannelsLabel = "Channels";
     JTextField textFieldChannels = new JTextField(12);
@@ -49,6 +64,10 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
     public void showDialog() {
 
+        // this ensures that selection points are added to the overlay
+        IJ.run("Point Tool...", "type=Hybrid color=Green size=Small add_to label");
+
+
         imp = IJ.getImage();
 
         frame = new JFrame("Spot Segmentation");
@@ -73,11 +92,11 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         c.add(panels.get(iPanel++));
 
         // action
-        addButton(panels, iPanel++, c, buttonSegmentSpots, buttonSegmentSpotsText);
         addComboBox(panels, iPanel++, c, comboBoxSegmentationMethod, comboBoxSegmentationMethodLabel);
         addTextField(panels, iPanel++, c, textFieldChannels, textFieldChannelsLabel, "2,3");
         addTextField(panels, iPanel++, c, textFieldSpotSizes, textFieldSpotSizesLabel, "1.0,1.0");
         addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "1.0,1.0");
+        addButton(panels, iPanel++, c, buttonSegmentSpots, buttonSegmentSpotsText);
 
         //
         // Spot visualisation
@@ -88,8 +107,23 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         panels.get(iPanel).add(new JLabel("SPOT VISUALIZATION"));
         c.add(panels.get(iPanel++));
 
-        // show spots button
+        // actions
+        addTextField(panels, iPanel++, c, textFieldRegionSize, textFieldRegionSizeLabel, "10,10,10");
         addButton(panels, iPanel++, c, buttonShowSpots, buttonShowSpotsText);
+
+        //
+        // Spot analysis
+        //
+
+        // header
+        panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+        panels.get(iPanel).add(new JLabel("SPOT ANALYSIS"));
+        c.add(panels.get(iPanel++));
+
+        // show spots button
+        addButton(panels, iPanel++, c, buttonAnalyzeSelectedRegions, buttonAnalyzeSelectedRegionsText);
+
+
 
         //
         // Show the GUI
@@ -123,6 +157,13 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         {
             segmentationResults.showOverlayUsingTrackMateHyperStackDisplayer(imp);
         }
+
+
+        if ( e.getActionCommand().equals(buttonAnalyzeSelectedRegionsText) )
+        {
+            AnalyzeObjects.measureSpotLocationsAndDistancesInSelectedRegions(imp, segmentationResults);
+        }
+
 
     }
 

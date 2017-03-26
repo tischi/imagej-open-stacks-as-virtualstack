@@ -2172,7 +2172,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                     zMax = new Integer(sA[1]);
                 }
                 ImagePlus imp2 = osv.crop(imp, zMin, zMax);
-                if (imp2 != null) {
+                if (imp2 != null)
+                {
                     imp2.show();
                     imp2.setPosition(1, imp.getCurrentSlice(), 1);
                     imp2.updateAndDraw();

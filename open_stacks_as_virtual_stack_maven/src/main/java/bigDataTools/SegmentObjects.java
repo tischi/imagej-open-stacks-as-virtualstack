@@ -1,11 +1,11 @@
 package bigDataTools;
 
+import fiji.plugin.trackmate.Logger;
 import fiji.plugin.trackmate.Model;
 import fiji.plugin.trackmate.Settings;
 import fiji.plugin.trackmate.TrackMate;
 import fiji.plugin.trackmate.detection.DetectorKeys;
 import fiji.plugin.trackmate.detection.DogDetectorFactory;
-import fiji.plugin.trackmate.detection.LogDetectorFactory;
 import fiji.plugin.trackmate.tracking.LAPUtils;
 import fiji.plugin.trackmate.tracking.TrackerKeys;
 import fiji.plugin.trackmate.tracking.sparselap.SparseLAPTrackerFactory;
@@ -53,23 +53,17 @@ public class SegmentObjects {
                                                              SegmentationSettings segmentationSettings)
     {
 
-
         segmentationResults.channels = segmentationSettings.channels;
         segmentationResults.models = new Model[segmentationResults.channels.length];
 
-        for( int i =0; i < segmentationResults.channels.length; i++ ) {
-
-            int channel = segmentationResults.channels[i];
-
+        for( int iChannel=0; iChannel < segmentationResults.channels.length; iChannel++ )
+        {
             Model model = new Model();
+            model.setLogger(Logger.IJ_LOGGER);
 
             Settings settings = new Settings();
 
-            if (segmentationSettings.method.equals(Globals.TRACKMATEDOG)) {
-                settings.detectorFactory = new LogDetectorFactory<>();
-            } else if (segmentationSettings.method.equals(Globals.IMAGESUITE3D)) {
-                settings.detectorFactory = new DogDetectorFactory<>();
-            }
+            settings.detectorFactory = new DogDetectorFactory<>();
 
             Roi roi = imp.getRoi();
 
@@ -92,10 +86,17 @@ public class SegmentObjects {
 
             settings.setFrom(imp);
             settings.detectorSettings = settings.detectorFactory.getDefaultSettings();
-            settings.detectorSettings.put(DetectorKeys.KEY_TARGET_CHANNEL, channel);
+            settings.detectorSettings.put(DetectorKeys.KEY_TARGET_CHANNEL, segmentationResults.channels[iChannel]);
             settings.detectorSettings.put(DetectorKeys.KEY_DO_SUBPIXEL_LOCALIZATION, true);
-            settings.detectorSettings.put(DetectorKeys.KEY_RADIUS, segmentationSettings.spotSizes);
-            settings.detectorSettings.put(DetectorKeys.KEY_THRESHOLD, segmentationSettings.thresholds);
+            settings.detectorSettings.put(DetectorKeys.KEY_RADIUS, segmentationSettings.spotSizes[iChannel]);
+            settings.detectorSettings.put(DetectorKeys.KEY_THRESHOLD, segmentationSettings.thresholds[iChannel]);
+
+            // Configure spot filters - Classical filter on quality
+            // TODO: Shall I filter via threshold or via QUALITY
+            /*
+            filter1 = FeatureFilter('QUALITY', 30, True)
+            settings.addSpotFilter(filter1)
+            */
 
             // TODO: can one get rid of the tracker?
             settings.trackerFactory = new SparseLAPTrackerFactory();
@@ -104,9 +105,6 @@ public class SegmentObjects {
             settings.trackerSettings.put(TrackerKeys.KEY_GAP_CLOSING_MAX_DISTANCE, TrackerKeys.DEFAULT_GAP_CLOSING_MAX_DISTANCE);
             settings.trackerSettings.put(TrackerKeys.KEY_GAP_CLOSING_MAX_FRAME_GAP, TrackerKeys.DEFAULT_GAP_CLOSING_MAX_FRAME_GAP);
 
-
-            // settings.detectorFactory.
-
             TrackMate trackmate = new TrackMate(model, settings);
 
             // Process (spot detection and tracking)
@@ -114,10 +112,7 @@ public class SegmentObjects {
                 log("Configuration error: " + trackmate.getErrorMessage());
                 //return segmentationResults;
             }
-            if (!trackmate.execDetection()) {
-                log("Detection error: " + trackmate.getErrorMessage());
-                //return segmentationResults;
-            }
+
             if (!trackmate.process()) {
                 log("Processing error: " + trackmate.getErrorMessage());
                 //return segmentationResults;
@@ -126,8 +121,8 @@ public class SegmentObjects {
             //
             // Store results
             //
-            log("Channel: "+channel+"; Number of spots: " + model.getSpots().getNSpots(false) );
-            segmentationResults.models[channel] = model;
+            log("##### Channel: "+segmentationResults.channels[iChannel]+"; Number of spots: " + model.getSpots().getNSpots(false) );
+            segmentationResults.models[iChannel] = model;
             segmentationResults.segmentationMethod = "segmentUsingTrackMateModel";
 
         }
