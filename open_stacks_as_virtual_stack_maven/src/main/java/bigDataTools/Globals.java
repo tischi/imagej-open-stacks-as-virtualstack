@@ -40,7 +40,9 @@ import static ij.IJ.log;
 /**
  * Created by tischi on 06/11/16.
  */
+
 public class Globals {
+
     public static boolean verbose = false;
     public static String version = "2016-Nov-21a";
     public static String TRACKMATEDOG = "TrackMate Dog";
@@ -65,6 +67,28 @@ public class Globals {
             IJ.showMessage("This is only implemented for images opened with the Data Streaming Tools plugin.");
             return (null);
         }
+    }
+
+    public static double[] commaSeparatedStringToDoubleArray(String s) {
+
+        String[] sA = s.split(",");
+        double[] nums = new double[sA.length];
+        for (int i = 0; i < nums.length; i++) {
+            nums[i] = Double.parseDouble(sA[i]);
+        }
+
+        return nums;
+    }
+
+    public static int[] commaSeparatedStringToIntegerArray(String s) {
+
+        String[] sA = s.split(",");
+        int[] nums = new int[sA.length];
+        for (int i = 0; i < nums.length; i++) {
+            nums[i] = Integer.parseInt(sA[i]);
+        }
+
+        return nums;
     }
 
 }

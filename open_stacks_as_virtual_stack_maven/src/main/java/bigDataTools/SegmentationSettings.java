@@ -5,8 +5,10 @@ package bigDataTools;
  */
 public class SegmentationSettings {
 
-    public double trackMateSpotSize;
-    public double trackMateSpotThreshold;
+    public double[] spotSizes;
+    public double[] thresholds;
+    public int[] channels;
+    public int[] frames;
     public String method;
 
     public SegmentationSettings() {

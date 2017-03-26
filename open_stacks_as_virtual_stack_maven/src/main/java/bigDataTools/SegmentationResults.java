@@ -6,9 +6,7 @@ import fiji.plugin.trackmate.SpotCollection;
 import fiji.plugin.trackmate.visualization.DummySpotColorGenerator;
 import fiji.plugin.trackmate.visualization.DummyTrackColorGenerator;
 import fiji.plugin.trackmate.visualization.hyperstack.HyperStackDisplayer;
-import fiji.plugin.trackmate.visualization.hyperstack.SpotOverlay;
 import ij.ImagePlus;
-import ij.gui.Overlay;
 import org.jfree.chart.renderer.InterpolatePaintScale;
 
 import java.awt.*;
@@ -21,7 +19,7 @@ import java.util.Map;
 public class SegmentationResults {
     public String segmentationMethod;
     public Model[] models; // the array is channel-wise
-    public int[] channels; 
+    public int[] channels;
     public SpotCollection[] spotCollections; // the array is channel-wise
 
     // TODO: Loop over the models to find spots in multiple channels;
@@ -50,15 +48,26 @@ public class SegmentationResults {
 
     public void showOverlayUsingTrackMateHyperStackDisplayer(ImagePlus imp)
     {
-        SelectionModel selectionModel = new SelectionModel(model);
-        HyperStackDisplayer hyperStackDisplayer =  new HyperStackDisplayer(model, selectionModel, imp);
-        hyperStackDisplayer.render();
-        hyperStackDisplayer.refresh();
+
+        HyperStackDisplayer[] hyperStackDisplayers = new HyperStackDisplayer[models.length];
+
+        //for (int i=0; i<hyperStackDisplayers.length; i++)
+        //{
+
+        int channel = channels[0];
+
+            SelectionModel selectionModel = new SelectionModel(models[channel]);
+            hyperStackDisplayers[channel] = new HyperStackDisplayer(models[channel], selectionModel, imp);
+            hyperStackDisplayers[channel].setDisplaySettings("Color", Color.green);
+            hyperStackDisplayers[channel].render();
+
+        //}
+
     }
 
     public void showOverlayUsingTrackMateSpotOverlay(ImagePlus imp)
     {
-
+        /*
         Overlay overlay = imp.getOverlay();
         if(overlay == null) {
             overlay = new Overlay();
@@ -79,6 +88,7 @@ public class SegmentationResults {
         SpotOverlay spotOverlay2 = new SpotOverlay(model, imp, displaySettings);
         imp.getOverlay().add(spotOverlay2);
         imp.updateAndDraw();
+        */
 
         /*
         displaySettings.put("Color", DEFAULT_SPOT_COLOR);

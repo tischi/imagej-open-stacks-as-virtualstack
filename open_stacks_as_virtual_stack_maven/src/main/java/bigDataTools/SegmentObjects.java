@@ -16,17 +16,12 @@ import javafx.geometry.Point3D;
 
 import static ij.IJ.log;
 
-/**
- * Created by tischi on 25/03/17.
- */
 public class SegmentObjects {
 
 
     public static SegmentationResults run(ImagePlus imp,
                                           SegmentationResults segmentationResults,
-                                          SegmentationSettings segmentationSettings,
-                                          int[] channels,
-                                          int[] frames)
+                                          SegmentationSettings segmentationSettings)
     {
 
         if( segmentationSettings.method.equals(Globals.TRACKMATEDOG) )
@@ -34,9 +29,7 @@ public class SegmentObjects {
 
             segmentationResults = segmentUsingTrackMateModel(imp,
                                                         segmentationResults,
-                                                        segmentationSettings,
-                                                        channels,
-                                                        frames);
+                                                        segmentationSettings);
         }
         else if ( segmentationSettings.method.equals(Globals.IMAGESUITE3D))
         {
@@ -46,33 +39,29 @@ public class SegmentObjects {
         return segmentationResults;
     }
 
+
+
     private static SegmentationResults segmentUsingTrackMateDogDetector(ImagePlus imp,
                                                                   SegmentationResults segmentationResults,
-                                                                  SegmentationSettings segmentationSettings,
-                                                                  int[] channels,
-                                                                  int[] frames)
+                                                                  SegmentationSettings segmentationSettings)
     {
-
+        return segmentationResults;
     }
 
     private static SegmentationResults segmentUsingTrackMateModel(ImagePlus imp,
                                                              SegmentationResults segmentationResults,
-                                                             SegmentationSettings segmentationSettings,
-                                                             int[] channels,
-                                                             int[] frames)
+                                                             SegmentationSettings segmentationSettings)
     {
 
-        // TODO: Loop over channels
 
-        segmentationResults.models = new Model[channels.length];
-        segmentationResults.channels = channels;
+        segmentationResults.channels = segmentationSettings.channels;
+        segmentationResults.models = new Model[segmentationResults.channels.length];
 
+        for( int i =0; i < segmentationResults.channels.length; i++ ) {
 
-        for( int channel : channels) {
+            int channel = segmentationResults.channels[i];
 
             Model model = new Model();
-            segmentationResults.models[channel] = model;
-            segmentationResults.segmentationMethod = "segmentUsingTrackMateModel";
 
             Settings settings = new Settings();
 
@@ -83,7 +72,9 @@ public class SegmentObjects {
             }
 
             Roi roi = imp.getRoi();
-            if (roi != null && roi.isArea()) {
+
+            if (roi != null && roi.isArea())
+            {
                 Point3D regionOffset = new Point3D(roi.getBounds().getX(), roi.getBounds().getY(), 0);
                 Point3D regionSize = new Point3D(roi.getBounds().getWidth(), roi.getBounds().getHeight(), imp.getNSlices());
                 settings.xstart = (int) regionOffset.getX();
@@ -92,20 +83,19 @@ public class SegmentObjects {
                 settings.yend = settings.ystart + (int) regionSize.getY() - 1;
                 settings.zstart = (int) regionOffset.getX();
                 settings.zend = settings.zstart + (int) regionSize.getZ() - 1;
-            } else {
+            }
+            else
+            {
                 Point3D regionOffset = null;
                 Point3D regionSize = null;
             }
-
-
-            int channel = imp.getChannel();
 
             settings.setFrom(imp);
             settings.detectorSettings = settings.detectorFactory.getDefaultSettings();
             settings.detectorSettings.put(DetectorKeys.KEY_TARGET_CHANNEL, channel);
             settings.detectorSettings.put(DetectorKeys.KEY_DO_SUBPIXEL_LOCALIZATION, true);
-            settings.detectorSettings.put(DetectorKeys.KEY_RADIUS, segmentationSettings.trackMateSpotSize);
-            settings.detectorSettings.put(DetectorKeys.KEY_THRESHOLD, segmentationSettings.trackMateSpotThreshold);
+            settings.detectorSettings.put(DetectorKeys.KEY_RADIUS, segmentationSettings.spotSizes);
+            settings.detectorSettings.put(DetectorKeys.KEY_THRESHOLD, segmentationSettings.thresholds);
 
             // TODO: can one get rid of the tracker?
             settings.trackerFactory = new SparseLAPTrackerFactory();
@@ -132,10 +122,13 @@ public class SegmentObjects {
                 log("Processing error: " + trackmate.getErrorMessage());
                 //return segmentationResults;
             }
+
             //
-            // Store results in segmentationResults
+            // Store results
             //
-            log("Number of spots: " + model.getSpots().getNSpots(false));
+            log("Channel: "+channel+"; Number of spots: " + model.getSpots().getNSpots(false) );
+            segmentationResults.models[channel] = model;
+            segmentationResults.segmentationMethod = "segmentUsingTrackMateModel";
 
         }
 
