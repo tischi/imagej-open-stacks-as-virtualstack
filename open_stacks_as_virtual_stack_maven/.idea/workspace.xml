@@ -47,12 +47,36 @@
       <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-13.333333">
-              <caret line="61" column="0" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="24" />
+            <state vertical-scroll-proportion="-12.225806">
+              <caret line="640" column="16" selection-start-line="640" selection-start-column="12" selection-end-line="640" selection-end-column="16" />
               <folding>
+                <element signature="imports" expanded="true" />
                 <element signature="method#logIfTrackingFinished#0;class#Registration#0" expanded="false" />
+                <element signature="method#clear#0;class#TrackTable#0;class#Registration#0" expanded="false" />
+                <element signature="class#23319:23525" expanded="false" />
+                <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+                <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
+                <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
+                <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
+                <element signature="method#showTrackedObjects#0;class#Registration#0" expanded="false" />
                 <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-                <element signature="e#31832#31920#0" expanded="false" />
+                <element signature="e#31831#31919#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AnalyzeFishSpotsTable.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsTable.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="38" column="8" selection-start-line="38" selection-start-column="8" selection-end-line="38" selection-end-column="8" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="method#showTable#0;class#AnalyzeFishSpotsTable#0" expanded="false" />
+                <element signature="method#addRow#0;class#AnalyzeFishSpotsTable#0" expanded="false" />
+                <element signature="method#clearTable#0;class#AnalyzeFishSpotsTable#0" expanded="false" />
+                <element signature="class#2705:2891" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -62,7 +86,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="70" column="28" selection-start-line="70" selection-start-column="28" selection-end-line="70" selection-end-column="28" />
+              <caret line="45" column="55" selection-start-line="45" selection-start-column="55" selection-end-line="45" selection-end-column="55" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#addTextField#0;class#AnalyzeFishSpotsGUI#0" expanded="false" />
@@ -75,21 +99,11 @@
       <file leaf-file-name="AnalyzeObjects.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.38240576">
-              <caret line="47" column="16" selection-start-line="47" selection-start-column="16" selection-end-line="47" selection-end-column="16" />
+            <state vertical-scroll-proportion="0.6086176">
+              <caret line="76" column="23" selection-start-line="76" selection-start-column="23" selection-end-line="76" selection-end-column="23" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SpotCollection.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/TrackMate_/3.4.2/TrackMate_-3.4.2.jar!/fiji/plugin/trackmate/SpotCollection.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-20.703703">
-              <caret line="237" column="22" selection-start-line="237" selection-start-column="22" selection-end-line="237" selection-end-column="22" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -108,7 +122,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="104" column="0" selection-start-line="104" selection-start-column="0" selection-end-line="104" selection-end-column="0" />
+              <caret line="83" column="42" selection-start-line="83" selection-start-column="42" selection-end-line="83" selection-end-column="42" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#run#0;class#SegmentObjects#0" expanded="false" />
@@ -188,7 +202,6 @@
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/OpenerExtensions.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/VirtualStackOfStacks.java" />
         <option value="$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java" />
         <option value="$PROJECT_DIR$/src/main/resources/plugins.config" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpots.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsPlugIn.java" />
@@ -197,11 +210,13 @@
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationSettings.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeSpots.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/OpenStacksAsVirtualStack.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationResults.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Globals.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java" />
       </list>
     </option>
   </component>
@@ -224,7 +239,7 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-17" />
+    <option name="x" value="25" />
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="873" />
@@ -578,7 +593,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-17" y="23" width="1440" height="873" extended-state="0" />
+    <frame x="25" y="23" width="1440" height="873" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -698,7 +713,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="499" />
+      <option name="time" value="502" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -707,13 +722,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$MAVEN_REPOSITORY$/net/imglib2/imglib2-ij/2.0.0-beta-30/imglib2-ij-2.0.0-beta-30.jar!/net/imglib2/img/ImagePlusAdapter.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="170" column="50" selection-start-line="170" selection-start-column="50" selection-end-line="170" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/net/imglib2/imglib2-ij/2.0.0-beta-30/imglib2-ij-2.0.0-beta-30.jar!/net/imglib2/img/display/imagej/ImageJFunctions.class">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1056,30 +1064,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-13.333333">
-          <caret line="61" column="0" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="24" />
-          <folding>
-            <element signature="method#logIfTrackingFinished#0;class#Registration#0" expanded="false" />
-            <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#31832#31920#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="70" column="28" selection-start-line="70" selection-start-column="28" selection-end-line="70" selection-end-column="28" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#addTextField#0;class#AnalyzeFishSpotsGUI#0" expanded="false" />
-            <element signature="method#addButton#0;class#AnalyzeFishSpotsGUI#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/TrackMate_/3.4.2/TrackMate_-3.4.2.jar!/fiji/plugin/trackmate/detection/DogDetectorFactory.class">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-6.814815">
@@ -1127,10 +1111,56 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-12.225806">
+          <caret line="640" column="16" selection-start-line="640" selection-start-column="12" selection-end-line="640" selection-end-column="16" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#logIfTrackingFinished#0;class#Registration#0" expanded="false" />
+            <element signature="method#clear#0;class#TrackTable#0;class#Registration#0" expanded="false" />
+            <element signature="class#23319:23525" expanded="false" />
+            <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
+            <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
+            <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
+            <element signature="method#showTrackedObjects#0;class#Registration#0" expanded="false" />
+            <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
+            <element signature="e#31831#31919#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="38" column="8" selection-start-line="38" selection-start-column="8" selection-end-line="38" selection-end-column="8" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#showTable#0;class#AnalyzeFishSpotsTable#0" expanded="false" />
+            <element signature="method#addRow#0;class#AnalyzeFishSpotsTable#0" expanded="false" />
+            <element signature="method#clearTable#0;class#AnalyzeFishSpotsTable#0" expanded="false" />
+            <element signature="class#2705:2891" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="45" column="55" selection-start-line="45" selection-start-column="55" selection-end-line="45" selection-end-column="55" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#addTextField#0;class#AnalyzeFishSpotsGUI#0" expanded="false" />
+            <element signature="method#addButton#0;class#AnalyzeFishSpotsGUI#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="104" column="0" selection-start-line="104" selection-start-column="0" selection-end-line="104" selection-end-column="0" />
+          <caret line="83" column="42" selection-start-line="83" selection-start-column="42" selection-end-line="83" selection-end-column="42" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#run#0;class#SegmentObjects#0" expanded="false" />
@@ -1140,8 +1170,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.38240576">
-          <caret line="47" column="16" selection-start-line="47" selection-start-column="16" selection-end-line="47" selection-end-column="16" />
+        <state vertical-scroll-proportion="0.6086176">
+          <caret line="76" column="23" selection-start-line="76" selection-start-column="23" selection-end-line="76" selection-end-column="23" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

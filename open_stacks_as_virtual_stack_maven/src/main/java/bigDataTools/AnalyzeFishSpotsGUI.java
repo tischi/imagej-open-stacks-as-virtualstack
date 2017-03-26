@@ -39,7 +39,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     final String textFieldRegionSizeLabel = "Region size [pixels]";
     JTextField textFieldRegionSize = new JTextField(12);
 
-    final String textFieldChannelsLabel = "Channels";
+    final String textFieldChannelsLabel = "Channels [one-based]";
     JTextField textFieldChannels = new JTextField(12);
 
     final String textFieldSpotSizesLabel = "Spot sizes";
@@ -54,6 +54,8 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     SegmentationResults segmentationResults = new SegmentationResults();
     SegmentationSettings segmentationSettings = new SegmentationSettings();
 
+    AnalyzeFishSpotsTable analyzeFishSpotsTable = new AnalyzeFishSpotsTable();
+
     // Other
     ImagePlus imp;
 
@@ -66,7 +68,6 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
         // this ensures that selection points are added to the overlay
         IJ.run("Point Tool...", "type=Hybrid color=Green size=Small add_to label");
-
 
         imp = IJ.getImage();
 

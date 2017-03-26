@@ -654,7 +654,6 @@ public class Registration implements PlugIn {
             });
         }
 
-
         public void clear() {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -663,7 +662,6 @@ public class Registration implements PlugIn {
                 }
             });
         }
-
 
         public JTable getTable() {
             return table;
@@ -768,6 +766,7 @@ public class Registration implements PlugIn {
             highlightSelectedTrack();
         }
     }
+
 
     public void showTrackTable(){
         if(trackTable==null) {
