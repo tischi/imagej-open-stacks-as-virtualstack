@@ -86,7 +86,7 @@ public class SegmentObjects {
 
             settings.setFrom(imp);
             settings.detectorSettings = settings.detectorFactory.getDefaultSettings();
-            settings.detectorSettings.put(DetectorKeys.KEY_TARGET_CHANNEL, segmentationResults.channels[iChannel]-1); // convert to zero-based
+            settings.detectorSettings.put(DetectorKeys.KEY_TARGET_CHANNEL, segmentationResults.channels[iChannel]); //one-based
             settings.detectorSettings.put(DetectorKeys.KEY_DO_SUBPIXEL_LOCALIZATION, true);
             settings.detectorSettings.put(DetectorKeys.KEY_RADIUS, segmentationSettings.spotSizes[iChannel]);
             settings.detectorSettings.put(DetectorKeys.KEY_THRESHOLD, segmentationSettings.thresholds[iChannel]);

@@ -44,28 +44,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-12.225806">
-              <caret line="640" column="16" selection-start-line="640" selection-start-column="12" selection-end-line="640" selection-end-column="16" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="method#logIfTrackingFinished#0;class#Registration#0" expanded="false" />
-                <element signature="method#clear#0;class#TrackTable#0;class#Registration#0" expanded="false" />
-                <element signature="class#23319:23525" expanded="false" />
-                <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-                <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
-                <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
-                <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
-                <element signature="method#showTrackedObjects#0;class#Registration#0" expanded="false" />
-                <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-                <element signature="e#31831#31919#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="AnalyzeFishSpotsTable.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsTable.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -96,10 +74,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AnalyzeObjects.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="AnalyzeObjects.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6086176">
+            <state vertical-scroll-proportion="0.0">
               <caret line="76" column="23" selection-start-line="76" selection-start-column="23" selection-end-line="76" selection-end-column="23" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -108,21 +86,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Globals.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Globals.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="94" column="41" selection-start-line="94" selection-start-column="23" selection-end-line="94" selection-end-column="41" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="SegmentObjects.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="83" column="42" selection-start-line="83" selection-start-column="42" selection-end-line="83" selection-end-column="42" />
+              <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#run#0;class#SegmentObjects#0" expanded="false" />
@@ -145,10 +113,35 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationResults.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="57" column="0" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
+              <caret line="0" column="21" selection-start-line="0" selection-start-column="21" selection-end-line="0" selection-end-column="21" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="method#initDisplaySettings#0;class#SegmentationResults#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SegmentationOverlay.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationOverlay.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.46858168">
+              <caret line="65" column="9" selection-start-line="65" selection-start-column="9" selection-end-line="65" selection-end-column="9" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="method#initDisplaySettings#0;class#SegmentationOverlay#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Spot.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/TrackMate_/3.4.2/TrackMate_-3.4.2.jar!/fiji/plugin/trackmate/Spot.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-76.111115">
+              <caret line="173" column="22" selection-start-line="173" selection-start-column="22" selection-end-line="173" selection-end-column="22" />
+              <folding>
+                <element signature="e#5875#5876#0" expanded="true" />
+                <element signature="e#5924#5925#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -210,13 +203,14 @@
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationSettings.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeSpots.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/OpenStacksAsVirtualStack.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationResults.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Globals.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationResults.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationOverlay.java" />
       </list>
     </option>
   </component>
@@ -239,7 +233,7 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="25" />
+    <option name="x" value="13" />
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="873" />
@@ -593,7 +587,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="25" y="23" width="1440" height="873" extended-state="1" />
+    <frame x="13" y="23" width="1440" height="873" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -612,7 +606,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299373" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27753934" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16881259" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25608194" sideWeight="0.688196" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -698,7 +692,6 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationResults.java</url>
-          <line>84</line>
           <properties />
           <option name="timeStamp" value="492" />
         </line-breakpoint>
@@ -722,13 +715,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$MAVEN_REPOSITORY$/net/imglib2/imglib2-ij/2.0.0-beta-30/imglib2-ij-2.0.0-beta-30.jar!/net/imglib2/img/display/imagej/ImageJFunctions.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="70" column="38" selection-start-line="70" selection-start-column="38" selection-end-line="70" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/net/imglib2/imglib2/3.2.1/imglib2-3.2.1.jar!/net/imglib2/Interval.class">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1072,37 +1058,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/TrackMate_/3.4.2/TrackMate_-3.4.2.jar!/fiji/plugin/trackmate/Spot.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.3612168">
-          <caret line="189" column="34" selection-start-line="189" selection-start-column="18" selection-end-line="189" selection-end-column="34" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#3600#3601#0" expanded="true" />
-            <element signature="e#3637#3638#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationResults.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="57" column="0" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#initDisplaySettings#0;class#SegmentationResults#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Globals.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="94" column="41" selection-start-line="94" selection-start-column="23" selection-end-line="94" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/TrackMate_/3.4.2/TrackMate_-3.4.2.jar!/fiji/plugin/trackmate/SpotCollection.class">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-20.703703">
@@ -1116,7 +1071,7 @@
         <state vertical-scroll-proportion="-12.225806">
           <caret line="640" column="16" selection-start-line="640" selection-start-column="12" selection-end-line="640" selection-end-column="16" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
             <element signature="method#logIfTrackingFinished#0;class#Registration#0" expanded="false" />
             <element signature="method#clear#0;class#TrackTable#0;class#Registration#0" expanded="false" />
             <element signature="class#23319:23525" expanded="false" />
@@ -1157,10 +1112,38 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Globals.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6965889">
+          <caret line="94" column="41" selection-start-line="94" selection-start-column="23" selection-end-line="94" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationResults.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="21" selection-start-line="0" selection-start-column="21" selection-end-line="0" selection-end-column="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="76" column="23" selection-start-line="76" selection-start-column="23" selection-end-line="76" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="83" column="42" selection-start-line="83" selection-start-column="42" selection-end-line="83" selection-end-column="42" />
+          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#run#0;class#SegmentObjects#0" expanded="false" />
@@ -1168,12 +1151,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java">
+    <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/TrackMate_/3.4.2/TrackMate_-3.4.2.jar!/fiji/plugin/trackmate/Spot.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6086176">
-          <caret line="76" column="23" selection-start-line="76" selection-start-column="23" selection-end-line="76" selection-end-column="23" />
+        <state vertical-scroll-proportion="-76.111115">
+          <caret line="173" column="22" selection-start-line="173" selection-start-column="22" selection-end-line="173" selection-end-column="22" />
+          <folding>
+            <element signature="e#5875#5876#0" expanded="true" />
+            <element signature="e#5924#5925#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationOverlay.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.46858168">
+          <caret line="65" column="9" selection-start-line="65" selection-start-column="9" selection-end-line="65" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#initDisplaySettings#0;class#SegmentationOverlay#0" expanded="false" />
           </folding>
         </state>
       </provider>
