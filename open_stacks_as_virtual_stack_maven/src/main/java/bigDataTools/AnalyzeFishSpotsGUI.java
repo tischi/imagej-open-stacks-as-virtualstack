@@ -96,7 +96,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         addComboBox(panels, iPanel++, c, comboBoxSegmentationMethod, comboBoxSegmentationMethodLabel);
         addTextField(panels, iPanel++, c, textFieldChannels, textFieldChannelsLabel, "2,3");
         addTextField(panels, iPanel++, c, textFieldSpotSizes, textFieldSpotSizesLabel, "1.0,1.0");
-        addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "1.0,1.0");
+        addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "10.0,10.0");
         addButton(panels, iPanel++, c, buttonSegmentSpots, buttonSegmentSpotsText);
 
         //
@@ -156,7 +156,10 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
         if ( e.getActionCommand().equals(buttonShowSpotsText) )
         {
-            segmentationResults.showOverlayUsingTrackMateHyperStackDisplayer(imp);
+            SegmentationOverlay segmentationOverlay = new SegmentationOverlay(imp,
+                    segmentationResults,
+                    segmentationSettings);
+            segmentationOverlay.showOverlayUsingTrackMateHyperStackDisplayer();
         }
 
 

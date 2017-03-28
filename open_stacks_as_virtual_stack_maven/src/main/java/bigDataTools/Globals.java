@@ -36,6 +36,9 @@ import ij.ImagePlus;
 
 import javax.swing.*;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import static ij.IJ.log;
 
 /**
@@ -99,5 +102,16 @@ public class Globals {
                 +spot.getDoublePosition(1)+","
                 +spot.getDoublePosition(2));
     }
+
+
+    public static void printMap(Map mp) {
+        Iterator it = mp.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            log(""+pair.getKey() + " = " + pair.getValue());
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+    }
+
 
 }

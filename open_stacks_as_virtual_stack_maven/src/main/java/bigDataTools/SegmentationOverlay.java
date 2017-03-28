@@ -14,16 +14,16 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by tischi on 27/03/17.
- */
+import static ij.IJ.log;
+
+
 public class SegmentationOverlay {
 
     ImagePlus imp;
     SegmentationResults segmentationResults;
     SegmentationSettings segmentationSettings;
 
-    public void SegmentationOverlay(ImagePlus imp,
+    public SegmentationOverlay(ImagePlus imp,
                                     SegmentationResults segmentationResults,
                                     SegmentationSettings segmentationSettings)
 
@@ -50,31 +50,55 @@ public class SegmentationOverlay {
         settings.addTrackAnalyzer(new TrackIndexAnalyzer());
         ModelFeatureUpdater modelFeatureUpdater = new ModelFeatureUpdater( modelOverlay, settings );
 
+        int frame = 0; // zero-based !!
 
-        int frame = 1;
-
+        modelOverlay.beginUpdate();
         for ( int iChannel = 0; iChannel < segmentationResults.channels.length; iChannel++)
         {
             Model model = models[iChannel];
             SpotCollection spotCollection = model.getSpots();
+            //log("Channel: "+segmentationResults.channels[iChannel]+"; Number of spots: "+spotCollection.getNSpots(false));
             for ( Spot spot : spotCollection.iterable(false) )
             {
-                spot.putFeature("Color", (double) iChannel);
+
+                spot.putFeature("COLOR", (double) iChannel+1);
                 modelOverlay.addSpotTo(spot, frame);
 
             }
         }
+        modelOverlay.endUpdate();
+
+
+        SpotCollection spotCollection = modelOverlay.getSpots();
+        log("Total number of spots: " + spotCollection.getNSpots(false));
+
 
         SpotColorGenerator spotColorGenerator = new SpotColorGenerator(modelOverlay);
-        spotColorGenerator.setFeature("Color");
+        spotColorGenerator.setFeature("COLOR");
+        spotColorGenerator.autoMinMax();
+
+        log("min: " + spotColorGenerator.getMin());
+        log("max: " + spotColorGenerator.getMax());
+        spotColorGenerator.activate();
+
 
         SelectionModel selectionModel = new SelectionModel(modelOverlay);
+        //selectionModel.addSpotToSelection(spotCollection);
         HyperStackDisplayer hyperStackDisplayer = new HyperStackDisplayer(modelOverlay, selectionModel, imp);
 
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_COLORING, spotColorGenerator);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_TRACKS_VISIBLE, false);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOTS_VISIBLE, true);
         hyperStackDisplayer.render();
+        hyperStackDisplayer.refresh();
+
+
+        // check all the spot features
+        /*
+        for ( Spot spot : spotCollection.iterable(false) )
+        {
+            Globals.printMap(spot.getFeatures());
+        }*/
 
         //	centerViewOn(Spot spot)
 
