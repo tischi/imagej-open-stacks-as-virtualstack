@@ -53,6 +53,7 @@ public class AnalyzeObjects {
                         calibration.getZ(roi.getZPosition()),
                         radius,
                         quality);
+
                 Globals.logSpotCoordinates("ROI", spotRoi);
 
                 List<Double> tableRow = new ArrayList<>();
@@ -84,7 +85,11 @@ public class AnalyzeObjects {
                         tableRow.add(closestSpots[ic].getDoublePosition(1));
                         tableRow.add(closestSpots[ic].getDoublePosition(2));
                     } else {
-                        //log()
+                        // TODO: handle the case of not spots better
+                        tableRow.add(-1.0);
+                        tableRow.add(-1.0);
+                        tableRow.add(-1.0);
+
                     }
 
                 }

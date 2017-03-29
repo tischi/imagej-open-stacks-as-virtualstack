@@ -42,6 +42,7 @@ public class SegmentationOverlay {
     public void trackMateSelectNClosestSpots(Spot location, int n, int frame)
     {
         SpotCollection spots = modelOverlay.getSpots();
+        selectionModel.clearSpotSelection();
         selectionModel.addSpotToSelection(spots.getNClosestSpots(location, frame, n, false));
     }
 
@@ -65,6 +66,7 @@ public class SegmentationOverlay {
 
         int frame = 0; // zero-based !!
 
+
         modelOverlay.beginUpdate();
         for ( int iChannel = 0; iChannel < segmentationResults.channels.length; iChannel++)
         {
@@ -73,10 +75,8 @@ public class SegmentationOverlay {
             log("Channel: "+segmentationResults.channels[iChannel]+"; Number of spots: "+spotCollection.getNSpots(false));
             for ( Spot spot : spotCollection.iterable(false) )
             {
-
-                spot.putFeature("COLOR", (double) iChannel + 1);
+                spot.putFeature("COLOR", (double)segmentationResults.channels[iChannel]); // one-based
                 modelOverlay.addSpotTo(spot, frame);
-
             }
         }
         modelOverlay.endUpdate();
@@ -86,26 +86,33 @@ public class SegmentationOverlay {
         log("Total number of spots: " + spotCollection.getNSpots(false));
 
 
+        // Deal with spot coloring
+        //
         SpotColorGenerator spotColorGenerator = new SpotColorGenerator(modelOverlay);
         spotColorGenerator.setFeature("COLOR");
-        spotColorGenerator.setMinMax(1.0,3.0);
-        //spotColorGenerator.autoMinMax();
+        Globals.threadlog("Minimum feature value for spot coloring " + spotColorGenerator.getMin());
+        Globals.threadlog("Maximum feature value for spot coloring " + spotColorGenerator.getMax());
+        spotColorGenerator.setAutoMinMaxMode(false);
+        spotColorGenerator.setMinMax(1.0, imp.getNChannels()); // one-based
         spotColorGenerator.activate();
+        InterpolatePaintScale interpolatePaintScale = createInterpolatePaintScaleFromImpLUTs(imp);
 
-        InterpolatePaintScale interpolatePaintScale = new InterpolatePaintScale(1.0, (double)segmentationResults.channels.length);
-        interpolatePaintScale.add(1.0, Color.red);
-        interpolatePaintScale.add(2.0, Color.green);
-        interpolatePaintScale.add(3.0, Color.white);
+        for (int iChannel = 0; iChannel < imp.getNChannels(); iChannel++) {
+
+            Color color = interpolatePaintScale.getPaint( (double)iChannel+1);
+            Globals.threadlog(" "+ (iChannel+1) + ": " +color.toString());
+
+        }
 
         selectionModel = new SelectionModel(modelOverlay);
         //selectionModel.addSpotToSelection(spotCollection);
         HyperStackDisplayer hyperStackDisplayer = new HyperStackDisplayer(modelOverlay, selectionModel, imp);
-
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_COLORMAP, interpolatePaintScale);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_COLORING, spotColorGenerator);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_TRACKS_VISIBLE, false);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOTS_VISIBLE, true);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_RADIUS_RATIO, 1.0);
+        hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_HIGHLIGHT_COLOR, Color.blue);
 
         hyperStackDisplayer.render();
         hyperStackDisplayer.refresh();
@@ -123,6 +130,35 @@ public class SegmentationOverlay {
         //}
 
     }
+
+    public InterpolatePaintScale createInterpolatePaintScaleFromImpLUTs(ImagePlus imp)
+    {
+
+        InterpolatePaintScale interpolatePaintScale = new InterpolatePaintScale(1.0, imp.getNChannels());
+
+        // create overlay colors from the imp LUTs
+        //
+        for (int iChannel = 0; iChannel < imp.getNChannels(); iChannel++)
+        {
+            int r = imp.getLuts()[iChannel].getRed(255);
+            int g = imp.getLuts()[iChannel].getGreen(255);
+            int b = imp.getLuts()[iChannel].getBlue(255);
+
+            Color color = new Color(r,g,b);
+
+            Globals.threadlog("CHANNEL: " + (iChannel + 1));
+            Globals.threadlog("Red: " + r);
+            Globals.threadlog("Green: " + g);
+            Globals.threadlog("Blue: " + b);
+
+            interpolatePaintScale.add(iChannel + 1, color); // one-based
+        }
+
+
+        return interpolatePaintScale;
+
+    }
+
 
     public void showOverlayUsingTrackMateSpotOverlay(ImagePlus imp)
     {

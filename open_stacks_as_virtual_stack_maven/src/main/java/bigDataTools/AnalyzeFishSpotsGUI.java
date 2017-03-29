@@ -95,7 +95,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         addComboBox(panels, iPanel++, c, comboBoxSegmentationMethod, comboBoxSegmentationMethodLabel);
         addTextField(panels, iPanel++, c, textFieldChannels, textFieldChannelsLabel, "2,3,4");
         addTextField(panels, iPanel++, c, textFieldSpotSizes, textFieldSpotSizesLabel, "0.5,0.5,0.5");
-        addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "10000.0,100.0,1000.0");
+        addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "100.0,100.0,100.0");
         addButton(panels, iPanel++, c, buttonSegmentSpots, buttonSegmentSpotsText);
 
 
