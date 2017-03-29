@@ -58,11 +58,12 @@ public class SegmentObjects {
 
         for( int iChannel=0; iChannel < segmentationResults.channels.length; iChannel++ )
         {
+            // TrackMate model to hold the results
             Model model = new Model();
-            model.setLogger(Logger.IJ_LOGGER);
+            model.setLogger(Logger.VOID_LOGGER);
 
+            // TrackMate settings
             Settings settings = new Settings();
-
             settings.detectorFactory = new DogDetectorFactory<>();
 
             Roi roi = imp.getRoi();

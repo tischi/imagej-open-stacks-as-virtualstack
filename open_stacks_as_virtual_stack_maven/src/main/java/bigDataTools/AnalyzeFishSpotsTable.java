@@ -1,5 +1,7 @@
 package bigDataTools;
 
+import fiji.plugin.trackmate.Spot;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -11,11 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 public class AnalyzeFishSpotsTable extends JPanel implements MouseListener, KeyListener {
     private boolean DEBUG = false;
     JTable table;
     JFrame frame;
     JScrollPane scrollPane;
+
+    SegmentationOverlay segmentationOverlay = null;
+
 
     public AnalyzeFishSpotsTable()
     {
@@ -56,6 +62,11 @@ public class AnalyzeFishSpotsTable extends JPanel implements MouseListener, KeyL
         add(scrollPane);
     }
 
+    public void setSegmentationOverlay(SegmentationOverlay segmentationOverlay)
+    {
+        this.segmentationOverlay =  segmentationOverlay;
+    }
+
     public void showTable()
     {
         //Create and set up the window.
@@ -93,6 +104,31 @@ public class AnalyzeFishSpotsTable extends JPanel implements MouseListener, KeyL
     }
 
 
+    public void updateSegmentationOverlayBasedOnSelectedRow()
+    {
+        Globals.threadlog("SELECTED");
+
+        if ( segmentationOverlay != null )
+        {
+
+            int selectedRow = table.getSelectedRow();
+            int indexToModel = table.convertRowIndexToModel(selectedRow);
+            float x = new Float(table.getModel().getValueAt(indexToModel, 0).toString());
+            float y = new Float(table.getModel().getValueAt(indexToModel, 1).toString());
+            float z = new Float(table.getModel().getValueAt(indexToModel, 2).toString());
+
+            double radius = 1.0; // not used
+            double quality = 1.0; // not used
+            Spot location = new Spot(x,y,z,radius,quality);
+
+            int frame = 0;
+            segmentationOverlay.trackMateSelectNClosestSpots(location, 3, frame);
+
+
+        }
+
+    }
+
     /*
     public void highlightSelectedTrack() {
         int rs = table.getSelectedRow();
@@ -116,7 +152,7 @@ public class AnalyzeFishSpotsTable extends JPanel implements MouseListener, KeyL
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        //highlightSelectedTrack();
+        updateSegmentationOverlayBasedOnSelectedRow();
     }
 
     @Override
@@ -151,7 +187,7 @@ public class AnalyzeFishSpotsTable extends JPanel implements MouseListener, KeyL
 
     @Override
     public void keyReleased(KeyEvent e) {
-        //highlightSelectedTrack();
+        updateSegmentationOverlayBasedOnSelectedRow();
     }
 }
 

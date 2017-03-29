@@ -23,6 +23,10 @@ public class SegmentationOverlay {
     SegmentationResults segmentationResults;
     SegmentationSettings segmentationSettings;
 
+    // TrackMate specific
+    public SelectionModel selectionModel;
+    public Model modelOverlay;
+
     public SegmentationOverlay(ImagePlus imp,
                                     SegmentationResults segmentationResults,
                                     SegmentationSettings segmentationSettings)
@@ -34,17 +38,26 @@ public class SegmentationOverlay {
 
     }
 
-    public void showOverlay()
+
+    public void trackMateSelectNClosestSpots(Spot location, int n, int frame)
     {
+        SpotCollection spots = modelOverlay.getSpots();
+        selectionModel.addSpotToSelection(spots.getNClosestSpots(location, frame, n, false));
+    }
+
+    public void trackMateClearSpotSelection()
+    {
+        selectionModel.clearSpotSelection();
     }
 
 
-    public void showOverlayUsingTrackMateHyperStackDisplayer()
+
+    public void trackMateShowOverlay()
     {
         // get the multi-channel TrackMate results
         Model[] models = segmentationResults.models;
 
-        Model modelOverlay = new Model();
+        modelOverlay = new Model();
         modelOverlay.setLogger(Logger.IJ_LOGGER);
         Settings settings = new Settings();
         settings.addTrackAnalyzer(new TrackIndexAnalyzer());
@@ -57,11 +70,11 @@ public class SegmentationOverlay {
         {
             Model model = models[iChannel];
             SpotCollection spotCollection = model.getSpots();
-            //log("Channel: "+segmentationResults.channels[iChannel]+"; Number of spots: "+spotCollection.getNSpots(false));
+            log("Channel: "+segmentationResults.channels[iChannel]+"; Number of spots: "+spotCollection.getNSpots(false));
             for ( Spot spot : spotCollection.iterable(false) )
             {
 
-                spot.putFeature("COLOR", (double) iChannel+1);
+                spot.putFeature("COLOR", (double) iChannel + 1);
                 modelOverlay.addSpotTo(spot, frame);
 
             }
@@ -75,20 +88,25 @@ public class SegmentationOverlay {
 
         SpotColorGenerator spotColorGenerator = new SpotColorGenerator(modelOverlay);
         spotColorGenerator.setFeature("COLOR");
-        spotColorGenerator.autoMinMax();
-
-        log("min: " + spotColorGenerator.getMin());
-        log("max: " + spotColorGenerator.getMax());
+        spotColorGenerator.setMinMax(1.0,3.0);
+        //spotColorGenerator.autoMinMax();
         spotColorGenerator.activate();
 
+        InterpolatePaintScale interpolatePaintScale = new InterpolatePaintScale(1.0, (double)segmentationResults.channels.length);
+        interpolatePaintScale.add(1.0, Color.red);
+        interpolatePaintScale.add(2.0, Color.green);
+        interpolatePaintScale.add(3.0, Color.white);
 
-        SelectionModel selectionModel = new SelectionModel(modelOverlay);
+        selectionModel = new SelectionModel(modelOverlay);
         //selectionModel.addSpotToSelection(spotCollection);
         HyperStackDisplayer hyperStackDisplayer = new HyperStackDisplayer(modelOverlay, selectionModel, imp);
 
+        hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_COLORMAP, interpolatePaintScale);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_COLORING, spotColorGenerator);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_TRACKS_VISIBLE, false);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOTS_VISIBLE, true);
+        hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_RADIUS_RATIO, 1.0);
+
         hyperStackDisplayer.render();
         hyperStackDisplayer.refresh();
 

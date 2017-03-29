@@ -53,8 +53,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
     SegmentationResults segmentationResults = new SegmentationResults();
     SegmentationSettings segmentationSettings = new SegmentationSettings();
-
-    AnalyzeFishSpotsTable analyzeFishSpotsTable = new AnalyzeFishSpotsTable();
+    SegmentationOverlay segmentationOverlay;
 
     // Other
     ImagePlus imp;
@@ -94,23 +93,11 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
         // action
         addComboBox(panels, iPanel++, c, comboBoxSegmentationMethod, comboBoxSegmentationMethodLabel);
-        addTextField(panels, iPanel++, c, textFieldChannels, textFieldChannelsLabel, "2,3");
-        addTextField(panels, iPanel++, c, textFieldSpotSizes, textFieldSpotSizesLabel, "1.0,1.0");
-        addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "10.0,10.0");
+        addTextField(panels, iPanel++, c, textFieldChannels, textFieldChannelsLabel, "2,3,4");
+        addTextField(panels, iPanel++, c, textFieldSpotSizes, textFieldSpotSizesLabel, "0.5,0.5,0.5");
+        addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "10000.0,100.0,1000.0");
         addButton(panels, iPanel++, c, buttonSegmentSpots, buttonSegmentSpotsText);
 
-        //
-        // Spot visualisation
-        //
-
-        // header
-        panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
-        panels.get(iPanel).add(new JLabel("SPOT VISUALIZATION"));
-        c.add(panels.get(iPanel++));
-
-        // actions
-        addTextField(panels, iPanel++, c, textFieldRegionSize, textFieldRegionSizeLabel, "10,10,10");
-        addButton(panels, iPanel++, c, buttonShowSpots, buttonShowSpotsText);
 
         //
         // Spot analysis
@@ -122,9 +109,8 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         c.add(panels.get(iPanel++));
 
         // show spots button
+        addTextField(panels, iPanel++, c, textFieldRegionSize, textFieldRegionSizeLabel, "10,10,10");
         addButton(panels, iPanel++, c, buttonAnalyzeSelectedRegions, buttonAnalyzeSelectedRegionsText);
-
-
 
         //
         // Show the GUI
@@ -149,23 +135,40 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
         if ( e.getActionCommand().equals(buttonSegmentSpotsText) )
         {
+            // Segment
+            //
             segmentationResults = SegmentObjects.run(imp,
                     segmentationResults,
                     segmentationSettings);
-        }
 
-        if ( e.getActionCommand().equals(buttonShowSpotsText) )
-        {
-            SegmentationOverlay segmentationOverlay = new SegmentationOverlay(imp,
+            // Construct and show overlay
+            //
+            segmentationOverlay = new SegmentationOverlay(imp,
                     segmentationResults,
                     segmentationSettings);
-            segmentationOverlay.showOverlayUsingTrackMateHyperStackDisplayer();
+
+            segmentationOverlay.trackMateShowOverlay();;
+
+
         }
 
 
         if ( e.getActionCommand().equals(buttonAnalyzeSelectedRegionsText) )
         {
+            // Measure spots around selected points
+            //
             AnalyzeObjects.measureSpotLocationsAndDistancesInSelectedRegions(imp, segmentationResults);
+
+            // Show results table
+            //
+            segmentationResults.analyzeFishSpotsTable.showTable();
+
+            // Notify table about overlay (such that it can change it, upon selection of a specific row)
+            //
+            segmentationResults.analyzeFishSpotsTable.setSegmentationOverlay(segmentationOverlay);
+
+
+
         }
 
 

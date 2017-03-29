@@ -11,6 +11,7 @@ public class SegmentationResults {
     public Model[] models; // the array is channel-wise
     public int[] channels;
     public SpotCollection[] spotCollections; // the array is channel-wise
+    public AnalyzeFishSpotsTable analyzeFishSpotsTable;
 
 
 }

@@ -32,60 +32,67 @@ public class AnalyzeObjects {
         //
         // Make and show the Results Table
         //
-        AnalyzeFishSpotsTable analyzeFishSpotsTable = new AnalyzeFishSpotsTable();
-        analyzeFishSpotsTable.initializeTable(segmentationResults.channels);
-        analyzeFishSpotsTable.showTable();
+        segmentationResults.analyzeFishSpotsTable = new AnalyzeFishSpotsTable();
+        segmentationResults.analyzeFishSpotsTable.initializeTable(segmentationResults.channels);
+        //segmentationResults.analyzeFishSpotsTable.showTable();
 
-        for (int i=0; i<overlay.size(); i++)
-        {
+        for (int i=0; i<overlay.size(); i++) {
 
             Roi roi = overlay.get(i);
-            Calibration calibration = imp.getCalibration();
-            int radius = 1;
-            int quality = 1;
-            Spot spotRoi = new Spot(calibration.getX(roi.getXBase()),
-                            calibration.getY(roi.getYBase()),
-                            calibration.getZ(roi.getZPosition()),
-                                    radius,
-                    quality);
-            Globals.logSpotCoordinates("ROI", spotRoi);
 
-            List<Double> tableRow = new ArrayList<>();
-            tableRow.add(spotRoi.getDoublePosition(0));
-            tableRow.add(spotRoi.getDoublePosition(1));
-            tableRow.add(spotRoi.getDoublePosition(2));
+            Globals.threadlog(roi.toString());
+            Globals.threadlog(roi.getTypeAsString());
 
-            Spot[] closestSpots = new Spot[segmentationResults.channels.length];
+            if (roi.getTypeAsString().equals("Point")) {
 
-            for (int ic=0; ic<segmentationResults.channels.length; ic++)
-            {
-                log("CHANNEL: "+segmentationResults.channels[ic]);
-                SpotCollection spotCollection = segmentationResults.models[ic].getSpots();
+                Calibration calibration = imp.getCalibration();
+                int radius = 1;
+                int quality = 1;
+                Spot spotRoi = new Spot(calibration.getX(roi.getXBase()),
+                        calibration.getY(roi.getYBase()),
+                        calibration.getZ(roi.getZPosition()),
+                        radius,
+                        quality);
+                Globals.logSpotCoordinates("ROI", spotRoi);
 
-                /*
-                // print all spots
-                for (Spot spot : spotCollection.iterable(false)) {
-                    Point3D pSpot = new Point3D(spot.getDoublePosition(0),
-                            spot.getDoublePosition(1),
-                            spot.getDoublePosition(2));
-                    log("SPOT: "+pSpot.toString());
-                }*/
+                List<Double> tableRow = new ArrayList<>();
+                tableRow.add(spotRoi.getDoublePosition(0));
+                tableRow.add(spotRoi.getDoublePosition(1));
+                tableRow.add(spotRoi.getDoublePosition(2));
 
-                int frame = 0; // 0-based
-                closestSpots[ic] = spotCollection.getClosestSpot(spotRoi, frame, false);
-                Globals.logSpotCoordinates("CLOSEST SPOT", closestSpots[ic]);
-                //log("DISTANCE: " + Math.sqrt(closestsSpots[ic].squareDistanceTo(spotRoi)));
+                Spot[] closestSpots = new Spot[segmentationResults.channels.length];
 
-                tableRow.add(closestSpots[ic].getDoublePosition(0));
-                tableRow.add(closestSpots[ic].getDoublePosition(1));
-                tableRow.add(closestSpots[ic].getDoublePosition(2));
+                for (int ic = 0; ic < segmentationResults.channels.length; ic++) {
+                    log("CHANNEL: " + segmentationResults.channels[ic]);
+                    SpotCollection spotCollection = segmentationResults.models[ic].getSpots();
+
+                    /*
+                    // print all spots
+                    for (Spot spot : spotCollection.iterable(false)) {
+                        Point3D pSpot = new Point3D(spot.getDoublePosition(0),
+                                spot.getDoublePosition(1),
+                                spot.getDoublePosition(2));
+                        log("SPOT: "+pSpot.toString());
+                    }*/
+
+                    int frame = 0; // 0-based
+                    closestSpots[ic] = spotCollection.getClosestSpot(spotRoi, frame, false);
+                    if ( closestSpots[ic] != null ) {
+                        Globals.logSpotCoordinates("CLOSEST SPOT", closestSpots[ic]);
+                        //log("DISTANCE: " + Math.sqrt(closestsSpots[ic].squareDistanceTo(spotRoi)));
+                        tableRow.add(closestSpots[ic].getDoublePosition(0));
+                        tableRow.add(closestSpots[ic].getDoublePosition(1));
+                        tableRow.add(closestSpots[ic].getDoublePosition(2));
+                    } else {
+                        //log()
+                    }
+
+                }
+
+                segmentationResults.analyzeFishSpotsTable.addRow(tableRow.toArray(new Object[tableRow.size()]));
 
             }
-
-            analyzeFishSpotsTable.addRow(tableRow.toArray(new Object[tableRow.size()]));
-
         }
-
     }
 
 
