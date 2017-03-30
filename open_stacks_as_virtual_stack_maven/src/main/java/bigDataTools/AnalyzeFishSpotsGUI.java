@@ -36,6 +36,9 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     final String buttonAnalyzeSelectedRegionsText = "Analyze Selected Regions";
     JButton buttonAnalyzeSelectedRegions =  new JButton();
 
+    final String buttonLogColumnAverageText = "Column averages";
+    JButton buttonLogColumnAverage =  new JButton();
+
     final String textFieldRegionSizeLabel = "Region size [pixels]";
     JTextField textFieldRegionSize = new JTextField(12);
 
@@ -98,7 +101,6 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "100.0,100.0,100.0");
         addButton(panels, iPanel++, c, buttonSegmentSpots, buttonSegmentSpotsText);
 
-
         //
         // Spot analysis
         //
@@ -109,8 +111,22 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         c.add(panels.get(iPanel++));
 
         // show spots button
-        addTextField(panels, iPanel++, c, textFieldRegionSize, textFieldRegionSizeLabel, "10,10,10");
+        //addTextField(panels, iPanel++, c, textFieldRegionSize, textFieldRegionSizeLabel, "10,10,10");
         addButton(panels, iPanel++, c, buttonAnalyzeSelectedRegions, buttonAnalyzeSelectedRegionsText);
+
+
+        //
+        // Table
+        //
+
+        // header
+        panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+        panels.get(iPanel).add(new JLabel("TABLE"));
+        c.add(panels.get(iPanel++));
+
+        // show spots button
+        //addTextField(panels, iPanel++, c, textFieldRegionSize, textFieldRegionSizeLabel, "10,10,10");
+        addButton(panels, iPanel++, c, buttonLogColumnAverage, buttonLogColumnAverageText);
 
         //
         // Show the GUI
@@ -167,7 +183,11 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
             segmentationResults.analyzeFishSpotsTable.setSegmentationOverlay(segmentationOverlay);
 
 
+        }
 
+        if ( e.getActionCommand().equals(buttonLogColumnAverage) )
+        {
+            segmentationResults.analyzeFishSpotsTable.logColumnAverages();
         }
 
 

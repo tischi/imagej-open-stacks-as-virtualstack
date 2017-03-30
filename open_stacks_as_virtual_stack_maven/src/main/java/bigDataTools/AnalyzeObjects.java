@@ -29,13 +29,15 @@ public class AnalyzeObjects {
             log("Please use the Point Selection tool to mark the center of regions of interest.");
         }
 
-        //
-        // Make and show the Results Table
+
+        // Initialise Results Table
         //
         segmentationResults.analyzeFishSpotsTable = new AnalyzeFishSpotsTable();
         segmentationResults.analyzeFishSpotsTable.initializeTable(segmentationResults.channels);
-        //segmentationResults.analyzeFishSpotsTable.showTable();
 
+
+        // Get spot locations and compute pari-wise distances for each selection region
+        //
         for (int i=0; i<overlay.size(); i++) {
 
             Roi roi = overlay.get(i);
@@ -56,13 +58,16 @@ public class AnalyzeObjects {
 
                 Globals.logSpotCoordinates("ROI", spotRoi);
 
+                // Add the selection region to the table
+                //
                 List<Double> tableRow = new ArrayList<>();
                 tableRow.add(spotRoi.getDoublePosition(0));
                 tableRow.add(spotRoi.getDoublePosition(1));
                 tableRow.add(spotRoi.getDoublePosition(2));
 
+                // Find the closest spot in each channel
+                //
                 Spot[] closestSpots = new Spot[segmentationResults.channels.length];
-
                 for (int ic = 0; ic < segmentationResults.channels.length; ic++) {
                     log("CHANNEL: " + segmentationResults.channels[ic]);
                     SpotCollection spotCollection = segmentationResults.models[ic].getSpots();
@@ -94,9 +99,27 @@ public class AnalyzeObjects {
 
                 }
 
+                // Compute pair-wise distance
+                //
+                for ( int ic = 0; ic < segmentationResults.channels.length - 1; ic++ )
+                {
+                    for ( int jc = ic+1; jc < segmentationResults.channels.length; jc++ )
+                    {
+
+                        Double distance = Math.sqrt(closestSpots[ic].squareDistanceTo(closestSpots[jc]));
+                        tableRow.add(distance);
+                    }
+
+                }
+
+                // Add row to table
+                //
                 segmentationResults.analyzeFishSpotsTable.addRow(tableRow.toArray(new Object[tableRow.size()]));
 
             }
+
+
+
         }
     }
 

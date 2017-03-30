@@ -4,6 +4,7 @@ import fiji.plugin.trackmate.Spot;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -42,7 +43,18 @@ public class AnalyzeFishSpotsTable extends JPanel implements MouseListener, KeyL
             columns.add("Ch"+String.valueOf(channels[i])+"_Y");
             columns.add("Ch"+String.valueOf(channels[i])+"_Z");
         }
-        
+
+
+        for (int i=0; i<channels.length-1; i++ )
+        {
+            for (int j=0; j<channels.length; j++ )
+            {
+                columns.add("Dist_Ch" + String.valueOf(channels[i]) + "_Ch" + String.valueOf(channels[i]));
+            }
+        }
+
+
+
         DefaultTableModel model = new DefaultTableModel(columns.toArray(new String[columns.size()]),0);
         table = new JTable(model);
         table.setPreferredScrollableViewportSize(new Dimension(500, 200));
@@ -147,7 +159,57 @@ public class AnalyzeFishSpotsTable extends JPanel implements MouseListener, KeyL
         //log("t="+table.getModel().getValueAt(r, 5));
     }*/
 
+    public double computeJTableColumnAverage(JTable table, int columnIndex)
+    {
+        TableModel tableModel = table.getModel();
+        int rowCount = tableModel.getRowCount();
 
+        double sum = 0;
+        for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
+        {
+            sum = sum + Double.parseDouble((String)tableModel.getValueAt(rowIndex, columnIndex));
+        }
+        return (sum / rowCount);
+    }
+
+
+    public Double[] computeJTableColumnAverages(JTable table)
+    {
+        int columnCount = table.getModel().getColumnCount();
+
+        Double[] columnAverages = new Double[columnCount];
+
+        for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
+        {
+            columnAverages[columnIndex] = computeJTableColumnAverage(table, columnIndex);
+        }
+        return columnAverages;
+    }
+
+    public String[] getColumnNames(JTable table)
+    {
+        int columnCount = table.getModel().getColumnCount();
+
+        String[] columnNames = new String[columnCount];
+
+        for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
+        {
+            columnNames[columnIndex] = table.getColumnName(columnIndex);
+        }
+        return columnNames;
+
+    }
+
+    public void logColumnAverages()
+    {
+        Double[] columnAverages = computeJTableColumnAverages(table);
+        String[] columnNames = getColumnNames(table);
+        Globals.threadlog("# Average value of all columns");
+        for ( int columnIndex = 0; columnIndex < columnNames.length; columnIndex++)
+        {
+            Globals.threadlog(""+columnNames[columnIndex]+": "+ columnAverages[columnIndex]);
+        }
+    }
 
 
     @Override
