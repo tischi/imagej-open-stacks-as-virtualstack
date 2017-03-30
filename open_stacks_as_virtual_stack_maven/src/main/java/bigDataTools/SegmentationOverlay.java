@@ -26,6 +26,7 @@ public class SegmentationOverlay {
     // TrackMate specific
     public SelectionModel selectionModel;
     public Model modelOverlay;
+    HyperStackDisplayer hyperStackDisplayer;
 
     public SegmentationOverlay(ImagePlus imp,
                                     SegmentationResults segmentationResults,
@@ -39,7 +40,7 @@ public class SegmentationOverlay {
     }
 
 
-    public void trackMateSelectNClosestSpots(Spot location, int n, int frame)
+    public void highlightClosestSpots(Spot location, int n, int frame)
     {
         //Globals.logSpotCoordinates("Highlighting the " + n + " spots that are closests to:", location);
         SpotCollection spots = modelOverlay.getSpots();
@@ -53,6 +54,9 @@ public class SegmentationOverlay {
         }
         */
         selectionModel.addSpotToSelection(spots.getNClosestSpots(location, frame, n, false));
+        hyperStackDisplayer.centerViewOn(location);
+        hyperStackDisplayer.refresh();
+
     }
 
     public void trackMateClearSpotSelection()
@@ -61,7 +65,7 @@ public class SegmentationOverlay {
     }
 
 
-    public void trackMateShowOverlay()
+    public void createHyperStackDisplayer()
     {
         // get the multi-channel TrackMate results
         Model[] models = segmentationResults.models;
@@ -91,12 +95,10 @@ public class SegmentationOverlay {
         }
         modelOverlay.endUpdate();
 
-
         SpotCollection spotCollection = modelOverlay.getSpots();
         Globals.threadlog("Total number of spots: " + spotCollection.getNSpots(false));
 
-
-        // Deal with spot coloring
+        // Color the spots for each channel according to the channel LUT
         //
         SpotColorGenerator spotColorGenerator = new SpotColorGenerator(modelOverlay);
         spotColorGenerator.setFeature("COLOR");
@@ -119,12 +121,12 @@ public class SegmentationOverlay {
             //Globals.threadlog(" " + (iChannel + 1) + ": " + color.toString());
             ((CompositeImage)imp).setChannelLut(createLUTFromColor(color), iChannel+1);
         }
-        //imp.updateAndDraw();
 
-
+        // Configure trackMate's visualization scheme
+        //
         selectionModel = new SelectionModel(modelOverlay);
         //selectionModel.addSpotToSelection(spotCollection);
-        HyperStackDisplayer hyperStackDisplayer = new HyperStackDisplayer(modelOverlay, selectionModel, imp);
+        hyperStackDisplayer = new HyperStackDisplayer(modelOverlay, selectionModel, imp);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_COLORMAP, interpolatePaintScale);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_COLORING, spotColorGenerator);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_TRACKS_VISIBLE, true);
@@ -133,18 +135,6 @@ public class SegmentationOverlay {
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_HIGHLIGHT_COLOR, Color.blue);
         hyperStackDisplayer.render();
         hyperStackDisplayer.refresh();
-
-
-        // check all the spot features
-        /*
-        for ( Spot spot : spotCollection.iterable(false) )
-        {
-            Globals.printMap(spot.getFeatures());
-        }*/
-
-        //	centerViewOn(Spot spot)
-
-        //}
 
     }
 

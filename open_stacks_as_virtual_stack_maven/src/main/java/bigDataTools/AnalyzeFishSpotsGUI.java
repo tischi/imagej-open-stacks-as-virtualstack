@@ -1,5 +1,6 @@
 package bigDataTools;
 
+import fiji.plugin.trackmate.visualization.hyperstack.HyperStackDisplayer;
 import ij.IJ;
 import ij.ImagePlus;
 
@@ -57,6 +58,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     SegmentationResults segmentationResults = new SegmentationResults();
     SegmentationSettings segmentationSettings = new SegmentationSettings();
     SegmentationOverlay segmentationOverlay;
+
 
     // Other
     ImagePlus imp;
@@ -163,7 +165,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
                     segmentationResults,
                     segmentationSettings);
 
-            segmentationOverlay.trackMateShowOverlay();
+            segmentationOverlay.createHyperStackDisplayer();
 
         }
 

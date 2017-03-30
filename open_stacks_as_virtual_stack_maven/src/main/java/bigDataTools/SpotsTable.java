@@ -131,7 +131,7 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
             Spot location = new Spot(x,y,z,radius,quality);
 
             int frame = 0;
-            segmentationOverlay.trackMateSelectNClosestSpots(location, 3, frame);
+            segmentationOverlay.highlightClosestSpots(location, 3, frame);
 
 
         }
