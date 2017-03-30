@@ -176,18 +176,18 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
             // Show results table
             //
-            segmentationResults.analyzeFishSpotsTable.showTable();
+            segmentationResults.table.showTable();
 
             // Notify table about overlay (such that it can change it, upon selection of a specific row)
             //
-            segmentationResults.analyzeFishSpotsTable.setSegmentationOverlay(segmentationOverlay);
+            segmentationResults.table.setSegmentationOverlay(segmentationOverlay);
 
 
         }
 
-        if ( e.getActionCommand().equals(buttonLogColumnAverage) )
+        if ( e.getActionCommand().equals(buttonLogColumnAverageText) )
         {
-            segmentationResults.analyzeFishSpotsTable.logColumnAverages();
+            segmentationResults.table.logColumnAverages();
         }
 
 

@@ -13,9 +13,8 @@ import ij.process.LUT;
 import org.jfree.chart.renderer.InterpolatePaintScale;
 
 import java.awt.*;
-import java.util.*;
-
-import static ij.IJ.log;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class SegmentationOverlay {
@@ -42,15 +41,17 @@ public class SegmentationOverlay {
 
     public void trackMateSelectNClosestSpots(Spot location, int n, int frame)
     {
-        Globals.logSpotCoordinates("Highlighting the " + n + " spots that are closests to:", location);
+        //Globals.logSpotCoordinates("Highlighting the " + n + " spots that are closests to:", location);
         SpotCollection spots = modelOverlay.getSpots();
         selectionModel.clearSpotSelection();
         java.util.List<Spot> closestSpots = spots.getNClosestSpots(location, frame, n, false);
+        /*
         for ( Spot spot : closestSpots)
         {
             Globals.logSpotCoordinates("Spot:", spot);
 
         }
+        */
         selectionModel.addSpotToSelection(spots.getNClosestSpots(location, frame, n, false));
     }
 
@@ -79,7 +80,9 @@ public class SegmentationOverlay {
         {
             Model model = models[iChannel];
             SpotCollection spotCollection = model.getSpots();
-            log("Channel: "+segmentationResults.channels[iChannel]+"; Number of spots: "+spotCollection.getNSpots(false));
+            Globals.threadlog("Channel: " + segmentationResults.channels[iChannel] + "; Number of spots: " +
+                    spotCollection
+                    .getNSpots(false));
             for ( Spot spot : spotCollection.iterable(false) )
             {
                 spot.putFeature("COLOR", (double)segmentationResults.channels[iChannel]); // one-based
@@ -90,7 +93,7 @@ public class SegmentationOverlay {
 
 
         SpotCollection spotCollection = modelOverlay.getSpots();
-        log("Total number of spots: " + spotCollection.getNSpots(false));
+        Globals.threadlog("Total number of spots: " + spotCollection.getNSpots(false));
 
 
         // Deal with spot coloring

@@ -32,8 +32,8 @@ public class AnalyzeObjects {
 
         // Initialise Results Table
         //
-        segmentationResults.analyzeFishSpotsTable = new AnalyzeFishSpotsTable();
-        segmentationResults.analyzeFishSpotsTable.initializeTable(segmentationResults.channels);
+        segmentationResults.table = new SpotsTable();
+        segmentationResults.table.initializeTable(segmentationResults.channels);
 
 
         // Get spot locations and compute pari-wise distances for each selection region
@@ -42,8 +42,8 @@ public class AnalyzeObjects {
 
             Roi roi = overlay.get(i);
 
-            Globals.threadlog(roi.toString());
-            Globals.threadlog(roi.getTypeAsString());
+            //Globals.threadlog(roi.toString());
+            //Globals.threadlog(roi.getTypeAsString());
 
             if (roi.getTypeAsString().equals("Point")) {
 
@@ -56,7 +56,7 @@ public class AnalyzeObjects {
                         radius,
                         quality);
 
-                Globals.logSpotCoordinates("ROI", spotRoi);
+                //Globals.logSpotCoordinates("ROI", spotRoi);
 
                 // Add the selection region to the table
                 //
@@ -84,7 +84,7 @@ public class AnalyzeObjects {
                     int frame = 0; // 0-based
                     closestSpots[ic] = spotCollection.getClosestSpot(spotRoi, frame, false);
                     if ( closestSpots[ic] != null ) {
-                        Globals.logSpotCoordinates("CLOSEST SPOT", closestSpots[ic]);
+                        //Globals.logSpotCoordinates("CLOSEST SPOT", closestSpots[ic]);
                         //log("DISTANCE: " + Math.sqrt(closestsSpots[ic].squareDistanceTo(spotRoi)));
                         tableRow.add(closestSpots[ic].getDoublePosition(0));
                         tableRow.add(closestSpots[ic].getDoublePosition(1));
@@ -114,7 +114,7 @@ public class AnalyzeObjects {
 
                 // Add row to table
                 //
-                segmentationResults.analyzeFishSpotsTable.addRow(tableRow.toArray(new Object[tableRow.size()]));
+                segmentationResults.table.addRow(tableRow.toArray(new Object[tableRow.size()]));
 
             }
 
