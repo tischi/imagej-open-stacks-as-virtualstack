@@ -1,6 +1,5 @@
 package bigDataTools;
 
-import fiji.plugin.trackmate.visualization.hyperstack.HyperStackDisplayer;
 import ij.IJ;
 import ij.ImagePlus;
 
@@ -46,14 +45,15 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     final String textFieldChannelsLabel = "Channels [one-based]";
     JTextField textFieldChannels = new JTextField(12);
 
-    final String textFieldSpotSizesLabel = "Spot sizes";
-    JTextField textFieldSpotSizes = new JTextField(12);
+    final String textFieldSpotRadiiLabel = "Spot radii [pixels]";
+    JTextField textFieldSpotRadii = new JTextField(12);
 
     final String textFieldSpotThresholdsLabel = "Spot thresholds";
     JTextField textFieldSpotThresholds = new JTextField(12);
 
     final String comboBoxSegmentationMethodLabel = "Segmentation method";
-    JComboBox comboBoxSegmentationMethod = new JComboBox(new String[] {Globals.TRACKMATEDOG,Globals.IMAGESUITE3D});
+    JComboBox comboBoxSegmentationMethod = new JComboBox(new String[]
+            {Globals.TRACKMATEDOG, Globals.TRACKMATEDOGSUBPIXEL, Globals.IMAGESUITE3D});
 
     SegmentationResults segmentationResults = new SegmentationResults();
     SegmentationSettings segmentationSettings = new SegmentationSettings();
@@ -99,7 +99,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         // action
         addComboBox(panels, iPanel++, c, comboBoxSegmentationMethod, comboBoxSegmentationMethodLabel);
         addTextField(panels, iPanel++, c, textFieldChannels, textFieldChannelsLabel, "2,3,4");
-        addTextField(panels, iPanel++, c, textFieldSpotSizes, textFieldSpotSizesLabel, "0.5,0.5,0.5");
+        addTextField(panels, iPanel++, c, textFieldSpotRadii, textFieldSpotRadiiLabel, "0.4,0.4,0.4");
         addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "100.0,100.0,100.0");
         addButton(panels, iPanel++, c, buttonSegmentSpots, buttonSegmentSpotsText);
 
@@ -147,7 +147,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         // update segmentationSettings
         segmentationSettings.frames = null;
         segmentationSettings.channels = Globals.commaSeparatedStringToIntegerArray(textFieldChannels.getText());
-        segmentationSettings.spotSizes = Globals.commaSeparatedStringToDoubleArray(textFieldSpotSizes.getText());
+        segmentationSettings.spotRadii = Globals.commaSeparatedStringToDoubleArray(textFieldSpotRadii.getText());
         segmentationSettings.thresholds = Globals.commaSeparatedStringToDoubleArray(textFieldSpotThresholds.getText());
         segmentationSettings.method = (String) comboBoxSegmentationMethod.getSelectedItem();
 
@@ -166,6 +166,13 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
                     segmentationSettings);
 
             segmentationOverlay.createHyperStackDisplayer();
+
+            // Prepare image for marking regions and for checking the spots
+            //
+            IJ.setTool("point");
+            IJ.run(imp, "Make Composite", "");
+            IJ.run("Channels Tool...");
+            //imp.setActiveChannels("0111");
 
         }
 

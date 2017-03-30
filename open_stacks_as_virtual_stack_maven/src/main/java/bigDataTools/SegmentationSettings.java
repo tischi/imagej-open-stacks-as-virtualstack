@@ -5,7 +5,7 @@ package bigDataTools;
  */
 public class SegmentationSettings {
 
-    public double[] spotSizes;
+    public double[] spotRadii;
     public double[] thresholds;
     public int[] channels;
     public int[] frames;

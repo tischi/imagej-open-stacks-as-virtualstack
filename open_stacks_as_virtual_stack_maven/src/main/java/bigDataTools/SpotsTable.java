@@ -49,7 +49,7 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
         {
             for (int j=i+1; j<channels.length; j++ )
             {
-                columns.add("Dist_Ch" + String.valueOf(channels[i]) + "_Ch" + String.valueOf(channels[i]));
+                columns.add("Dist_Ch" + String.valueOf(channels[i]) + "_Ch" + String.valueOf(channels[j]));
             }
         }
 
@@ -164,7 +164,7 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
         double sum = 0;
         for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
         {
-            sum = sum + Double.parseDouble((String)tableModel.getValueAt(rowIndex, columnIndex));
+            sum = sum + (Double)tableModel.getValueAt(rowIndex, columnIndex);
         }
         return (sum / rowCount);
     }

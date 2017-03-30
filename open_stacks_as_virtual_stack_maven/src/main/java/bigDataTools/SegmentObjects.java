@@ -1,9 +1,6 @@
 package bigDataTools;
 
-import fiji.plugin.trackmate.Logger;
-import fiji.plugin.trackmate.Model;
-import fiji.plugin.trackmate.Settings;
-import fiji.plugin.trackmate.TrackMate;
+import fiji.plugin.trackmate.*;
 import fiji.plugin.trackmate.detection.DetectorKeys;
 import fiji.plugin.trackmate.detection.DogDetectorFactory;
 import fiji.plugin.trackmate.tracking.LAPUtils;
@@ -12,6 +9,7 @@ import fiji.plugin.trackmate.tracking.sparselap.SparseLAPTrackerFactory;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Roi;
+import ij.measure.Calibration;
 import javafx.geometry.Point3D;
 
 import static ij.IJ.log;
@@ -24,12 +22,13 @@ public class SegmentObjects {
                                           SegmentationSettings segmentationSettings)
     {
 
-        if( segmentationSettings.method.equals(Globals.TRACKMATEDOG) )
+        if( segmentationSettings.method.equals(Globals.TRACKMATEDOG)
+                || segmentationSettings.method.equals(Globals.TRACKMATEDOGSUBPIXEL) )
         {
 
-            segmentationResults = segmentUsingTrackMateModel(imp,
-                                                        segmentationResults,
-                                                        segmentationSettings);
+            segmentationResults = segmentUsingTrackMate(imp,
+                    segmentationResults,
+                    segmentationSettings);
         }
         else if ( segmentationSettings.method.equals(Globals.IMAGESUITE3D))
         {
@@ -40,18 +39,19 @@ public class SegmentObjects {
     }
 
 
-
-    private static SegmentationResults segmentUsingTrackMateDogDetector(ImagePlus imp,
-                                                                  SegmentationResults segmentationResults,
-                                                                  SegmentationSettings segmentationSettings)
-    {
-        return segmentationResults;
-    }
-
-    private static SegmentationResults segmentUsingTrackMateModel(ImagePlus imp,
+    private static SegmentationResults segmentUsingTrackMate(ImagePlus imp,
                                                              SegmentationResults segmentationResults,
                                                              SegmentationSettings segmentationSettings)
     {
+
+        // Temporarily remove/change the calibration of the imp
+        //
+        Calibration calibrationOrig = imp.getCalibration();
+        Calibration calibrationTemp = new Calibration(imp);
+        calibrationTemp.pixelWidth = 1;
+        calibrationTemp.pixelHeight = 1;
+        calibrationTemp.pixelDepth = 1;
+        imp.setCalibration(calibrationTemp);
 
         segmentationResults.channels = segmentationSettings.channels;
         segmentationResults.models = new Model[segmentationResults.channels.length];
@@ -88,8 +88,17 @@ public class SegmentObjects {
             settings.setFrom(imp);
             settings.detectorSettings = settings.detectorFactory.getDefaultSettings();
             settings.detectorSettings.put(DetectorKeys.KEY_TARGET_CHANNEL, segmentationResults.channels[iChannel]); //one-based
-            settings.detectorSettings.put(DetectorKeys.KEY_DO_SUBPIXEL_LOCALIZATION, false);
-            settings.detectorSettings.put(DetectorKeys.KEY_RADIUS, segmentationSettings.spotSizes[iChannel]);
+
+            if( segmentationSettings.method.equals(Globals.TRACKMATEDOGSUBPIXEL))
+            {
+                settings.detectorSettings.put(DetectorKeys.KEY_DO_SUBPIXEL_LOCALIZATION, true);
+            }
+            else if( segmentationSettings.method.equals(Globals.TRACKMATEDOG))
+            {
+                settings.detectorSettings.put(DetectorKeys.KEY_DO_SUBPIXEL_LOCALIZATION, true);
+            }
+
+            settings.detectorSettings.put(DetectorKeys.KEY_RADIUS, segmentationSettings.spotRadii[iChannel]);
             settings.detectorSettings.put(DetectorKeys.KEY_THRESHOLD, segmentationSettings.thresholds[iChannel]);
 
             // Configure spot filters - Classical filter on quality
@@ -119,12 +128,24 @@ public class SegmentObjects {
                 //return segmentationResults;
             }
 
+
+            // Put back the original calibration on the image
             //
+            imp.setCalibration(calibrationOrig);
+
+            // Convert spot coordinates to scaled coordinates
+            //
+            SpotCollection spots = model.getSpots();
+            for ( Spot spot : spots.iterable(false))
+            {
+                spot.putFeature(spot.POSITION_X, spot.getDoublePosition(0) * calibrationOrig.pixelWidth);
+                spot.putFeature(spot.POSITION_Y, spot.getDoublePosition(1) * calibrationOrig.pixelHeight);
+                spot.putFeature(spot.POSITION_Z, spot.getDoublePosition(2) * calibrationOrig.pixelDepth);
+            }
+
             // Store results
             //
-            //log("##### Channel: "+segmentationResults.channels[iChannel]+"; Number of spots: " + model.getSpots().getNSpots(false) );
             segmentationResults.models[iChannel] = model;
-            segmentationResults.segmentationMethod = "segmentUsingTrackMateModel";
 
         }
 
