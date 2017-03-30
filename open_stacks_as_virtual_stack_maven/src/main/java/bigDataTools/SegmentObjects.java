@@ -122,7 +122,7 @@ public class SegmentObjects {
             //
             // Store results
             //
-            log("##### Channel: "+segmentationResults.channels[iChannel]+"; Number of spots: " + model.getSpots().getNSpots(false) );
+            //log("##### Channel: "+segmentationResults.channels[iChannel]+"; Number of spots: " + model.getSpots().getNSpots(false) );
             segmentationResults.models[iChannel] = model;
             segmentationResults.segmentationMethod = "segmentUsingTrackMateModel";
 

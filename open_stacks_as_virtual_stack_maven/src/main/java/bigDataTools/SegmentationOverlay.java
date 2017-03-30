@@ -7,12 +7,13 @@ import fiji.plugin.trackmate.visualization.DummySpotColorGenerator;
 import fiji.plugin.trackmate.visualization.DummyTrackColorGenerator;
 import fiji.plugin.trackmate.visualization.SpotColorGenerator;
 import fiji.plugin.trackmate.visualization.hyperstack.HyperStackDisplayer;
+import ij.CompositeImage;
 import ij.ImagePlus;
+import ij.process.LUT;
 import org.jfree.chart.renderer.InterpolatePaintScale;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static ij.IJ.log;
 
@@ -41,8 +42,15 @@ public class SegmentationOverlay {
 
     public void trackMateSelectNClosestSpots(Spot location, int n, int frame)
     {
+        Globals.logSpotCoordinates("Highlighting the " + n + " spots that are closests to:", location);
         SpotCollection spots = modelOverlay.getSpots();
         selectionModel.clearSpotSelection();
+        java.util.List<Spot> closestSpots = spots.getNClosestSpots(location, frame, n, false);
+        for ( Spot spot : closestSpots)
+        {
+            Globals.logSpotCoordinates("Spot:", spot);
+
+        }
         selectionModel.addSpotToSelection(spots.getNClosestSpots(location, frame, n, false));
     }
 
@@ -50,7 +58,6 @@ public class SegmentationOverlay {
     {
         selectionModel.clearSpotSelection();
     }
-
 
 
     public void trackMateShowOverlay()
@@ -90,30 +97,37 @@ public class SegmentationOverlay {
         //
         SpotColorGenerator spotColorGenerator = new SpotColorGenerator(modelOverlay);
         spotColorGenerator.setFeature("COLOR");
-        Globals.threadlog("Minimum feature value for spot coloring " + spotColorGenerator.getMin());
-        Globals.threadlog("Maximum feature value for spot coloring " + spotColorGenerator.getMax());
         spotColorGenerator.setAutoMinMaxMode(false);
         spotColorGenerator.setMinMax(1.0, imp.getNChannels()); // one-based
         spotColorGenerator.activate();
+
+        // currently my changes in the LUT for the spots are ignored by TrackMate...
         InterpolatePaintScale interpolatePaintScale = createInterpolatePaintScaleFromImpLUTs(imp);
-
         for (int iChannel = 0; iChannel < imp.getNChannels(); iChannel++) {
-
             Color color = interpolatePaintScale.getPaint( (double)iChannel+1);
-            Globals.threadlog(" "+ (iChannel+1) + ": " +color.toString());
-
+            //Globals.threadlog(" "+ (iChannel+1) + ": " +color.toString());
         }
+
+        // ...thus we change the LUTs of the image to fit the color of the spots
+        double lower = spotColorGenerator.getMin();
+        double upper = spotColorGenerator.getMax();
+        for (int iChannel = 0; iChannel < imp.getNChannels(); iChannel++) {
+            Color color = interpolatePaintScale.Jet.getPaint( ((iChannel+1.0)-lower) / (upper-lower));
+            //Globals.threadlog(" " + (iChannel + 1) + ": " + color.toString());
+            ((CompositeImage)imp).setChannelLut(createLUTFromColor(color), iChannel+1);
+        }
+        //imp.updateAndDraw();
+
 
         selectionModel = new SelectionModel(modelOverlay);
         //selectionModel.addSpotToSelection(spotCollection);
         HyperStackDisplayer hyperStackDisplayer = new HyperStackDisplayer(modelOverlay, selectionModel, imp);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_COLORMAP, interpolatePaintScale);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_COLORING, spotColorGenerator);
-        hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_TRACKS_VISIBLE, false);
+        hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_TRACKS_VISIBLE, true);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOTS_VISIBLE, true);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_RADIUS_RATIO, 1.0);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_HIGHLIGHT_COLOR, Color.blue);
-
         hyperStackDisplayer.render();
         hyperStackDisplayer.refresh();
 
@@ -131,6 +145,26 @@ public class SegmentationOverlay {
 
     }
 
+    //
+    public LUT createLUTFromColor(Color color)
+    {
+        byte[] red = new byte[256];
+        byte[] green = new byte[256];
+        byte[] blue = new byte[256];
+
+        for (int i=0; i<256; i++)
+        {
+            red[i] = (byte)(color.getRed()*i/255.0);
+            green[i] = (byte)(color.getGreen()*i/255.0);
+            blue[i] = (byte)(color.getBlue()*i/255.0);
+        }
+
+        return new LUT(red, green, blue);
+
+    }
+
+    // Not useful yet, because TrackMate ignores the LUT for the SpotColoring
+    //
     public InterpolatePaintScale createInterpolatePaintScaleFromImpLUTs(ImagePlus imp)
     {
 
@@ -145,13 +179,16 @@ public class SegmentationOverlay {
             int b = imp.getLuts()[iChannel].getBlue(255);
 
             Color color = new Color(r,g,b);
-
+            /*
             Globals.threadlog("CHANNEL: " + (iChannel + 1));
             Globals.threadlog("Red: " + r);
             Globals.threadlog("Green: " + g);
             Globals.threadlog("Blue: " + b);
+            */
 
             interpolatePaintScale.add(iChannel + 1, color); // one-based
+
+
         }
 
 

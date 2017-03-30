@@ -147,8 +147,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
                     segmentationResults,
                     segmentationSettings);
 
-            segmentationOverlay.trackMateShowOverlay();;
-
+            segmentationOverlay.trackMateShowOverlay();
 
         }
 

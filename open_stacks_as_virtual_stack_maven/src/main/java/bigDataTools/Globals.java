@@ -95,9 +95,9 @@ public class Globals {
         return nums;
     }
 
-    public static void logSpotCoordinates(String spotName, Spot spot)
+    public static void logSpotCoordinates(String string, Spot spot)
     {
-        log(spotName+": "+
+        log(string+": "+
                 +spot.getDoublePosition(0)+","
                 +spot.getDoublePosition(1)+","
                 +spot.getDoublePosition(2));
