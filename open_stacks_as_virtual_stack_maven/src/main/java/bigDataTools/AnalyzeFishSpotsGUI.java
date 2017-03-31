@@ -128,9 +128,9 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         panels.get(iPanel).add(new JLabel("TABLE"));
         c.add(panels.get(iPanel++));
 
-        // show spots button
-        //addTextField(panels, iPanel++, c, textFieldRegionSize, textFieldRegionSizeLabel, "10,10,10");
         addButton(panels, iPanel++, c, buttonLogColumnAverage, buttonLogColumnAverageText);
+        addButton(panels, iPanel++, c, buttonSaveTable, buttonSaveTableText);
+
 
         //
         // Show the GUI

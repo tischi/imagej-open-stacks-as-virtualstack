@@ -33,12 +33,12 @@
       <file leaf-file-name="AnalyzeFishSpotsGUI.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4686907">
-              <caret line="176" column="39" selection-start-line="176" selection-start-column="39" selection-end-line="176" selection-end-column="39" />
+            <state vertical-scroll-proportion="0.6053131">
+              <caret line="134" column="10" selection-start-line="134" selection-start-column="10" selection-end-line="134" selection-end-column="10" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#AnalyzeFishSpotsGUI#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-                <element signature="method#showDialog#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
+                <element signature="method#actionPerformed#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
                 <element signature="method#addComboBox#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
                 <element signature="method#focusGained#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
                 <element signature="method#focusLost#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
@@ -1282,12 +1282,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4686907">
-          <caret line="176" column="39" selection-start-line="176" selection-start-column="39" selection-end-line="176" selection-end-column="39" />
+        <state vertical-scroll-proportion="0.6053131">
+          <caret line="134" column="10" selection-start-line="134" selection-start-column="10" selection-end-line="134" selection-end-column="10" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#AnalyzeFishSpotsGUI#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-            <element signature="method#showDialog#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
+            <element signature="method#actionPerformed#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
             <element signature="method#addComboBox#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
             <element signature="method#focusGained#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
             <element signature="method#focusLost#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
