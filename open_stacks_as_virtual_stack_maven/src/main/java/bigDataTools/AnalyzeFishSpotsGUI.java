@@ -4,11 +4,13 @@ import ij.IJ;
 import ij.ImagePlus;
 
 import javax.swing.*;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -36,6 +38,9 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     final String buttonAnalyzeSelectedRegionsText = "Analyze Selected Regions";
     JButton buttonAnalyzeSelectedRegions =  new JButton();
 
+    final String buttonSaveTableText = "Save Table";
+    JButton buttonSaveTable =  new JButton();
+
     final String buttonLogColumnAverageText = "Column averages";
     JButton buttonLogColumnAverage =  new JButton();
 
@@ -45,10 +50,10 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     final String textFieldChannelsLabel = "Channels [one-based]";
     JTextField textFieldChannels = new JTextField(12);
 
-    final String textFieldSpotRadiiLabel = "Spot radii [scaled]";
+    final String textFieldSpotRadiiLabel = "Spot radii [pixels]";
     JTextField textFieldSpotRadii = new JTextField(12);
 
-    final String textFieldSpotThresholdsLabel = "Spot thresholds";
+    final String textFieldSpotThresholdsLabel = "Spot thresholds [a.u.]";
     JTextField textFieldSpotThresholds = new JTextField(12);
 
     final String comboBoxSegmentationMethodLabel = "Segmentation method";
@@ -69,9 +74,6 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
 
     public void showDialog() {
-
-        // this ensures that selection points are added to the overlay
-        IJ.run("Point Tool...", "type=Hybrid color=Green size=Small add_to label");
 
         imp = IJ.getImage();
 
@@ -169,7 +171,8 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
             // Prepare image for marking regions and for checking the spots
             //
-            IJ.setTool("point");
+            IJ.run("Point Tool...", "type=Hybrid color=Blue size=[Extra Large] add_to label");
+            IJ.setTool("multipoint");
             IJ.run(imp, "Make Composite", "");
             IJ.run("Channels Tool...");
             //imp.setActiveChannels("0111");
@@ -196,9 +199,23 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
         if ( e.getActionCommand().equals(buttonLogColumnAverageText) )
         {
+            // Print average values of all columns to log window
+            //
             segmentationResults.table.logColumnAverages();
         }
 
+        if ( e.getActionCommand().equals(buttonSaveTableText))
+        {
+
+            // Save Table
+            //
+            JFileChooser jFileChooser = new JFileChooser();
+            if (jFileChooser.showSaveDialog(this.frame) == JFileChooser.APPROVE_OPTION) {
+                File file = jFileChooser.getSelectedFile();
+                segmentationResults.table.saveTable(file);
+            }
+
+        }
 
     }
 

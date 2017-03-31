@@ -30,18 +30,33 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="AnalyzeFishSpotsGUI.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="AnalyzeFishSpotsGUI.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.333333">
-              <caret line="96" column="36" selection-start-line="96" selection-start-column="36" selection-end-line="96" selection-end-column="36" />
+            <state vertical-scroll-proportion="0.4686907">
+              <caret line="176" column="39" selection-start-line="176" selection-start-column="39" selection-end-line="176" selection-end-column="39" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#AnalyzeFishSpotsGUI#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-                <element signature="method#actionPerformed#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
+                <element signature="method#showDialog#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
                 <element signature="method#addComboBox#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
                 <element signature="method#focusGained#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
                 <element signature="method#focusLost#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="441" column="0" selection-start-line="427" selection-start-column="15" selection-end-line="441" selection-end-column="0" />
+              <folding>
+                <element signature="method#TrackTable#0;class#TrackTable#0;class#Registration#0" expanded="true" />
+                <element signature="class#23319:23525" expanded="false" />
+                <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+                <element signature="e#31831#31919#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -51,30 +66,28 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SpotsTable.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="95" column="20" selection-start-line="95" selection-start-column="20" selection-end-line="95" selection-end-column="20" />
+              <caret line="105" column="0" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="method#initializeTable#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#setSegmentationOverlay#0;class#SpotsTable#0" expanded="false" />
-                <element signature="method#addRow#0;class#SpotsTable#0" expanded="true" />
-                <element signature="method#run#0;class#2946:3129" expanded="true" />
-                <element signature="class#3213:3399" expanded="false" />
-                <element signature="method#run#0;class#3213:3399" expanded="true" />
+                <element signature="method#run#0;class#3851:4034" expanded="true" />
+                <element signature="class#4118:4304" expanded="false" />
+                <element signature="method#run#0;class#4118:4304" expanded="true" />
                 <element signature="method#updateSegmentationOverlayBasedOnSelectedRow#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#computeJTableColumnAverage#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#computeJTableColumnAverages#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#getColumnNames#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#logColumnAverages#0;class#SpotsTable#0" expanded="true" />
-                <element signature="e#6774#6775#0" expanded="true" />
-                <element signature="e#6835#6836#0" expanded="true" />
+                <element signature="e#7679#7680#0" expanded="true" />
+                <element signature="e#7740#7741#0" expanded="true" />
                 <element signature="method#mousePressed#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#mouseReleased#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#mouseEntered#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#mouseExited#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#keyTyped#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#keyPressed#0;class#SpotsTable#0" expanded="true" />
-                <element signature="e#7284#7285#0" expanded="true" />
-                <element signature="e#7345#7346#0" expanded="true" />
+                <element signature="e#8189#8190#0" expanded="true" />
+                <element signature="e#8250#8251#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -84,7 +97,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="88" column="55" selection-start-line="88" selection-start-column="55" selection-end-line="88" selection-end-column="55" />
+              <caret line="40" column="38" selection-start-line="40" selection-start-column="38" selection-end-line="40" selection-end-column="38" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -92,11 +105,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SegmentObjects.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SegmentObjects.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="4.0094876">
-              <caret line="153" column="0" selection-start-line="153" selection-start-column="0" selection-end-line="153" selection-end-column="0" />
+            <state vertical-scroll-proportion="1.4074074">
+              <caret line="75" column="35" selection-start-line="75" selection-start-column="35" selection-end-line="75" selection-end-column="35" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#run#0;class#SegmentObjects#0" expanded="true" />
@@ -108,10 +121,25 @@
       <file leaf-file-name="SegmentationOverlay.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationOverlay.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-11.444445">
-              <caret line="53" column="9" selection-start-line="53" selection-start-column="9" selection-end-line="53" selection-end-column="9" />
+            <state vertical-scroll-proportion="-10.222222">
+              <caret line="191" column="0" selection-start-line="191" selection-start-column="0" selection-end-line="191" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#SegmentationOverlay#0;class#SegmentationOverlay#0" expanded="true" />
+                <element signature="method#createHyperStackDisplayer#0;class#SegmentationOverlay#0" expanded="true" />
+                <element signature="method#clearOverlay#0;class#SegmentationOverlay#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ImagePlus.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51h/ij-1.51h.jar!/ij/ImagePlus.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-50.703705">
+              <caret line="2902" column="16" selection-start-line="2902" selection-start-column="16" selection-end-line="2902" selection-end-column="16" />
+              <folding>
+                <element signature="method#setOverlay#0;class#ImagePlus#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -237,12 +265,12 @@
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationResults.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsTable.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationOverlay.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SpotsTable.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Globals.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SpotsTable.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationOverlay.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java" />
       </list>
     </option>
   </component>
@@ -265,7 +293,7 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="30" />
+    <option name="x" value="2" />
     <option name="y" value="23" />
     <option name="width" value="1392" />
     <option name="height" value="873" />
@@ -336,6 +364,62 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="OpenStacksAsVirtualStack" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="open_stacks_as_virtual_stack_maven" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="OpenStacksAsVirtualStack" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="open_stacks_as_virtual_stack_maven" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bigDataTools" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -563,7 +647,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="30" y="23" width="1392" height="873" extended-state="0" />
+    <frame x="2" y="23" width="1392" height="873" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -582,7 +666,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299373" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.10074074" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.06666667" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25480154" sideWeight="0.688196" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -796,14 +880,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/plugins.config">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -866,26 +942,6 @@
         <state vertical-scroll-proportion="-6.814815">
           <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-12.225806">
-          <caret line="640" column="16" selection-start-line="640" selection-start-column="12" selection-end-line="640" selection-end-column="16" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="method#logIfTrackingFinished#0;class#Registration#0" expanded="false" />
-            <element signature="method#clear#0;class#TrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="class#23319:23525" expanded="false" />
-            <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="method#showTrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="method#saveTrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="method#addTrackStart#0;class#Registration#0" expanded="false" />
-            <element signature="method#showTrackedObjects#0;class#Registration#0" expanded="false" />
-            <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="false" />
-            <element signature="e#31831#31919#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1104,16 +1160,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationOverlay.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-11.444445">
-          <caret line="53" column="9" selection-start-line="53" selection-start-column="9" selection-end-line="53" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/TrackMate_/3.4.2/TrackMate_-3.4.2.jar!/fiji/plugin/trackmate/Spot.class">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-33.333332">
@@ -1121,198 +1167,6 @@
           <folding>
             <element signature="e#5875#5876#0" expanded="true" />
             <element signature="e#5924#5925#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SpotsTable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="95" column="20" selection-start-line="95" selection-start-column="20" selection-end-line="95" selection-end-column="20" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#initializeTable#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#setSegmentationOverlay#0;class#SpotsTable#0" expanded="false" />
-            <element signature="method#addRow#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#run#0;class#2946:3129" expanded="true" />
-            <element signature="class#3213:3399" expanded="false" />
-            <element signature="method#run#0;class#3213:3399" expanded="true" />
-            <element signature="method#updateSegmentationOverlayBasedOnSelectedRow#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#computeJTableColumnAverage#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#computeJTableColumnAverages#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#getColumnNames#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#logColumnAverages#0;class#SpotsTable#0" expanded="true" />
-            <element signature="e#6774#6775#0" expanded="true" />
-            <element signature="e#6835#6836#0" expanded="true" />
-            <element signature="method#mousePressed#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#mouseReleased#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#mouseEntered#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#mouseExited#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#keyTyped#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#keyPressed#0;class#SpotsTable#0" expanded="true" />
-            <element signature="e#7284#7285#0" expanded="true" />
-            <element signature="e#7345#7346#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.333333">
-          <caret line="96" column="36" selection-start-line="96" selection-start-column="36" selection-end-line="96" selection-end-column="36" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#AnalyzeFishSpotsGUI#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-            <element signature="method#actionPerformed#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-            <element signature="method#addComboBox#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-            <element signature="method#focusGained#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-            <element signature="method#focusLost#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="88" column="55" selection-start-line="88" selection-start-column="55" selection-end-line="88" selection-end-column="55" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51h/ij-1.51h.jar!/ij/ImagePlus.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33206832">
-          <caret line="2376" column="16" selection-start-line="2376" selection-start-column="16" selection-end-line="2376" selection-end-column="16" />
-          <folding>
-            <element signature="method#ImagePlus#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#ImagePlus#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#ImagePlus#2;class#ImagePlus#0" expanded="true" />
-            <element signature="method#ImagePlus#3;class#ImagePlus#0" expanded="true" />
-            <element signature="method#ImagePlus#4;class#ImagePlus#0" expanded="true" />
-            <element signature="method#lock#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#lockSilently#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#unlock#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#waitForImage#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#showProgress#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#draw#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#draw#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#updateAndDraw#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setDisplayMode#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setActiveChannels#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getLuts#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#repaintWindow#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#updateAndRepaintWindow#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#updateImage#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#hide#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#close#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#show#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#invertLookupTable#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getImage#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getBufferedImage#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setImage#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setImage#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setProcessor#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setProcessor2#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setStack#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setStack#2;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setFileInfo#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setWindow#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setColor#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setupProcessor#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getProcessor#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#trimProcessor#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getMask#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getRawStatistics#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getStatistics#2;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getStatistics#3;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getShortTitle#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setTitle#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getStackSize#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getImageStackSize#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setDimensions#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#isHyperStack#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getNDimensions#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#isDisplayedHyperStack#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getNChannels#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getNSlices#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getNFrames#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getDimensions#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#verifyDimensions#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getBitDepth#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getBytesPerPixel#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setType#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getStringProperty#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#isDicomTag#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getStringProperty#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#findKey#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getInfoProperty#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setProperty#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#createLut#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#isInvertedLut#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getPixel#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#createEmptyStack#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getStack#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getImageStack#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getCurrentSlice#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setCurrentSlice#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#killStack#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setPosition#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setPositionWithoutUpdate#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getStackIndex#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#resetStack#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setPosition#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#convertIndexToPosition#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setSlice#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setSliceWithoutUpdate#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setRoi#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#createNewRoi#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#deleteRoi#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#saveRoi#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#restoreRoi#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#isSmaller#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#revert#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#revertStack#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getFileInfo#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#addLut#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getOriginalFileInfo#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#imageUpdate#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#flush#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#createImagePlus#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#createHyperStack#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#copyScale#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#copyAttributes#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getCalibration#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setCalibration#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setGlobalCalibration#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getLocalCalibration#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#mouseMoved#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#updateStatusbarValue#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getFFTLocation#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getLocationAsString#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getValueAsString#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#copy#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#paste#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#notifyListeners#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#isComposite#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setDisplayRange#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setDisplayRange#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#resetDisplayRange#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setDefault16bitRange#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#updatePosition#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#flatten#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#flattenStack#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#flattenImage#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#flattenImage#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setLut#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setOverlay#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setOverlay#1;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setOverlay#2;class#ImagePlus#0" expanded="true" />
-            <element signature="method#getOverlay#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#setHideOverlay#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#clone#0;class#ImagePlus#0" expanded="true" />
-            <element signature="method#toString#0;class#ImagePlus#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1332,13 +1186,111 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/plugins.config">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="441" column="0" selection-start-line="427" selection-start-column="15" selection-end-line="441" selection-end-column="0" />
+          <folding>
+            <element signature="method#TrackTable#0;class#TrackTable#0;class#Registration#0" expanded="true" />
+            <element signature="class#23319:23525" expanded="false" />
+            <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="e#31831#31919#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SpotsTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="105" column="0" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#setSegmentationOverlay#0;class#SpotsTable#0" expanded="false" />
+            <element signature="method#run#0;class#3851:4034" expanded="true" />
+            <element signature="class#4118:4304" expanded="false" />
+            <element signature="method#run#0;class#4118:4304" expanded="true" />
+            <element signature="method#updateSegmentationOverlayBasedOnSelectedRow#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#computeJTableColumnAverage#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#computeJTableColumnAverages#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#getColumnNames#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#logColumnAverages#0;class#SpotsTable#0" expanded="true" />
+            <element signature="e#7679#7680#0" expanded="true" />
+            <element signature="e#7740#7741#0" expanded="true" />
+            <element signature="method#mousePressed#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#mouseReleased#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#mouseEntered#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#mouseExited#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#keyTyped#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#keyPressed#0;class#SpotsTable#0" expanded="true" />
+            <element signature="e#8189#8190#0" expanded="true" />
+            <element signature="e#8250#8251#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51h/ij-1.51h.jar!/ij/ImagePlus.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-50.703705">
+          <caret line="2902" column="16" selection-start-line="2902" selection-start-column="16" selection-end-line="2902" selection-end-column="16" />
+          <folding>
+            <element signature="method#setOverlay#0;class#ImagePlus#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationOverlay.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-10.222222">
+          <caret line="191" column="0" selection-start-line="191" selection-start-column="0" selection-end-line="191" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#SegmentationOverlay#0;class#SegmentationOverlay#0" expanded="true" />
+            <element signature="method#createHyperStackDisplayer#0;class#SegmentationOverlay#0" expanded="true" />
+            <element signature="method#clearOverlay#0;class#SegmentationOverlay#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="40" column="38" selection-start-line="40" selection-start-column="38" selection-end-line="40" selection-end-column="38" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="4.0094876">
-          <caret line="153" column="0" selection-start-line="153" selection-start-column="0" selection-end-line="153" selection-end-column="0" />
+        <state vertical-scroll-proportion="1.4074074">
+          <caret line="75" column="35" selection-start-line="75" selection-start-column="35" selection-end-line="75" selection-end-column="35" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#run#0;class#SegmentObjects#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4686907">
+          <caret line="176" column="39" selection-start-line="176" selection-start-column="39" selection-end-line="176" selection-end-column="39" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#AnalyzeFishSpotsGUI#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
+            <element signature="method#showDialog#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
+            <element signature="method#addComboBox#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
+            <element signature="method#focusGained#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
+            <element signature="method#focusLost#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -69,8 +69,11 @@ public class SegmentObjects {
             Settings settings = new Settings();
             settings.detectorFactory = new DogDetectorFactory<>();
 
-            Roi roi = imp.getRoi();
 
+            // Check if there was a ROI
+            // Not necessary, seems to be done automatically by TrackMate
+            /*
+            Roi roi = imp.getRoi();
             if (roi != null && roi.isArea())
             {
                 Point3D regionOffset = new Point3D(roi.getBounds().getX(), roi.getBounds().getY(), 0);
@@ -81,13 +84,18 @@ public class SegmentObjects {
                 settings.yend = settings.ystart + (int) regionSize.getY() - 1;
                 settings.zstart = (int) regionOffset.getX();
                 settings.zend = settings.zstart + (int) regionSize.getZ() - 1;
+                imp.deleteRoi();
             }
             else
             {
                 Point3D regionOffset = null;
                 Point3D regionSize = null;
             }
+            */
 
+
+            // Go on with TrackMate settings
+            //
             settings.setFrom(imp);
             settings.detectorSettings = settings.detectorFactory.getDefaultSettings();
             settings.detectorSettings.put(DetectorKeys.KEY_TARGET_CHANNEL, segmentationResults.channels[iChannel]); //one-based
@@ -132,17 +140,15 @@ public class SegmentObjects {
             }
 
 
-            // Convert spot coordinates to scaled coordinates
+            // Convert spot features to scaled coordinates
             //
             SpotCollection spots = model.getSpots();
-            Globals.threadlog("Number of spots"+spots.getNSpots(false));
             for ( Spot spot : spots.iterable(false))
             {
                 spot.putFeature(spot.POSITION_X, spot.getDoublePosition(0) * calibrationOrig.pixelWidth);
                 spot.putFeature(spot.POSITION_Y, spot.getDoublePosition(1) * calibrationOrig.pixelHeight);
                 spot.putFeature(spot.POSITION_Z, spot.getDoublePosition(2) * calibrationOrig.pixelDepth);
                 spot.putFeature(spot.RADIUS, segmentationSettings.spotRadii[iChannel] * calibrationOrig.pixelWidth);
-
             }
 
             // Store results

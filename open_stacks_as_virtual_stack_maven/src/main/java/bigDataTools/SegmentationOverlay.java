@@ -10,6 +10,7 @@ import fiji.plugin.trackmate.visualization.hyperstack.HyperStackDisplayer;
 import ij.CompositeImage;
 import ij.ImagePlus;
 import ij.process.LUT;
+import ij.gui.Overlay;
 import org.jfree.chart.renderer.InterpolatePaintScale;
 
 import java.awt.*;
@@ -189,6 +190,15 @@ public class SegmentationOverlay {
 
     }
 
+
+    public static void clearOverlay(ImagePlus imp)
+    {
+        Overlay overlay = imp.getOverlay();
+        if(overlay != null) {
+            overlay.clear();
+        }
+
+    }
 
     public void showOverlayUsingTrackMateSpotOverlay(ImagePlus imp)
     {

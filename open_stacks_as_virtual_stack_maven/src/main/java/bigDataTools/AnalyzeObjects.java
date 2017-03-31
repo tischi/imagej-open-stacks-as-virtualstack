@@ -38,7 +38,7 @@ public class AnalyzeObjects {
 
         // Get spot locations and compute pari-wise distances for each selection region
         //
-        for (int i=0; i<overlay.size(); i++) {
+        for ( int i=0; i<overlay.size(); i++ ) {
 
             Roi roi = overlay.get(i);
 

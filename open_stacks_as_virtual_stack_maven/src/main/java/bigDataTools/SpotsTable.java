@@ -1,6 +1,7 @@
 package bigDataTools;
 
 import fiji.plugin.trackmate.Spot;
+import ij.IJ;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -10,6 +11,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,6 +95,33 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
         frame.pack();
         //frame.setLocation(trackingGUI.getFrame().getX() + trackingGUI.getFrame().getWidth(), trackingGUI.getFrame().getY());
         frame.setVisible(true);
+    }
+
+    public void saveTable(File file) {
+
+        if(table.getModel() == null) {
+            IJ.showMessage("There is not table to be saved.");
+            return;
+        }
+
+        try{
+            TableModel model = table.getModel();
+            FileWriter excel = new FileWriter(file);
+
+            for(int i = 0; i < model.getColumnCount(); i++){
+                excel.write(model.getColumnName(i) + "\t");
+            }
+            excel.write("\n");
+
+            for(int i=0; i< model.getRowCount(); i++) {
+                for(int j=0; j < model.getColumnCount(); j++) {
+                    excel.write(model.getValueAt(i,j).toString()+"\t");
+                }
+                excel.write("\n");
+            }
+            excel.close();
+
+        } catch(IOException e) { IJ.showMessage(e.toString()); }
     }
 
     public void addRow(final Object[] row)
