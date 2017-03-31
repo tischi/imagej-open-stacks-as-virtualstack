@@ -6,6 +6,7 @@ import fiji.plugin.trackmate.detection.DogDetectorFactory;
 import fiji.plugin.trackmate.tracking.LAPUtils;
 import fiji.plugin.trackmate.tracking.TrackerKeys;
 import fiji.plugin.trackmate.tracking.sparselap.SparseLAPTrackerFactory;
+import ij.CompositeImage;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Roi;
@@ -53,6 +54,8 @@ public class SegmentObjects {
         calibrationTemp.pixelDepth = 1;
         imp.setCalibration(calibrationTemp);
 
+        // Prepare results storage
+        //
         segmentationResults.channels = segmentationSettings.channels;
         segmentationResults.models = new Model[segmentationResults.channels.length];
 
@@ -129,25 +132,27 @@ public class SegmentObjects {
             }
 
 
-            // Put back the original calibration on the image
-            //
-            imp.setCalibration(calibrationOrig);
-
             // Convert spot coordinates to scaled coordinates
             //
             SpotCollection spots = model.getSpots();
+            Globals.threadlog("Number of spots"+spots.getNSpots(false));
             for ( Spot spot : spots.iterable(false))
             {
                 spot.putFeature(spot.POSITION_X, spot.getDoublePosition(0) * calibrationOrig.pixelWidth);
                 spot.putFeature(spot.POSITION_Y, spot.getDoublePosition(1) * calibrationOrig.pixelHeight);
                 spot.putFeature(spot.POSITION_Z, spot.getDoublePosition(2) * calibrationOrig.pixelDepth);
+                spot.putFeature(spot.RADIUS, segmentationSettings.spotRadii[iChannel] * calibrationOrig.pixelWidth);
+
             }
 
             // Store results
             //
             segmentationResults.models[iChannel] = model;
-
         }
+
+        // Put back the original calibration on the image
+        //
+        imp.setCalibration(calibrationOrig);
 
         return segmentationResults;
 

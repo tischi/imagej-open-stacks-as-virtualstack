@@ -45,7 +45,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     final String textFieldChannelsLabel = "Channels [one-based]";
     JTextField textFieldChannels = new JTextField(12);
 
-    final String textFieldSpotRadiiLabel = "Spot radii [pixels]";
+    final String textFieldSpotRadiiLabel = "Spot radii [scaled]";
     JTextField textFieldSpotRadii = new JTextField(12);
 
     final String textFieldSpotThresholdsLabel = "Spot thresholds";
@@ -99,7 +99,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         // action
         addComboBox(panels, iPanel++, c, comboBoxSegmentationMethod, comboBoxSegmentationMethodLabel);
         addTextField(panels, iPanel++, c, textFieldChannels, textFieldChannelsLabel, "2,3,4");
-        addTextField(panels, iPanel++, c, textFieldSpotRadii, textFieldSpotRadiiLabel, "0.4,0.4,0.4");
+        addTextField(panels, iPanel++, c, textFieldSpotRadii, textFieldSpotRadiiLabel, "3,3,3");
         addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "100.0,100.0,100.0");
         addButton(panels, iPanel++, c, buttonSegmentSpots, buttonSegmentSpotsText);
 

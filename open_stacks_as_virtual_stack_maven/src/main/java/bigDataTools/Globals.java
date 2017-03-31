@@ -51,7 +51,6 @@ public class Globals {
     public static String version = "2016-Nov-21a";
     public static String TRACKMATEDOGSUBPIXEL = "TrackMate>DoG>SubPixel";
     public static String TRACKMATEDOG = "TrackMate>DoG";
-
     public static String IMAGESUITE3D = "3D ImageSuite";
 
 
