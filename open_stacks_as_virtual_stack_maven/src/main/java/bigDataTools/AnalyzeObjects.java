@@ -87,10 +87,11 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
                 // Find the closest spot in each channel
                 //
+
                 Spot[] closestSpots = new Spot[segmentationResults.channels.length];
-                for (int ic = 0; ic < segmentationResults.channels.length; ic++) {
-                    log("CHANNEL: " + segmentationResults.channels[ic]);
-                    SpotCollection spotCollection = segmentationResults.models[ic].getSpots();
+                for (int iChannel = 0; iChannel < segmentationResults.channels.length; iChannel++) {
+
+                    SpotCollection spotCollection = segmentationResults.models[iChannel].getSpots();
 
                     /*
                     // print all spots
@@ -102,68 +103,21 @@ public class AnalyzeObjects< T extends RealType< T >> {
                     }*/
 
                     int frame = 0; // 0-based
-                    closestSpots[ic] = spotCollection.getClosestSpot(spotRoi, frame, false);
-                    if ( closestSpots[ic] != null ) {
-                        //Globals.logSpotCoordinates("CLOSEST SPOT", closestSpots[ic]);
-                        //log("DISTANCE: " + Math.sqrt(closestsSpots[ic].squareDistanceTo(spotRoi)));
-                        tableRow.add(closestSpots[ic].getDoublePosition(0));
-                        tableRow.add(closestSpots[ic].getDoublePosition(1));
-                        tableRow.add(closestSpots[ic].getDoublePosition(2));
+                    Spot spot = spotCollection.getClosestSpot(spotRoi, frame, false);
 
-                        // compute center of mass
+                    if ( spot != null ) {
+
+                        // Add trackmate position to the table
                         //
-                        // construct the img of respective channel
-                        Img<T> img = ImageJFunctions.wrapReal(imp);
-                        int numDim = img.numDimensions();
-                        for ( int d = 0; d < img.numDimensions(); d++ )
-                        {
-                            long nd = img.dimension(d);
-                            nd += 2;
-                        }
+                        tableRow.add(spot.getDoublePosition(0));
+                        tableRow.add(spot.getDoublePosition(1));
+                        tableRow.add(spot.getDoublePosition(2));
 
-                        // https://javadoc.imagej.net/ImgLib2/net/imglib2/view/Views.html
-                        // extended_img = Views.extendMirrorSingle(img)
-                        // interval = Views.interval(extended_img, [x - rX, y - rY, z - rZ], [x + rX, y + rY, z + rZ])
-                        // https://github.com/imglib/imglib2-introductory-workshop/blob/master/completed/ImgLib2_CenterOfMass2.java
-                        // http://javadoc.imagej.net/ImgLib2/index.html?net/imglib2/algorithm/neighborhood/Neighborhood.html
+                        // Compute center of mass
+                        //
+                        double backgroundValue = 0;
+                        double[] centerOfMass = computeCenterOfMass(spot, imp, segmentationResults.channels[iChannel], backgroundValue);
 
-                        double[] cali = new double[3];
-                        cali[0] = imp.getCalibration().pixelWidth;
-                        cali[1] = imp.getCalibration().pixelHeight;
-                        cali[2] = imp.getCalibration().pixelDepth;
-                        long[] center = new long[numDim];
-                        for(int span = 0; span < 3; ++span)
-                        {
-                            center[span] = Math.round(closestSpots[ic].getFeature(Spot.POSITION_FEATURES[span]).doubleValue() / cali[span]);
-                        }
-                        center[4]=0; //channel
-
-                        long[] size = new long[]{3,3,3,0};
-                        RectangleNeighborhoodGPL rectangleNeighborhood = new RectangleNeighborhoodGPL(img, new OutOfBoundsMirrorExpWindowingFactory() );
-                        rectangleNeighborhood.setPosition(center);
-                        rectangleNeighborhood.setSpan(size);
-
-                        Cursor<T> cursor = rectangleNeighborhood.localizingCursor();
-
-                        while ( cursor.hasNext() )
-                        {
-                            // move the cursor to the next pixel
-                            cursor.fwd();
-
-                            // intensity of the pixel
-                            //double i = cursor.get().getRealDouble();
-                            double x = cursor.getDoublePosition(0);
-                            double y = cursor.getDoublePosition(1);
-                            double z = cursor.getDoublePosition(2);
-                            double v = cursor.get().getRealDouble();
-
-                            //// sum up the location weighted by the intensity for each dimension
-                            //for ( int d = 0; d < img.numDimensions(); ++d )
-                            //    sumDim[ d ] += cursor.getLongPosition( d ) * i;
-
-                            // sum up the intensities
-                            //sumI += i;
-                        }
 
                     }
                     else
@@ -176,9 +130,11 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
                     }
 
+                    closestSpots[iChannel] = spot;
+
                 }
 
-                // Compute pair-wise distance
+                // Compute pair-wise distances
                 //
                 for ( int ic = 0; ic < segmentationResults.channels.length - 1; ic++ )
                 {
@@ -203,12 +159,76 @@ public class AnalyzeObjects< T extends RealType< T >> {
     }
 
 
-    public static <T extends RealType<T>> void getAsImg(final ImagePlus imp) {
-        final Img<T> wrapImg = ImageJFunctions.wrapReal(imp);
-        System.out.println("ImgLib2 image type is " +
-                wrapImg.firstElement().getClass().getName());
+
+    public double[] computeCenterOfMass(Spot spot, ImagePlus imp, int channel, double backgroundValue)
+    {
+
+        channel = channel - 1; // convert to zero-based channel indexing
+
+        double[] centerOfMass =  new double[3];
+
+        // wrap to img
+        //
+        Img<T> img = ImageJFunctions.wrapReal(imp);
+
+        // Dimensions are: width, height, channels, slices, frames
+        int numDim = img.numDimensions();
+        for ( int d = 0; d < img.numDimensions(); d++ )
+        {
+            long nd = img.dimension(d);
+            nd += 2;
+        }
+
+        // https://javadoc.imagej.net/ImgLib2/net/imglib2/view/Views.html
+        // extended_img = Views.extendMirrorSingle(img)
+        // interval = Views.interval(extended_img, [x - rX, y - rY, z - rZ], [x + rX, y + rY, z + rZ])
+        // https://github.com/imglib/imglib2-introductory-workshop/blob/master/completed/ImgLib2_CenterOfMass2.java
+        // http://javadoc.imagej.net/ImgLib2/index.html?net/imglib2/algorithm/neighborhood/Neighborhood.html
+
+        double[] cali = new double[3];
+        cali[0] = imp.getCalibration().pixelWidth;
+        cali[1] = imp.getCalibration().pixelHeight;
+        cali[2] = imp.getCalibration().pixelDepth;
+        long[] center = new long[numDim];
+        for(int d = 0; d < 3; d++)
+        {
+            center[d] = Math.round(spot.getFeature(Spot.POSITION_FEATURES[d]).doubleValue() / cali[d]);
+        }
+        center[3] = center[2]; // the ordering in img is x,y,c,z,t
+        center[2] = channel; // channel
+
+        long[] size = new long[]{3,3,0,3};
+        RectangleNeighborhoodGPL rectangleNeighborhood = new RectangleNeighborhoodGPL(img, new OutOfBoundsMirrorExpWindowingFactory() );
+        rectangleNeighborhood.setPosition(center);
+        rectangleNeighborhood.setSpan(size);
+
+        Cursor<T> cursor = rectangleNeighborhood.localizingCursor();
+
+        while ( cursor.hasNext() )
+        {
+            // move the cursor to the next pixel
+            cursor.fwd();
+
+            // intensity of the pixel
+            //double i = cursor.get().getRealDouble();
+            double x = cursor.getDoublePosition(0);
+            double y = cursor.getDoublePosition(1);
+            double c = cursor.getDoublePosition(2);
+            double z = cursor.getDoublePosition(3);
+            double v = cursor.get().getRealDouble();
+            v = v +2;
+
+            //// sum up the location weighted by the intensity for each dimension
+            //for ( int d = 0; d < img.numDimensions(); ++d )
+            //    sumDim[ d ] += cursor.getLongPosition( d ) * i;
+
+            // sum up the intensities
+            //sumI += i;
+        }
+
+
+        return centerOfMass;
 
     }
-
 
 }

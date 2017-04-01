@@ -172,7 +172,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
             // Prepare image for marking regions and for checking the spots
             //
             IJ.run("Point Tool...", "type=Hybrid color=Blue size=[Extra Large] add_to label");
-            IJ.setTool("multipoint");
+            //IJ.setTool("multipoint");
             IJ.run(imp, "Make Composite", "");
             IJ.run("Channels Tool...");
             //imp.setActiveChannels("0111");
@@ -184,7 +184,8 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         {
             // Measure spots around selected points
             //
-            AnalyzeObjects.measureSpotLocationsAndDistancesInSelectedRegions(imp, segmentationResults);
+            AnalyzeObjects analyzeObjects = new AnalyzeObjects();
+            analyzeObjects.measureSpotLocationsAndDistancesInSelectedRegions(imp, segmentationResults);
 
             // Show results table
             //
