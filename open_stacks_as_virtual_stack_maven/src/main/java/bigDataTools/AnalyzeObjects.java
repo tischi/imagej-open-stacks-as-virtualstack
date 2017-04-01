@@ -35,10 +35,21 @@ import static ij.IJ.log;
 
 public class AnalyzeObjects< T extends RealType< T >> {
 
-    public void measureSpotLocationsAndDistancesInSelectedRegions(ImagePlus imp,
-                                                                         SegmentationResults segmentationResults)
-    {
+    ImagePlus imp;
+    SegmentationSettings segmentationSettings;
+    SegmentationResults segmentationResults;
 
+    public AnalyzeObjects(ImagePlus imp, SegmentationSettings segmentationSettings,
+                          SegmentationResults segmentationResults)
+    {
+        this.imp = imp;
+        this.segmentationResults = segmentationResults;
+        this.segmentationSettings = segmentationSettings;
+    }
+
+
+    public void measureSpotLocationsAndDistancesInSelectedRegions()
+    {
         ij.gui.Overlay overlay = imp.getOverlay();
 
         if(overlay != null) {
@@ -116,7 +127,7 @@ public class AnalyzeObjects< T extends RealType< T >> {
                         // Compute center of mass
                         //
                         double backgroundValue = 0;
-                        double[] centerOfMass = computeCenterOfMass(spot, imp, segmentationResults.channels[iChannel], backgroundValue);
+                        double[] centerOfMass = computeCenterOfMass(spot, iChannel, backgroundValue);
 
 
                     }
@@ -160,71 +171,83 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
 
 
-    public double[] computeCenterOfMass(Spot spot, ImagePlus imp, int channel, double backgroundValue)
+    public double[] computeCenterOfMass(Spot spot, int iChannel, double backgroundValue)
     {
 
-        channel = channel - 1; // convert to zero-based channel indexing
+        // https://javadoc.imagej.net/ImgLib2/net/imglib2/view/Views.html
+        // https://github.com/imglib/imglib2-introductory-workshop/blob/master/completed/ImgLib2_CenterOfMass2.java
+        // http://javadoc.imagej.net/ImgLib2/index.html?net/imglib2/algorithm/neighborhood/Neighborhood.html
 
-        double[] centerOfMass =  new double[3];
+
 
         // wrap to img
         //
         Img<T> img = ImageJFunctions.wrapReal(imp);
 
-        // Dimensions are: width, height, channels, slices, frames
-        int numDim = img.numDimensions();
-        for ( int d = 0; d < img.numDimensions(); d++ )
+        /*for ( int d = 0; d < img.numDimensions(); d++ )
         {
             long nd = img.dimension(d);
             nd += 2;
-        }
+        }*/
 
-        // https://javadoc.imagej.net/ImgLib2/net/imglib2/view/Views.html
-        // extended_img = Views.extendMirrorSingle(img)
-        // interval = Views.interval(extended_img, [x - rX, y - rY, z - rZ], [x + rX, y + rY, z + rZ])
-        // https://github.com/imglib/imglib2-introductory-workshop/blob/master/completed/ImgLib2_CenterOfMass2.java
-        // http://javadoc.imagej.net/ImgLib2/index.html?net/imglib2/algorithm/neighborhood/Neighborhood.html
 
-        double[] cali = new double[3];
-        cali[0] = imp.getCalibration().pixelWidth;
-        cali[1] = imp.getCalibration().pixelHeight;
-        cali[2] = imp.getCalibration().pixelDepth;
-        long[] center = new long[numDim];
-        for(int d = 0; d < 3; d++)
-        {
-            center[d] = Math.round(spot.getFeature(Spot.POSITION_FEATURES[d]).doubleValue() / cali[d]);
-        }
-        center[3] = center[2]; // the ordering in img is x,y,c,z,t
-        center[2] = channel; // channel
+        // Compute spot center in pixel coordinates
+        //
+        // ! Dimensions in img are: x,y,c,z,t
+        long[] center = new long[img.numDimensions()];
+        center[0] = Math.round(spot.getFeature(Spot.POSITION_FEATURES[0]).doubleValue() / imp.getCalibration().pixelWidth);
+        center[1] = Math.round(spot.getFeature(Spot.POSITION_FEATURES[1]).doubleValue() / imp.getCalibration().pixelHeight);
+        center[2] = segmentationSettings.channels[iChannel] - 1;  // zero-based channels for img
+        center[3] = Math.round(spot.getFeature(Spot.POSITION_FEATURES[2]).doubleValue() / imp.getCalibration().pixelDepth);
 
-        long[] size = new long[]{3,3,0,3};
+        // Set radii of the region in which the center of mass should be computed
+        //
+
+        // TODO: consider multiplication of region size with a constant factor gere
+        long[] size = new long[]{
+                segmentationSettings.spotRadii[iChannel],
+                segmentationSettings.spotRadii[iChannel],
+                0,  // 0 size in  channel dimension, because we only want to evaluate one channel
+                segmentationSettings.spotRadii[iChannel]};
+
+        // Create a local neighborhood around this spot
+        //
         RectangleNeighborhoodGPL rectangleNeighborhood = new RectangleNeighborhoodGPL(img, new OutOfBoundsMirrorExpWindowingFactory() );
         rectangleNeighborhood.setPosition(center);
         rectangleNeighborhood.setSpan(size);
-
         Cursor<T> cursor = rectangleNeighborhood.localizingCursor();
 
+        // Loop through the region and compute the center of mass
+        //
+        double[] sumDim = new double[]{0,0,0};
+        double sumVal = 0;
         while ( cursor.hasNext() )
         {
             // move the cursor to the next pixel
             cursor.fwd();
 
-            // intensity of the pixel
-            //double i = cursor.get().getRealDouble();
+
             double x = cursor.getDoublePosition(0);
             double y = cursor.getDoublePosition(1);
-            double c = cursor.getDoublePosition(2);
+            double c = cursor.getDoublePosition(2);  // this is the channel; should be the same always
             double z = cursor.getDoublePosition(3);
-            double v = cursor.get().getRealDouble();
-            v = v +2;
+            double v = cursor.get().getRealDouble() -  backgroundValue;
 
-            //// sum up the location weighted by the intensity for each dimension
-            //for ( int d = 0; d < img.numDimensions(); ++d )
-            //    sumDim[ d ] += cursor.getLongPosition( d ) * i;
+            sumDim[0] += x * v;
+            sumDim[1] += y * v;
+            sumDim[2] += z * v;
 
-            // sum up the intensities
-            //sumI += i;
+            sumVal += v;
+
         }
+
+
+        double[] centerOfMass =  new double[]
+                {
+                        sumDim[0]/sumVal,
+                        sumDim[1]/sumVal,
+                        sumDim[2]/sumVal,
+                };
 
 
         return centerOfMass;

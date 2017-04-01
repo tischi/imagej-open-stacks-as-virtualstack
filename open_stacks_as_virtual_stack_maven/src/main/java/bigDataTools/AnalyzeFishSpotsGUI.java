@@ -149,7 +149,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         // update segmentationSettings
         segmentationSettings.frames = null;
         segmentationSettings.channels = Globals.commaSeparatedStringToIntegerArray(textFieldChannels.getText());
-        segmentationSettings.spotRadii = Globals.commaSeparatedStringToDoubleArray(textFieldSpotRadii.getText());
+        segmentationSettings.spotRadii = Globals.commaSeparatedStringToIntegerArray(textFieldSpotRadii.getText());
         segmentationSettings.thresholds = Globals.commaSeparatedStringToDoubleArray(textFieldSpotThresholds.getText());
         segmentationSettings.method = (String) comboBoxSegmentationMethod.getSelectedItem();
 
@@ -184,8 +184,8 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         {
             // Measure spots around selected points
             //
-            AnalyzeObjects analyzeObjects = new AnalyzeObjects();
-            analyzeObjects.measureSpotLocationsAndDistancesInSelectedRegions(imp, segmentationResults);
+            AnalyzeObjects analyzeObjects = new AnalyzeObjects(imp, segmentationSettings, segmentationResults);
+            analyzeObjects.measureSpotLocationsAndDistancesInSelectedRegions();
 
             // Show results table
             //
