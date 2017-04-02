@@ -8,6 +8,8 @@ import fiji.plugin.trackmate.visualization.DummyTrackColorGenerator;
 import fiji.plugin.trackmate.visualization.SpotColorGenerator;
 import fiji.plugin.trackmate.visualization.hyperstack.HyperStackDisplayer;
 import ij.CompositeImage;
+import ij.IJ;
+import ij.ImageListener;
 import ij.ImagePlus;
 import ij.process.LUT;
 import ij.gui.Overlay;
@@ -18,11 +20,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class SegmentationOverlay {
+public class SegmentationOverlay implements ImageListener {
 
     ImagePlus imp;
     SegmentationResults segmentationResults;
     SegmentationSettings segmentationSettings;
+    boolean[] activeChannels;
 
     // TrackMate specific
     public SelectionModel selectionModel;
@@ -37,6 +40,13 @@ public class SegmentationOverlay {
         this.imp = imp;
         this.segmentationResults = segmentationResults;
         this.segmentationSettings = segmentationSettings;
+
+        activeChannels = new boolean[imp.getNChannels()];
+        for ( boolean activeChannel : activeChannels )
+        {
+            activeChannel = true;
+        }
+        ImagePlus.addImageListener(this);
 
     }
 
@@ -84,15 +94,20 @@ public class SegmentationOverlay {
         modelOverlay.beginUpdate();
         for ( int iChannel = 0; iChannel < segmentationResults.channels.length; iChannel++)
         {
-            Model model = models[iChannel];
-            SpotCollection spotCollection = model.getSpots();
-            Utils.threadlog("Channel: " + segmentationResults.channels[iChannel] + "; Number of spots: " +
-                    spotCollection
-                            .getNSpots(false));
-            for ( Spot spot : spotCollection.iterable(false) )
+            // add spots to overlay only if this channel is active
+            //
+            if (activeChannels[segmentationResults.channels[iChannel]-1])
             {
-                spot.putFeature("COLOR", (double)segmentationResults.channels[iChannel]); // one-based
-                modelOverlay.addSpotTo(spot, frame);
+                Model model = models[iChannel];
+                SpotCollection spotCollection = model.getSpots();
+                Utils.threadlog("Channel: " + segmentationResults.channels[iChannel] + "; Number of spots: " +
+                        spotCollection
+                                .getNSpots(false));
+                for (Spot spot : spotCollection.iterable(false))
+                {
+                    spot.putFeature("COLOR", (double) segmentationResults.channels[iChannel]); // one-based
+                    modelOverlay.addSpotTo(spot, frame);
+                }
             }
         }
         modelOverlay.endUpdate();
@@ -110,8 +125,10 @@ public class SegmentationOverlay {
 
         // currently my changes in the LUT for the spots are ignored by TrackMate...
         InterpolatePaintScale interpolatePaintScale = createInterpolatePaintScaleFromImpLUTs(imp);
-        for (int iChannel = 0; iChannel < imp.getNChannels(); iChannel++) {
-            Color color = interpolatePaintScale.getPaint( (double)iChannel+1);
+        for (int iChannel = 0; iChannel < imp.getNChannels(); iChannel++)
+        {
+
+            Color color = interpolatePaintScale.getPaint((double) iChannel + 1);
             //Utils.threadlog(" "+ (iChannel+1) + ": " +color.toString());
         }
 
@@ -133,7 +150,7 @@ public class SegmentationOverlay {
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_COLORING, spotColorGenerator);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_TRACKS_VISIBLE, false);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOTS_VISIBLE, true);
-        hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_RADIUS_RATIO, 1.5);
+        hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_RADIUS_RATIO, 2);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_HIGHLIGHT_COLOR, Color.blue);
         hyperStackDisplayer.render();
         hyperStackDisplayer.refresh();
@@ -263,4 +280,44 @@ public class SegmentationOverlay {
     }
 
 
+    @Override
+    public void imageOpened(ImagePlus imagePlus)
+    {
+
+    }
+
+    @Override
+    public void imageClosed(ImagePlus imagePlus)
+    {
+
+    }
+
+    @Override
+    public void imageUpdated(ImagePlus imagePlus)
+    {
+
+        if( imp == IJ.getImage() )
+        {
+            boolean updateView = false;
+            //Utils.threadlog("updated");
+            boolean[] activeChannelsImp = ((CompositeImage) imp).getActiveChannels();
+            for (int i = 0; i < activeChannels.length; i++)
+            {
+                //Utils.threadlog("Channel " + (i+1) + ":" + activeChannels[i]);
+                if (activeChannelsImp[i] != activeChannels[i])
+                {
+                    updateView = true;
+                    activeChannels[i] = activeChannelsImp[i];
+                }
+            }
+
+            // update the view
+            if( updateView )
+            {
+                this.createHyperStackDisplayer();
+            }
+
+        }
+
+    }
 }

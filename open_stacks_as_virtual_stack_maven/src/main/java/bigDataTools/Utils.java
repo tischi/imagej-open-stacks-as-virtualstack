@@ -49,8 +49,8 @@ public class Utils {
 
     public static boolean verbose = false;
     public static String version = "2016-Nov-21a";
-    public static String TRACKMATEDOGSUBPIXEL = "TrackMate>DoG>SubPixel";
-    public static String TRACKMATEDOG = "TrackMate>DoG";
+    public static String TRACKMATEDOGSUBPIXEL = "TrackMate_DoG_SubPixel";
+    public static String TRACKMATEDOG = "TrackMate_DoG";
     public static String IMAGESUITE3D = "3D ImageSuite";
 
     public static void threadlog(final String log) {

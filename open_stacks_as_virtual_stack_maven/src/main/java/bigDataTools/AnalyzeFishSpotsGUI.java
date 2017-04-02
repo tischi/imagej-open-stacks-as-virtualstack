@@ -118,7 +118,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         // Spot analysis
         //
         addHeader(panels, iPanel++, c, "SPOT ANALYSIS");
-        addTextField(panels, iPanel++, c, textFieldSpotBackgroundValues, textFieldSpotBackgroundValuesLabel, "100;30;300");
+        addTextField(panels, iPanel++, c, textFieldSpotBackgroundValues, textFieldSpotBackgroundValuesLabel, "100;300;300");
         addButton(panels, iPanel++, c, buttonAnalyzeSelectedRegions, buttonAnalyzeSelectedRegionsText);
 
         // Table
