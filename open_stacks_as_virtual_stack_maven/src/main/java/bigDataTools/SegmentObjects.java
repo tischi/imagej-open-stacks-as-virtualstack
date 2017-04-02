@@ -6,12 +6,9 @@ import fiji.plugin.trackmate.detection.DogDetectorFactory;
 import fiji.plugin.trackmate.tracking.LAPUtils;
 import fiji.plugin.trackmate.tracking.TrackerKeys;
 import fiji.plugin.trackmate.tracking.sparselap.SparseLAPTrackerFactory;
-import ij.CompositeImage;
 import ij.IJ;
 import ij.ImagePlus;
-import ij.gui.Roi;
 import ij.measure.Calibration;
-import javafx.geometry.Point3D;
 
 import static ij.IJ.log;
 
@@ -23,15 +20,15 @@ public class SegmentObjects {
                                           SegmentationSettings segmentationSettings)
     {
 
-        if( segmentationSettings.method.equals(Globals.TRACKMATEDOG)
-                || segmentationSettings.method.equals(Globals.TRACKMATEDOGSUBPIXEL) )
+        if( segmentationSettings.method.equals(Utils.TRACKMATEDOG)
+                || segmentationSettings.method.equals(Utils.TRACKMATEDOGSUBPIXEL) )
         {
 
             segmentationResults = segmentUsingTrackMate(imp,
                     segmentationResults,
                     segmentationSettings);
         }
-        else if ( segmentationSettings.method.equals(Globals.IMAGESUITE3D))
+        else if ( segmentationSettings.method.equals(Utils.IMAGESUITE3D))
         {
             IJ.showMessage( segmentationSettings.method + " is not yet implemented." );
         }
@@ -45,14 +42,9 @@ public class SegmentObjects {
                                                              SegmentationSettings segmentationSettings)
     {
 
-        // Temporarily remove/change the calibration of the imp
+        // Remember the actual calibration, because we'll temporarily remove/change it
         //
         Calibration calibrationOrig = imp.getCalibration();
-        Calibration calibrationTemp = new Calibration(imp);
-        calibrationTemp.pixelWidth = 1;
-        calibrationTemp.pixelHeight = 1;
-        calibrationTemp.pixelDepth = 1;
-        imp.setCalibration(calibrationTemp);
 
         // Prepare results storage
         //
@@ -61,6 +53,15 @@ public class SegmentObjects {
 
         for( int iChannel=0; iChannel < segmentationResults.channels.length; iChannel++ )
         {
+
+            // Change image calibration to trick TrackMate into anisotropic DoG filtering
+            //
+            Calibration calibrationTemp = new Calibration(imp);
+            calibrationTemp.pixelWidth = segmentationSettings.spotRadii[iChannel][0];
+            calibrationTemp.pixelHeight = segmentationSettings.spotRadii[iChannel][1];
+            calibrationTemp.pixelDepth = segmentationSettings.spotRadii[iChannel][2];
+            imp.setCalibration(calibrationTemp);
+
             // TrackMate model to hold the results
             Model model = new Model();
             model.setLogger(Logger.VOID_LOGGER);
@@ -100,16 +101,16 @@ public class SegmentObjects {
             settings.detectorSettings = settings.detectorFactory.getDefaultSettings();
             settings.detectorSettings.put(DetectorKeys.KEY_TARGET_CHANNEL, segmentationResults.channels[iChannel]); //one-based
 
-            if( segmentationSettings.method.equals(Globals.TRACKMATEDOGSUBPIXEL))
+            if( segmentationSettings.method.equals(Utils.TRACKMATEDOGSUBPIXEL))
             {
                 settings.detectorSettings.put(DetectorKeys.KEY_DO_SUBPIXEL_LOCALIZATION, true);
             }
-            else if( segmentationSettings.method.equals(Globals.TRACKMATEDOG))
+            else if( segmentationSettings.method.equals(Utils.TRACKMATEDOG))
             {
                 settings.detectorSettings.put(DetectorKeys.KEY_DO_SUBPIXEL_LOCALIZATION, true);
             }
 
-            settings.detectorSettings.put(DetectorKeys.KEY_RADIUS, segmentationSettings.spotRadii[iChannel]);
+            settings.detectorSettings.put(DetectorKeys.KEY_RADIUS, 1.0); // because we rather calibrate the image accordingly
             settings.detectorSettings.put(DetectorKeys.KEY_THRESHOLD, segmentationSettings.thresholds[iChannel]);
 
             // Configure spot filters - Classical filter on quality
@@ -140,15 +141,15 @@ public class SegmentObjects {
             }
 
 
-            // Convert spot features to scaled coordinates
+            // Convert spot features back to the original scaling of the image
             //
             SpotCollection spots = model.getSpots();
-            for ( Spot spot : spots.iterable(false))
+            for ( Spot spot : spots.iterable(false) )
             {
-                spot.putFeature(spot.POSITION_X, spot.getDoublePosition(0) * calibrationOrig.pixelWidth);
-                spot.putFeature(spot.POSITION_Y, spot.getDoublePosition(1) * calibrationOrig.pixelHeight);
-                spot.putFeature(spot.POSITION_Z, spot.getDoublePosition(2) * calibrationOrig.pixelDepth);
-                spot.putFeature(spot.RADIUS, segmentationSettings.spotRadii[iChannel] * calibrationOrig.pixelWidth);
+                spot.putFeature(spot.POSITION_X, (spot.getDoublePosition(0) / calibrationTemp.pixelWidth) * calibrationOrig.pixelWidth);
+                spot.putFeature(spot.POSITION_Y, (spot.getDoublePosition(1) / calibrationTemp.pixelHeight) * calibrationOrig.pixelHeight);
+                spot.putFeature(spot.POSITION_Z, (spot.getDoublePosition(2) / calibrationTemp.pixelDepth) * calibrationOrig.pixelDepth);
+                spot.putFeature(spot.RADIUS, segmentationSettings.spotRadii[iChannel][0] * calibrationOrig.pixelWidth);
             }
 
             // Store results

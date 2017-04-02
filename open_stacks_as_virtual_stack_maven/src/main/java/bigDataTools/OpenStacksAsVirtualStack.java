@@ -172,7 +172,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             nT = infos[0].length;
             nZ = infos[0][0].length;
 
-            if(Globals.verbose) {
+            if(Utils.verbose) {
                 log("nC: " + infos.length);
                 log("nT: " + infos[0].length);
                 log("nz: " + infos[0][0].length);
@@ -671,7 +671,8 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         else
         {
             if( requestedMemoryGB > 0.1 ) {
-                Globals.threadlog("Memory [GB]: Max=" + maxMemoryGB + "; Free=" + freeMemoryGB + "; Requested=" + requestedMemoryGB);
+                Utils.threadlog("Memory [GB]: Max=" + maxMemoryGB + "; Free=" + freeMemoryGB + "; Requested=" +
+                        requestedMemoryGB);
             }
 
         }
@@ -786,9 +787,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                 for (int c = 0; c < imp.getNChannels(); c++) {
 
-                    Globals.threadlog("Loading timepoint "+t+", channel "+c+"; memory: "+IJ.freeMemory());
+                    Utils.threadlog("Loading timepoint " + t + ", channel " + c + "; memory: " + IJ.freeMemory());
                     impChannelTime = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
-                    Globals.threadlog("Loading finished: timepoint "+t+", channel "+c+"; memory: "+IJ.freeMemory());
+                    Utils.threadlog("Loading finished: timepoint " + t + ", channel " + c + "; memory: " + IJ.freeMemory());
 
                     if (fileType.equals("TIFF")) {
 
@@ -1022,7 +1023,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 String sC = String.format("%1$02d", c);
                 String sT = String.format("%1$05d", t);
                 String pathCT = path + "--C" + sC + "--T" + sT + ".tif";
-                Globals.threadlog("Saving " + pathCT);
+                Utils.threadlog("Saving " + pathCT);
                 fileSaver.saveAsTiffStack(pathCT);
             }
         }
@@ -1241,7 +1242,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         FileInfoSer[][][] croppedInfos = new FileInfoSer[nC][nT][nZ];
 
-        if(Globals.verbose){
+        if(Utils.verbose){
             log("# OpenStacksAsVirtualStack.openCroppedFromInfos");
             log("tMin: "+tMin);
             log("tMax: "+tMax);
@@ -1296,7 +1297,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 		imp.setFileInfo(fi.getFileInfo()); // saves FileInfo of the first image
 
-        if(Globals.verbose) {
+        if(Utils.verbose) {
             log("# OpenStacksAsVirtualStack.makeImagePlus");
             log("nC: "+nC);
             log("nZ: "+nZ);
@@ -1386,7 +1387,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         public void run() {
 
-            VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
+            VirtualStackOfStacks vss = Utils.getVirtualStackOfStacks(imp);
 
             while (true) {
 
@@ -1397,9 +1398,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
                     // Load time-point and channel
 
-                    Globals.threadlog("Loading timepoint " + t + ", channel " + c + "; memory: " + IJ.freeMemory());
+                    Utils.threadlog("Loading timepoint " + t + ", channel " + c + "; memory: " + IJ.freeMemory());
                     ImagePlus impChannelTime = vss.getFullFrame(t, c, new Point3D(1, 1, 1));
-                    //Globals.threadlog("Loading finished: timepoint " + t + ", channel " + c + "; memory: " + IJ.freeMemory());
+                    //Utils.threadlog("Loading finished: timepoint " + t + ", channel " + c + "; memory: " + IJ.freeMemory());
 
                     // Copy time-point and channel at the right place into impOut
 
@@ -1461,7 +1462,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
 
         /*
-        final VirtualStackOfStacks stack = Globals.getVirtualStackOfStacks(imp);
+        final VirtualStackOfStacks stack = Utils.getVirtualStackOfStacks(imp);
         if(stack==null) return(null);
 
         nProgress = stack.nSlices;
@@ -1589,7 +1590,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //OpenHDF5test oh5 = new OpenHDF5test();
         //oh5.openOneFileAsImp("/Users/tischi/Desktop/example-data/luxendo/ch0/fused_t00000_c0.h5");
-        //Globals.verbose = true;
+        //Utils.verbose = true;
 
         /*
         Thread t1 = new Thread(new Runnable() {
@@ -1605,9 +1606,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         register.run("");
         */
 
-        AnalyzeFishSpotsPlugIn afs =  new AnalyzeFishSpotsPlugIn("/Users/tischi/Desktop/FISH_01_Crop.tif");
-        afs.run("");
-
+        AnalyzeFISHSpotsPlugIn afs =  new AnalyzeFISHSpotsPlugIn("/Users/tischi/Desktop/FISH_01_Crop.tif");
 
         /*
         if (Mitosis_ome) {
@@ -1912,9 +1911,9 @@ public class OpenStacksAsVirtualStack implements PlugIn {
             Object source = e.getItemSelectable();
             if (source == cbLog) {
                 if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    Globals.verbose = false;
+                    Utils.verbose = false;
                 } else {
-                    Globals.verbose = true;
+                    Utils.verbose = true;
                 }
             }
         }
@@ -1984,7 +1983,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 // "Save as info file"
                 //
                 ImagePlus imp = IJ.getImage();
-                final VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
+                final VirtualStackOfStacks vss = Utils.getVirtualStackOfStacks(imp);
                 if(vss==null) return;
 
                 fc = new JFileChooser(vss.getDirectory());
@@ -2040,7 +2039,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 // Get handle on the currently active image
                 //
                 ImagePlus imp = IJ.getImage();
-                final VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
+                final VirtualStackOfStacks vss = Utils.getVirtualStackOfStacks(imp);
                 if(vss==null) return;
 
                 // Check that all image files have been parsed
@@ -2139,7 +2138,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
                 //
 
                 ImagePlus imp = IJ.getImage();
-                final VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
+                final VirtualStackOfStacks vss = Utils.getVirtualStackOfStacks(imp);
                 if(vss==null) return;
 
                 //

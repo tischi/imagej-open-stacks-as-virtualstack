@@ -73,8 +73,8 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
             Roi roi = overlay.get(i);
 
-            //Globals.threadlog(roi.toString());
-            //Globals.threadlog(roi.getTypeAsString());
+            //Utils.threadlog(roi.toString());
+            //Utils.threadlog(roi.getTypeAsString());
 
             if (roi.getTypeAsString().equals("Point")) {
 
@@ -90,7 +90,7 @@ public class AnalyzeObjects< T extends RealType< T >> {
                         radius,
                         quality);
 
-                //Globals.logSpotCoordinates("ROI", spotRoi);
+                //Utils.logSpotCoordinates("ROI", spotRoi);
 
                 // Init a new row in the table
                 //
@@ -143,8 +143,7 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
                         // Compute center of mass
                         //
-                        double backgroundValue = 0;
-                        Spot spotCenterOfMass = computeCenterOfMass(spot, iChannel, backgroundValue);
+                        Spot spotCenterOfMass = computeCenterOfMass(spot, iChannel, segmentationSettings.backgrounds[iChannel]);
 
 
                         // Add position to table
@@ -239,13 +238,11 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
         // Set radii of the region in which the center of mass should be computed
         //
-
-        // TODO: consider multiplication of region size with a constant factor gere
         long[] size = new long[]{
-                Math.round(segmentationSettings.spotRadii[iChannel] + 0.5),
-                Math.round(segmentationSettings.spotRadii[iChannel] + 0.5),
+                Math.round(1.5 * segmentationSettings.spotRadii[iChannel][0]),
+                Math.round(1.5 * segmentationSettings.spotRadii[iChannel][1]),
                 0,  // 0 size in  channel dimension, because we only want to evaluate one channel
-                Math.round(segmentationSettings.spotRadii[iChannel] + 0.5)};
+                Math.round(1.5 * segmentationSettings.spotRadii[iChannel][2])};
 
         // Create a local neighborhood around this spot
         //

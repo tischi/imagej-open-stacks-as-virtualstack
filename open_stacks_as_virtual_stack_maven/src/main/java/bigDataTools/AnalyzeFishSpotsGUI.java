@@ -48,7 +48,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     JTextField textFieldChannels = new JTextField(12);
 
     final String textFieldSpotRadiiLabel = "Spot Radii [pixels]";
-    JTextField textFieldSpotRadii = new JTextField(12);
+    JTextField textFieldSpotRadii = new JTextField(20);
 
     final String textFieldSpotThresholdsLabel = "Spot Channel Thresholds [a.u.]";
     JTextField textFieldSpotThresholds = new JTextField(12);
@@ -75,7 +75,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
     final String comboBoxSegmentationMethodLabel = "Segmentation method";
     JComboBox comboBoxSegmentationMethod = new JComboBox(new String[]
-            {Globals.TRACKMATEDOG}); //, Globals.TRACKMATEDOGSUBPIXEL, Globals.IMAGESUITE3D
+            {Utils.TRACKMATEDOG}); //, Utils.TRACKMATEDOGSUBPIXEL, Utils.IMAGESUITE3D
 
     SegmentationResults segmentationResults = new SegmentationResults();
     SegmentationSettings segmentationSettings = new SegmentationSettings();
@@ -110,15 +110,15 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         //
         addHeader(panels, iPanel++, c, "SPOT DETECTION");
         addComboBox(panels, iPanel++, c, comboBoxSegmentationMethod, comboBoxSegmentationMethodLabel);
-        addTextField(panels, iPanel++, c, textFieldChannels, textFieldChannelsLabel, "2,3,4");
-        addTextField(panels, iPanel++, c, textFieldSpotRadii, textFieldSpotRadiiLabel, "3,3,3");
-        addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "100.0,100.0,100.0");
+        addTextField(panels, iPanel++, c, textFieldChannels, textFieldChannelsLabel, "2;3;4");
+        addTextField(panels, iPanel++, c, textFieldSpotRadii, textFieldSpotRadiiLabel, "1.5,1.5,3;1.5,1.5,3;1.5,1.5,3");
+        addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "200;200;200");
         addButton(panels, iPanel++, c, buttonSegmentSpots, buttonSegmentSpotsText);
 
         // Spot analysis
         //
         addHeader(panels, iPanel++, c, "SPOT ANALYSIS");
-        addTextField(panels, iPanel++, c, textFieldSpotBackgroundValues, textFieldSpotBackgroundValuesLabel, "0,0,0");
+        addTextField(panels, iPanel++, c, textFieldSpotBackgroundValues, textFieldSpotBackgroundValuesLabel, "100;30;300");
         addButton(panels, iPanel++, c, buttonAnalyzeSelectedRegions, buttonAnalyzeSelectedRegionsText);
 
         // Table
@@ -140,7 +140,6 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
     }
 
-
     public void actionPerformed(ActionEvent e)
     {
 
@@ -149,11 +148,16 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
         // update segmentationSettings
         segmentationSettings.frames = null;
-        segmentationSettings.channels = Globals.commaSeparatedStringToIntegerArray(textFieldChannels.getText());
-        segmentationSettings.spotRadii = Globals.commaSeparatedStringToDoubleArray(textFieldSpotRadii.getText());
-        segmentationSettings.backgrounds = Globals.commaSeparatedStringToDoubleArray(textFieldSpotBackgroundValues.getText());
-
-        segmentationSettings.thresholds = Globals.commaSeparatedStringToDoubleArray(textFieldSpotThresholds.getText());
+        segmentationSettings.channels = Utils.delimitedStringToIntegerArray(textFieldChannels.getText(), ";");
+        segmentationSettings.spotRadii = new double[segmentationSettings.channels.length][];
+        String[] spotRadii = textFieldSpotRadii.getText().split(";");
+        for (int iChannel = 0; iChannel < segmentationSettings.channels.length; iChannel++)
+        {
+            segmentationSettings.spotRadii[iChannel] = Utils.delimitedStringToDoubleArray(spotRadii[iChannel], ",");
+        }
+        segmentationSettings.backgrounds = Utils.delimitedStringToDoubleArray(textFieldSpotBackgroundValues.getText()
+                , ";");
+        segmentationSettings.thresholds = Utils.delimitedStringToDoubleArray(textFieldSpotThresholds.getText(), ";");
         segmentationSettings.experimentalBatch = textFieldExperimentalBatch.getText();
         segmentationSettings.experimentID = textFieldExperimentID.getText();
         segmentationSettings.treatment = textFieldTreatment.getText();

@@ -1263,7 +1263,7 @@ public class FastTiffDecoder {
     }
 
     public FileInfo[] getTiffInfo() throws IOException {
-        if(Globals.verbose) {
+        if(Utils.verbose) {
             log("# getTiffInfo");
         }
 
@@ -1302,7 +1302,7 @@ public class FastTiffDecoder {
                fi = onlyReadStripsFromIFD(stripInfos);
             }
             fi.longOffset = (long)fi.offset & 4294967295L;
-            if(Globals.verbose) {
+            if(Utils.verbose) {
                 log("IFD " + list.size() + " at " + ifdOffset);
                 log("fi.nImages: " + fi.nImages);
                 log("fi.offset: " + fi.offset);

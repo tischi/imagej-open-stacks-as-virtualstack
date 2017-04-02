@@ -10,15 +10,15 @@ import javax.swing.*;
 /**
  * Created by tischi on 24/03/17.
  */
-public class AnalyzeFishSpotsPlugIn implements PlugIn {
+public class AnalyzeFISHSpotsPlugIn implements PlugIn {
 
     ImagePlus imp;
     AnalyzeFishSpotsGUI gui;
 
-    public AnalyzeFishSpotsPlugIn() {
+    public AnalyzeFISHSpotsPlugIn() {
     }
 
-    public AnalyzeFishSpotsPlugIn(String path) {
+    public AnalyzeFISHSpotsPlugIn(String path) {
         IJ.open(path);
         this.imp = IJ.getImage();
         SwingUtilities.invokeLater(new Runnable() {
@@ -27,7 +27,6 @@ public class AnalyzeFishSpotsPlugIn implements PlugIn {
             }
         });
     }
-
 
     public void run(String arg) {
         this.imp = IJ.getImage();

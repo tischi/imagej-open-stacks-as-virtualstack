@@ -77,7 +77,7 @@ public class VirtualStackOfStacks extends ImageStack {
         this.infos = new FileInfoSer[nC][nT][];
         this.h5DataSet = h5DataSet;
 
-        if(Globals.verbose) {
+        if(Utils.verbose) {
             logStatus();
         }
 
@@ -109,7 +109,7 @@ public class VirtualStackOfStacks extends ImageStack {
         if(infos[0][0][0].fileName.endsWith(".tif"))
             this.fileType = "tif";
 
-        if(Globals.verbose) {
+        if(Utils.verbose) {
             logStatus();
         }
 
@@ -286,7 +286,7 @@ public class VirtualStackOfStacks extends ImageStack {
 
         ImagePlus imp;
 
-        if(Globals.verbose) {
+        if(Utils.verbose) {
             log("# VirtualStackOfStacks.getProcessor");
             log("requested slice [one-based]: "+(n+1));
             log("c [one-based]: "+ (c+1));
@@ -356,7 +356,7 @@ public class VirtualStackOfStacks extends ImageStack {
 
         ImagePlus impLoaded = null;
 
-        if (Globals.verbose) {
+        if (Utils.verbose) {
             log("# VirtualStackOfStacks.getCroppedFrameOffsetSize");
             log("t: " + t);
             log("c: " + c);
@@ -617,7 +617,7 @@ public class VirtualStackOfStacks extends ImageStack {
 // todo: put the conversion from centerRadii to offsetSize into this function
     public ImagePlus getCubeByTimeCenterAndRadii(int t, int c, Point3D psub, Point3D pc, Point3D pr) {
 
-        if(Globals.verbose) {
+        if(Utils.verbose) {
             log("# VirtualStackOfStacks.getCroppedFrameCenterRadii");
             log("t: "+t);
             log("c: "+c);

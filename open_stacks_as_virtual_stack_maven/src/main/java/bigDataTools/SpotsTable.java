@@ -2,7 +2,6 @@ package bigDataTools;
 
 import fiji.plugin.trackmate.Spot;
 import ij.IJ;
-import ij.ImagePlus;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -266,10 +265,10 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
     {
         Double[] columnAverages = computeJTableColumnAverages(table);
         String[] columnNames = getColumnNames(table);
-        Globals.threadlog("# Average value of all columns");
+        Utils.threadlog("# Average value of all columns");
         for ( int columnIndex = 0; columnIndex < columnNames.length; columnIndex++)
         {
-            Globals.threadlog(""+columnNames[columnIndex]+": "+ columnAverages[columnIndex]);
+            Utils.threadlog("" + columnNames[columnIndex] + ": " + columnAverages[columnIndex]);
         }
     }
 

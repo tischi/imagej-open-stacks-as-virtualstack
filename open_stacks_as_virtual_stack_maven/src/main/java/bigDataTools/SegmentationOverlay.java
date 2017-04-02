@@ -43,20 +43,19 @@ public class SegmentationOverlay {
 
     public void highlightClosestSpots(Spot location, int n, int frame)
     {
-        //Globals.logSpotCoordinates("Highlighting the " + n + " spots that are closests to:", location);
+        //Utils.logSpotCoordinates("Highlighting the " + n + " spots that are closests to:", location);
         SpotCollection spots = modelOverlay.getSpots();
         selectionModel.clearSpotSelection();
         java.util.List<Spot> closestSpots = spots.getNClosestSpots(location, frame, n, false);
         /*
         for ( Spot spot : closestSpots)
         {
-            Globals.logSpotCoordinates("Spot:", spot);
+            Utils.logSpotCoordinates("Spot:", spot);
 
         }
         */
         selectionModel.addSpotToSelection(spots.getNClosestSpots(location, frame, n, false));
-        location.putFeature("FRAME", (double)frame); // otherwise the "center view on method" crashes
-
+        location.putFeature("FRAME", (double) frame); // otherwise the "center view on method" crashes
         hyperStackDisplayer.centerViewOn(location);
         hyperStackDisplayer.refresh();
 
@@ -87,9 +86,9 @@ public class SegmentationOverlay {
         {
             Model model = models[iChannel];
             SpotCollection spotCollection = model.getSpots();
-            Globals.threadlog("Channel: " + segmentationResults.channels[iChannel] + "; Number of spots: " +
+            Utils.threadlog("Channel: " + segmentationResults.channels[iChannel] + "; Number of spots: " +
                     spotCollection
-                    .getNSpots(false));
+                            .getNSpots(false));
             for ( Spot spot : spotCollection.iterable(false) )
             {
                 spot.putFeature("COLOR", (double)segmentationResults.channels[iChannel]); // one-based
@@ -99,7 +98,7 @@ public class SegmentationOverlay {
         modelOverlay.endUpdate();
 
         SpotCollection spotCollection = modelOverlay.getSpots();
-        Globals.threadlog("Total number of spots: " + spotCollection.getNSpots(false));
+        Utils.threadlog("Total number of spots: " + spotCollection.getNSpots(false));
 
         // Color the spots for each channel according to the channel LUT
         //
@@ -113,7 +112,7 @@ public class SegmentationOverlay {
         InterpolatePaintScale interpolatePaintScale = createInterpolatePaintScaleFromImpLUTs(imp);
         for (int iChannel = 0; iChannel < imp.getNChannels(); iChannel++) {
             Color color = interpolatePaintScale.getPaint( (double)iChannel+1);
-            //Globals.threadlog(" "+ (iChannel+1) + ": " +color.toString());
+            //Utils.threadlog(" "+ (iChannel+1) + ": " +color.toString());
         }
 
         // ...thus we change the LUTs of the image to fit the color of the spots
@@ -121,7 +120,7 @@ public class SegmentationOverlay {
         double upper = spotColorGenerator.getMax();
         for (int iChannel = 0; iChannel < imp.getNChannels(); iChannel++) {
             Color color = interpolatePaintScale.Jet.getPaint( ((iChannel+1.0)-lower) / (upper-lower));
-            //Globals.threadlog(" " + (iChannel + 1) + ": " + color.toString());
+            //Utils.threadlog(" " + (iChannel + 1) + ": " + color.toString());
             ((CompositeImage)imp).setChannelLut(createLUTFromColor(color), iChannel+1);
         }
 
@@ -132,13 +131,12 @@ public class SegmentationOverlay {
         hyperStackDisplayer = new HyperStackDisplayer(modelOverlay, selectionModel, imp);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_COLORMAP, interpolatePaintScale);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_COLORING, spotColorGenerator);
-        hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_TRACKS_VISIBLE, true);
+        hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_TRACKS_VISIBLE, false);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOTS_VISIBLE, true);
-        hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_RADIUS_RATIO, 1.0);
+        hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_SPOT_RADIUS_RATIO, 1.5);
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_HIGHLIGHT_COLOR, Color.blue);
         hyperStackDisplayer.render();
         hyperStackDisplayer.refresh();
-
     }
 
     //
@@ -176,10 +174,10 @@ public class SegmentationOverlay {
 
             Color color = new Color(r,g,b);
             /*
-            Globals.threadlog("CHANNEL: " + (iChannel + 1));
-            Globals.threadlog("Red: " + r);
-            Globals.threadlog("Green: " + g);
-            Globals.threadlog("Blue: " + b);
+            Utils.threadlog("CHANNEL: " + (iChannel + 1));
+            Utils.threadlog("Red: " + r);
+            Utils.threadlog("Green: " + g);
+            Utils.threadlog("Blue: " + b);
             */
 
             interpolatePaintScale.add(iChannel + 1, color); // one-based

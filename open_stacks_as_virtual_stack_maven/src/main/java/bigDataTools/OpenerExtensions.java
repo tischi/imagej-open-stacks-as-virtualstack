@@ -142,7 +142,7 @@ class OpenerExtensions extends Opener {
                 int se = (int) (1.0*ye/rps);
                 readStart = (long)fi.stripOffsets[ss] & 0xffffffffL; // interpret the int as unsigned
                 // 3rps 012,345,678   8/3
-                if(Globals.verbose) {
+                if(Utils.verbose) {
                     log("number of strips: "+fi.stripLengths.length);
                     log("rows per strip: "+rps);
                     log("min strip read: "+ss);
@@ -170,7 +170,7 @@ class OpenerExtensions extends Opener {
                     readLength = ((ye-ys)+1) * fi0.width * fi0.bytesPerPixel;
                 }
 
-                if(Globals.verbose) {
+                if(Utils.verbose) {
                     log("fi.longOffset: "+fi.longOffset);
                     log("ys: "+ys);
                     log("readStart: "+readStart);
@@ -257,7 +257,7 @@ class OpenerExtensions extends Opener {
         int imShortSize = nx * ny;
 
 
-        if (Globals.verbose) {
+        if (Utils.verbose) {
             log("# openCroppedH5stack");
             log("root directory: " + directory);
             log("fi.directory: " + fi.directory);
@@ -276,7 +276,7 @@ class OpenerExtensions extends Opener {
         long nPixels = (long) nx * ny * nz;
         boolean readInOneGo = true;
         if (nPixels > maxSize) {
-            Globals.threadlog("H5 Loader: nPixels > 2^31 => reading plane wise (=> slower!).");
+            Utils.threadlog("H5 Loader: nPixels > 2^31 => reading plane wise (=> slower!).");
             readInOneGo = false;
         }
 
@@ -358,7 +358,7 @@ class OpenerExtensions extends Opener {
         readingTime += (System.currentTimeMillis() - startTime);
         totalTime = (System.currentTimeMillis() - totalTime);
 
-        if(Globals.verbose) {
+        if(Utils.verbose) {
             log("readingTime [ms]: " + readingTime);
             log("pixels read: "+asFlatArray.length);
             log("effective reading speed [MB/s]: " + (double)nz*nx*ny*fi.bytesPerPixel/((readingTime+0.001)*1000));
@@ -667,7 +667,7 @@ class OpenerExtensions extends Opener {
         int nx = xe - xs + 1;
         int ny = ye - ys + 1;
 
-        if(Globals.verbose) {
+        if(Utils.verbose) {
             log("# openCroppedTiffStackUsingIFDs");
             log("root directory: " + directory);
             log("info.length: " + info.length);
@@ -728,7 +728,7 @@ class OpenerExtensions extends Opener {
 
         totalTime = (System.currentTimeMillis() - totalTime);
 
-        if(Globals.verbose) {
+        if(Utils.verbose) {
             int usefulBytesRead = nz*nx*ny*fi0.bytesPerPixel;
             log("readingTime [ms]: " + readingTime);
             log("effective reading speed [MB/s]: " + usefulBytesRead/((readingTime+0.001)*1000));
@@ -936,7 +936,7 @@ class OpenerExtensions extends Opener {
 
                 }
 
-                if(Globals.verbose) {
+                if(Utils.verbose) {
                     log("z: " + z);
                     log("zs: " + zs);
                     log("dz: " + dz);

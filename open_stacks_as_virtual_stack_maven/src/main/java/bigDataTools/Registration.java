@@ -339,7 +339,7 @@ public class Registration implements PlugIn {
 
             // update current imp object
             imp = IJ.getImage();
-            VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
+            VirtualStackOfStacks vss = Utils.getVirtualStackOfStacks(imp);
             if(vss==null) return;
 
 
@@ -584,7 +584,7 @@ public class Registration implements PlugIn {
             IJ.wait(500);
             //log(""+totalTimePointsTracked.get()+" "+totalTimePointsToBeTracked);
         }
-        Globals.threadlog(
+        Utils.threadlog(
                 "Tracking completed!"
         );
         return true;
@@ -607,7 +607,7 @@ public class Registration implements PlugIn {
 
     private void initialize() {
 
-        VirtualStackOfStacks vss = Globals.getVirtualStackOfStacks(imp);
+        VirtualStackOfStacks vss = Utils.getVirtualStackOfStacks(imp);
         if(vss==null) return;
 
         FileInfoSer[][][] infos = vss.getFileInfosSer();
@@ -1062,7 +1062,7 @@ public class Registration implements PlugIn {
 
                 if (gui_trackingMethod == "correlation") {
 
-                    if(Globals.verbose) log("measuring drift using correlation...");
+                    if(Utils.verbose) log("measuring drift using correlation...");
 
                     // compute shift relative to previous time-point
                     startTime = System.currentTimeMillis();
@@ -1079,11 +1079,11 @@ public class Registration implements PlugIn {
                     pShift = pShift.add(p1offset.subtract(p0offset));
                     //log("Correlation Tracking Shift including image shift: "+pShift);
 
-                    if(Globals.verbose) log("actual final shift is "+pShift.toString());
+                    if(Utils.verbose) log("actual final shift is "+pShift.toString());
 
                 } else if (gui_trackingMethod == "center of mass") {
 
-                    if(Globals.verbose) log("measuring drift using center of mass...");
+                    if(Utils.verbose) log("measuring drift using center of mass...");
 
                     // compute the different of the center of mass
                     // to the geometric center of imp1
@@ -1097,7 +1097,7 @@ public class Registration implements PlugIn {
                     pLocalShift = multiplyPoint3dComponents(pLocalShift, pSubSample);
                     //log("Center of Mass Local Shift: "+pLocalShift);
 
-                    if(Globals.verbose) log("local shift after correction for sub-sampling is "+pLocalShift.toString());
+                    if(Utils.verbose) log("local shift after correction for sub-sampling is "+pLocalShift.toString());
 
                     // the drift corrected position in the global coordinate system is: p1offset.add(pLocalShift)
                     // in center coordinates this is: computeCenter(p1offset.add(pShift),pSize)
@@ -1108,7 +1108,7 @@ public class Registration implements PlugIn {
                     pShift = computeCenter(p1offset.add(pLocalShift),pSize).subtract(track.getXYZ(itPrevious-tStart));
                     //log("Center of Mass Tracking Shift relative to previous position: "+pShift);
 
-                    if(Globals.verbose) log("actual shift is "+pShift.toString());
+                    if(Utils.verbose) log("actual shift is "+pShift.toString());
 
                 }
 
@@ -1165,7 +1165,7 @@ public class Registration implements PlugIn {
                     float speed = (float)1.0*dn/dtt*1000;
                     float remainingTime = (float)1.0*nToGo/speed;
 
-                    Globals.threadlog(
+                    Utils.threadlog(
                             "progress = " + n + "/" + totalTimePointsToBeTracked +
                                     "; speed [n/s] = " + String.format("%.2g", speed) +
                                     "; remaining [s] = " + String.format("%.2g", remainingTime) +
@@ -1296,9 +1296,9 @@ public class Registration implements PlugIn {
     }
 
     public Point3D computeShift16bitUsingPhaseCorrelation(ImagePlus imp1, ImagePlus imp0) {
-        if(Globals.verbose) log("PhaseCorrelation phc = new PhaseCorrelation(...)");
+        if(Utils.verbose) log("PhaseCorrelation phc = new PhaseCorrelation(...)");
         PhaseCorrelation phc = new PhaseCorrelation(ImagePlusAdapter.wrap(imp1), ImagePlusAdapter.wrap(imp0), 5, true);
-        if(Globals.verbose) log("phc.process()... ");
+        if(Utils.verbose) log("phc.process()... ");
         phc.process();
         // get the first peak that is not a clean 1.0,
         // because 1.0 cross-correlation typically is an artifact of too much shift into black areas of both images
