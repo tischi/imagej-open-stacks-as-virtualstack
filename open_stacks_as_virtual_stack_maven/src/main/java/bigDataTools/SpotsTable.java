@@ -25,6 +25,7 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
     JTable table;
     JFrame frame;
     JScrollPane scrollPane;
+    int REGION_ID;
 
     SegmentationOverlay segmentationOverlay;
     SegmentationSettings segmentationSettings;
@@ -50,7 +51,7 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
         columns.add("PathName_Image");
         columns.add("FileName_Image");
 
-        columns.add("Region_X");
+        columns.add("Region_X"); REGION_ID = 5;
         columns.add("Region_Y");
         columns.add("Region_Z");
 
@@ -174,23 +175,24 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
 
     public void highlightBasedOnSelectedRow()
     {
-        
+
         if ( segmentationOverlay != null )
         {
 
             int indexToModel = table.convertRowIndexToModel(table.getSelectedRow());
-            float x = new Float(table.getModel().getValueAt(indexToModel, table.getColumn("Region_X").getModelIndex()).toString());
-            float y = new Float(table.getModel().getValueAt(indexToModel, table.getColumn("Region_Y").getModelIndex()).toString());
-            float z = new Float(table.getModel().getValueAt(indexToModel, table.getColumn("Region_Z").getModelIndex()).toString());
+            float x = new Float(table.getModel().getValueAt(indexToModel, REGION_ID).toString());
+            float y = new Float(table.getModel().getValueAt(indexToModel, REGION_ID+1).toString());
+            float z = new Float(table.getModel().getValueAt(indexToModel, REGION_ID+2).toString());
 
             double radius = 1.0; // not used
             double quality = 1.0; // not used
+            int frame = 0;
             Spot location = new Spot(x,y,z,radius,quality);
 
-            int frame = 0;
+
             segmentationOverlay.highlightClosestSpots(location, 3, frame);
-            ImagePlus imp = segmentationOverlay.imp;
-            imp.setZ( (int) Math.round(z / imp.getCalibration().pixelDepth) );
+            //ImagePlus imp = segmentationOverlay.imp;
+            //imp.setZ( (int) Math.round(z / imp.getCalibration().pixelDepth) );
 
         }
 

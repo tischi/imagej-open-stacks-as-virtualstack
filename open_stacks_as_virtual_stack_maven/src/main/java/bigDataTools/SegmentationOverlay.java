@@ -55,6 +55,8 @@ public class SegmentationOverlay {
         }
         */
         selectionModel.addSpotToSelection(spots.getNClosestSpots(location, frame, n, false));
+        location.putFeature("FRAME", (double)frame); // otherwise the "center view on method" crashes
+
         hyperStackDisplayer.centerViewOn(location);
         hyperStackDisplayer.refresh();
 

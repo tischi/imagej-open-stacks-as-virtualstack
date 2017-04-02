@@ -81,9 +81,11 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
                 int radius = 1;
                 int quality = 1;
-                Spot spotRoi = new Spot(calibration.getX(roi.getXBase()),
+
+                Spot spotRoi = new Spot(
+                        calibration.getX(roi.getXBase()),
                         calibration.getY(roi.getYBase()),
-                        calibration.getZ(roi.getZPosition()),
+                        calibration.getZ(roi.getZPosition() - 1), // roi z-position is the slice and thus one-based
                         radius,
                         quality);
 
