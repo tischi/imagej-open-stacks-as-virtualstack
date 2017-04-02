@@ -11,6 +11,10 @@ public class SegmentationSettings {
     public int[] frames;
     public String method;
 
+    public String experimentalBatch;
+    public String experimentID;
+    public String treatment;
+
     public SegmentationSettings() {
 
     }

@@ -63,11 +63,10 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
         // Initialise Results Table
         //
-        segmentationResults.table = new SpotsTable();
-        segmentationResults.table.initializeTable(segmentationResults.channels);
+        segmentationResults.table = new SpotsTable(segmentationSettings);
+        segmentationResults.table.initializeTable();
 
-
-        // Get spot locations and compute pari-wise distances for each selection region
+        // Get spot locations and compute pair-wise distances for each selection region
         //
         for ( int i=0; i<overlay.size(); i++ ) {
 
@@ -79,6 +78,7 @@ public class AnalyzeObjects< T extends RealType< T >> {
             if (roi.getTypeAsString().equals("Point")) {
 
                 Calibration calibration = imp.getCalibration();
+
                 int radius = 1;
                 int quality = 1;
                 Spot spotRoi = new Spot(calibration.getX(roi.getXBase()),
@@ -89,17 +89,28 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
                 //Globals.logSpotCoordinates("ROI", spotRoi);
 
-                // Add the selection region to the table
+                // Init a new row in the table
                 //
-                List<Double> tableRow = new ArrayList<>();
-                tableRow.add(spotRoi.getDoublePosition(0));
-                tableRow.add(spotRoi.getDoublePosition(1));
-                tableRow.add(spotRoi.getDoublePosition(2));
+                List<String> tableRow = new ArrayList<>();
+
+                // Add experimental metadata to the table
+                //
+                tableRow.add(segmentationSettings.experimentalBatch);
+                tableRow.add(segmentationSettings.experimentID);
+                tableRow.add(segmentationSettings.treatment);
+
+                // Add selected region center to the table
+                //
+                for (int d = 0; d < 3; d++)
+                {
+                    tableRow.add(String.valueOf(spotRoi.getDoublePosition(d)));
+                }
 
                 // Find the closest spot in each channel
                 //
+                Spot[] closestSpotsTrackMateDoGMax = new Spot[segmentationResults.channels.length];
+                Spot[] closestSpotsCenterOfMass = new Spot[segmentationResults.channels.length];
 
-                Spot[] closestSpots = new Spot[segmentationResults.channels.length];
                 for (int iChannel = 0; iChannel < segmentationResults.channels.length; iChannel++) {
 
                     SpotCollection spotCollection = segmentationResults.models[iChannel].getSpots();
@@ -118,60 +129,74 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
                     if ( spot != null ) {
 
-                        // Add trackmate position to the table
-                        //
-                        tableRow.add(spot.getDoublePosition(0));
-                        tableRow.add(spot.getDoublePosition(1));
-                        tableRow.add(spot.getDoublePosition(2));
-
                         // Compute center of mass
                         //
                         double backgroundValue = 0;
-                        double[] centerOfMass = computeCenterOfMass(spot, iChannel, backgroundValue);
+                        Spot spotCenterOfMass = computeCenterOfMass(spot, iChannel, backgroundValue);
 
+
+                        // Add position to table
+                        //
+                        for (int d = 0; d < 3; d++)
+                        {
+                            tableRow.add(String.valueOf(spot.getDoublePosition(d)));
+                        }
+
+                        // Add center of mass to table
+                        //
+                        for (int d = 0; d < 3; d++)
+                        {
+                            tableRow.add(String.valueOf(spotCenterOfMass.getDoublePosition(d)));
+                        }
+
+                        // Remember positions for distance computations
+                        //
+                        closestSpotsTrackMateDoGMax[iChannel] = spot;
+                        closestSpotsCenterOfMass[iChannel] = spotCenterOfMass;
 
                     }
                     else
                     {
-
-                        // TODO: handle the case of not spots better
-                        tableRow.add(-1.0);
-                        tableRow.add(-1.0);
-                        tableRow.add(-1.0);
-
+                        tableRow.add("No spot found");
+                        tableRow.add("No spot found");
+                        tableRow.add("No spot found");
                     }
 
-                    closestSpots[iChannel] = spot;
+                } // channel loop
 
-                }
 
-                // Compute pair-wise distances
+                // Compute pair-wise distances and add to table
                 //
-                for ( int ic = 0; ic < segmentationResults.channels.length - 1; ic++ )
-                {
-                    for ( int jc = ic+1; jc < segmentationResults.channels.length; jc++ )
-                    {
 
-                        Double distance = Math.sqrt(closestSpots[ic].squareDistanceTo(closestSpots[jc]));
-                        tableRow.add(distance);
-                    }
+                computePairWiseDistancesAndAddToTable(tableRow, closestSpotsTrackMateDoGMax);
+                computePairWiseDistancesAndAddToTable(tableRow, closestSpotsCenterOfMass);
 
-                }
-
-                // Add row to table
+                // Add the whole row to actual table
                 //
                 segmentationResults.table.addRow(tableRow.toArray(new Object[tableRow.size()]));
 
             }
 
-
-
         }
     }
 
 
+    public void computePairWiseDistancesAndAddToTable(List<String> tableRow, Spot[] spots)
+    {
 
-    public double[] computeCenterOfMass(Spot spot, int iChannel, double backgroundValue)
+        for ( int i = 0; i < spots.length - 1; i++ )
+        {
+            for ( int j = i+1; j < spots.length; j++ )
+            {
+                Double distance = Math.sqrt(spots[i].squareDistanceTo(spots[j]));
+                tableRow.add(String.valueOf(distance));
+            }
+        }
+
+    }
+
+
+    public Spot computeCenterOfMass(Spot spot, int iChannel, double backgroundValue)
     {
 
         // https://javadoc.imagej.net/ImgLib2/net/imglib2/view/Views.html
@@ -242,15 +267,17 @@ public class AnalyzeObjects< T extends RealType< T >> {
         }
 
 
-        double[] centerOfMass =  new double[]
-                {
-                        sumDim[0]/sumVal,
-                        sumDim[1]/sumVal,
-                        sumDim[2]/sumVal,
-                };
+        int radius = 1;
+        int quality = 1;
+        Spot spotCenterOfMass = new Spot(
+                sumDim[0]/sumVal,
+                sumDim[1]/sumVal,
+                sumDim[2]/sumVal,
+                radius,
+                quality);
 
 
-        return centerOfMass;
+        return spotCenterOfMass;
 
     }
 

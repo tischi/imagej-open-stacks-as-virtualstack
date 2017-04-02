@@ -4,7 +4,6 @@ import ij.IJ;
 import ij.ImagePlus;
 
 import javax.swing.*;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,24 +40,31 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     final String buttonSaveTableText = "Save Table";
     JButton buttonSaveTable =  new JButton();
 
-    final String buttonLogColumnAverageText = "Column averages";
+    final String buttonLogColumnAverageText = "Log Column Averages";
     JButton buttonLogColumnAverage =  new JButton();
 
-    final String textFieldRegionSizeLabel = "Region size [pixels]";
-    JTextField textFieldRegionSize = new JTextField(12);
-
-    final String textFieldChannelsLabel = "Channels [one-based]";
+    final String textFieldChannelsLabel = "Channel IDs [one-based]";
     JTextField textFieldChannels = new JTextField(12);
 
-    final String textFieldSpotRadiiLabel = "Spot radii [pixels]";
+    final String textFieldSpotRadiiLabel = "Spot Radii [pixels]";
     JTextField textFieldSpotRadii = new JTextField(12);
 
-    final String textFieldSpotThresholdsLabel = "Spot thresholds [a.u.]";
+    final String textFieldSpotThresholdsLabel = "Spot Channel Thresholds [a.u.]";
     JTextField textFieldSpotThresholds = new JTextField(12);
+
+    final String textFieldExperimentalBatchLabel = "Experimental Batch";
+    JTextField textFieldExperimentalBatch = new JTextField(15);
+
+    final String textFieldTreatmentLabel = "Treatment";
+    JTextField textFieldTreatment = new JTextField(15);
+
+    final String textFieldExperimentIDLabel = "Experiment ID";
+    JTextField textFieldExperimentID = new JTextField(15);
+
 
     final String comboBoxSegmentationMethodLabel = "Segmentation method";
     JComboBox comboBoxSegmentationMethod = new JComboBox(new String[]
-            {Globals.TRACKMATEDOG, Globals.TRACKMATEDOGSUBPIXEL, Globals.IMAGESUITE3D});
+            {Globals.TRACKMATEDOG}); //, Globals.TRACKMATEDOGSUBPIXEL, Globals.IMAGESUITE3D
 
     SegmentationResults segmentationResults = new SegmentationResults();
     SegmentationSettings segmentationSettings = new SegmentationSettings();
@@ -92,13 +98,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         //
         // Spot detection
         //
-
-        // header
-        panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
-        panels.get(iPanel).add(new JLabel("SPOT DETECTION"));
-        c.add(panels.get(iPanel++));
-
-        // action
+        addHeader(panels, iPanel++, c, "SPOT DETECTION");
         addComboBox(panels, iPanel++, c, comboBoxSegmentationMethod, comboBoxSegmentationMethodLabel);
         addTextField(panels, iPanel++, c, textFieldChannels, textFieldChannelsLabel, "2,3,4");
         addTextField(panels, iPanel++, c, textFieldSpotRadii, textFieldSpotRadiiLabel, "3,3,3");
@@ -108,26 +108,17 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         //
         // Spot analysis
         //
-
-        // header
-        panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
-        panels.get(iPanel).add(new JLabel("SPOT ANALYSIS"));
-        c.add(panels.get(iPanel++));
-
-        // show spots button
-        //addTextField(panels, iPanel++, c, textFieldRegionSize, textFieldRegionSizeLabel, "10,10,10");
+        addHeader(panels, iPanel++, c, "SPOT ANALYSIS");
         addButton(panels, iPanel++, c, buttonAnalyzeSelectedRegions, buttonAnalyzeSelectedRegionsText);
 
 
         //
         // Table
         //
-
-        // header
-        panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
-        panels.get(iPanel).add(new JLabel("TABLE"));
-        c.add(panels.get(iPanel++));
-
+        addHeader(panels, iPanel++, c, "TABLE");
+        addTextField(panels, iPanel++, c, textFieldExperimentalBatch, textFieldExperimentalBatchLabel, "Today");
+        addTextField(panels, iPanel++, c, textFieldExperimentID, textFieldExperimentIDLabel, "001");
+        addTextField(panels, iPanel++, c, textFieldTreatment, textFieldTreatmentLabel, "Negative control");
         addButton(panels, iPanel++, c, buttonLogColumnAverage, buttonLogColumnAverageText);
         addButton(panels, iPanel++, c, buttonSaveTable, buttonSaveTableText);
 
@@ -141,6 +132,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
     }
 
+
     public void actionPerformed(ActionEvent e) {
 
         // update current imp object
@@ -151,7 +143,12 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         segmentationSettings.channels = Globals.commaSeparatedStringToIntegerArray(textFieldChannels.getText());
         segmentationSettings.spotRadii = Globals.commaSeparatedStringToIntegerArray(textFieldSpotRadii.getText());
         segmentationSettings.thresholds = Globals.commaSeparatedStringToDoubleArray(textFieldSpotThresholds.getText());
+        segmentationSettings.experimentalBatch = textFieldExperimentalBatch.getText();
+        segmentationSettings.experimentID = textFieldExperimentID.getText();
+        segmentationSettings.treatment = textFieldTreatment.getText();
+
         segmentationSettings.method = (String) comboBoxSegmentationMethod.getSelectedItem();
+
 
         if ( e.getActionCommand().equals(buttonSegmentSpotsText) )
         {
@@ -218,6 +215,15 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
         }
 
+    }
+
+
+
+    private void addHeader(ArrayList<JPanel> panels, int iPanel, Container c, String label)
+    {
+        panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
+        panels.get(iPanel).add(new JLabel(label));
+        c.add(panels.get(iPanel++));
     }
 
     private void addTextField(ArrayList<JPanel> panels, int iPanel, Container c, JTextField textField, String textFieldLabel, String textFieldDefault)

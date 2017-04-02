@@ -25,37 +25,62 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
     JFrame frame;
     JScrollPane scrollPane;
 
-    SegmentationOverlay segmentationOverlay = null;
+    SegmentationOverlay segmentationOverlay;
+    SegmentationSettings segmentationSettings;
 
 
-    public SpotsTable()
+    public SpotsTable(SegmentationSettings segmentationSettings)
     {
+
         super(new GridLayout(1, 0));
+        this.segmentationSettings = segmentationSettings;
     }
 
-    public void initializeTable(int[] channels)
+    public void initializeTable()
     {
 
+        int[] channels = segmentationSettings.channels;
+
         List<String> columns = new ArrayList<>();
+
+        columns.add("Experimental_Batch");
+        columns.add("Experiment_ID");
+        columns.add("Treatment");
+
         columns.add("Region_X");
         columns.add("Region_Y");
         columns.add("Region_Z");
 
         for (int i=0; i<channels.length; i++ )
         {
-            columns.add("Ch"+String.valueOf(channels[i])+"_X");
-            columns.add("Ch"+String.valueOf(channels[i])+"_Y");
-            columns.add("Ch"+String.valueOf(channels[i])+"_Z");
+            columns.add("Ch"+String.valueOf(channels[i])+"_DoG_X");
+            columns.add("Ch"+String.valueOf(channels[i])+"_DoG_Y");
+            columns.add("Ch"+String.valueOf(channels[i])+"_DoG_Z");
         }
 
+        for (int i=0; i<channels.length; i++ )
+        {
+            columns.add("Ch"+String.valueOf(channels[i])+"_CoM_X");
+            columns.add("Ch"+String.valueOf(channels[i])+"_CoM_Y");
+            columns.add("Ch"+String.valueOf(channels[i])+"_CoM_Z");
+        }
 
         for (int i=0; i<channels.length-1; i++ )
         {
             for (int j=i+1; j<channels.length; j++ )
             {
-                columns.add("Dist_Ch" + String.valueOf(channels[i]) + "_Ch" + String.valueOf(channels[j]));
+                columns.add("Dist_DoG_Ch" + String.valueOf(channels[i]) + "_Ch" + String.valueOf(channels[j]));
             }
         }
+
+        for (int i=0; i<channels.length-1; i++ )
+        {
+            for (int j=i+1; j<channels.length; j++ )
+            {
+                columns.add("Dist_CoM_Ch" + String.valueOf(channels[i]) + "_Ch" + String.valueOf(channels[j]));
+            }
+        }
+
 
         DefaultTableModel model = new DefaultTableModel(columns.toArray(new String[columns.size()]),0);
         table = new JTable(model);
@@ -195,7 +220,12 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
         double sum = 0;
         for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
         {
-            sum = sum + (Double)tableModel.getValueAt(rowIndex, columnIndex);
+            try {
+                sum = sum + (Double)tableModel.getValueAt(rowIndex, columnIndex);
+            } catch (NumberFormatException e) {
+                // do nothing
+            }
+
         }
         return (sum / rowCount);
     }

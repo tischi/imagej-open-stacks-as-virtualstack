@@ -30,17 +30,15 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="AnalyzeFishSpotsGUI.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="AnalyzeFishSpotsGUI.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-12.555555">
-              <caret line="157" column="22" selection-start-line="157" selection-start-column="22" selection-end-line="157" selection-end-column="22" />
+            <state vertical-scroll-proportion="0.47368422">
+              <caret line="98" column="25" selection-start-line="98" selection-start-column="25" selection-end-line="98" selection-end-column="25" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#AnalyzeFishSpotsGUI#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-                <element signature="method#showDialog#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-                <element signature="method#addComboBox#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-                <element signature="method#focusGained#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
+                <element signature="method#actionPerformed#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
                 <element signature="method#focusLost#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
               </folding>
             </state>
@@ -51,42 +49,43 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SpotsTable.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="105" column="0" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
+              <caret line="227" column="0" selection-start-line="227" selection-start-column="0" selection-end-line="227" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#SpotsTable#0;class#SpotsTable#0" expanded="true" />
+                <element signature="method#initializeTable#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#setSegmentationOverlay#0;class#SpotsTable#0" expanded="false" />
-                <element signature="method#run#0;class#3851:4034" expanded="true" />
-                <element signature="class#4118:4304" expanded="false" />
-                <element signature="method#run#0;class#4118:4304" expanded="true" />
-                <element signature="method#updateSegmentationOverlayBasedOnSelectedRow#0;class#SpotsTable#0" expanded="true" />
-                <element signature="method#computeJTableColumnAverage#0;class#SpotsTable#0" expanded="true" />
+                <element signature="method#run#0;class#4702:4885" expanded="true" />
+                <element signature="class#4969:5155" expanded="false" />
+                <element signature="method#run#0;class#4969:5155" expanded="true" />
                 <element signature="method#computeJTableColumnAverages#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#getColumnNames#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#logColumnAverages#0;class#SpotsTable#0" expanded="true" />
-                <element signature="e#7679#7680#0" expanded="true" />
-                <element signature="e#7740#7741#0" expanded="true" />
+                <element signature="e#8645#8646#0" expanded="true" />
+                <element signature="e#8706#8707#0" expanded="true" />
                 <element signature="method#mousePressed#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#mouseReleased#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#mouseEntered#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#mouseExited#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#keyTyped#0;class#SpotsTable#0" expanded="true" />
                 <element signature="method#keyPressed#0;class#SpotsTable#0" expanded="true" />
-                <element signature="e#8189#8190#0" expanded="true" />
-                <element signature="e#8250#8251#0" expanded="true" />
+                <element signature="e#9155#9156#0" expanded="true" />
+                <element signature="e#9216#9217#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AnalyzeObjects.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="AnalyzeObjects.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="2.0626118">
-              <caret line="237" column="0" selection-start-line="237" selection-start-column="0" selection-end-line="237" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="112" column="0" selection-start-line="112" selection-start-column="0" selection-end-line="112" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#AnalyzeObjects#0;class#AnalyzeObjects#0" expanded="true" />
-                <element signature="method#measureSpotLocationsAndDistancesInSelectedRegions#0;class#AnalyzeObjects#0" expanded="true" />
+                <element signature="method#computePairWiseDistancesAndAddToTable#0;class#AnalyzeObjects#0" expanded="true" />
+                <element signature="method#computeCenterOfMass#0;class#AnalyzeObjects#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -96,7 +95,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationSettings.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+              <caret line="13" column="36" selection-start-line="13" selection-start-column="36" selection-end-line="13" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -105,7 +104,7 @@
       <file leaf-file-name="SegmentObjects.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-48.555557">
+            <state vertical-scroll-proportion="23.925926">
               <caret line="75" column="35" selection-start-line="75" selection-start-column="35" selection-end-line="75" selection-end-column="35" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -189,12 +188,12 @@
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationResults.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Globals.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SpotsTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationOverlay.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationSettings.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SpotsTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java" />
       </list>
     </option>
   </component>
@@ -698,20 +697,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/src.zip!/java/lang/Runtime.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="51" column="62" selection-start-line="51" selection-start-column="55" selection-end-line="51" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51h/ij-1.51h.jar!/ij/IJ.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="792" column="38" selection-start-line="792" selection-start-column="23" selection-end-line="792" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/cisd/jhdf5/14.12.5/jhdf5-14.12.5.jar!/ch/systemsx/cisd/hdf5/IHDF5SimpleReader.class">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1074,35 +1059,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SpotsTable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="105" column="0" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#setSegmentationOverlay#0;class#SpotsTable#0" expanded="false" />
-            <element signature="method#run#0;class#3851:4034" expanded="true" />
-            <element signature="class#4118:4304" expanded="false" />
-            <element signature="method#run#0;class#4118:4304" expanded="true" />
-            <element signature="method#updateSegmentationOverlayBasedOnSelectedRow#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#computeJTableColumnAverage#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#computeJTableColumnAverages#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#getColumnNames#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#logColumnAverages#0;class#SpotsTable#0" expanded="true" />
-            <element signature="e#7679#7680#0" expanded="true" />
-            <element signature="e#7740#7741#0" expanded="true" />
-            <element signature="method#mousePressed#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#mouseReleased#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#mouseEntered#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#mouseExited#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#keyTyped#0;class#SpotsTable#0" expanded="true" />
-            <element signature="method#keyPressed#0;class#SpotsTable#0" expanded="true" />
-            <element signature="e#8189#8190#0" expanded="true" />
-            <element signature="e#8250#8251#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/net/imagej/ij/1.51h/ij-1.51h.jar!/ij/ImagePlus.class">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-50.703705">
@@ -1199,9 +1155,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationSettings.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="13" column="36" selection-start-line="13" selection-start-column="36" selection-end-line="13" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-48.555557">
+        <state vertical-scroll-proportion="23.925926">
           <caret line="75" column="35" selection-start-line="75" selection-start-column="35" selection-end-line="75" selection-end-column="35" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -1210,37 +1174,76 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationSettings.java">
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/src.zip!/java/util/List.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <caret line="237" column="12" selection-start-line="237" selection-start-column="12" selection-end-line="237" selection-end-column="12" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/src.zip!/java/lang/String.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-12.555555">
-          <caret line="157" column="22" selection-start-line="157" selection-start-column="22" selection-end-line="157" selection-end-column="22" />
+        <state vertical-scroll-proportion="3.3613596">
+          <caret line="2980" column="25" selection-start-line="2980" selection-start-column="25" selection-end-line="2980" selection-end-column="25" />
+          <folding>
+            <element signature="e#117557#117558#0" expanded="true" />
+            <element signature="e#117619#117620#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SpotsTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="227" column="0" selection-start-line="227" selection-start-column="0" selection-end-line="227" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#AnalyzeFishSpotsGUI#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-            <element signature="method#showDialog#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-            <element signature="method#addComboBox#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-            <element signature="method#focusGained#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
-            <element signature="method#focusLost#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
+            <element signature="method#SpotsTable#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#initializeTable#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#setSegmentationOverlay#0;class#SpotsTable#0" expanded="false" />
+            <element signature="method#run#0;class#4702:4885" expanded="true" />
+            <element signature="class#4969:5155" expanded="false" />
+            <element signature="method#run#0;class#4969:5155" expanded="true" />
+            <element signature="method#computeJTableColumnAverages#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#getColumnNames#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#logColumnAverages#0;class#SpotsTable#0" expanded="true" />
+            <element signature="e#8645#8646#0" expanded="true" />
+            <element signature="e#8706#8707#0" expanded="true" />
+            <element signature="method#mousePressed#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#mouseReleased#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#mouseEntered#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#mouseExited#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#keyTyped#0;class#SpotsTable#0" expanded="true" />
+            <element signature="method#keyPressed#0;class#SpotsTable#0" expanded="true" />
+            <element signature="e#9155#9156#0" expanded="true" />
+            <element signature="e#9216#9217#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.0626118">
-          <caret line="237" column="0" selection-start-line="237" selection-start-column="0" selection-end-line="237" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="112" column="0" selection-start-line="112" selection-start-column="0" selection-end-line="112" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#AnalyzeObjects#0;class#AnalyzeObjects#0" expanded="true" />
-            <element signature="method#measureSpotLocationsAndDistancesInSelectedRegions#0;class#AnalyzeObjects#0" expanded="true" />
+            <element signature="method#computePairWiseDistancesAndAddToTable#0;class#AnalyzeObjects#0" expanded="true" />
+            <element signature="method#computeCenterOfMass#0;class#AnalyzeObjects#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.47368422">
+          <caret line="98" column="25" selection-start-line="98" selection-start-column="25" selection-end-line="98" selection-end-column="25" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#AnalyzeFishSpotsGUI#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
+            <element signature="method#actionPerformed#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
+            <element signature="method#focusLost#0;class#AnalyzeFishSpotsGUI#0" expanded="true" />
           </folding>
         </state>
       </provider>
