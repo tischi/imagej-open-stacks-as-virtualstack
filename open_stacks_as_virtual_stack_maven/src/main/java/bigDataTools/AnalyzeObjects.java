@@ -6,6 +6,7 @@ import fiji.plugin.trackmate.util.SpotNeighborhood;
 
 import fiji.plugin.trackmate.util.SpotNeighborhoodCursor;
 
+import ij.io.FileInfo;
 import net.imagej.ImgPlus;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccessible;
@@ -95,13 +96,19 @@ public class AnalyzeObjects< T extends RealType< T >> {
                 //
                 List<String> tableRow = new ArrayList<>();
 
-                // Add experimental metadata to the table
+                // Add metadata to table
                 //
                 tableRow.add(segmentationSettings.experimentalBatch);
                 tableRow.add(segmentationSettings.experimentID);
                 tableRow.add(segmentationSettings.treatment);
                 tableRow.add(segmentationSettings.pathName);
                 tableRow.add(segmentationSettings.fileName);
+
+                /*
+                FileInfo fi = imp.getFileInfo();
+                String dir = imp.getFileInfo().directory;
+                String name = imp.getFileInfo().fileName;
+                */
 
 
                 // Add selected region center to the table
