@@ -5,8 +5,9 @@ package bigDataTools;
  */
 public class SegmentationSettings {
 
-    public int[] spotRadii;
+    public double[] spotRadii;
     public double[] thresholds;
+    public double[] backgrounds;
     public int[] channels;
     public int[] frames;
     public String method;
@@ -14,6 +15,8 @@ public class SegmentationSettings {
     public String experimentalBatch;
     public String experimentID;
     public String treatment;
+    public String pathName;
+    public String fileName;
 
     public SegmentationSettings() {
 

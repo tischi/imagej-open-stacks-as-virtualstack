@@ -98,6 +98,9 @@ public class AnalyzeObjects< T extends RealType< T >> {
                 tableRow.add(segmentationSettings.experimentalBatch);
                 tableRow.add(segmentationSettings.experimentID);
                 tableRow.add(segmentationSettings.treatment);
+                tableRow.add(segmentationSettings.pathName);
+                tableRow.add(segmentationSettings.fileName);
+
 
                 // Add selected region center to the table
                 //
@@ -230,10 +233,10 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
         // TODO: consider multiplication of region size with a constant factor gere
         long[] size = new long[]{
-                segmentationSettings.spotRadii[iChannel],
-                segmentationSettings.spotRadii[iChannel],
+                Math.round(segmentationSettings.spotRadii[iChannel] + 0.5),
+                Math.round(segmentationSettings.spotRadii[iChannel] + 0.5),
                 0,  // 0 size in  channel dimension, because we only want to evaluate one channel
-                segmentationSettings.spotRadii[iChannel]};
+                Math.round(segmentationSettings.spotRadii[iChannel] + 0.5)};
 
         // Create a local neighborhood around this spot
         //
@@ -251,11 +254,10 @@ public class AnalyzeObjects< T extends RealType< T >> {
             // move the cursor to the next pixel
             cursor.fwd();
 
-
-            double x = cursor.getDoublePosition(0);
-            double y = cursor.getDoublePosition(1);
+            double x = cursor.getDoublePosition(0) * imp.getCalibration().pixelWidth;
+            double y = cursor.getDoublePosition(1) * imp.getCalibration().pixelHeight;
             double c = cursor.getDoublePosition(2);  // this is the channel; should be the same always
-            double z = cursor.getDoublePosition(3);
+            double z = cursor.getDoublePosition(3) * imp.getCalibration().pixelDepth;
             double v = cursor.get().getRealDouble() -  backgroundValue;
 
             sumDim[0] += x * v;

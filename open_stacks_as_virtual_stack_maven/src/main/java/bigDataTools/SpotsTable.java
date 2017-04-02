@@ -2,6 +2,7 @@ package bigDataTools;
 
 import fiji.plugin.trackmate.Spot;
 import ij.IJ;
+import ij.ImagePlus;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -46,6 +47,8 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
         columns.add("Experimental_Batch");
         columns.add("Experiment_ID");
         columns.add("Treatment");
+        columns.add("PathName_Image");
+        columns.add("FileName_Image");
 
         columns.add("Region_X");
         columns.add("Region_Y");
@@ -169,18 +172,16 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
         });
     }
 
-    public void updateSegmentationOverlayBasedOnSelectedRow()
+    public void highlightBasedOnSelectedRow()
     {
-        Globals.threadlog("SELECTED");
-
+        
         if ( segmentationOverlay != null )
         {
 
-            int selectedRow = table.getSelectedRow();
-            int indexToModel = table.convertRowIndexToModel(selectedRow);
-            float x = new Float(table.getModel().getValueAt(indexToModel, 0).toString());
-            float y = new Float(table.getModel().getValueAt(indexToModel, 1).toString());
-            float z = new Float(table.getModel().getValueAt(indexToModel, 2).toString());
+            int indexToModel = table.convertRowIndexToModel(table.getSelectedRow());
+            float x = new Float(table.getModel().getValueAt(indexToModel, table.getColumn("Region_X").getModelIndex()).toString());
+            float y = new Float(table.getModel().getValueAt(indexToModel, table.getColumn("Region_Y").getModelIndex()).toString());
+            float z = new Float(table.getModel().getValueAt(indexToModel, table.getColumn("Region_Z").getModelIndex()).toString());
 
             double radius = 1.0; // not used
             double quality = 1.0; // not used
@@ -188,7 +189,8 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
 
             int frame = 0;
             segmentationOverlay.highlightClosestSpots(location, 3, frame);
-
+            ImagePlus imp = segmentationOverlay.imp;
+            imp.setZ( (int) Math.round(z / imp.getCalibration().pixelDepth) );
 
         }
 
@@ -221,7 +223,7 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
         for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
         {
             try {
-                sum = sum + (Double)tableModel.getValueAt(rowIndex, columnIndex);
+                sum = sum + Double.parseDouble((String)tableModel.getValueAt(rowIndex, columnIndex));
             } catch (NumberFormatException e) {
                 // do nothing
             }
@@ -272,7 +274,7 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        updateSegmentationOverlayBasedOnSelectedRow();
+        highlightBasedOnSelectedRow();
     }
 
     @Override
@@ -307,7 +309,7 @@ public class SpotsTable extends JPanel implements MouseListener, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        updateSegmentationOverlayBasedOnSelectedRow();
+        highlightBasedOnSelectedRow();
     }
 }
 

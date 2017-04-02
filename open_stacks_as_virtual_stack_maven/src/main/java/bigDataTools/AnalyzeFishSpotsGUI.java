@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 // Notes:
 // - See: https://imagej.net/TrackMate_Algorithms#Spot_features_generated_by_the_spot_detectors
+// -
 // - The Quality feature of the DoG is the actual maximal DoG signal
 // - We hope that TrackMate will be used in experiments requiring Sub-pixel localization, such as following motor proteins in biophysical experiments, so we added schemes to achieve this. The one currently implemented uses a quadratic fitting scheme (made by Stephan Saalfeld and Stephan Preibisch) based on David Lowe SIFT work[1]. It has the advantage of being very quick, compared to the segmentation time itself.
 //     - See: http://www.cs.ubc.ca/~lowe/keypoints/
@@ -52,6 +53,9 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     final String textFieldSpotThresholdsLabel = "Spot Channel Thresholds [a.u.]";
     JTextField textFieldSpotThresholds = new JTextField(12);
 
+    final String textFieldSpotBackgroundValuesLabel = "Spot Background Values [gray value]";
+    JTextField textFieldSpotBackgroundValues = new JTextField(12);
+
     final String textFieldExperimentalBatchLabel = "Experimental Batch";
     JTextField textFieldExperimentalBatch = new JTextField(15);
 
@@ -60,6 +64,13 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
     final String textFieldExperimentIDLabel = "Experiment ID";
     JTextField textFieldExperimentID = new JTextField(15);
+
+    final String textFieldPathNameLabel = "Path to image";
+    JTextField textFieldPathName = new JTextField(15);
+
+    final String textFieldFileNameLabel = "Filename of image";
+    JTextField textFieldFileName = new JTextField(15);
+
 
 
     final String comboBoxSegmentationMethodLabel = "Segmentation method";
@@ -76,26 +87,25 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
     public void AnalyzeFishSpotsGUI()
     {
+        //
     }
 
-
-    public void showDialog() {
+    public void showDialog()
+    {
 
         imp = IJ.getImage();
 
-        frame = new JFrame("Spot Segmentation");
+        frame = new JFrame("FISH Spots");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         Container c = frame.getContentPane();
         c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
 
-        //
         // Panels
         //
         ArrayList<JPanel> panels = new ArrayList<JPanel>();
         int iPanel = 0;
 
-        //
         // Spot detection
         //
         addHeader(panels, iPanel++, c, "SPOT DETECTION");
@@ -105,26 +115,24 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         addTextField(panels, iPanel++, c, textFieldSpotThresholds, textFieldSpotThresholdsLabel, "100.0,100.0,100.0");
         addButton(panels, iPanel++, c, buttonSegmentSpots, buttonSegmentSpotsText);
 
-        //
         // Spot analysis
         //
         addHeader(panels, iPanel++, c, "SPOT ANALYSIS");
+        addTextField(panels, iPanel++, c, textFieldSpotBackgroundValues, textFieldSpotBackgroundValuesLabel, "0,0,0");
         addButton(panels, iPanel++, c, buttonAnalyzeSelectedRegions, buttonAnalyzeSelectedRegionsText);
 
-
-        //
         // Table
         //
         addHeader(panels, iPanel++, c, "TABLE");
         addTextField(panels, iPanel++, c, textFieldExperimentalBatch, textFieldExperimentalBatchLabel, "Today");
         addTextField(panels, iPanel++, c, textFieldExperimentID, textFieldExperimentIDLabel, "001");
-        addTextField(panels, iPanel++, c, textFieldTreatment, textFieldTreatmentLabel, "Negative control");
+        addTextField(panels, iPanel++, c, textFieldTreatment, textFieldTreatmentLabel, "Negative_Control");
+        addTextField(panels, iPanel++, c, textFieldPathName, textFieldPathNameLabel, "path_to_image");
+        addTextField(panels, iPanel++, c, textFieldFileName, textFieldFileNameLabel, "filename.lif");
         addButton(panels, iPanel++, c, buttonLogColumnAverage, buttonLogColumnAverageText);
         addButton(panels, iPanel++, c, buttonSaveTable, buttonSaveTableText);
 
-
-        //
-        // Show the GUI
+        // Show GUI
         //
         frame.pack();
         frame.setLocation(imp.getWindow().getX() + imp.getWindow().getWidth(), imp.getWindow().getY());
@@ -133,7 +141,8 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     }
 
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e)
+    {
 
         // update current imp object
         imp = IJ.getImage();
@@ -141,11 +150,15 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         // update segmentationSettings
         segmentationSettings.frames = null;
         segmentationSettings.channels = Globals.commaSeparatedStringToIntegerArray(textFieldChannels.getText());
-        segmentationSettings.spotRadii = Globals.commaSeparatedStringToIntegerArray(textFieldSpotRadii.getText());
+        segmentationSettings.spotRadii = Globals.commaSeparatedStringToDoubleArray(textFieldSpotRadii.getText());
+        segmentationSettings.backgrounds = Globals.commaSeparatedStringToDoubleArray(textFieldSpotBackgroundValues.getText());
+
         segmentationSettings.thresholds = Globals.commaSeparatedStringToDoubleArray(textFieldSpotThresholds.getText());
         segmentationSettings.experimentalBatch = textFieldExperimentalBatch.getText();
         segmentationSettings.experimentID = textFieldExperimentID.getText();
         segmentationSettings.treatment = textFieldTreatment.getText();
+        segmentationSettings.pathName = textFieldPathName.getText();
+        segmentationSettings.fileName = textFieldFileName.getText();
 
         segmentationSettings.method = (String) comboBoxSegmentationMethod.getSelectedItem();
 
@@ -216,8 +229,6 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         }
 
     }
-
-
 
     private void addHeader(ArrayList<JPanel> panels, int iPanel, Container c, String label)
     {
