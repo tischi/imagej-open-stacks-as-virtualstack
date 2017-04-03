@@ -30,6 +30,63 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
+      <file leaf-file-name="OpenStacksAsVirtualStack.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/OpenStacksAsVirtualStack.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.30075186">
+              <caret line="1715" column="0" selection-start-line="1715" selection-start-column="0" selection-end-line="1715" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#80960#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+                <element signature="method#openFromDirectory#0;class#OpenStacksAsVirtualStack#0" expanded="true" />
+                <element signature="method#checkMemoryRequirements#1;class#OpenStacksAsVirtualStack#0" expanded="true" />
+                <element signature="method#saveAsHDF5#0;class#SaveToStacks#0;class#OpenStacksAsVirtualStack#0" expanded="true" />
+                <element signature="method#main#0;class#OpenStacksAsVirtualStack#0" expanded="true" />
+                <element signature="method#actionPerformed#0;class#StackStreamToolsGUI#0;class#OpenStacksAsVirtualStack#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Registration.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-6.4814816">
+              <caret line="1397" column="97" selection-start-line="1397" selection-start-column="94" selection-end-line="1397" selection-end-column="97" />
+              <folding>
+                <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="true" />
+                <element signature="class#TrackTable#0;class#Registration#0" expanded="false" />
+                <element signature="class#23347:23553" expanded="false" />
+                <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+                <element signature="method#addTrackStart#0;class#Registration#0" expanded="true" />
+                <element signature="method#showTrackedObjects#0;class#Registration#0" expanded="true" />
+                <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="true" />
+                <element signature="method#run#0;class#32135:33210" expanded="true" />
+                <element signature="method#Tracking#0;class#Tracking#0;class#Registration#0" expanded="true" />
+                <element signature="method#run#0;class#Tracking#0;class#Registration#0" expanded="true" />
+                <element signature="method#computeOffset#0;class#Registration#0" expanded="true" />
+                <element signature="method#computeCenter#0;class#Registration#0" expanded="true" />
+                <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="true" />
+                <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="true" />
+                <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="true" />
+                <element signature="method#computeShift16bitUsingPhaseCorrelation#0;class#Registration#0" expanded="true" />
+                <element signature="method#computeMean16bit#0;class#Registration#0" expanded="true" />
+                <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TrackAndCropHelp.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-3.75">
+              <caret line="56" column="13" selection-start-line="56" selection-start-column="13" selection-end-line="56" selection-end-column="13" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="AnalyzeFishSpotsGUI.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -42,49 +99,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SpotOverlay.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/sc/fiji/TrackMate_/3.4.2/TrackMate_-3.4.2.jar!/fiji/plugin/trackmate/visualization/hyperstack/SpotOverlay.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-6.814815">
-              <caret line="181" column="0" selection-start-line="181" selection-start-column="0" selection-end-line="181" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Utils.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Utils.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
               <caret line="53" column="56" selection-start-line="53" selection-start-column="56" selection-end-line="53" selection-end-column="56" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SpotsTable.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SpotsTable.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="164" column="28" selection-start-line="164" selection-start-column="28" selection-end-line="164" selection-end-column="28" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="method#initializeTable#0;class#SpotsTable#0" expanded="true" />
-                <element signature="method#setSegmentationOverlay#0;class#SpotsTable#0" expanded="false" />
-                <element signature="method#run#0;class#4814:4997" expanded="true" />
-                <element signature="class#5081:5267" expanded="false" />
-                <element signature="method#run#0;class#5081:5267" expanded="true" />
-                <element signature="e#8844#8845#0" expanded="true" />
-                <element signature="e#8889#8890#0" expanded="true" />
-                <element signature="method#mousePressed#0;class#SpotsTable#0" expanded="true" />
-                <element signature="method#mouseReleased#0;class#SpotsTable#0" expanded="true" />
-                <element signature="method#mouseEntered#0;class#SpotsTable#0" expanded="true" />
-                <element signature="method#mouseExited#0;class#SpotsTable#0" expanded="true" />
-                <element signature="method#keyTyped#0;class#SpotsTable#0" expanded="true" />
-                <element signature="method#keyPressed#0;class#SpotsTable#0" expanded="true" />
-                <element signature="e#9338#9339#0" expanded="true" />
-                <element signature="e#9383#9384#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -127,10 +147,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SegmentationOverlay.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SegmentationOverlay.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationOverlay.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.63946867">
+            <state vertical-scroll-proportion="-12.481482">
               <caret line="175" column="0" selection-start-line="175" selection-start-column="0" selection-end-line="175" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -193,26 +213,26 @@
         <option value="$PROJECT_DIR$/src/main/java/ct/vss/OpenerExtensions.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/OpenerExtensions.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/VirtualStackOfStacks.java" />
-        <option value="$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html" />
         <option value="$PROJECT_DIR$/src/main/resources/plugins.config" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpots.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/OverlaySegmentationResults.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeSpots.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationResults.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SpotsTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationSettings.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentObjects.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeObjects.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/OpenStacksAsVirtualStack.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsPlugIn.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFISHSpotsPlugIn.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Globals.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Utils.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java" />
         <option value="$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationOverlay.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bigDataTools/OpenStacksAsVirtualStack.java" />
       </list>
     </option>
   </component>
@@ -235,7 +255,7 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="2" />
+    <option name="x" value="62" />
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="873" />
@@ -591,7 +611,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="2" y="23" width="1440" height="873" extended-state="0" />
+    <frame x="62" y="23" width="1440" height="873" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -605,13 +625,13 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28994083" sideWeight="0.53119427" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24839948" sideWeight="0.4688057" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24839948" sideWeight="0.4688057" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32771084" sideWeight="0.4974656" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3484708" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299373" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25751072" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25480154" sideWeight="0.688196" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3304721" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25480154" sideWeight="0.688196" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -723,13 +743,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="117" column="0" selection-start-line="117" selection-start-column="0" selection-end-line="117" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="21" column="4" selection-start-line="21" selection-start-column="4" selection-end-line="21" selection-end-column="4" />
         </state>
       </provider>
     </entry>
@@ -1208,37 +1221,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.49819493">
-          <caret line="115" column="63" selection-start-line="115" selection-start-column="63" selection-end-line="115" selection-end-column="63" />
-          <folding>
-            <element signature="class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="false" />
-            <element signature="class#TrackTable#0;class#Registration#0" expanded="false" />
-            <element signature="class#23313:23519" expanded="false" />
-            <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
-            <element signature="e#31825#31913#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/OpenStacksAsVirtualStack.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="10.16129">
-          <caret line="1609" column="0" selection-start-line="1609" selection-start-column="0" selection-end-line="1609" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#80960#0" expanded="true" />
-            <element signature="imports" expanded="true" />
-            <element signature="method#openFromDirectory#0;class#OpenStacksAsVirtualStack#0" expanded="true" />
-            <element signature="method#checkMemoryRequirements#1;class#OpenStacksAsVirtualStack#0" expanded="true" />
-            <element signature="method#saveAsHDF5#0;class#SaveToStacks#0;class#OpenStacksAsVirtualStack#0" expanded="true" />
-            <element signature="class#StackStreamToolsGUI#0;class#OpenStacksAsVirtualStack#0" expanded="false" />
-            <element signature="method#actionPerformed#0;class#StackStreamToolsGUI#0;class#OpenStacksAsVirtualStack#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/AnalyzeFishSpotsGUI.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-1.1481482">
@@ -1259,7 +1241,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/SegmentationOverlay.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.63946867">
+        <state vertical-scroll-proportion="-12.481482">
           <caret line="175" column="0" selection-start-line="175" selection-start-column="0" selection-end-line="175" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -1270,6 +1252,57 @@
             <element signature="method#imageOpened#0;class#SegmentationOverlay#0" expanded="true" />
             <element signature="method#imageClosed#0;class#SegmentationOverlay#0" expanded="true" />
             <element signature="method#imageUpdated#0;class#SegmentationOverlay#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/TrackAndCropHelp.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.75">
+          <caret line="56" column="13" selection-start-line="56" selection-start-column="13" selection-end-line="56" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/Registration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-6.4814816">
+          <caret line="1397" column="97" selection-start-line="1397" selection-start-column="94" selection-end-line="1397" selection-end-column="97" />
+          <folding>
+            <element signature="method#actionPerformed#0;class#TrackingGUI#0;class#Registration#0" expanded="true" />
+            <element signature="class#TrackTable#0;class#Registration#0" expanded="false" />
+            <element signature="class#23347:23553" expanded="false" />
+            <element signature="class#TrackTablePanel#0;class#Registration#0" expanded="false" />
+            <element signature="method#addTrackStart#0;class#Registration#0" expanded="true" />
+            <element signature="method#showTrackedObjects#0;class#Registration#0" expanded="true" />
+            <element signature="method#addTrackToOverlay#0;class#Registration#0" expanded="true" />
+            <element signature="method#run#0;class#32135:33210" expanded="true" />
+            <element signature="method#Tracking#0;class#Tracking#0;class#Registration#0" expanded="true" />
+            <element signature="method#run#0;class#Tracking#0;class#Registration#0" expanded="true" />
+            <element signature="method#computeOffset#0;class#Registration#0" expanded="true" />
+            <element signature="method#computeCenter#0;class#Registration#0" expanded="true" />
+            <element signature="method#multiplyPoint3dComponents#0;class#Registration#0" expanded="true" />
+            <element signature="method#computeIterativeCenterOfMassShift16bit#0;class#Registration#0" expanded="true" />
+            <element signature="method#computeCenter16bit#0;class#Registration#0" expanded="true" />
+            <element signature="method#computeShift16bitUsingPhaseCorrelation#0;class#Registration#0" expanded="true" />
+            <element signature="method#computeMean16bit#0;class#Registration#0" expanded="true" />
+            <element signature="method#maxLoc16bit#0;class#Registration#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bigDataTools/OpenStacksAsVirtualStack.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.30075186">
+          <caret line="1715" column="0" selection-start-line="1715" selection-start-column="0" selection-end-line="1715" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#80960#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="method#openFromDirectory#0;class#OpenStacksAsVirtualStack#0" expanded="true" />
+            <element signature="method#checkMemoryRequirements#1;class#OpenStacksAsVirtualStack#0" expanded="true" />
+            <element signature="method#saveAsHDF5#0;class#SaveToStacks#0;class#OpenStacksAsVirtualStack#0" expanded="true" />
+            <element signature="method#main#0;class#OpenStacksAsVirtualStack#0" expanded="true" />
+            <element signature="method#actionPerformed#0;class#StackStreamToolsGUI#0;class#OpenStacksAsVirtualStack#0" expanded="true" />
           </folding>
         </state>
       </provider>

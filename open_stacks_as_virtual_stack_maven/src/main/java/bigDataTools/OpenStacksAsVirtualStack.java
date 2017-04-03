@@ -1714,7 +1714,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         final String SAVEasInfoFile = "Save as info file";
         JButton saveAsInfoFile =  new JButton(SAVEasInfoFile);
 
-        final String DUPLICATEtoRAM = "Duplicate to RAM";
+        final String DUPLICATEtoRAM = "Load into to RAM";
         JButton duplicateToRAM =  new JButton(DUPLICATEtoRAM);
 
         final String CROPasNewStream = "Crop as new stream";

@@ -123,7 +123,7 @@ public class Registration implements PlugIn {
                 "Binning/Subsampling: dx, dy, dz, dt [pixels, frames]",
                 "Length [frames]",
                 "Background value [gray values]",
-                "Crop size [factor]"
+                "Expand/crop the tracked region by [factor]"
         };
 
         String[] buttonActions = {
@@ -133,7 +133,7 @@ public class Registration implements PlugIn {
                 "Show table",
                 "Save table",
                 "Clear all tracks",
-                "View tracked objects",
+                "View as new stream",
                 "Report issue"
         };
 
@@ -291,7 +291,7 @@ public class Registration implements PlugIn {
             //
             c.add(new JSeparator(SwingConstants.HORIZONTAL));
             panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
-            panels.get(iPanel).add(new JLabel("CROPPING"));
+            panels.get(iPanel).add(new JLabel("VIEW TRACKED OBJECTS"));
             c.add(panels.get(iPanel++));
 
             panels.add(new JPanel(new FlowLayout(FlowLayout.CENTER)));
@@ -767,7 +767,6 @@ public class Registration implements PlugIn {
         }
     }
 
-
     public void showTrackTable(){
         if(trackTable==null) {
             IJ.showMessage("There are no tracks to show yet.");
@@ -815,10 +814,11 @@ public class Registration implements PlugIn {
 
         int ntTracking = gui_ntTracking;
         t = imp.getT()-1;
-        if(t+gui_ntTracking > imp.getNFrames()) {
-            IJ.showMessage("Your Track would be longer than the movie; " +
-                    "please\n - reduce 'Track length', or\n- move the time slide to an earlier time point.");
-            return(-1);
+        if( t+gui_ntTracking > imp.getNFrames() )
+        {
+            ntTracking = imp.getNFrames() - t;
+            Utils.threadlog("Due to the track length that you requested, the track would have been longer than the movie;" +
+                    "The length of the track was adjusted to avoid this and will thus be shorter.");
         }
 
         totalTimePointsToBeTracked += ntTracking;
