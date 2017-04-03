@@ -2,6 +2,7 @@ package bigDataTools;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.io.FileInfo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -127,8 +128,8 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         addTextField(panels, iPanel++, c, textFieldExperimentalBatch, textFieldExperimentalBatchLabel, "Today");
         addTextField(panels, iPanel++, c, textFieldExperimentID, textFieldExperimentIDLabel, "001");
         addTextField(panels, iPanel++, c, textFieldTreatment, textFieldTreatmentLabel, "Negative_Control");
-        addTextField(panels, iPanel++, c, textFieldPathName, textFieldPathNameLabel, "path_to_image");
-        addTextField(panels, iPanel++, c, textFieldFileName, textFieldFileNameLabel, "filename.lif");
+        addTextField(panels, iPanel++, c, textFieldPathName, textFieldPathNameLabel, imp.getOriginalFileInfo().directory);
+        addTextField(panels, iPanel++, c, textFieldFileName, textFieldFileNameLabel, imp.getOriginalFileInfo().fileName);
         addButton(panels, iPanel++, c, buttonLogColumnAverage, buttonLogColumnAverageText);
         addButton(panels, iPanel++, c, buttonSaveTable, buttonSaveTableText);
 
