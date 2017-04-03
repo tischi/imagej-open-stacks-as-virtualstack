@@ -2,7 +2,6 @@ package bigDataTools;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.io.FileInfo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,34 +29,37 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     // GUI
     JFrame frame;
 
-    final String buttonSegmentSpotsText = "Find Spots";
+    final String buttonSegmentSpotsText = "Find spots";
     JButton buttonSegmentSpots =  new JButton();
 
-    final String buttonShowSpotsText = "Show Spots";
+    final String buttonShowSpotsText = "Show spots";
     JButton buttonShowSpots =  new JButton();
 
-    final String buttonAnalyzeSelectedRegionsText = "Analyze Selected Regions";
+    final String buttonAnalyzeSelectedRegionsText = "Analyze selected regions";
     JButton buttonAnalyzeSelectedRegions =  new JButton();
 
-    final String buttonSaveTableText = "Save Table";
+    final String buttonSaveTableText = "Save table";
     JButton buttonSaveTable =  new JButton();
 
-    final String buttonLogColumnAverageText = "Log Column Averages";
+    final String buttonLoadTableText = "Load table";
+    JButton buttonLoadTable =  new JButton();
+
+    final String buttonLogColumnAverageText = "Log column averages";
     JButton buttonLogColumnAverage =  new JButton();
 
     final String textFieldChannelsLabel = "Channel IDs [one-based]";
     JTextField textFieldChannels = new JTextField(12);
 
-    final String textFieldSpotRadiiLabel = "Spot Radii [pixels]";
+    final String textFieldSpotRadiiLabel = "Spot radii [pixels]";
     JTextField textFieldSpotRadii = new JTextField(20);
 
-    final String textFieldSpotThresholdsLabel = "Spot Channel Thresholds [a.u.]";
+    final String textFieldSpotThresholdsLabel = "Spot channel thresholds [a.u.]";
     JTextField textFieldSpotThresholds = new JTextField(12);
 
-    final String textFieldSpotBackgroundValuesLabel = "Spot Background Values [gray value]";
+    final String textFieldSpotBackgroundValuesLabel = "Spot background values [gray value]";
     JTextField textFieldSpotBackgroundValues = new JTextField(12);
 
-    final String textFieldExperimentalBatchLabel = "Experimental Batch";
+    final String textFieldExperimentalBatchLabel = "Experimental batch";
     JTextField textFieldExperimentalBatch = new JTextField(15);
 
     final String textFieldTreatmentLabel = "Treatment";
@@ -72,11 +74,8 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     final String textFieldFileNameLabel = "Filename of image";
     JTextField textFieldFileName = new JTextField(15);
 
-
-
     final String comboBoxSegmentationMethodLabel = "Segmentation method";
-    JComboBox comboBoxSegmentationMethod = new JComboBox(new String[]
-            {Utils.TRACKMATEDOG}); //, Utils.TRACKMATEDOGSUBPIXEL, Utils.IMAGESUITE3D
+    JComboBox comboBoxSegmentationMethod = new JComboBox(new String[] {Utils.TRACKMATEDOG}); //, Utils.TRACKMATEDOGSUBPIXEL, Utils.IMAGESUITE3D
 
     SegmentationResults segmentationResults = new SegmentationResults();
     SegmentationSettings segmentationSettings = new SegmentationSettings();
@@ -128,10 +127,11 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         addTextField(panels, iPanel++, c, textFieldExperimentalBatch, textFieldExperimentalBatchLabel, "Today");
         addTextField(panels, iPanel++, c, textFieldExperimentID, textFieldExperimentIDLabel, "001");
         addTextField(panels, iPanel++, c, textFieldTreatment, textFieldTreatmentLabel, "Negative_Control");
-        addTextField(panels, iPanel++, c, textFieldPathName, textFieldPathNameLabel, imp.getOriginalFileInfo().directory);
-        addTextField(panels, iPanel++, c, textFieldFileName, textFieldFileNameLabel, imp.getOriginalFileInfo().fileName);
+        //addTextField(panels, iPanel++, c, textFieldPathName, textFieldPathNameLabel, imp.getOriginalFileInfo().directory);
+        //addTextField(panels, iPanel++, c, textFieldFileName, textFieldFileNameLabel, imp.getOriginalFileInfo().fileName);
         addButton(panels, iPanel++, c, buttonLogColumnAverage, buttonLogColumnAverageText);
         addButton(panels, iPanel++, c, buttonSaveTable, buttonSaveTableText);
+        //addButton(panels, iPanel++, c, buttonLoadTable, buttonLoadTableText);
 
         // Show GUI
         //
@@ -150,6 +150,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         // update segmentationSettings
         segmentationSettings.frames = null;
         segmentationSettings.channels = Utils.delimitedStringToIntegerArray(textFieldChannels.getText(), ";");
+        segmentationSettings.channelIDs = textFieldChannels.getText();
         segmentationSettings.spotRadii = new double[segmentationSettings.channels.length][];
         String[] spotRadii = textFieldSpotRadii.getText().split(";");
         for (int iChannel = 0; iChannel < segmentationSettings.channels.length; iChannel++)
@@ -162,10 +163,9 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         segmentationSettings.experimentalBatch = textFieldExperimentalBatch.getText();
         segmentationSettings.experimentID = textFieldExperimentID.getText();
         segmentationSettings.treatment = textFieldTreatment.getText();
-        segmentationSettings.pathName = textFieldPathName.getText();
-        segmentationSettings.fileName = textFieldFileName.getText();
-
         segmentationSettings.method = (String) comboBoxSegmentationMethod.getSelectedItem();
+        segmentationSettings.pathName = imp.getOriginalFileInfo().directory; // textFieldPathName.getText();
+        segmentationSettings.fileName = imp.getOriginalFileInfo().fileName; // textFieldFileName.getText();
 
 
         if ( e.getActionCommand().equals(buttonSegmentSpotsText) )
@@ -182,7 +182,8 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
                     segmentationResults,
                     segmentationSettings);
 
-            segmentationOverlay.createHyperStackDisplayer();
+            segmentationOverlay.setTrackMateOverlayFromSegmentationResults();
+            segmentationOverlay.displayTrackMateOverlay();
 
             // Prepare image for marking regions and for checking the spots
             //
@@ -202,14 +203,13 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
             AnalyzeObjects analyzeObjects = new AnalyzeObjects(imp, segmentationSettings, segmentationResults);
             analyzeObjects.measureSpotLocationsAndDistancesInSelectedRegions();
 
-            // Show results table
+            // Show results jTableSpots
             //
-            segmentationResults.table.showTable();
+            segmentationResults.jTableSpots.showTable();
 
-            // Notify table about overlay (such that it can change it, upon selection of a specific row)
+            // Notify jTableSpots about overlay (such that it can change it, upon selection of a specific row)
             //
-            segmentationResults.table.setSegmentationOverlay(segmentationOverlay);
-
+            segmentationResults.jTableSpots.segmentationOverlay = segmentationOverlay;
 
         }
 
@@ -217,7 +217,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         {
             // Print average values of all columns to log window
             //
-            segmentationResults.table.logColumnAverages();
+            segmentationResults.jTableSpots.logColumnAverages();
         }
 
         if ( e.getActionCommand().equals(buttonSaveTableText))
@@ -225,10 +225,40 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
             // Save Table
             //
-            JFileChooser jFileChooser = new JFileChooser();
+            JFileChooser jFileChooser = new JFileChooser(segmentationSettings.pathName);
             if (jFileChooser.showSaveDialog(this.frame) == JFileChooser.APPROVE_OPTION) {
                 File file = jFileChooser.getSelectedFile();
-                segmentationResults.table.saveTable(file);
+                segmentationResults.jTableSpots.saveTable(file);
+            }
+
+        }
+
+
+        if ( e.getActionCommand().equals(buttonLoadTableText))
+        {
+
+            // Load Table
+            //
+            JFileChooser jFileChooser = new JFileChooser(segmentationSettings.pathName);
+            if (jFileChooser.showOpenDialog(this.frame) == JFileChooser.APPROVE_OPTION) {
+                File file = jFileChooser.getSelectedFile();
+                if ( file != null )
+                {
+                    // load and show jTableSpots
+                    //
+                    segmentationResults.jTableSpots = new jTableSpots();
+                    segmentationResults.jTableSpots.loadTable(file);
+                    segmentationResults.jTableSpots.showTable();
+
+                    // construct overlay from jTableSpots
+                    //
+                    //segmentationResults.jTableSpots.segmentationOverlay = segmentationOverlay;
+                }
+                else
+                {
+                    Utils.threadlog("No file selected.");
+                }
+
             }
 
         }

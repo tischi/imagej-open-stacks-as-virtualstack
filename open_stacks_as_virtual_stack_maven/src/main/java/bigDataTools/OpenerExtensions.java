@@ -69,7 +69,7 @@ class OpenerExtensions extends Opener {
     /** 32-bit floating-point. */
     public static final int GRAY32_FLOAT = 4;
 
-    /** 8-bit unsigned integer with color lookup table. */
+    /** 8-bit unsigned integer with color lookup jTableSpots. */
     public static final int COLOR8 = 5;
 
     /** 24-bit interleaved RGB. Import/export only. */
@@ -1006,7 +1006,7 @@ class OpenerExtensions extends Opener {
                     break;
                 if (code==CLEAR_CODE) {
                     //startTime4 = System.nanoTime();
-                    // initialize symbol table
+                    // initialize symbol jTableSpots
                     for (i = 0; i < 256; i++)
                         symbolTable[i][0] = (byte)i;
                     nextSymbol = 258;
@@ -1023,14 +1023,14 @@ class OpenerExtensions extends Opener {
                 } else {
                     if (code<nextSymbol) {
                         //startTime6 = System.nanoTime();
-                        // code is in table
+                        // code is in jTableSpots
                         //startTime5 = System.nanoTime();
                         //out.add(symbolTable[code]);
                         symbolLength = symbolTable[code].length;
                         System.arraycopy(symbolTable[code], 0, out, iOut, symbolLength);
                         iOut += symbolLength;
                         //totalTime5 += (System.nanoTime() - startTime5);
-                        // add string to table
+                        // add string to jTableSpots
 
                         //ByteVector symbol = new ByteVector(byteBuffer1);
                         //symbol.add(symbolTable[oldCode]);
@@ -1050,7 +1050,7 @@ class OpenerExtensions extends Opener {
                     } else {
 
                         //startTime3 = System.nanoTime();
-                        // out of table
+                        // out of jTableSpots
                         ByteVector symbol = new ByteVector(byteBuffer2);
                         symbol.add(symbolTable[oldCode]);
                         symbol.add(symbolTable[oldCode][0]);

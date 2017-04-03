@@ -9,6 +9,8 @@ public class SegmentationSettings {
     public double[] thresholds;
     public double[] backgrounds;
     public int[] channels;
+    public String channelIDs;
+
     public int[] frames;
     public String method;
 

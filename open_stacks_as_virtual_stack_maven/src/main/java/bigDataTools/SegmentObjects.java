@@ -48,10 +48,9 @@ public class SegmentObjects {
 
         // Prepare results storage
         //
-        segmentationResults.channels = segmentationSettings.channels;
-        segmentationResults.models = new Model[segmentationResults.channels.length];
+        segmentationResults.models = new Model[segmentationSettings.channels.length];
 
-        for( int iChannel=0; iChannel < segmentationResults.channels.length; iChannel++ )
+        for( int iChannel=0; iChannel < segmentationSettings.channels.length; iChannel++ )
         {
 
             // Change image calibration to trick TrackMate into anisotropic DoG filtering
@@ -99,7 +98,7 @@ public class SegmentObjects {
             //
             settings.setFrom(imp);
             settings.detectorSettings = settings.detectorFactory.getDefaultSettings();
-            settings.detectorSettings.put(DetectorKeys.KEY_TARGET_CHANNEL, segmentationResults.channels[iChannel]); //one-based
+            settings.detectorSettings.put(DetectorKeys.KEY_TARGET_CHANNEL, segmentationSettings.channels[iChannel]); //one-based
 
             if( segmentationSettings.method.equals(Utils.TRACKMATEDOGSUBPIXEL))
             {

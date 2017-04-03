@@ -2,34 +2,21 @@ package bigDataTools;
 
 import fiji.plugin.trackmate.Spot;
 import fiji.plugin.trackmate.SpotCollection;
-import fiji.plugin.trackmate.util.SpotNeighborhood;
 
-import fiji.plugin.trackmate.util.SpotNeighborhoodCursor;
-
-import ij.io.FileInfo;
-import net.imagej.ImgPlus;
 import net.imglib2.Cursor;
-import net.imglib2.RandomAccessible;
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.algorithm.neighborhood.RectangleNeighborhood;
 import net.imglib2.algorithm.region.localneighborhood.RectangleNeighborhoodGPL;
-import net.imglib2.img.ImagePlusAdapter;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 
 import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.measure.Calibration;
-import net.imglib2.img.imageplus.ImagePlusImgs;
 import net.imglib2.outofbounds.OutOfBoundsMirrorExpWindowingFactory;
-import net.imglib2.view.Views;
 import net.imglib2.type.numeric.RealType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.RandomAccess;
 
-import static ij.IJ.currentMemory;
 import static ij.IJ.log;
 
 // TODO: replace Point3D by import net.imglib2.RealLocalizable;
@@ -53,19 +40,11 @@ public class AnalyzeObjects< T extends RealType< T >> {
     {
         ij.gui.Overlay overlay = imp.getOverlay();
 
-        if(overlay != null) {
-            log("Number of selected points:" + overlay.size());
-        }
-        else
-        {
-            log("Please use the Point Selection tool to mark the center of regions of interest.");
-        }
-
-
         // Initialise Results Table
         //
-        segmentationResults.table = new SpotsTable(segmentationSettings);
-        segmentationResults.table.initializeTable();
+        segmentationResults.jTableSpots = new jTableSpots();
+        segmentationResults.jTableSpots.segmentationSettings = segmentationSettings;
+        segmentationResults.jTableSpots.initializeTable();
 
         // Get spot locations and compute pair-wise distances for each selection region
         //
@@ -92,17 +71,18 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
                 //Utils.logSpotCoordinates("ROI", spotRoi);
 
-                // Init a new row in the table
+                // Init a new row in the jTableSpots
                 //
                 List<String> tableRow = new ArrayList<>();
 
-                // Add metadata to table
+                // Add metadata to jTableSpots
                 //
                 tableRow.add(segmentationSettings.experimentalBatch);
                 tableRow.add(segmentationSettings.experimentID);
                 tableRow.add(segmentationSettings.treatment);
                 tableRow.add(segmentationSettings.pathName);
                 tableRow.add(segmentationSettings.fileName);
+                tableRow.add(segmentationSettings.channelIDs);
 
                 /*
                 FileInfo fi = imp.getFileInfo();
@@ -111,7 +91,7 @@ public class AnalyzeObjects< T extends RealType< T >> {
                 */
 
 
-                // Add selected region center to the table
+                // Add selected region center to the jTableSpots
                 //
                 for (int d = 0; d < 3; d++)
                 {
@@ -120,10 +100,10 @@ public class AnalyzeObjects< T extends RealType< T >> {
 
                 // Find the closest spot in each channel
                 //
-                Spot[] closestSpotsTrackMateDoGMax = new Spot[segmentationResults.channels.length];
-                Spot[] closestSpotsCenterOfMass = new Spot[segmentationResults.channels.length];
+                Spot[] closestSpotsTrackMateDoGMax = new Spot[segmentationSettings.channels.length];
+                Spot[] closestSpotsCenterOfMass = new Spot[segmentationSettings.channels.length];
 
-                for (int iChannel = 0; iChannel < segmentationResults.channels.length; iChannel++) {
+                for (int iChannel = 0; iChannel < segmentationSettings.channels.length; iChannel++) {
 
                     SpotCollection spotCollection = segmentationResults.models[iChannel].getSpots();
 
@@ -146,14 +126,14 @@ public class AnalyzeObjects< T extends RealType< T >> {
                         Spot spotCenterOfMass = computeCenterOfMass(spot, iChannel, segmentationSettings.backgrounds[iChannel]);
 
 
-                        // Add position to table
+                        // Add position to jTableSpots
                         //
                         for (int d = 0; d < 3; d++)
                         {
                             tableRow.add(String.valueOf(spot.getDoublePosition(d)));
                         }
 
-                        // Add center of mass to table
+                        // Add center of mass to jTableSpots
                         //
                         for (int d = 0; d < 3; d++)
                         {
@@ -176,15 +156,15 @@ public class AnalyzeObjects< T extends RealType< T >> {
                 } // channel loop
 
 
-                // Compute pair-wise distances and add to table
+                // Compute pair-wise distances and add to jTableSpots
                 //
 
                 computePairWiseDistancesAndAddToTable(tableRow, closestSpotsTrackMateDoGMax);
                 computePairWiseDistancesAndAddToTable(tableRow, closestSpotsCenterOfMass);
 
-                // Add the whole row to actual table
+                // Add the whole row to actual jTableSpots
                 //
-                segmentationResults.table.addRow(tableRow.toArray(new Object[tableRow.size()]));
+                segmentationResults.jTableSpots.addRow(tableRow.toArray(new Object[tableRow.size()]));
 
             }
 

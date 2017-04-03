@@ -42,9 +42,9 @@ public class SegmentationOverlay implements ImageListener {
         this.segmentationSettings = segmentationSettings;
 
         activeChannels = new boolean[imp.getNChannels()];
-        for ( boolean activeChannel : activeChannels )
+        for ( int i = 0; i < activeChannels.length; i++ )
         {
-            activeChannel = true;
+            activeChannels[i] = true;
         }
         ImagePlus.addImageListener(this);
 
@@ -76,8 +76,39 @@ public class SegmentationOverlay implements ImageListener {
         selectionModel.clearSpotSelection();
     }
 
+    public void setTrackMateOverlayFromTable()
+    {
 
-    public void createHyperStackDisplayer()
+        modelOverlay = new Model();
+        modelOverlay.setLogger(Logger.IJ_LOGGER);
+        Settings settings = new Settings();
+        settings.addTrackAnalyzer(new TrackIndexAnalyzer());
+        ModelFeatureUpdater modelFeatureUpdater = new ModelFeatureUpdater(modelOverlay, settings);
+
+        int frame = 0; // zero-based !!
+        int channelColumn = 5;
+
+        segmentationSettings.channelIDs = segmentationResults.jTableSpots.table.getModel().getValueAt(0, channelColumn).toString();
+        segmentationSettings.channels =  Utils.delimitedStringToIntegerArray(segmentationSettings.channelIDs, ";");
+
+        modelOverlay.beginUpdate();
+        for (int iChannel = 0; iChannel < segmentationSettings.channels.length; iChannel++)
+        {
+            // add spots to overlay only if this channel is active
+            //
+            if (activeChannels[segmentationSettings.channels[iChannel] - 1])
+            {
+                /*
+                Spot spot = new Spot();
+                spot.putFeature("COLOR", (double) segmentationSettings.channels[iChannel]); // one-based
+                modelOverlay.addSpotTo(spot, frame);
+                */
+            }
+        }
+        modelOverlay.endUpdate();
+    }
+
+    public void setTrackMateOverlayFromSegmentationResults()
     {
         // get the multi-channel TrackMate results
         Model[] models = segmentationResults.models;
@@ -86,31 +117,34 @@ public class SegmentationOverlay implements ImageListener {
         modelOverlay.setLogger(Logger.IJ_LOGGER);
         Settings settings = new Settings();
         settings.addTrackAnalyzer(new TrackIndexAnalyzer());
-        ModelFeatureUpdater modelFeatureUpdater = new ModelFeatureUpdater( modelOverlay, settings );
+        ModelFeatureUpdater modelFeatureUpdater = new ModelFeatureUpdater(modelOverlay, settings);
 
         int frame = 0; // zero-based !!
 
-
         modelOverlay.beginUpdate();
-        for ( int iChannel = 0; iChannel < segmentationResults.channels.length; iChannel++)
+        for (int iChannel = 0; iChannel < segmentationSettings.channels.length; iChannel++)
         {
             // add spots to overlay only if this channel is active
             //
-            if (activeChannels[segmentationResults.channels[iChannel]-1])
+            if (activeChannels[segmentationSettings.channels[iChannel] - 1])
             {
                 Model model = models[iChannel];
                 SpotCollection spotCollection = model.getSpots();
-                Utils.threadlog("Channel: " + segmentationResults.channels[iChannel] + "; Number of spots: " +
+                Utils.threadlog("Channel: " + segmentationSettings.channels[iChannel] + "; Number of spots: " +
                         spotCollection
                                 .getNSpots(false));
                 for (Spot spot : spotCollection.iterable(false))
                 {
-                    spot.putFeature("COLOR", (double) segmentationResults.channels[iChannel]); // one-based
+                    spot.putFeature("COLOR", (double) segmentationSettings.channels[iChannel]); // one-based
                     modelOverlay.addSpotTo(spot, frame);
                 }
             }
         }
         modelOverlay.endUpdate();
+    }
+
+    public void displayTrackMateOverlay()
+    {
 
         SpotCollection spotCollection = modelOverlay.getSpots();
         Utils.threadlog("Total number of spots: " + spotCollection.getNSpots(false));
@@ -154,9 +188,9 @@ public class SegmentationOverlay implements ImageListener {
         hyperStackDisplayer.setDisplaySettings(hyperStackDisplayer.KEY_HIGHLIGHT_COLOR, Color.blue);
         hyperStackDisplayer.render();
         hyperStackDisplayer.refresh();
+
     }
 
-    //
     public LUT createLUTFromColor(Color color)
     {
         byte[] red = new byte[256];
@@ -206,7 +240,6 @@ public class SegmentationOverlay implements ImageListener {
         return interpolatePaintScale;
 
     }
-
 
     public static void clearOverlay(ImagePlus imp)
     {
@@ -289,17 +322,19 @@ public class SegmentationOverlay implements ImageListener {
     @Override
     public void imageClosed(ImagePlus imagePlus)
     {
+        Utils.threadlog("closed");
+        ImagePlus.removeImageListener(this);
 
     }
 
     @Override
     public void imageUpdated(ImagePlus imagePlus)
     {
+        //Utils.threadlog("updated");
 
         if( imp == IJ.getImage() )
         {
             boolean updateView = false;
-            //Utils.threadlog("updated");
             boolean[] activeChannelsImp = ((CompositeImage) imp).getActiveChannels();
             for (int i = 0; i < activeChannels.length; i++)
             {
@@ -314,7 +349,8 @@ public class SegmentationOverlay implements ImageListener {
             // update the view
             if( updateView )
             {
-                this.createHyperStackDisplayer();
+                this.setTrackMateOverlayFromSegmentationResults();
+                this.displayTrackMateOverlay();
             }
 
         }

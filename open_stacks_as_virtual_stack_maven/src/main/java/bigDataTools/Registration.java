@@ -69,7 +69,7 @@ import static ij.IJ.log;
 // todo: add unique track id to tracktable, track, and imageName of cropped track
 
 // todo: multi-point selection tool
-// todo: track-table: load button
+// todo: track-jTableSpots: load button
 
     // todo: make frames around buttons that belong together
 
@@ -130,8 +130,8 @@ public class Registration implements PlugIn {
                 "Set x&y",
                 "Set z",
                 "Track selected object",
-                "Show table",
-                "Save table",
+                "Show jTableSpots",
+                "Save jTableSpots",
                 "Clear all tracks",
                 "View as new stream",
                 "Report issue"
@@ -687,7 +687,7 @@ public class Registration implements PlugIn {
             table.addMouseListener(this);
             table.addKeyListener(this);
 
-            //Create the scroll pane and add the table to it.
+            //Create the scroll pane and add the jTableSpots to it.
             scrollPane = new JScrollPane(table);
 
             //Add the scroll pane to this panel.
@@ -723,7 +723,7 @@ public class Registration implements PlugIn {
             pr.setPosition(0,(int)z+1,t+1);
             imp.setRoi(pr);
             //log(" rs="+rs+" r ="+r+" x="+x+" y="+y+" z="+z+" t="+t);
-            //log("t="+table.getModel().getValueAt(r, 5));
+            //log("t="+jTableSpots.getModel().getValueAt(r, 5));
         }
 
         @Override
@@ -1007,7 +1007,7 @@ public class Registration implements PlugIn {
             Point3D pUpdate = computeCenter(p0offset.add(pShift), pSize);
             track.addLocation(pUpdate, tStart, channel);
 
-            // Update global track table and imp.overlay
+            // Update global track jTableSpots and imp.overlay
             // - thread safe, because both internally use SwingUtilities.invokeLater
             //
             trackTable.addRow(new Object[]{
@@ -1132,7 +1132,7 @@ public class Registration implements PlugIn {
                     track.addLocation(pUpdate, itUpdate, channel);
 
 
-                    // Update global track table and imp.overlay
+                    // Update global track jTableSpots and imp.overlay
                     // - thread safe, because both internally use SwingUtilities.invokeLater
                     //
                     trackTable.addRow(new Object[]{

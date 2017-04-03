@@ -1573,7 +1573,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
 
         //final String directory = "/Users/tischi/Desktop/example-data/luxendo/";
 
-        final String directory = "/Users/tischi/Desktop/example-data/Alexis/";
+        final String directory = "/Users/tischi/Desktop/example-data/Gustavo/";
         //final String directory = "/Users/tischi/Desktop/example-data/Nils--MATLAB--Compressed/";
 
         // final String directory = "/Volumes/USB DISK/Ashna -test/";
@@ -1607,6 +1607,10 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         */
 
         AnalyzeFISHSpotsPlugIn afs =  new AnalyzeFISHSpotsPlugIn("/Users/tischi/Desktop/FISH_01_Crop.tif");
+
+
+
+
 
         /*
         if (Mitosis_ome) {

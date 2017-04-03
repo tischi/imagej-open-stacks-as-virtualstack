@@ -9,9 +9,7 @@ import fiji.plugin.trackmate.SpotCollection;
 public class SegmentationResults {
     public String segmentationMethod;
     public Model[] models; // the array is channel-wise
-    public int[] channels;
     public SpotCollection[] spotCollections; // the array is channel-wise
-    public SpotsTable table;
-
+    public jTableSpots jTableSpots;
 
 }
