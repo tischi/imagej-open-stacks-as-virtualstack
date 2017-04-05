@@ -1,7 +1,13 @@
 package bigDataTools;
 
+import automic.parameters.ParameterCollection;
+import fiji.plugin.trackmate.Spot;
+import fiji.plugin.trackmate.SpotCollection;
 import ij.IJ;
 import ij.ImagePlus;
+import ij.gui.Roi;
+import ij.measure.Calibration;
+import ij.plugin.frame.RoiManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,8 +29,7 @@ import java.util.ArrayList;
 // Ideas:
 // - maybe bin the data in z to have it isotropic in terms sigmas?
 
-public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
-{
+public class AnalyzeFISHSpotsGUI implements ActionListener, FocusListener {
 
     // GUI
     JFrame frame;
@@ -80,14 +85,15 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
     SegmentationResults segmentationResults = new SegmentationResults();
     SegmentationSettings segmentationSettings = new SegmentationSettings();
     SegmentationOverlay segmentationOverlay;
+    ParameterCollection parameterCollection;
 
 
     // Other
     ImagePlus imp;
 
-    public void AnalyzeFishSpotsGUI()
+    public AnalyzeFISHSpotsGUI(ParameterCollection parameterCollection)
     {
-        //
+        this.parameterCollection = parameterCollection;
     }
 
     public void showDialog()
@@ -100,6 +106,7 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
         Container c = frame.getContentPane();
         c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+
 
         // Panels
         //
@@ -182,13 +189,17 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
                     segmentationResults,
                     segmentationSettings);
 
-            segmentationOverlay.setTrackMateOverlayFromSegmentationResults();
+            segmentationOverlay.setTrackMateModelOfAllChannelsFromSegmentationResults();
+            segmentationOverlay.setTrackMateModelOfSelectedChannelsFromSegmentationResults();
             segmentationOverlay.displayTrackMateOverlay();
 
-            // Prepare image for marking regions and for checking the spots
+            // Prepare for marking regions
             //
-            IJ.run("Point Tool...", "type=Hybrid color=Blue size=[Extra Large] add_to label");
-            //IJ.setTool("multipoint");
+            RoiManager roiManager = RoiManager.getInstance();
+            if (roiManager == null)
+                roiManager = new RoiManager();
+            IJ.run("Point Tool...", "type=Hybrid color=Blue size=[Extra Large] add label");
+
             IJ.run(imp, "Make Composite", "");
             IJ.run("Channels Tool...");
             //imp.setActiveChannels("0111");
@@ -196,12 +207,23 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         }
 
 
+
         if ( e.getActionCommand().equals(buttonAnalyzeSelectedRegionsText) )
         {
+
+            // Check the ROI Manager for selected points
+            //
+            // ....
+
             // Measure spots around selected points
             //
-            AnalyzeObjects analyzeObjects = new AnalyzeObjects(imp, segmentationSettings, segmentationResults);
-            analyzeObjects.measureSpotLocationsAndDistancesInSelectedRegions();
+            SegmentationAnalysis segmentationAnalysis = new SegmentationAnalysis(imp, segmentationSettings, segmentationResults);
+
+            SpotCollection selectedPoints = getSpotCollectionFromRoiManager();
+
+            segmentationAnalysis.analyzeSpotsAroundSelectedPoints(selectedPoints);
+
+
 
             // Show results jTableSpots
             //
@@ -265,6 +287,42 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
 
     }
 
+
+    public SpotCollection getSpotCollectionFromRoiManager()
+    {
+        SpotCollection spotCollection = new SpotCollection();
+
+        RoiManager roiManager = RoiManager.getInstance();
+        if (roiManager != null)
+        {
+            Roi[] rois = roiManager.getRoisAsArray();
+            for (Roi roi : rois)
+            {
+                if (roi.getTypeAsString().equals("Point"))
+                {
+
+                    Calibration calibration = imp.getCalibration();
+
+                    int radius = 1;
+                    int quality = 1;
+
+                    Spot spot = new Spot(
+                            calibration.getX(roi.getXBase()),
+                            calibration.getY(roi.getYBase()),
+                            calibration.getZ(roi.getZPosition() - 1), // roi z-position is the slice and thus one-based
+                            radius,
+                            quality);
+
+                    int frame = 0;
+                    spotCollection.add(spot, frame);
+                }
+            }
+        }
+
+        return spotCollection;
+
+    }
+
     private void addHeader(ArrayList<JPanel> panels, int iPanel, Container c, String label)
     {
         panels.add(new JPanel(new FlowLayout(FlowLayout.LEFT)));
@@ -302,7 +360,6 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
         c.add(panels.get(iPanel));
     }
 
-
     public void focusGained(FocusEvent e) {
         //
     }
@@ -313,7 +370,5 @@ public class AnalyzeFishSpotsGUI implements ActionListener, FocusListener
             tf.postActionEvent();
         }
     }
-
-
 
 }

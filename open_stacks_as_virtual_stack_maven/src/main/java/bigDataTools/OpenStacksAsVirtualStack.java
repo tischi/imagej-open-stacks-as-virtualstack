@@ -1607,9 +1607,7 @@ public class OpenStacksAsVirtualStack implements PlugIn {
         */
 
         AnalyzeFISHSpotsPlugIn afs =  new AnalyzeFISHSpotsPlugIn("/Users/tischi/Desktop/FISH_01_Crop.tif");
-
-
-
+        afs.run("");
 
 
         /*
