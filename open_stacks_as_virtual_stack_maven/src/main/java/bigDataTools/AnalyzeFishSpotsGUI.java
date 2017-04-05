@@ -190,8 +190,8 @@ public class AnalyzeFISHSpotsGUI implements ActionListener, FocusListener {
                     segmentationSettings);
 
             segmentationOverlay.setTrackMateModelOfAllChannelsFromSegmentationResults();
-            segmentationOverlay.setTrackMateModelOfSelectedChannelsFromSegmentationResults();
-            segmentationOverlay.displayTrackMateOverlay();
+            segmentationOverlay.setTrackMateModelForVisualisationOfSelectedChannels();
+            segmentationOverlay.displayTrackMateModelAsOverlay();
 
             // Prepare for marking regions
             //

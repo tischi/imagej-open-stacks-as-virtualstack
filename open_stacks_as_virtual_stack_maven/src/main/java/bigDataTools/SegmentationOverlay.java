@@ -33,7 +33,6 @@ public class SegmentationOverlay implements ImageListener {
     // TrackMate specific
     public SelectionModel selectionModel;
     public Model modelSelectedChannels;
-    public Model modelAllChannels;
     HyperStackDisplayer hyperStackDisplayer;
 
     public SegmentationOverlay(ImagePlus imp,
@@ -55,14 +54,14 @@ public class SegmentationOverlay implements ImageListener {
     }
 
 
-    public void highlightNClosestSpotsForAllVisibleChannels(Spot location, int n, int frame)
+    public void highlightNClosestSpotsOfActiveChannels(Spot location, int n, int frame)
     {
 
         selectionModel.clearSpotSelection();
 
         for (int iChannel = 0; iChannel < segmentationSettings.channels.length; iChannel++)
         {
-            // add spots to overlay only if this channel is active
+            // add spots to selectionModel only if this channel is active
             //
             if (activeChannels[segmentationSettings.channels[iChannel] - 1])
             {
@@ -71,13 +70,7 @@ public class SegmentationOverlay implements ImageListener {
             }
         }
 
-        //Utils.logSpotCoordinates("Highlighting the " + n + " spots that are closests to:", location);
-        /*
-        SpotCollection spots = modelAllChannels.getSpots();
-        selectionModel.addSpotToSelection(spots.getNClosestSpots(location, frame, n, false));
-        */
-
-        location.putFeature("FRAME", (double) frame); // otherwise the "center view on method" crashes
+        location.putFeature("FRAME", (double) frame); // if this is not set the "center view on method" crashes
         hyperStackDisplayer.centerViewOn(location);
         hyperStackDisplayer.refresh();
     }
@@ -119,37 +112,7 @@ public class SegmentationOverlay implements ImageListener {
         modelSelectedChannels.endUpdate();
     }
 
-    public void setTrackMateModelOfAllChannelsFromSegmentationResults()
-    {
-        // get the multi-channel TrackMate results
-        Model[] models = segmentationResults.models;
-
-        modelAllChannels = new Model();
-        modelAllChannels.setLogger(Logger.IJ_LOGGER);
-
-        Settings settings = new Settings();
-        settings.addTrackAnalyzer(new TrackIndexAnalyzer());
-        ModelFeatureUpdater modelFeatureUpdater = new ModelFeatureUpdater(modelAllChannels, settings);
-
-        int frame = 0; // zero-based !!
-
-        modelAllChannels.beginUpdate();
-        for (int iChannel = 0; iChannel < segmentationSettings.channels.length; iChannel++)
-        {
-            Model model = models[iChannel];
-            SpotCollection spotCollection = model.getSpots();
-            Utils.threadlog("Channel: " + segmentationSettings.channels[iChannel] + "; Number of spots: " +
-                    spotCollection.getNSpots(false));
-            for (Spot spot : spotCollection.iterable(false))
-            {
-                spot.putFeature("COLOR", (double) segmentationSettings.channels[iChannel]); // one-based
-                modelAllChannels.addSpotTo(spot, frame);
-            }
-        }
-        modelAllChannels.endUpdate();
-    }
-
-    public void setTrackMateModelOfSelectedChannelsFromSegmentationResults()
+    public void setTrackMateModelForVisualisationOfSelectedChannels()
     {
         // get the multi-channel TrackMate results
         Model[] models = segmentationResults.models;
@@ -182,7 +145,7 @@ public class SegmentationOverlay implements ImageListener {
         modelSelectedChannels.endUpdate();
     }
 
-    public void displayTrackMateOverlay()
+    public void displayTrackMateModelAsOverlay()
     {
 
         SpotCollection spotCollection = modelSelectedChannels.getSpots();
@@ -288,66 +251,34 @@ public class SegmentationOverlay implements ImageListener {
 
     }
 
-    public void showOverlayUsingTrackMateSpotOverlay(ImagePlus imp)
+
+    public void updateActiveChannels()
     {
-        /*
-        Overlay overlay = imp.getOverlay();
-        if(overlay == null) {
-            overlay = new Overlay();
-            imp.setOverlay(overlay);
+
+        if( imp == IJ.getImage() )
+        {
+            boolean updateView = false;
+            boolean[] activeChannelsImp = ((CompositeImage) imp).getActiveChannels();
+            for (int i = 0; i < activeChannels.length; i++)
+            {
+                //Utils.threadlog("Channel " + (i+1) + ":" + activeChannels[i]);
+                if (activeChannelsImp[i] != activeChannels[i])
+                {
+                    updateView = true;
+                    activeChannels[i] = activeChannelsImp[i];
+                }
+            }
+
+            // update the view
+            if( updateView )
+            {
+                this.setTrackMateModelForVisualisationOfSelectedChannels();
+                this.displayTrackMateModelAsOverlay();
+            }
+
         }
-        overlay.clear();
-
-        Map<String, Object> displaySettings = initDisplaySettings(model);
-        displaySettings.put("TracksVisible", Boolean.valueOf(false));
 
 
-        displaySettings.put("SpotRadiusRatio", Double.valueOf(5.0D));
-        SpotOverlay spotOverlay = new SpotOverlay(model, imp, displaySettings);
-        imp.getOverlay().add(spotOverlay);
-        imp.updateAndDraw();
-
-        displaySettings.put("SpotRadiusRatio", Double.valueOf(1.0D));
-        SpotOverlay spotOverlay2 = new SpotOverlay(model, imp, displaySettings);
-        imp.getOverlay().add(spotOverlay2);
-        imp.updateAndDraw();
-        */
-
-        /*
-        displaySettings.put("Color", DEFAULT_SPOT_COLOR);
-        displaySettings.put("HighlightColor", DEFAULT_HIGHLIGHT_COLOR);
-        displaySettings.put("SpotsVisible", Boolean.valueOf(true));
-        displaySettings.put("DisplaySpotNames", Boolean.valueOf(false));
-        displaySettings.put("SpotColoring", new DummySpotColorGenerator());
-        displaySettings.put("SpotRadiusRatio", Double.valueOf(1.0D));
-        displaySettings.put("TracksVisible", Boolean.valueOf(true));
-        displaySettings.put("TrackDisplaymode", Integer.valueOf(0));
-        displaySettings.put("TrackDisplayDepth", Integer.valueOf(10));
-        displaySettings.put("TrackColoring", new DummyTrackColorGenerator());
-        displaySettings.put("ColorMap", DEFAULT_COLOR_MAP);
-        displaySettings.put("LimitDrawingDepth", Boolean.valueOf(false));
-        displaySettings.put("DrawingDepth", Double.valueOf(10.0D));
-        */
-
-    }
-
-    protected Map<String, Object> initDisplaySettings(Model model)
-    {
-        HashMap displaySettings = new HashMap(11);
-        displaySettings.put("Color", Color.green);
-        displaySettings.put("HighlightColor", Color.cyan);
-        displaySettings.put("SpotsVisible", Boolean.valueOf(true));
-        displaySettings.put("DisplaySpotNames", Boolean.valueOf(false));
-        displaySettings.put("SpotColoring", new DummySpotColorGenerator());
-        displaySettings.put("SpotRadiusRatio", Double.valueOf(1.0D));
-        displaySettings.put("TracksVisible", Boolean.valueOf(true));
-        displaySettings.put("TrackDisplaymode", Integer.valueOf(0));
-        displaySettings.put("TrackDisplayDepth", Integer.valueOf(10));
-        displaySettings.put("TrackColoring", new DummyTrackColorGenerator());
-        displaySettings.put("ColorMap", InterpolatePaintScale.Jet);
-        displaySettings.put("LimitDrawingDepth", Boolean.valueOf(false));
-        displaySettings.put("DrawingDepth", Double.valueOf(10.0D));
-        return displaySettings;
     }
 
 
@@ -368,30 +299,6 @@ public class SegmentationOverlay implements ImageListener {
     @Override
     public void imageUpdated(ImagePlus imagePlus)
     {
-        //Utils.threadlog("updated");
-
-        if( imp == IJ.getImage() )
-        {
-            boolean updateView = false;
-            boolean[] activeChannelsImp = ((CompositeImage) imp).getActiveChannels();
-            for (int i = 0; i < activeChannels.length; i++)
-            {
-                //Utils.threadlog("Channel " + (i+1) + ":" + activeChannels[i]);
-                if (activeChannelsImp[i] != activeChannels[i])
-                {
-                    updateView = true;
-                    activeChannels[i] = activeChannelsImp[i];
-                }
-            }
-
-            // update the view
-            if( updateView )
-            {
-                this.setTrackMateModelOfSelectedChannelsFromSegmentationResults();
-                this.displayTrackMateOverlay();
-            }
-
-        }
-
+        updateActiveChannels();
     }
 }

@@ -231,7 +231,7 @@ public class jTableSpots extends JPanel implements MouseListener, KeyListener {
             int frame = 0;
             Spot location = new Spot(x,y,z,radius,quality);
 
-            segmentationOverlay.highlightNClosestSpotsForAllVisibleChannels(location, 1, frame);
+            segmentationOverlay.highlightNClosestSpotsOfActiveChannels(location, 1, frame);
             //ImagePlus imp = segmentationOverlay.imp;
             //imp.setZ( (int) Math.round(z / imp.getCalibration().pixelDepth) );
 
